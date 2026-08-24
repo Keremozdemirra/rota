@@ -1,0 +1,29 @@
+[
+  {
+    "full_name": "example/claude-pdf-toolkit",
+    "name": "claude-pdf-toolkit",
+    "html_url": "https://github.com/example/claude-pdf-toolkit",
+    "description": "PDF extraction and OCR skills for Claude Code agents",
+    "stargazers_count": 412,
+    "pushed_at": "2026-08-20T10:00:00Z",
+    "license": { "key": "mit", "spdx_id": "MIT" }
+  },
+  {
+    "full_name": "example/agent-telegram-bridge",
+    "name": "agent-telegram-bridge",
+    "html_url": "https://github.com/example/agent-telegram-bridge",
+    "description": "Telegram notifications MCP server for agent pipelines",
+    "stargazers_count": 87,
+    "pushed_at": "2026-07-30T10:00:00Z",
+    "license": { "key": "apache-2.0", "spdx_id": "Apache-2.0" }
+  },
+  {
+    "full_name": "example/unlicensed-scraper",
+    "name": "unlicensed-scraper",
+    "html_url": "https://github.com/example/unlicensed-scraper",
+    "description": "Scraper with no license file",
+    "stargazers_count": 950,
+    "pushed_at": "2026-02-01T10:00:00Z",
+    "license": null
+  }
+]

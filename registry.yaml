@@ -1,0 +1,181 @@
+# rota — capability registry. Single source of truth for routing.
+#
+# Edit THIS file. agents/*.md are generated from it (tools/gen_agents.py).
+# Every always-loaded byte elsewhere is rent; this file is read once per
+# dispatch and never enters a model context in full — only the compact
+# route table (id + desc) does, and only when Tier-0 fails.
+
+version: 1
+
+models:
+  triage: haiku     # Tier-1 classifier — cheapest tier, single turn, no tools
+  default: sonnet   # workers unless a route overrides
+  deep: opus        # planning / adversarial verification only
+
+budgets:
+  # Hard caps per response class. response_tokens is a contract line injected
+  # into the worker's system prompt; max_turns is enforced by the SDK.
+  S: { max_turns: 4,  response_tokens: 350 }
+  M: { max_turns: 8,  response_tokens: 900 }
+  L: { max_turns: 16, response_tokens: 2500 }
+
+memory:
+  vault: ".."                # agents root, relative to this repo (CLAUDE.md, DEVAM.md, memory/)
+  k: 6                       # chunks recalled per request
+  max_chars: 3200            # ~800 tokens of recall injected, never more
+  inbox: "../memory/_inbox"  # gated writes land here — never in canonical files
+
+scout:
+  topics: [claude-skill, claude-code, mcp-server, agent-skills]
+  min_stars: 30
+  max_age_days: 120
+  per_topic: 8
+  # Capability wishlist. A candidate repo matching one of these scores higher.
+  gaps: [pdf, ocr, calendar, telegram, embeddings]
+
+# ---------------------------------------------------------------------------
+# Routes. One per capability. Keys:
+#   id        stable identifier (also the generated agent name)
+#   desc      one line, shown to the Tier-1 classifier — keep it under 15 words
+#   triggers  lowercase substrings for the Tier-0 zero-token fast path (TR + EN)
+#   tools     the ONLY tools the worker gets
+#   repo      which repository in ~/agents owns this capability (documentation)
+#   skill     optional file whose body is loaded into the worker prompt at
+#             dispatch time — pay-per-use, never resident
+#   memory    whether vault recall is injected
+# ---------------------------------------------------------------------------
+routes:
+  - id: chat
+    desc: Small talk or quick factual Q&A, no tools needed. Fallback.
+    triggers: []
+    tools: []
+    model: haiku
+    budget: S
+    memory: false
+
+  - id: memory-recall
+    desc: Questions about past decisions, preferences, project state, people.
+    triggers: ["hatırla", "ne karar", "nerede kalmıştık", "geçen sefer", "remember", "what did we decide", "last time"]
+    tools: [Bash, Read, Grep]
+    repo: rota
+    skill: skills/hafiza-ara/SKILL.md
+    model: haiku
+    budget: S
+    memory: true
+
+  - id: career
+    desc: Job search, CV tailoring, applications, interview prep.
+    triggers: ["cv", "başvuru", "mülakat", "iş ilanı", "interview", "job post", "cover letter"]
+    tools: [Read, Write, Edit, Grep, Glob, WebSearch, WebFetch]
+    repo: career-agent
+    model: sonnet
+    budget: M
+    memory: true
+
+  - id: research
+    desc: Web research with sources and citations.
+    triggers: ["araştır", "kaynak bul", "research", "literature", "what's the latest"]
+    tools: [WebSearch, WebFetch, Write]
+    repo: research-agent
+    model: sonnet
+    budget: M
+    memory: false
+
+  - id: github-audit
+    desc: Repository audits, code review, bug hunting across repos.
+    triggers: ["repo", "code review", "kod inceleme", "audit", "hata av", "pull request"]
+    tools: [Bash, Read, Grep, Glob, WebFetch]
+    repo: github-agent
+    model: sonnet
+    budget: L
+    memory: true
+
+  - id: finance
+    desc: Financial analysis, budgets, cost models.
+    triggers: ["finans", "bütçe", "maliyet", "finance", "cash flow", "cost model"]
+    tools: [Read, Write, Bash, WebSearch]
+    repo: finance-agent
+    model: sonnet
+    budget: M
+    memory: true
+
+  - id: sustainability
+    desc: ESG, climate, sustainability analysis and reporting.
+    triggers: ["esg", "iklim", "sürdürülebilir", "climate", "emissions", "csrd"]
+    tools: [Read, Write, WebSearch, WebFetch]
+    repo: sustainability-agent
+    model: sonnet
+    budget: M
+    memory: true
+
+  - id: risk
+    desc: Risk assessment, scenario analysis, mitigation plans.
+    triggers: ["risk", "senaryo", "scenario", "mitigation", "what could go wrong"]
+    tools: [Read, Write, WebSearch]
+    repo: risk-agent
+    model: sonnet
+    budget: M
+    memory: true
+
+  - id: strategy
+    desc: Strategic options, decision notes, trade-off analysis.
+    triggers: ["strateji", "karar notu", "strategy", "trade-off", "options analysis"]
+    tools: [Read, Write, WebSearch]
+    repo: strategy-agent
+    model: sonnet
+    budget: M
+    memory: true
+
+  - id: writing
+    desc: Articles, posts, long-form writing and editing.
+    triggers: ["yaz", "blog", "makale", "draft", "article", "rewrite", "edit this text"]
+    tools: [Read, Write, Edit]
+    repo: writing-agent
+    model: sonnet
+    budget: M
+    memory: true
+
+  - id: site
+    desc: Personal website changes, content and deployment.
+    triggers: ["site", "web sayfa", "website", "deploy", "landing"]
+    tools: [Read, Write, Edit, Bash, Grep, Glob]
+    repo: site-agent
+    model: sonnet
+    budget: M
+    memory: true
+
+  - id: deck
+    desc: Slide decks and presentations.
+    triggers: ["sunum", "slayt", "deck", "slides", "presentation", "pptx"]
+    tools: [Read, Write, Bash]
+    repo: deck-agent
+    model: sonnet
+    budget: M
+    memory: false
+
+  - id: excel
+    desc: Spreadsheets, tables, data wrangling.
+    triggers: ["excel", "tablo", "spreadsheet", "xlsx", "csv", "pivot"]
+    tools: [Read, Write, Bash]
+    repo: excel-agent
+    model: sonnet
+    budget: M
+    memory: false
+
+  - id: build-project
+    desc: Multi-step build delivered by the mimar→uygulayıcı→doğrulayıcı team.
+    triggers: ["proje", "baştan sona", "build me", "end to end", "iş paketi"]
+    tools: [Task, Read, Write, Edit, Bash, Grep, Glob]
+    repo: agent-kit
+    model: deep
+    budget: L
+    memory: true
+
+  - id: ops-scout
+    desc: Discover new capabilities on GitHub, write proposals only.
+    triggers: ["scout", "yeni yetenek", "keşfet", "discover repos", "find new skills"]
+    tools: [Bash]
+    repo: rota
+    model: haiku
+    budget: S
+    memory: false
