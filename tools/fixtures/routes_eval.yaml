@@ -48,6 +48,29 @@ expect:
   - { q: "İklim finansmanı üzerine kaynak bul", route: research }
   - { q: "Riskleri sırala", route: risk }
 
+  # Kerem writes without diacritics — 100% of his messages, measured. Before
+  # _fold stripped them, every one of these fell through to the paid Tier-1
+  # classifier while the diacritic spellings above passed, so the suite scored
+  # 100% on input that never occurs. Keep both spellings of every case.
+  - { q: "cvmi su ilana gore uyarla", route: career }
+  - { q: "cvme bak", route: career }
+  - { q: "mulakatim var yarin", route: career }
+  - { q: "su sirkete basvurdum", route: career }
+  - { q: "ozgecmisimi guncelle", route: career }
+  - { q: "nerede kalmistik", route: memory-recall }
+  - { q: "repolarimi tara", route: github-audit }
+  - { q: "bu exceli incele", route: excel }
+  - { q: "sunum hazirla", route: deck }
+  - { q: "degerlemeyi kontrol et", route: finance }
+  - { q: "kaynaklari dogrula", route: research }
+  - { q: "guvenlik denetimi yap", route: risk }
+  - { q: "site yavas aciliyor", route: site }
+  - { q: "gunluk brifing", route: daily-brief }
+  - { q: "bugun ne var", route: daily-brief }
+  - { q: "gorsel uret", route: generate }
+  - { q: "video olustur", route: generate }
+  - { q: "yeni proje kur", route: build-project }
+
 ambiguous:
   - { q: "esg raporu için risk senaryosu yaz", among: [sustainability, risk, writing] }
   - { q: "site için blog yazısı yaz", among: [site, writing] }

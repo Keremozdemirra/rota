@@ -1,6 +1,6 @@
 ---
 name: risk
-description: Risk assessment, scenario analysis, mitigation plans. Use when the request says: "risk", "senaryo", "scenario", "mitigation", "what could go wrong".
+description: Risk assessment, scenario analysis, mitigation plans. Use when the request says: "risk", "senaryo", "güvenlik denetimi", "güvenli mi", "scenario", "security audit".
 tools: Read, Write, WebSearch
 model: sonnet
 ---

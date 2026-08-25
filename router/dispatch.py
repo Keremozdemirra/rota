@@ -67,10 +67,10 @@ def recall(query_text: str, registry: Registry) -> str:
 def build_system_prompt(route: Route, registry: Registry, memory_block: str) -> str:
     budget = registry.budgets.get(route.budget, {"response_tokens": 900})
     parts = [WORKER_CONTRACT.format(response_tokens=budget.get("response_tokens", 900))]
-    if route.skill:
-        skill_path = REPO_ROOT / route.skill
+    for skill in route.skills:
+        skill_path = REPO_ROOT / skill
         if skill_path.exists():
-            parts.append(f"--- skill: {route.skill} ---\n{skill_path.read_text(encoding='utf-8')}")
+            parts.append(f"--- skill: {skill} ---\n{skill_path.read_text(encoding='utf-8')}")
     if memory_block:
         parts.append(f"--- memory (cite paths when used) ---\n{memory_block}")
     return "\n\n".join(parts)

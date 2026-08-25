@@ -28,7 +28,11 @@ class Route:
     budget: str         # S | M | L
     memory: bool
     repo: str = ""
-    skill: str = ""     # optional file loaded into the worker prompt at dispatch
+    # Files loaded into the worker prompt at dispatch. A route may name several:
+    # career carries cv-uyarla, mulakat-hazirlik and basvuru-takip, which cost
+    # nothing until the request is actually about a CV or an interview. Paths
+    # resolve from rota's root, so another repo is reached with "../<repo>/...".
+    skills: tuple[str, ...] = ()
 
 
 @dataclasses.dataclass(frozen=True)
@@ -56,6 +60,15 @@ class Registry:
         return (REPO_ROOT / str(self.memory.get("inbox", "../memory/_inbox"))).resolve()
 
 
+def _skills(raw: dict[str, Any]) -> tuple[str, ...]:
+    """Accept `skills: [a, b]` or the older singular `skill: a`."""
+    many = raw.get("skills")
+    if many:
+        return tuple(str(s) for s in many)
+    one = raw.get("skill")
+    return (str(one),) if one else ()
+
+
 def load(path: Path = REGISTRY_PATH) -> Registry:
     raw = yaml.safe_load(path.read_text(encoding="utf-8"))
     models = dict(raw.get("models", {}))
@@ -72,7 +85,7 @@ def load(path: Path = REGISTRY_PATH) -> Registry:
                 budget=str(r.get("budget", "M")),
                 memory=bool(r.get("memory", False)),
                 repo=str(r.get("repo", "")),
-                skill=str(r.get("skill", "")),
+                skills=_skills(r),
             )
         )
     if not routes:

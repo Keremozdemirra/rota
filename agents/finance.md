@@ -1,6 +1,6 @@
 ---
 name: finance
-description: Financial analysis, budgets, cost models. Use when the request says: "finans", "bütçe", "maliyet", "finance", "cash flow", "cost model".
+description: Financial analysis, budgets, cost models. Use when the request says: "finans", "bütçe", "maliyet", "değerleme", "valuation", "dcf".
 tools: Read, Write, Bash, WebSearch
 model: sonnet
 ---

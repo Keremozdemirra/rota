@@ -65,16 +65,23 @@ routes:
 
   - id: career
     desc: Job search, CV tailoring, applications, interview prep.
-    triggers: ["cv", "özgeçmiş", "başvuru", "mülakat", "iş ilanı", "interview", "job post", "cover letter", "niyet mektubu"]
+    triggers: ["cv", "cvmi", "cvme", "cvyi", "özgeçmiş", "başvur", "mülakat", "iş ilanı", "ilana göre", "interview", "job post", "cover letter", "niyet mektubu"]
     tools: [Read, Write, Edit, Grep, Glob, WebSearch, WebFetch]
     repo: career-agent
+    # Loaded only when a request is actually about a CV, an application or an
+    # interview. These used to sit in ~/.claude/skills, resident every session
+    # whether or not the topic ever came up.
+    skills:
+      - ../career-agent/skills/cv-uyarla/SKILL.md
+      - ../career-agent/skills/mulakat-hazirlik/SKILL.md
+      - ../career-agent/skills/basvuru-takip/SKILL.md
     model: sonnet
     budget: M
     memory: true
 
   - id: research
     desc: Web research with sources and citations.
-    triggers: ["araştır", "kaynak bul", "literatür", "research", "literature", "what's the latest"]
+    triggers: ["araştır", "kaynak bul", "kaynakları doğrula", "atıf", "literatür", "research", "literature", "citation", "fact check", "what's the latest"]
     tools: [WebSearch, WebFetch, Write]
     repo: research-agent
     model: sonnet
@@ -92,7 +99,7 @@ routes:
 
   - id: finance
     desc: Financial analysis, budgets, cost models.
-    triggers: ["finans", "bütçe", "maliyet", "finance", "cash flow", "cost model"]
+    triggers: ["finans", "bütçe", "maliyet", "değerleme", "valuation", "dcf", "wacc", "finance", "cash flow", "cost model"]
     tools: [Read, Write, Bash, WebSearch]
     repo: finance-agent
     model: sonnet
@@ -110,7 +117,7 @@ routes:
 
   - id: risk
     desc: Risk assessment, scenario analysis, mitigation plans.
-    triggers: ["risk", "senaryo", "scenario", "mitigation", "what could go wrong"]
+    triggers: ["risk", "senaryo", "güvenlik denetimi", "güvenli mi", "scenario", "security audit", "mitigation", "what could go wrong"]
     tools: [Read, Write, WebSearch]
     repo: risk-agent
     model: sonnet
@@ -181,4 +188,23 @@ routes:
     repo: rota
     model: haiku
     budget: S
+    memory: false
+
+  - id: daily-brief
+    desc: One-page brief of the day — mail, commitments, what needs attention.
+    triggers: ["günlük brifing", "günü özetle", "bugün ne var", "neyi kaçırıyorum", "daily brief", "what's on today"]
+    tools: [Read, Bash, Grep]
+    repo: rota
+    skill: skills/gunluk-brifing/SKILL.md
+    model: sonnet
+    budget: M
+    memory: true
+
+  - id: generate
+    desc: Produce images or video through the cheapest capable provider.
+    triggers: ["görsel üret", "video oluştur", "thumbnail", "afiş", "reels", "generate an image", "make me a video"]
+    tools: [Read, Write, Bash]
+    repo: writing-agent
+    model: sonnet
+    budget: M
     memory: false

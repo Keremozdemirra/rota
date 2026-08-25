@@ -42,8 +42,12 @@ Rules:
 # an orchestration route would look fine and be unable to spawn anyone.
 NATIVE_TOOL_ALIASES = {"Task": "Agent"}
 
-SKILL_LINE = ("- Run the `{skill}` skill (Skill tool) first and follow it. Where it "
-              "conflicts with the rules above, the skill wins.\n")
+# Referenced by path, not by Skill-tool name. A route may carry skills that are
+# deliberately not registered in ~/.claude/skills — the career ones cost resident
+# context in every session while the topic came up in almost none — and a name
+# the Skill tool cannot resolve fails silently at the worst moment.
+SKILL_LINE = ("- Read `{path}` first and follow it. Where it conflicts with the "
+              "rules above, the skill wins.\n")
 
 HEADER = "<!-- GENERATED from registry.yaml by tools/gen_agents.py — edit the registry, not this file -->"
 
@@ -77,9 +81,13 @@ def main() -> int:
             response_tokens=budget.get("response_tokens", 900),
             rota_rel="rota",
         )
-        if route.skill:
-            # skills/<name>/SKILL.md → <name>: the name the Skill tool takes.
-            body += SKILL_LINE.format(skill=Path(route.skill).parent.name)
+        for skill in route.skills:
+            resolved = (REPO_ROOT / skill).resolve()
+            try:
+                shown = "~/" + str(resolved.relative_to(Path.home()))
+            except ValueError:
+                shown = str(resolved)
+            body += SKILL_LINE.format(path=shown)
         (out_dir / f"{route.id}.md").write_text(
             "\n".join(frontmatter) + f"\n{HEADER}\n\n{body}", encoding="utf-8"
         )

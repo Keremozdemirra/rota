@@ -31,10 +31,19 @@ _SUFFIX = r"(?<![0-9a-zçğıöşü]){}[aeıiuübcçdgğklmnrsştyz]{{0,8}}(?![0
 _MIN_SUFFIXABLE = 4
 
 
+# Kerem types without diacritics — "mulakat", not "mülakat"; measured at 100%
+# of his messages. Every trigger in registry.yaml carried them, so Tier-0
+# matched only spellings he never writes and all 15 routes fell through to the
+# paid Tier-1 classifier. Folding both the request and the trigger means either
+# spelling resolves on the zero-token path.
+_DIACRITICS = str.maketrans("çğıöşüâîû", "cgiosuaiu")
+
+
 def _fold(text: str) -> str:
-    """Lowercase with Turkish-aware folding so 'İlan' matches 'ilan'."""
+    """Lowercase and strip Turkish diacritics, so 'İlan', 'ilan' and 'ilan' agree."""
     text = text.replace("İ", "i").replace("I", "ı")
-    return unicodedata.normalize("NFC", text.lower())
+    text = unicodedata.normalize("NFC", text.lower())
+    return text.translate(_DIACRITICS)
 
 
 def _pattern(trigger: str) -> str:
