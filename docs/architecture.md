@@ -97,7 +97,8 @@ Same registry, two frontends:
 │   ├── registry.yaml         single source of truth
 │   ├── router/               __main__, config, triage, dispatch,
 │   │                         mem_inbox, ledger
-│   ├── tools/                ltm.py, scout.py, gen_agents.py, inbox_add.py
+│   ├── tools/                ltm.py, scout.py, gen_agents.py, inbox_add.py,
+│   │                         eval_routes.py + fixtures/routes_eval.yaml
 │   ├── agents/               generated subagents (from registry)
 │   ├── skills/               rota, hafiza-ara
 │   ├── docs/                 architecture.md, token-rules.md

@@ -1,6 +1,6 @@
 ---
 name: career
-description: Job search, CV tailoring, applications, interview prep. Use when the request says: "cv", "başvuru", "mülakat", "iş ilanı", "interview", "job post".
+description: Job search, CV tailoring, applications, interview prep. Use when the request says: "cv", "özgeçmiş", "başvuru", "mülakat", "iş ilanı", "interview".
 tools: Read, Write, Edit, Grep, Glob, WebSearch, WebFetch
 model: sonnet
 ---

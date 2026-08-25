@@ -22,12 +22,14 @@ One request → one route → one capability's context. The three tiers:
 
 | Tier | Mechanism | Cost |
 | --- | --- | --- |
-| 0 | trigger regex over the registry | 0 tokens |
+| 0 | trigger regex over the registry, Turkish-suffix tolerant, phrase beats word | 0 tokens |
 | 1 | haiku classifier, route table only | ~300 tokens |
 | 2 | one worker, route-scoped tools | the job itself |
 
 Loading two skills for one job means the routing failed — fix the
-triggers, do not widen the load.
+triggers, do not widen the load. Trigger edits are held to
+`tools/eval_routes.py`, which measures what fraction of real requests
+Tier-0 resolves for free — the number that decides what routing costs.
 
 ## 3. Model tiering
 

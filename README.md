@@ -21,6 +21,19 @@ proposals rather than as impulse installs.
 | Self-improvement | `tools/scout.py` → `proposals/` | GitHub discovery, scored; proposes registry entries; **never installs** |
 | Token standard | `docs/token-rules.md` | The ten rules every session and agent here follows |
 
+Three things are built on top of those four:
+
+| Piece | Where | Docs |
+| --- | --- | --- |
+| video-mcp | `mcpservers/video/` | Generate, encode and embed real video from a Claude session — [docs/video-mcp.md](docs/video-mcp.md) |
+| Platform | `service/` | BYO-key web front end running the workflows on the caller's key — [docs/platform.md](docs/platform.md) |
+| Weekly pipeline | `pipeline/` | One backlog line → one finished project → one PR, weekly — [docs/weekly-pipeline.md](docs/weekly-pipeline.md) |
+
+```bash
+rota serve            # platform on http://127.0.0.1:8787
+rota build --dry-run  # next weekly project, no model call
+```
+
 ## Quick start
 
 ```bash

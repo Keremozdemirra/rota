@@ -1,0 +1,65 @@
+# Route eval set — the regression guard for Tier-0.
+#
+# Tier-0 is the zero-token path; every request it fails to resolve costs a
+# ~300-token classifier call. Trigger edits are cheap to make and easy to get
+# wrong, so they are held to this file. Run `python3 tools/eval_routes.py`
+# after touching registry.yaml triggers or router/triage.py.
+#
+#   expect     Tier-0 must resolve to exactly this route, with no model call.
+#   ambiguous  Tier-0 must NOT resolve alone — the request genuinely spans
+#              several capabilities and Tier-1 is the right place to decide.
+#              `among` lists the routes that must be in the candidate set.
+#   reject     Must match nothing. These are the false positives that a
+#              looser trigger rule would let through.
+
+expect:
+  - { q: "CV'mi şu ilana göre uyarla", route: career }
+  - { q: "Yarınki mülakat için hazırlan", route: career }
+  - { q: "Başvurularımı listele", route: career }
+  - { q: "Mülakatımdan sonra ne yapmalıyım", route: career }
+  - { q: "Tailor my CV to this job post", route: career }
+  - { q: "Özgeçmişimi güncelle", route: career }
+  - { q: "Niyet mektubunu yaz", route: career }
+  - { q: "CSRD raporu taslağı çıkar", route: sustainability }
+  - { q: "İklim hedeflerini gözden geçir", route: sustainability }
+  - { q: "CBAM yükümlülüğünü hesapla", route: sustainability }
+  - { q: "Emisyonlarımızı kırılımla", route: sustainability }
+  - { q: "Şu PR'ı kod incelemesinden geçir", route: github-audit }
+  - { q: "Repoyu audit et", route: github-audit }
+  - { q: "Şu PR'a bakar mısın", route: github-audit }
+  - { q: "LinkedIn için bir blog yazısı yaz", route: writing }
+  - { q: "Bu metni yeniden yaz", route: writing }
+  - { q: "Siteye yeni bir landing ekle", route: site }
+  - { q: "Bütçe modeli kur", route: finance }
+  - { q: "Maliyetleri kır", route: finance }
+  - { q: "Nakit akışı tablosu çıkar", route: excel }
+  - { q: "Şu csv'yi pivotla", route: excel }
+  - { q: "Yatırımcı sunumu hazırla", route: deck }
+  - { q: "Sunumumu güncelle", route: deck }
+  - { q: "Bu kararın trade-off analizini yap", route: strategy }
+  - { q: "Karar notu yazalım", route: strategy }
+  - { q: "En son ne karar vermiştik?", route: memory-recall }
+  - { q: "Nerede kalmıştık?", route: memory-recall }
+  - { q: "What did we decide last time?", route: memory-recall }
+  - { q: "Yeni yetenek keşfet", route: ops-scout }
+  - { q: "Bu projeyi baştan sona kur", route: build-project }
+  - { q: "Bu planın riskleri neler?", route: risk }
+  - { q: "Literatürü tara", route: research }
+  - { q: "İklim finansmanı üzerine kaynak bul", route: research }
+  - { q: "Riskleri sırala", route: risk }
+
+ambiguous:
+  - { q: "esg raporu için risk senaryosu yaz", among: [sustainability, risk, writing] }
+  - { q: "site için blog yazısı yaz", among: [site, writing] }
+  - { q: "repo'daki finans hesaplarını incele", among: [github-audit, finance] }
+  - { q: "esg-toolkit reposunu audit et", among: [github-audit, sustainability] }
+
+reject:
+  - "Projeksiyon eğrisini çiz"
+  - "Sitemap dosyası bozuk"
+  - "Excelsior kelimesi latince"
+  - "Auditorium nerede"
+  - "Yazık oldu"
+  - "Bugün hava çok sıcak"
+  - "Pre-launch kontrolü yapalım"
+  - "Prova yarın"

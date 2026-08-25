@@ -15,6 +15,11 @@
 - [x] gen_agents.py + skills/rota + skills/hafiza-ara — native bridge
   (2026-08-24)
 - [x] docs: architecture.md, token-rules.md (2026-08-24)
+- [x] 005 — route eval set: tools/eval_routes.py + fixtures/routes_eval.yaml,
+  46 cases (expect / ambiguous / reject), offline. Drove two Tier-0 fixes —
+  Turkish suffix tolerance and phrase precedence — plus the missing Turkish
+  triggers (literatür, emisyon, cbam, özgeçmiş, niyet mektubu, pr).
+  Tier-0 resolution 62% → 100% on the set, no false positives (2026-08-24)
 
 ## Queue
 
@@ -26,5 +31,3 @@
   rendering approach)
 - [ ] 004 — embeddings upgrade for ltm.py behind the same search CLI, only
   if FTS5 recall demonstrably misses (record misses first)
-- [ ] 005 — route-level eval set: 30 real requests with expected route ids,
-  run in CI to catch trigger drift

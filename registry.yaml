@@ -65,7 +65,7 @@ routes:
 
   - id: career
     desc: Job search, CV tailoring, applications, interview prep.
-    triggers: ["cv", "başvuru", "mülakat", "iş ilanı", "interview", "job post", "cover letter"]
+    triggers: ["cv", "özgeçmiş", "başvuru", "mülakat", "iş ilanı", "interview", "job post", "cover letter", "niyet mektubu"]
     tools: [Read, Write, Edit, Grep, Glob, WebSearch, WebFetch]
     repo: career-agent
     model: sonnet
@@ -74,7 +74,7 @@ routes:
 
   - id: research
     desc: Web research with sources and citations.
-    triggers: ["araştır", "kaynak bul", "research", "literature", "what's the latest"]
+    triggers: ["araştır", "kaynak bul", "literatür", "research", "literature", "what's the latest"]
     tools: [WebSearch, WebFetch, Write]
     repo: research-agent
     model: sonnet
@@ -83,7 +83,7 @@ routes:
 
   - id: github-audit
     desc: Repository audits, code review, bug hunting across repos.
-    triggers: ["repo", "code review", "kod inceleme", "audit", "hata av", "pull request"]
+    triggers: ["repo", "code review", "kod inceleme", "audit", "hata av", "pull request", "pr"]
     tools: [Bash, Read, Grep, Glob, WebFetch]
     repo: github-agent
     model: sonnet
@@ -101,7 +101,7 @@ routes:
 
   - id: sustainability
     desc: ESG, climate, sustainability analysis and reporting.
-    triggers: ["esg", "iklim", "sürdürülebilir", "climate", "emissions", "csrd"]
+    triggers: ["esg", "iklim", "sürdürülebilir", "emisyon", "cbam", "climate", "emissions", "csrd"]
     tools: [Read, Write, WebSearch, WebFetch]
     repo: sustainability-agent
     model: sonnet
@@ -167,6 +167,9 @@ routes:
     triggers: ["proje", "baştan sona", "build me", "end to end", "iş paketi"]
     tools: [Task, Read, Write, Edit, Bash, Grep, Glob]
     repo: agent-kit
+    # The pipeline itself lives in agent-kit and is shared with the native
+    # side, so both frontends orchestrate identically instead of drifting.
+    skill: ../agent-kit/skills/proje/SKILL.md
     model: deep
     budget: L
     memory: true

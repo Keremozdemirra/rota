@@ -1,6 +1,6 @@
 ---
 name: sustainability
-description: ESG, climate, sustainability analysis and reporting. Use when the request says: "esg", "iklim", "sürdürülebilir", "climate", "emissions", "csrd".
+description: ESG, climate, sustainability analysis and reporting. Use when the request says: "esg", "iklim", "sürdürülebilir", "emisyon", "cbam", "climate".
 tools: Read, Write, WebSearch, WebFetch
 model: sonnet
 ---

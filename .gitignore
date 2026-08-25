@@ -2,3 +2,9 @@ __pycache__/
 *.pyc
 ledger/usage.jsonl
 tools/scout_state.json
+
+# platform + pipeline
+ledger/weekly.jsonl
+projects/**/.rota-*.md
+media/
+.env

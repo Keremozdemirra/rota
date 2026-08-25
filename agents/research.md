@@ -1,6 +1,6 @@
 ---
 name: research
-description: Web research with sources and citations. Use when the request says: "araştır", "kaynak bul", "research", "literature", "what's the latest".
+description: Web research with sources and citations. Use when the request says: "araştır", "kaynak bul", "literatür", "research", "literature", "what's the latest".
 tools: WebSearch, WebFetch, Write
 model: sonnet
 ---

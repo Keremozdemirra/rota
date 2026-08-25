@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "video": {
+      "type": "stdio",
+      "command": "python3",
+      "args": ["-m", "mcpservers.video.server"],
+      "env": {
+        "PYTHONPATH": "${HOME}/agents/rota",
+        "VIDEO_MCP_WORKSPACE": "${HOME}/agents/media",
+        "REPLICATE_API_TOKEN": "${REPLICATE_API_TOKEN}",
+        "FAL_KEY": "${FAL_KEY}"
+      }
+    }
+  }
+}

@@ -20,6 +20,16 @@ from .config import Registry, Route
 
 _WORD = r"(?<![0-9a-zçğıöşü]){}(?![0-9a-zçğıöşü])"
 
+# Turkish is agglutinative: "mülakat" surfaces as "mülakatımdan", "risk" as
+# "riskleri", "kod inceleme" as "kod incelemesinden". A trailing word boundary
+# alone misses every one of those and pushes the request down to the paid tier.
+# Triggers of 4+ characters may therefore carry a suffix, restricted to the
+# alphabet Turkish inflection actually uses — o, ö, f, h, j, p and v never
+# occur in a suffix, which is what keeps "auditorium" out of the audit route
+# and "projeksiyon" out of build-project.
+_SUFFIX = r"(?<![0-9a-zçğıöşü]){}[aeıiuübcçdgğklmnrsştyz]{{0,8}}(?![0-9a-zçğıöşü])"
+_MIN_SUFFIXABLE = 4
+
 
 def _fold(text: str) -> str:
     """Lowercase with Turkish-aware folding so 'İlan' matches 'ilan'."""
@@ -27,18 +37,40 @@ def _fold(text: str) -> str:
     return unicodedata.normalize("NFC", text.lower())
 
 
+def _pattern(trigger: str) -> str:
+    """Compile-ready pattern for one trigger. Short triggers stay exact-match."""
+    folded = _fold(trigger)
+    template = _SUFFIX if len(folded) >= _MIN_SUFFIXABLE else _WORD
+    return template.format(re.escape(folded))
+
+
 def tier0(request: str, registry: Registry) -> tuple[Route | None, list[Route]]:
-    """Return (unique_match_or_None, all_candidates)."""
+    """Return (unique_match_or_None, all_candidates).
+
+    A multi-word trigger outranks single-word ones: "niyet mektubunu yaz"
+    matches career on "niyet mektubu" and writing on "yaz", and the phrase is
+    the stronger signal by a wide margin. Only one phrase match may claim the
+    request — two phrases mean the request genuinely spans capabilities, and
+    Tier-1 gets it.
+    """
     folded = _fold(request)
-    candidates = []
+    candidates: list[Route] = []
+    phrase_hits: list[Route] = []
     for route in registry.routes:
-        for trig in route.triggers:
-            pattern = _WORD.format(re.escape(_fold(trig)))
-            if re.search(pattern, folded):
-                candidates.append(route)
-                break
-    unique = candidates[0] if len(candidates) == 1 else None
-    return unique, candidates
+        # Every trigger is checked, not just the first hit: a route whose
+        # single-word trigger matches early must still get credit for a phrase
+        # match later in its list, or precedence would depend on trigger order.
+        matched = [t for t in route.triggers if re.search(_pattern(t), folded)]
+        if not matched:
+            continue
+        candidates.append(route)
+        if any(" " in t.strip() for t in matched):
+            phrase_hits.append(route)
+    if len(candidates) == 1:
+        return candidates[0], candidates
+    if len(phrase_hits) == 1:
+        return phrase_hits[0], candidates
+    return None, candidates
 
 
 def build_tier1_prompt(request: str, registry: Registry, candidates: list[Route]) -> str:

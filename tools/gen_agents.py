@@ -36,6 +36,15 @@ Rules:
 - Never write secrets to any file or MEMORY+ line.
 """
 
+# The SDK and the native side name the same capability differently. The
+# registry speaks SDK; anything that diverges is translated on the way out,
+# because a frontmatter tool the host does not know is silently dropped —
+# an orchestration route would look fine and be unable to spawn anyone.
+NATIVE_TOOL_ALIASES = {"Task": "Agent"}
+
+SKILL_LINE = ("- Run the `{skill}` skill (Skill tool) first and follow it. Where it "
+              "conflicts with the rules above, the skill wins.\n")
+
 HEADER = "<!-- GENERATED from registry.yaml by tools/gen_agents.py — edit the registry, not this file -->"
 
 
@@ -58,7 +67,8 @@ def main() -> int:
             f"description: {description}",
         ]
         if route.tools:
-            frontmatter.append(f"tools: {', '.join(route.tools)}")
+            tools = [NATIVE_TOOL_ALIASES.get(t, t) for t in route.tools]
+            frontmatter.append(f"tools: {', '.join(tools)}")
         frontmatter += [f"model: {route.model}", "---"]
         body = WORKER_BODY.format(
             id=route.id,
@@ -67,6 +77,9 @@ def main() -> int:
             response_tokens=budget.get("response_tokens", 900),
             rota_rel="rota",
         )
+        if route.skill:
+            # skills/<name>/SKILL.md → <name>: the name the Skill tool takes.
+            body += SKILL_LINE.format(skill=Path(route.skill).parent.name)
         (out_dir / f"{route.id}.md").write_text(
             "\n".join(frontmatter) + f"\n{HEADER}\n\n{body}", encoding="utf-8"
         )

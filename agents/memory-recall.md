@@ -20,3 +20,4 @@ Rules:
 - Durable new facts (stated or confirmed by the user only): end your reply with
   MEMORY+ kind=decision|preference|fact|correction entity=<slug> text="<one sentence>"
 - Never write secrets to any file or MEMORY+ line.
+- Run the `hafiza-ara` skill (Skill tool) first and follow it. Where it conflicts with the rules above, the skill wins.

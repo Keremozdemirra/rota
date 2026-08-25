@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rota — agent platform</title>
+<style>
+  :root {
+    --bg: #fbfaf8; --fg: #1c1b19; --dim: #6b6862; --line: #dedbd4;
+    --accent: #8a3d20; --ok: #2f6b3a; --warn: #8a6a1f; --panel: #ffffff;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#151412; --fg:#e8e5df; --dim:#928d84; --line:#2e2c28;
+            --accent:#d98a63; --ok:#7fbf8c; --warn:#d4b264; --panel:#1d1b19; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.55 var(--mono); }
+  main { max-width: 62rem; margin: 0 auto; padding: 2.5rem 1.25rem 6rem; }
+  h1 { font-size: 1.1rem; font-weight: 600; letter-spacing: .02em; margin: 0 0 .25rem; }
+  .sub { color: var(--dim); margin: 0 0 2rem; font-size: .85rem; }
+  section { border:1px solid var(--line); background:var(--panel); padding:1.25rem; margin-bottom:1rem; }
+  h2 { font-size:.75rem; text-transform:uppercase; letter-spacing:.09em; color:var(--dim);
+       margin:0 0 .9rem; font-weight:600; }
+  label { display:block; font-size:.78rem; color:var(--dim); margin-bottom:.35rem; }
+  input, textarea, select, button {
+    font:inherit; color:inherit; background:var(--bg);
+    border:1px solid var(--line); padding:.55rem .65rem; width:100%; border-radius:0;
+  }
+  textarea { min-height: 7rem; resize: vertical; }
+  button { background:var(--fg); color:var(--bg); border-color:var(--fg); cursor:pointer; width:auto; padding:.55rem 1.1rem; }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  button.ghost { background:transparent; color:var(--dim); border-color:var(--line); }
+  .row { display:flex; gap:.75rem; flex-wrap:wrap; align-items:end; }
+  .row > div { flex:1 1 12rem; }
+  .notice { border-left:3px solid var(--warn); padding:.6rem .8rem; margin:.9rem 0 0;
+            font-size:.8rem; color:var(--dim); background:transparent; }
+  .meter { display:flex; gap:1.5rem; font-size:.78rem; color:var(--dim); margin-top:.9rem; flex-wrap:wrap; }
+  .meter b { color:var(--fg); font-weight:600; }
+  .phase { border:1px solid var(--line); margin-bottom:.6rem; }
+  .phase > summary { padding:.6rem .8rem; cursor:pointer; display:flex; justify-content:space-between;
+                     gap:1rem; font-size:.85rem; list-style:none; }
+  .phase > summary::-webkit-details-marker { display:none; }
+  .phase pre { margin:0; padding:.9rem; border-top:1px solid var(--line); white-space:pre-wrap;
+               word-break:break-word; font-size:.82rem; max-height:32rem; overflow:auto; }
+  .tag { color:var(--dim); font-size:.72rem; }
+  .running { color:var(--warn); } .done { color:var(--ok); } .failed { color:var(--accent); }
+  .files a { color:var(--accent); display:block; font-size:.8rem; padding:.15rem 0; }
+  .err { color:var(--accent); font-size:.85rem; }
+  .hide { display:none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>rota — agent platform</h1>
+  <p class="sub">Bring your own Anthropic key. It is held in the server's memory for the
+     length of the session, never written to disk, and dropped when you sign out.</p>
+
+  <section id="auth">
+    <h2>Session</h2>
+    <div class="row">
+      <div style="flex:3 1 22rem">
+        <label for="key">Anthropic API key</label>
+        <input id="key" type="password" autocomplete="off" spellcheck="false"
+               placeholder="sk-ant-…">
+      </div>
+      <div>
+        <label for="cap">Spend cap (USD)</label>
+        <input id="cap" type="number" min="0.10" max="50" step="0.25" value="2.00">
+      </div>
+      <div style="flex:0 0 auto"><button id="connect">Start session</button></div>
+    </div>
+    <p class="notice">
+      Executing agents server-side means this server sees your key in plaintext while it
+      runs. That is unavoidable for any hosted agent platform — judge it accordingly.
+      The cap above is enforced per run by the SDK, so the worst case is bounded.
+    </p>
+    <div id="meter" class="meter hide"></div>
+    <p id="autherr" class="err"></p>
+  </section>
+
+  <section id="work" class="hide">
+    <h2>Run</h2>
+    <label for="wf">Workflow</label>
+    <select id="wf"></select>
+    <p id="wfdesc" class="tag" style="margin:.4rem 0 1rem"></p>
+    <label for="brief">Brief</label>
+    <textarea id="brief" placeholder="Build a one-page site for a coffee roaster with a looping hero video of beans being poured."></textarea>
+    <div class="row" style="margin-top:.9rem">
+      <div style="flex:0 0 auto"><button id="go">Run workflow</button></div>
+      <div style="flex:0 0 auto"><button id="signout" class="ghost">Sign out &amp; wipe key</button></div>
+    </div>
+  </section>
+
+  <section id="out" class="hide">
+    <h2>Progress</h2>
+    <div id="phases"></div>
+    <div id="files" class="files"></div>
+  </section>
+</main>
+
+<script>
+// The key is read from the input, posted once, and never stored anywhere by
+// this page. Only the opaque session token survives, and only for this tab.
+const $ = (id) => document.getElementById(id);
+let token = sessionStorage.getItem("rota_token") || null;
+let runId = null;
+
+async function api(path, opts = {}) {
+  const headers = { "Content-Type": "application/json", ...(opts.headers || {}) };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(path, { ...opts, headers });
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).detail || res.statusText);
+  return res;
+}
+
+function paintMeter(s) {
+  $("meter").classList.remove("hide");
+  $("meter").innerHTML =
+    `<span>key <b>${s.key_label}</b></span>` +
+    `<span>spent <b>$${s.spent_usd.toFixed(3)}</b> of $${s.spend_cap_usd.toFixed(2)}</span>` +
+    `<span>runs <b>${s.runs}</b></span>` +
+    `<span>expires in <b>${Math.max(0, Math.round(s.expires_in_s / 60))}m</b></span>`;
+}
+
+async function loadWorkflows() {
+  const { workflows } = await (await api("/api/workflows")).json();
+  $("wf").innerHTML = workflows
+    .map((w) => `<option value="${w.id}" data-desc="${w.description}">${w.label} — ${w.phases.length} phase(s)</option>`)
+    .join("");
+  showDesc();
+}
+function showDesc() {
+  const opt = $("wf").selectedOptions[0];
+  $("wfdesc").textContent = opt ? opt.dataset.desc : "";
+}
+$("wf").addEventListener("change", showDesc);
+
+$("connect").addEventListener("click", async () => {
+  $("autherr").textContent = "";
+  $("connect").disabled = true;
+  try {
+    const res = await fetch("/api/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        api_key: $("key").value.trim(),
+        spend_cap_usd: parseFloat($("cap").value),
+      }),
+    });
+    if (!res.ok) throw new Error((await res.json()).detail);
+    const session = await res.json();
+    token = session.token;
+    sessionStorage.setItem("rota_token", token);
+    $("key").value = "";                       // drop it from the DOM immediately
+    paintMeter(session);
+    $("work").classList.remove("hide");
+    await loadWorkflows();
+  } catch (e) {
+    $("autherr").textContent = e.message;
+  } finally {
+    $("connect").disabled = false;
+  }
+});
+
+$("signout").addEventListener("click", async () => {
+  await api("/api/session", { method: "DELETE" }).catch(() => {});
+  token = null;
+  sessionStorage.removeItem("rota_token");
+  location.reload();
+});
+
+function phaseNode(id, label, model) {
+  let node = document.getElementById(`ph-${id}`);
+  if (!node) {
+    node = document.createElement("details");
+    node.className = "phase";
+    node.id = `ph-${id}`;
+    node.open = true;
+    node.innerHTML = `<summary><span>${label} <span class="tag">${model}</span></span>
+                      <span class="running" data-state>running…</span></summary><pre></pre>`;
+    $("phases").appendChild(node);
+  }
+  return node;
+}
+
+$("go").addEventListener("click", async () => {
+  $("out").classList.remove("hide");
+  $("phases").innerHTML = "";
+  $("files").innerHTML = "";
+  $("go").disabled = true;
+  try {
+    const res = await api("/api/run", {
+      method: "POST",
+      body: JSON.stringify({ brief: $("brief").value, workflow: $("wf").value }),
+    });
+    const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+    let buffer = "";
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += value;
+      const frames = buffer.split("\n\n");
+      buffer = frames.pop();
+      for (const frame of frames) {
+        const line = frame.split("\n").find((l) => l.startsWith("data: "));
+        if (line) handle(JSON.parse(line.slice(6)));
+      }
+    }
+  } catch (e) {
+    $("phases").insertAdjacentHTML("beforeend", `<p class="err">${e.message}</p>`);
+  } finally {
+    $("go").disabled = false;
+    api("/api/session").then((r) => r.json()).then(paintMeter).catch(() => {});
+  }
+});
+
+function handle(ev) {
+  if (ev.event === "run_start") { runId = ev.run_id; return; }
+  if (ev.event === "phase_start") { phaseNode(ev.phase, ev.label, ev.model); return; }
+  if (ev.event === "fan_out") {
+    const node = phaseNode(ev.phase, "Implementers", "");
+    node.querySelector("pre").textContent =
+      ev.packages.map((p, i) => `${i + 1}. ${p}`).join("\n") + "\n\n(running in parallel…)";
+    return;
+  }
+  if (ev.event === "phase_done") {
+    const node = phaseNode(ev.phase, ev.label, "");
+    node.querySelector("pre").textContent = ev.text || "(no output)";
+    node.querySelector("[data-state]").className = "done";
+    node.querySelector("[data-state]").textContent =
+      `${ev.duration_s}s · $${ev.cost_usd.toFixed(3)}`;
+    node.open = false;
+    return;
+  }
+  if (ev.event === "run_done") {
+    $("files").innerHTML = `<p class="tag">artefacts · $${ev.cost_usd.toFixed(3)} total</p>` +
+      ev.files.map((f) => `<a href="/api/run/${runId}/file/${f}" download>${f}</a>`).join("");
+    document.querySelectorAll(".files a").forEach((a) => {
+      a.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const res = await api(a.getAttribute("href"));
+        const url = URL.createObjectURL(await res.blob());
+        Object.assign(document.createElement("a"), { href: url, download: a.textContent }).click();
+        URL.revokeObjectURL(url);
+      });
+    });
+    return;
+  }
+  if (ev.event === "error") {
+    $("phases").insertAdjacentHTML("beforeend", `<p class="err">${ev.kind}: ${ev.message}</p>`);
+  }
+}
+
+if (token) {
+  api("/api/session").then((r) => r.json()).then((s) => {
+    paintMeter(s); $("work").classList.remove("hide"); loadWorkflows();
+  }).catch(() => { token = null; sessionStorage.removeItem("rota_token"); });
+}
+</script>
+</body>
+</html>

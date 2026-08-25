@@ -1,0 +1,65 @@
+# One autonomous project per week. Monday 07:00 Berlin.
+#
+# The key lives in repository secrets and nowhere else. The job has
+# contents:write and pull-requests:write because ship.sh opens a PR — it does
+# not have permission to push to the default branch, and that is the point:
+# every weekly build arrives as something a human merges.
+name: weekly build
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"        # 05:00 UTC = 07:00 Europe/Berlin in summer
+  workflow_dispatch:
+    inputs:
+      item:
+        description: "Backlog id to build (blank = first in Queue)"
+        required: false
+      cap:
+        description: "Spend cap in USD"
+        default: "10"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: weekly-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: |
+          pip install --quiet -r requirements.txt
+          npm install -g @anthropic-ai/claude-code
+
+      - name: Build the next backlog item
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python -m pipeline.weekly \
+            ${{ inputs.item && format('--item {0}', inputs.item) || '' }} \
+            --cap ${{ inputs.cap || '10' }}
+
+      - name: Upload the phase transcripts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-transcripts
+          path: |
+            ledger/weekly.jsonl
+            projects/**/.rota-*.md
+          if-no-files-found: ignore
+          retention-days: 14
