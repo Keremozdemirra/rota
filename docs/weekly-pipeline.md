@@ -1,9 +1,11 @@
 # The weekly pipeline — one autonomous project a week
 
-`daily-loop` moves an existing repository forward by one PR a day. This is the
-other cadence: once a week, take one line from a backlog and turn it into a
-finished project directory with a plan, an implementation, an integration pass,
-an adversarial review and a pull request.
+There used to be a second cadence: `daily-loop` moved an existing repository
+forward by one PR a day. Kerem retired it on 2026 08 25 and asked for nothing
+daily anywhere, so this is the only cadence left. Once a week, take one line
+from a backlog and turn it into a finished project directory with a plan, an
+implementation, an integration pass, an adversarial review and a pull
+request.
 
 ## The loop
 
@@ -108,7 +110,7 @@ packages is two items.
 
 ## What this is not
 
-Not unattended shipping: it opens a PR, it does not merge. Not a replacement
-for `daily-loop`, which moves existing repositories; this creates new ones.
-Not deterministic — the same backlog line will produce a different project on
+Not unattended shipping: it opens a PR, it does not merge. Not a way of moving
+existing repositories forward either: this creates new ones, and the loop that
+moved existing ones is retired rather than replaced. Not deterministic — the same backlog line will produce a different project on
 a different week, and that is the cost of the cadence, not a bug in it.

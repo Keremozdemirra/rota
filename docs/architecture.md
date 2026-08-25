@@ -75,9 +75,9 @@ Same registry, two frontends:
   (link into `~/.claude/agents`); `skills/rota` and `skills/hafiza-ara`
   sync like every other skill. Routing happens by description matching,
   discipline comes from the skills.
-- **SDK (headless):** `python -m router run "..."` for cron jobs,
-  daily-loop automation, and batch work. Same routes, same budgets, plus
-  the ledger.
+- **SDK (headless):** `python -m router run "..."` for the weekly job and
+  for batch work. Same routes, same budgets, plus the ledger. It once also
+  served a daily loop, which was retired on 2026 08 25.
 
 ## Directory tree
 
