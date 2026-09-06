@@ -26,12 +26,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sqlite3
 import sys
+import urllib.error
+import urllib.request
+from array import array
 from pathlib import Path
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 EXCLUDED_DIRS = {"_index", "_inbox", ".obsidian", ".git"}
 _TR_FOLD = str.maketrans("çğıöşüÇĞİÖŞÜI", "cgiosucgiosui")
 
@@ -39,6 +43,50 @@ _TR_FOLD = str.maketrans("çğıöşüÇĞİÖŞÜI", "cgiosucgiosui")
 def fold(text: str) -> str:
     """Turkish-aware fold so 'hafıza' matches ascii 'hafiza' and vice versa."""
     return text.translate(_TR_FOLD).lower()
+
+# Semantic layer. Chat here is Turkish and every document is English, so a
+# keyword index cannot bridge the query and the text it should match — there
+# are no shared tokens to match on. Embeddings do bridge it. Local ollama
+# only: no network, no key, and every failure falls back to plain BM25.
+EMBED_MODEL = os.environ.get("LTM_EMBED_MODEL", "bge-m3")
+EMBED_HOST = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434").rstrip("/")
+EMBED_TIMEOUT = float(os.environ.get("LTM_EMBED_TIMEOUT", "60"))
+RRF_K = 60  # standard reciprocal-rank-fusion damping
+
+
+def embed(texts: list[str]) -> list[list[float]] | None:
+    """Embed via local ollama, L2-normalised. None on any failure — the caller
+    then behaves exactly as it did before this layer existed."""
+    if not texts or os.environ.get("LTM_NO_EMBED"):
+        return None
+    payload = json.dumps({"model": EMBED_MODEL, "input": texts}).encode()
+    req = urllib.request.Request(
+        f"{EMBED_HOST}/api/embed", data=payload,
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=EMBED_TIMEOUT) as r:
+            vectors = json.load(r).get("embeddings")
+    except (urllib.error.URLError, OSError, ValueError, json.JSONDecodeError):
+        return None
+    if not vectors or len(vectors) != len(texts):
+        return None
+    out = []
+    for v in vectors:
+        norm = sum(x * x for x in v) ** 0.5 or 1.0
+        out.append([x / norm for x in v])
+    return out
+
+
+def pack(vec: list[float]) -> bytes:
+    return array("f", vec).tobytes()
+
+
+def unpack(blob: bytes) -> array:
+    a = array("f")
+    a.frombytes(blob)
+    return a
+
 
 DEFAULT_VAULT = Path(__file__).resolve().parent.parent.parent  # tools/ -> rota/ -> agents root
 # Post-fold forms (see fold() below): "şu" → "su", "için" → "icin".
@@ -117,7 +165,7 @@ class Index:
                 "CREATE TABLE IF NOT EXISTS files (path TEXT PRIMARY KEY, mtime REAL)"
             )
         if self.conn.execute("PRAGMA user_version").fetchone()[0] != SCHEMA_VERSION:
-            for table in ("chunks", "files"):
+            for table in ("chunks", "files", "vectors"):
                 self.conn.execute(f"DROP TABLE IF EXISTS {table}")
             self.conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
             self.conn.execute(
@@ -138,6 +186,12 @@ class Index:
                 "(folded TEXT, body TEXT, heading TEXT, path TEXT)"
             )
             self.fts = False
+        # Keyed on the chunk rowid so a re-indexed file drops its vectors with
+        # its chunks; `dim` guards against a model swap producing mixed widths.
+        self.conn.execute(
+            "CREATE TABLE IF NOT EXISTS vectors "
+            "(chunk_id INTEGER PRIMARY KEY, path TEXT, dim INTEGER, vec BLOB)"
+        )
 
     def refresh(self) -> tuple[int, int]:
         """Sync index with vault by mtime. Returns (files_indexed, files_removed)."""
@@ -150,13 +204,17 @@ class Index:
             if known.get(rel) == mtime:
                 continue
             self.conn.execute("DELETE FROM chunks WHERE path = ?", (rel,))
+            self.conn.execute("DELETE FROM vectors WHERE path = ?", (rel,))
+            pending: list[tuple[int, str]] = []
             for heading, body in chunk(f.read_text(encoding="utf-8"), f.stem):
                 if body:
-                    self.conn.execute(
+                    cur = self.conn.execute(
                         "INSERT INTO chunks (folded, body, heading, path) "
                         "VALUES (?, ?, ?, ?)",
                         (fold(f"{heading}\n{body}"), body, heading, rel),
                     )
+                    pending.append((cur.lastrowid, f"{heading}\n{body}"))
+            self._embed_chunks(rel, pending)
             self.conn.execute(
                 "INSERT OR REPLACE INTO files (path, mtime) VALUES (?, ?)", (rel, mtime)
             )
@@ -164,40 +222,97 @@ class Index:
         removed = 0
         for rel in set(known) - seen:
             self.conn.execute("DELETE FROM chunks WHERE path = ?", (rel,))
+            self.conn.execute("DELETE FROM vectors WHERE path = ?", (rel,))
             self.conn.execute("DELETE FROM files WHERE path = ?", (rel,))
             removed += 1
         self.conn.commit()
         return updated, removed
 
+    def _embed_chunks(self, rel: str, pending: list[tuple[int, str]]) -> None:
+        vectors = embed([text for _, text in pending])
+        if not vectors:
+            return
+        self.conn.executemany(
+            "INSERT OR REPLACE INTO vectors (chunk_id, path, dim, vec) "
+            "VALUES (?, ?, ?, ?)",
+            [(cid, rel, len(v), pack(v)) for (cid, _), v in zip(pending, vectors)],
+        )
+
     def _tokens(self, query: str) -> list[str]:
         words = re.findall(r"\w{2,}", fold(query))
         return [w for w in words if w not in STOPWORDS] or words
 
-    def search(self, query: str, k: int) -> list[dict]:
+    def _lexical(self, query: str, limit: int) -> list[tuple[int, float]]:
+        """(chunk_id, score) best-first. Score is BM25 (negative) or -term count."""
         tokens = self._tokens(query)
         if not tokens:
             return []
         if self.fts:
             match = " OR ".join(f'"{t}"' for t in tokens)
-            rows = self.conn.execute(
-                "SELECT path, heading, body, bm25(chunks) AS score FROM chunks "
+            return list(self.conn.execute(
+                "SELECT rowid, bm25(chunks) AS score FROM chunks "
                 "WHERE chunks MATCH ? ORDER BY score LIMIT ?",
-                (match, k),
-            ).fetchall()
-        else:  # fallback: term-count scoring on the folded text
-            rows = []
-            for path, heading, body, folded in self.conn.execute(
-                "SELECT path, heading, body, folded FROM chunks"
-            ):
-                score = -sum(folded.count(t) for t in tokens)
-                if score < 0:
-                    rows.append((path, heading, body, score))
-            rows.sort(key=lambda r: r[3])
-            rows = rows[:k]
-        return [
-            {"path": p, "heading": h, "body": b, "score": round(s, 3)}
-            for p, h, b, s in rows
-        ]
+                (match, limit),
+            ))
+        rows = []
+        for rowid, folded in self.conn.execute("SELECT rowid, folded FROM chunks"):
+            score = -sum(folded.count(t) for t in tokens)
+            if score < 0:
+                rows.append((rowid, score))
+        rows.sort(key=lambda r: r[1])
+        return rows[:limit]
+
+    def _semantic(self, query: str, limit: int) -> list[tuple[int, float]]:
+        """(chunk_id, cosine) best-first. Empty when the vector table is cold
+        or ollama is unreachable — the lexical side then carries the result."""
+        rows = self.conn.execute(
+            "SELECT chunk_id, dim, vec FROM vectors"
+        ).fetchall()
+        if not rows:
+            return []
+        vectors = embed([query])
+        if not vectors:
+            return []
+        q = vectors[0]
+        scored = []
+        for chunk_id, dim, blob in rows:
+            if dim != len(q):  # model changed since indexing; skip, do not guess
+                continue
+            v = unpack(blob)
+            scored.append((chunk_id, sum(a * b for a, b in zip(q, v))))
+        scored.sort(key=lambda r: -r[1])
+        return scored[:limit]
+
+    def search(self, query: str, k: int) -> list[dict]:
+        pool = max(k * 4, 20)
+        lex = self._lexical(query, pool)
+        sem = self._semantic(query, pool)
+        if not lex and not sem:
+            return []
+        # Reciprocal rank fusion. BM25 is negative and unbounded, cosine is
+        # 0..1; fusing on rank avoids inventing a scale between the two.
+        fused: dict[int, float] = {}
+        for ranked in (lex, sem):
+            for rank, (chunk_id, _) in enumerate(ranked):
+                fused[chunk_id] = fused.get(chunk_id, 0.0) + 1.0 / (RRF_K + rank + 1)
+        top = sorted(fused.items(), key=lambda kv: -kv[1])[:k]
+        if not top:
+            return []
+        placeholders = ",".join("?" * len(top))
+        meta = {
+            row[0]: row[1:] for row in self.conn.execute(
+                f"SELECT rowid, path, heading, body FROM chunks "
+                f"WHERE rowid IN ({placeholders})",
+                [cid for cid, _ in top],
+            )
+        }
+        out = []
+        for chunk_id, score in top:
+            if chunk_id in meta:
+                path, heading, body = meta[chunk_id]
+                out.append({"path": path, "heading": heading, "body": body,
+                            "score": round(score, 5)})
+        return out
 
 
 def format_hits(hits: list[dict], max_chars: int) -> str:
@@ -240,15 +355,25 @@ def main() -> int:
     updated, removed = index.refresh()
 
     if args.cmd == "index":
+        vecs = index.conn.execute("SELECT COUNT(*) FROM vectors").fetchone()[0]
         print(f"indexed: {updated} updated, {removed} removed "
-              f"({'fts5' if index.fts else 'fallback'})")
+              f"({'fts5' if index.fts else 'fallback'}), {vecs} vectors")
         return 0
     if args.cmd == "stats":
         files = index.conn.execute("SELECT COUNT(*) FROM files").fetchone()[0]
         chunks_n = index.conn.execute("SELECT COUNT(*) FROM chunks").fetchone()[0]
+        vecs = index.conn.execute("SELECT COUNT(*) FROM vectors").fetchone()[0]
+        engine = "fts5" if index.fts else "like-fallback"
+        if vecs:
+            # Degrading to BM25 is safe but silent, and a silent downgrade is
+            # how you keep using a broken half for weeks. Say it out loud.
+            live = embed(["ping"]) is not None
+            engine += f" + {EMBED_MODEL} hybrid" if live else \
+                f" [!] {vecs} vectors indexed but {EMBED_MODEL} unreachable — " \
+                f"keyword-only until ollama is up"
         print(f"vault: {vault}\ndb: {index.db_path}\n"
-              f"files: {files}  chunks: {chunks_n}  "
-              f"engine: {'fts5' if index.fts else 'like-fallback'}")
+              f"files: {files}  chunks: {chunks_n}  vectors: {vecs}  "
+              f"engine: {engine}")
         return 0
 
     hits = index.search(args.query, args.k)

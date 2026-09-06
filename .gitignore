@@ -8,3 +8,6 @@ ledger/weekly.jsonl
 projects/**/.rota-*.md
 media/
 .env
+
+# Stray editor backups: flagged in T-030, never intended for history
+*.bak

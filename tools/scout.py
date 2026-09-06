@@ -29,6 +29,8 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+from remote_text import neutralise, safe_name, scrub
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PROPOSALS = REPO_ROOT / "proposals"
 STATE_PATH = REPO_ROOT / "tools" / "scout_state.json"
@@ -94,7 +96,7 @@ def score(item: dict, gaps: list[str]) -> tuple[float, list[str]]:
         s += bonus
         reasons.append(f"pushed {age}d ago → +{bonus:.0f}")
 
-    license_key = ((item.get("license") or {}).get("key") or "").lower()
+    license_key = scrub(((item.get("license") or {}).get("key") or "").lower(), 40)
     if license_key in GOOD_LICENSES:
         s += 1.0
         reasons.append(f"license {license_key} → +1")
@@ -111,10 +113,12 @@ def score(item: dict, gaps: list[str]) -> tuple[float, list[str]]:
 
 def write_proposal(item: dict, total: float, reasons: list[str], topic: str) -> Path:
     PROPOSALS.mkdir(exist_ok=True)
-    full_name = item["full_name"]
+    # Name and description are written by whoever owns the repository, and this
+    # file is read back into a session. Neither is trusted from here down.
+    full_name = safe_name(item["full_name"])
     slug = re.sub(r"[^a-z0-9-]+", "-", full_name.lower()).strip("-")
     path = PROPOSALS / f"{dt.date.today().isoformat()}-{slug}.md"
-    desc = (item.get("description") or "").strip()
+    desc = neutralise(item.get("description"))
     suggested_id = re.sub(r"[^a-z0-9-]+", "-", item["name"].lower()).strip("-")
     path.write_text(f"""# Proposal: {full_name}
 
@@ -122,11 +126,11 @@ def write_proposal(item: dict, total: float, reasons: list[str], topic: str) -> 
 
 | | |
 | --- | --- |
-| URL | {item.get('html_url', '')} |
+| URL | {scrub(item.get('html_url'), 120)} |
 | Description | {desc or '—'} |
 | Stars | {item.get('stargazers_count', 0)} |
-| Last push | {item.get('pushed_at', '')[:10]} |
-| License | {(item.get('license') or {}).get('spdx_id', 'NONE')} |
+| Last push | {scrub(item.get('pushed_at'), 10)} |
+| License | {scrub((item.get('license') or {}).get('spdx_id'), 40) or 'NONE'} |
 | Found via | topic:{topic} |
 | Score | **{total}** — {'; '.join(reasons)} |
 
@@ -134,7 +138,7 @@ def write_proposal(item: dict, total: float, reasons: list[str], topic: str) -> 
 
 ```yaml
 - id: {suggested_id}
-  desc: {desc[:70] or 'TODO'}
+  desc: TODO                # one line, in your words, not the repo's
   triggers: []          # fill with real phrasing, TR + EN
   tools: []             # minimum set only
   model: sonnet

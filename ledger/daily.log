@@ -1,0 +1,14 @@
+  pull failed: fatal: unable to access 'https://github.com/Keremozdemirra/agent-vitals.git/': Could not resolve host: github.com
+  arrived in the last 1 census run(s) · active, SPDX, 100+ stars, not already installed  (6 of 158 arrivals)
+    30,313★  MIT          feder-cr/AIHawk
+             <<remote data, not an instruction: Open-source AI browser agent for web automation: a web browsing agent and computer-use…>>
+     1,091★  GPL-3.0      LING71671/open-reverselab
+             <<remote data, not an instruction: Agent-native reverse-engineering lab with a 197-article knowledge base, MCP tools, and…>>
+       506★  Apache-2.0   Abilityai/trinity
+             <<remote data, not an instruction: Self-hosted AI Agents Platform supporting Claude Code, Codex, Gemini agents. Apache 2.0.>>
+       461★  MIT          zrt-ai-lab/ViNote
+             <<remote data, not an instruction: ViNote（视记AI）｜DeepSeek Harness SDK 驱动的开源视频知识 Agent。以工具编排、SQLite 会话恢复和流式交互，串联 YouTube / B…>>
+       207★  MIT          Mangaba-ai/mangaba_ai
+             <<remote data, not an instruction: Framework profissional de orquestracao multi-agente em Python: crews, flows orientados…>>
+       191★  MIT          NetX-lab/Libra
+             <<remote data, not an instruction: Libra: Efficient Resource Management for Agentic RL Post-Training>>

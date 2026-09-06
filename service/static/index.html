@@ -116,18 +116,36 @@ async function api(path, opts = {}) {
 
 function paintMeter(s) {
   $("meter").classList.remove("hide");
-  $("meter").innerHTML =
-    `<span>key <b>${s.key_label}</b></span>` +
-    `<span>spent <b>$${s.spent_usd.toFixed(3)}</b> of $${s.spend_cap_usd.toFixed(2)}</span>` +
-    `<span>runs <b>${s.runs}</b></span>` +
-    `<span>expires in <b>${Math.max(0, Math.round(s.expires_in_s / 60))}m</b></span>`;
+  // key_label is whatever the person typed when they stored the key.
+  const meter = $("meter");
+  meter.textContent = "";
+  const cell = (lead, strong, tail) => {
+    const span = document.createElement("span");
+    span.append(lead);
+    const b = document.createElement("b");
+    b.textContent = strong;
+    span.append(b);
+    if (tail) span.append(tail);
+    meter.appendChild(span);
+  };
+  cell("key ", s.key_label);
+  cell("spent ", `$${s.spent_usd.toFixed(3)}`, ` of $${s.spend_cap_usd.toFixed(2)}`);
+  cell("runs ", String(s.runs));
+  cell("expires in ", `${Math.max(0, Math.round(s.expires_in_s / 60))}m`);
 }
 
 async function loadWorkflows() {
   const { workflows } = await (await api("/api/workflows")).json();
-  $("wf").innerHTML = workflows
-    .map((w) => `<option value="${w.id}" data-desc="${w.description}">${w.label} — ${w.phases.length} phase(s)</option>`)
-    .join("");
+  // A description containing a double quote used to close the attribute early.
+  const wf = $("wf");
+  wf.textContent = "";
+  for (const w of workflows) {
+    const opt = document.createElement("option");
+    opt.value = w.id;
+    opt.dataset.desc = w.description ?? "";
+    opt.textContent = `${w.label} — ${w.phases.length} phase(s)`;
+    wf.appendChild(opt);
+  }
   showDesc();
 }
 function showDesc() {
@@ -177,8 +195,21 @@ function phaseNode(id, label, model) {
     node.className = "phase";
     node.id = `ph-${id}`;
     node.open = true;
-    node.innerHTML = `<summary><span>${label} <span class="tag">${model}</span></span>
-                      <span class="running" data-state>running…</span></summary><pre></pre>`;
+    // label and model come from the run, not from this file. Built as nodes so
+    // a phase label containing markup renders as the characters it is.
+    const summary = document.createElement("summary");
+    const left = document.createElement("span");
+    left.textContent = `${label} `;
+    const tag = document.createElement("span");
+    tag.className = "tag";
+    tag.textContent = model;
+    left.appendChild(tag);
+    const state = document.createElement("span");
+    state.className = "running";
+    state.setAttribute("data-state", "");
+    state.textContent = "running…";
+    summary.append(left, state);
+    node.append(summary, document.createElement("pre"));
     $("phases").appendChild(node);
   }
   return node;
@@ -186,8 +217,8 @@ function phaseNode(id, label, model) {
 
 $("go").addEventListener("click", async () => {
   $("out").classList.remove("hide");
-  $("phases").innerHTML = "";
-  $("files").innerHTML = "";
+  $("phases").textContent = "";
+  $("files").textContent = "";
   $("go").disabled = true;
   try {
     const res = await api("/api/run", {
@@ -208,12 +239,22 @@ $("go").addEventListener("click", async () => {
       }
     }
   } catch (e) {
-    $("phases").insertAdjacentHTML("beforeend", `<p class="err">${e.message}</p>`);
+    showError(e.message);
   } finally {
     $("go").disabled = false;
     api("/api/session").then((r) => r.json()).then(paintMeter).catch(() => {});
   }
 });
+
+// Error text reaches here from the server, or from a parser quoting a frame it
+// could not read. Neither is ours, and an error path is exactly where a sink
+// gets added back without thinking.
+function showError(text) {
+  const p = document.createElement("p");
+  p.className = "err";
+  p.textContent = text;
+  $("phases").appendChild(p);
+}
 
 function handle(ev) {
   if (ev.event === "run_start") { runId = ev.run_id; return; }
@@ -234,8 +275,21 @@ function handle(ev) {
     return;
   }
   if (ev.event === "run_done") {
-    $("files").innerHTML = `<p class="tag">artefacts · $${ev.cost_usd.toFixed(3)} total</p>` +
-      ev.files.map((f) => `<a href="/api/run/${runId}/file/${f}" download>${f}</a>`).join("");
+    // Artefact names are produced by the run. Same reason as above: nodes, not
+    // markup — a file called <img onerror=…> is a file, not an element.
+    const files = $("files");
+    files.textContent = "";
+    const caption = document.createElement("p");
+    caption.className = "tag";
+    caption.textContent = `artefacts · $${ev.cost_usd.toFixed(3)} total`;
+    files.appendChild(caption);
+    for (const f of ev.files) {
+      const link = document.createElement("a");
+      link.setAttribute("href", `/api/run/${runId}/file/${f}`);
+      link.download = "";
+      link.textContent = f;
+      files.appendChild(link);
+    }
     document.querySelectorAll(".files a").forEach((a) => {
       a.addEventListener("click", async (e) => {
         e.preventDefault();
@@ -248,7 +302,7 @@ function handle(ev) {
     return;
   }
   if (ev.event === "error") {
-    $("phases").insertAdjacentHTML("beforeend", `<p class="err">${ev.kind}: ${ev.message}</p>`);
+    showError(`${ev.kind}: ${ev.message}`);
   }
 }
 

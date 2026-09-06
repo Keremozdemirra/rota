@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Memory and drift pipeline",
+    "output": "memory-and-drift.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "write-path",
+        "label": "How a fact becomes memory",
+        "focus": [
+          "session",
+          "inbox",
+          "canonical"
+        ],
+        "note": "Nothing reaches canonical memory without a human promoting it. The gate exists because auto-injection once poisoned the vault."
+      },
+      {
+        "id": "read-path",
+        "label": "How a question finds it",
+        "focus": [
+          "canonical",
+          "ltm",
+          "ollama",
+          "ltmdb",
+          "session"
+        ],
+        "note": "Chat is Turkish, documents English — BM25 has no shared tokens to match. Embeddings carry that half; rank fusion merges both."
+      },
+      {
+        "id": "drift-path",
+        "label": "How staleness gets caught",
+        "focus": [
+          "install",
+          "drift",
+          "inventory",
+          "weekly",
+          "brief"
+        ],
+        "note": "araclar.md drifted for six days unnoticed. The weekly run now compares the record against the machine instead of trusting it."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "session",
+      "type": "external",
+      "label": "Claude session",
+      "sublabel": "reads and writes",
+      "pos": [
+        620,
+        60
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "inbox",
+      "type": "security",
+      "label": "memory/_inbox",
+      "sublabel": "human review gate",
+      "pos": [
+        340,
+        60
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "canonical",
+      "type": "database",
+      "label": "memory/*.md",
+      "sublabel": "CLAUDE.md · DEVAM.md",
+      "pos": [
+        340,
+        220
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "ollama",
+      "type": "backend",
+      "label": "ollama bge-m3",
+      "sublabel": "127.0.0.1:11434 · 1024-dim",
+      "pos": [
+        900,
+        220
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "ltm",
+      "type": "backend",
+      "label": "ltm.py",
+      "sublabel": "BM25 + cosine → RRF",
+      "pos": [
+        620,
+        220
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "ltmdb",
+      "type": "database",
+      "label": "ltm.sqlite",
+      "sublabel": "40 chunks · 40 vectors",
+      "pos": [
+        620,
+        380
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "weekly",
+      "type": "messagebus",
+      "label": "launchd",
+      "sublabel": "com.rota.weekly · Mon 09:30",
+      "pos": [
+        60,
+        630
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "install",
+      "type": "cloud",
+      "label": "Live install",
+      "sublabel": "36 skills · 31 agents · 14 MCP",
+      "pos": [
+        340,
+        780
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "drift",
+      "type": "security",
+      "label": "drift.py",
+      "sublabel": "recorded vs actual",
+      "pos": [
+        340,
+        630
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "inventory",
+      "type": "database",
+      "label": "inventory.json",
+      "sublabel": "last-run fingerprint",
+      "pos": [
+        620,
+        630
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "brief",
+      "type": "external",
+      "label": "weekly-brief.md",
+      "sublabel": "+ macOS notification",
+      "pos": [
+        900,
+        630
+      ],
+      "size": [
+        180,
+        64
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "s-inbox",
+      "from": "session",
+      "to": "inbox",
+      "label": "drafts",
+      "variant": "dashed"
+    },
+    {
+      "id": "inbox-can",
+      "from": "inbox",
+      "to": "canonical",
+      "label": "human promotes",
+      "variant": "security",
+      "labelDy": 24
+    },
+    {
+      "id": "can-ltm",
+      "from": "canonical",
+      "to": "ltm",
+      "label": "reindex"
+    },
+    {
+      "id": "oll-ltm",
+      "from": "ollama",
+      "to": "ltm",
+      "label": "embeddings",
+      "variant": "dashed"
+    },
+    {
+      "id": "ltm-db",
+      "from": "ltm",
+      "to": "ltmdb",
+      "label": "chunks + vectors",
+      "labelDy": 24
+    },
+    {
+      "id": "ltm-s",
+      "from": "ltm",
+      "to": "session",
+      "label": "top-k, fused",
+      "variant": "emphasis"
+    },
+    {
+      "id": "can-drift",
+      "from": "canonical",
+      "to": "drift",
+      "label": "what we claim",
+      "variant": "dashed",
+      "labelDy": 24
+    },
+    {
+      "id": "wk-drift",
+      "from": "weekly",
+      "to": "drift",
+      "label": "every Monday",
+      "variant": "emphasis"
+    },
+    {
+      "id": "inst-drift",
+      "from": "install",
+      "to": "drift",
+      "label": "what is here"
+    },
+    {
+      "id": "drift-inv",
+      "from": "drift",
+      "to": "inventory",
+      "label": "fingerprint"
+    },
+    {
+      "id": "inv-brief",
+      "from": "inventory",
+      "to": "brief",
+      "label": "the gap",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Write path",
+      "items": [
+        "Claude never edits canonical memory",
+        "_inbox holds drafts until a human promotes",
+        "The gate is why the vault stays trustworthy"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Read path",
+      "items": [
+        "fts5 BM25 handles exact terms",
+        "bge-m3 handles Turkish query against English text",
+        "Reciprocal rank fusion merges both",
+        "ollama down = keyword-only, and it says so"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Drift path",
+      "items": [
+        "Named-but-absent tools are flagged",
+        "Counts compared against the last run",
+        "Runs inside the existing weekly job"
+      ]
+    }
+  ]
+}

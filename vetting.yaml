@@ -1,0 +1,88 @@
+# What makes a candidate worth a look here.
+#
+# Star count is reach, not fit. This file is the fit test, and it exists as a
+# file rather than inside the code so the criteria can be argued with. Every
+# entry below was written from a decision actually taken, not from a guess
+# about what might matter.
+#
+# Read by tools/vitals.py for --new and --gaps.
+
+# 1. Jobs already covered. A candidate that only does one of these is not a
+#    gap, whatever its star count — the incumbent is named so the comparison
+#    is possible rather than implied.
+covered:
+  web research:        [search, scrape, crawl, browse, serp, web-search]      # jina, exa, scrapling-replacement, playwright
+  library docs:        [documentation, docs-server, api-reference, llms-txt]  # context7, deepwiki, gitmcp
+  code review:         [code-review, pull-request, pr-review, linter]         # pr-review-toolkit, kod-review
+  app security:        [sast, vulnerability-scan, secret-scan, owasp]         # pre-launch-security-audit, claude-security
+  browser automation:  [playwright, puppeteer, headless, browser-automation]  # playwright, chrome-devtools, Claude Browser
+  diagrams:            [diagram, mermaid, architecture-diagram, flowchart]    # archify
+  memory and recall:   [memory, rag, vector-store, embeddings, knowledge-graph]  # ltm.py hybrid + review gate
+  orchestration:       [multi-agent, swarm, orchestrator, agent-framework]    # proje + rota + 31 agents
+  spreadsheets:        [excel, xlsx, spreadsheet, openpyxl]                   # model-audit, xlsx
+  slides:              [powerpoint, pptx, slide, deck]                        # storyline-first, pptx, plsfix
+
+# 2. Categories decided against, with the reason. A new arrival matching one
+#    of these is not a new question — it is the same question with a new name,
+#    and the answer is already recorded.
+declined:
+  third-party routing:
+    match: [proxy, gateway, router, fallback, multi-provider, free-tier, unlimited]
+    why:   "routes a subscription through something else; the red line, and quota is not the bottleneck on Max"
+  unattended swarms:
+    match: [autonomous, unattended, overnight, self-driving, hands-free, 24/7]
+    why:   "grants standing authority to act without being watched"
+  auto-injected memory:
+    match: [auto-capture, auto-inject, always-on-memory, session-memory]
+    why:   "injection without a review gate is what poisoned the vault once"
+  catalogues:
+    match: [awesome, curated-list, collection-of, directory-of, list-of]
+    why:   "menus, not teams; feed them to the scout instead of installing"
+
+# 2b. Individual repositories already decided on, so a proposer does not
+#     offer the same one every morning. A category rule cannot carry these:
+#     each was rejected for its own reason, and the reason is the record.
+#     Add a line here the day a candidate is declined, never later.
+declined_repos:
+  ruvnet/ruflo:                    "routes through third-party providers / unattended swarm (2026-08-25)"
+  Alishahryar1/free-claude-code:   "same (2026-08-25)"
+  diegosouzapw/OmniRoute:          "installed, hardened, removed same day; shipped shared secrets, empty storage key, binds 0.0.0.0 — GHSA-wmgv-ph3p-rv57 (2026-08-31)"
+  thedotmack/claude-mem:           "six hooks, per-tool-call capture, no review gate before injection (2026-08-31)"
+  mem0ai/mem0:                     "hosted memory layer; ltm.py already does hybrid recall locally and the review gate is the point (2026-09-06)"
+  headroomlabs-ai/headroom:        "MCP mode cannot intercept so cannot compress; proxy mode is the ruled-out category (2026-08-31)"
+  DietrichGebert/ponytail:         "restates a rule already resident in CLAUDE.md §5 (2026-08-31)"
+  blader/humanizer:                "same (2026-09-01)"
+  gsd-build/get-shit-done:         "proje + four agents already is a spec-driven build system; 3 months stale (2026-08-31)"
+  max-sixty/worktrunk:             "duplicates Claude Code's native worktree isolation (2026-08-31)"
+  Panniantong/Agent-Reach:         "unique half is authenticated social scraping (2026-09-01)"
+  usestrix/strix:                  "good active pentest tool, but nothing here is a running app to point it at — revisit if that changes (2026-09-01)"
+  amaancoderx/npxskillui:          "no licence file at all (2026-09-01)"
+  Paidax01/math-curve-loaders:     "no licence file at all (2026-09-01)"
+  multica-ai/andrej-karpathy-skills: "no licence file; readable, not redistributable (2026-09-01)"
+  chaitanyagiri/munder-difflin:    "clean architecture, but N parallel sessions on one subscription and a supervisor agent with standing authority (2026-09-04)"
+
+# 3. Where the work actually is. A candidate outside all of these needs a
+#    named target before it is worth reading, because a tool with nothing to
+#    point at is a tool that will sit inert.
+domains:
+  - [esg, climate, emissions, carbon, sustainability, cbam, csrd]
+  - [finance, valuation, financial, accounting, fundamentals, sec-filings]
+  - [consulting, slides, deck, memo, report, provenance, lineage, audit-trail]
+  - [pdf, docx, ocr, document-extraction, table-extraction]
+  - [claude-code, agent-skills, mcp-server, harness, prompt-injection, supply-chain]
+
+# 4. Hard stops, checked before anything else.
+require:
+  licence: spdx        # no licence grants nothing, whatever the README invites
+  status: active       # pushed within 30 days
+  not_fork: true
+  not_archived: true
+  min_stars: 100       # not a quality signal — a noise floor. The census tiers
+                       # start at 2 and 10 stars, which is right for measuring
+                       # the ground and far too low for proposing something.
+  min_age_days: 30     # a repository that appeared last week and spiked has not
+                       # yet shown whether anyone maintains it. Of the repos in
+                       # this census old enough to judge, 29.1% had already gone
+                       # quiet — age is the cheapest filter against that.
+  # Deliberately absent: a language filter. Language says nothing about fit
+  # here; the installed set spans Python, TypeScript and plain markdown.
