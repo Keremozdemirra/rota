@@ -13,7 +13,9 @@ ADVERBS = ["really","just","actually","genuinely","truly","simply","fundamentall
            "honestly","literally","importantly","interestingly","inevitably","inherently"]
 CONTRAST = [r"\bnot (?:just|only|merely) [^.]{1,60}?\b(?:but|it'?s)\b", r"\bisn'?t (?:the )?[^.]{1,40}?\. ?[^.]{1,40}? is\b",
             r"\bnot because [^.]{1,60}?\. because\b", r"\bit'?s not [^.]{1,40}?\. it'?s\b", r"\bthe (?:answer|question) isn'?t\b",
-            r"\b(?:this|that|it) is not (?:a |an |the )?[^.]{1,40}?, (?:it|this|that) is\b", r"\bnot (?:a |an |the )?[^.]{1,40}?, (?:but |it is |it'?s )",
+            r"\b(?:this|that|it) is not (?:a |an |the )?[^.]{1,40}?, (?:it|this|that) is\b",
+            # "not X, but Y" after a copula or a comma; "could not break there, but" is plain narrative
+            r"(?<!could )(?<!would )(?<!should )(?<!did )(?<!do )(?<!does )(?<!can)(?<!will )(?<!must )(?<!may )(?<!might )\bnot (?:a |an |the )?[^.]{1,40}?, (?:but |it is |it'?s )",
             # definition by contrast: "X is Y, not Z" / "X, not Y" / "X, never Y" / a rule title "X are Y not Z"
             r"\b(?:is|are|was|were|means|stays|counts as|becomes|remains|gets?)\b[^.;:\n]{0,60}?,\s*not\b",
             r",\s*not\s+(?:a|an|the|his|her|its|their|your|our|what|how|because|from|by|on|in|to|of|for|with|every|one|nine|eight)\b",
