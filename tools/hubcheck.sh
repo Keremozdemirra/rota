@@ -34,7 +34,7 @@ done | sort -rn
 echo "---"
 echo "path citations in charters:"
 for f in ~/.claude/orkestra/leads/*.md; do
-  c=$(python3 "$T/pathcheck.py" "$f" 2>/dev/null | grep -c . || true)
+  c=$(python3 "$T/pathcheck.py" "$f" 2>/dev/null | grep -cE "does not exist|glob parent missing" || true)
   [ "$c" -gt 0 ] && echo "  $c stale in ${f/#$HOME/~}"
 done
 echo "---"
