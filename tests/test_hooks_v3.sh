@@ -59,5 +59,18 @@ check "edit that removes the contrast → passes" 0 "$GATE" "$(E "$HOME/agents/p
 check "edit that keeps the contrast → blocked" 1 "$GATE" "$(E "$HOME/agents/projects/_hooktest/e.md" "Old line" "New line")"
 rm -rf "$HOME/agents/projects/_hooktest" "$T"
 
+echo "== read-budget"
+RB="$H/read-budget.sh.proposed"; [ -f "$RB" ] || RB="$H/read-budget.sh"
+T2=$(mktemp -d); python3 -c 'print("\n".join("line %d" % i for i in range(1000)))' > "$T2/long.md"; printf 'short\n' > "$T2/short.md"
+R() { python3 -c 'import json,sys; ti={"file_path":sys.argv[1]}
+if len(sys.argv)>2: ti["limit"]=int(sys.argv[2])
+print(json.dumps({"tool_name":"Read","tool_input":ti}))' "$@"; }
+check "1000-line file, no limit → blocked" 1 "$RB" "$(R "$T2/long.md")"
+check "1000-line file with limit → passes" 0 "$RB" "$(R "$T2/long.md" 120)"
+check "short file → passes" 0 "$RB" "$(R "$T2/short.md")"
+check "missing file → passes" 0 "$RB" "$(R "$T2/none.md")"
+check "other tool → passes" 0 "$RB" "$(j '{"tool_name":"Bash","tool_input":{"command":"ls"}}')"
+rm -rf "$T2"
+
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]
