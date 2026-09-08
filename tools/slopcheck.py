@@ -46,6 +46,8 @@ def check(path):
     low = t.lower(); out = []; hard = 0
     # numeric ranges (0.0–1.0, 9–11) are not prose dashes
     tt = re.sub(r"(?<=\d)[—–](?=\d)", "-", t)
+    # an en dash in a date range ("07/2026 – Present", "2019 – 2023") is typography, kept; an em dash never is
+    tt = re.sub(r"(?<=\d)\s?–\s?(?=\d|present\b|now\b|today\b|heute\b|bugün\b)", " to ", tt, flags=re.I)
     em = tt.count("—"); en = tt.count("–")
     if em or en: out.append(f"  dashes: em {em}, en {en}"); hard += em + en
     for b in BANNED:
