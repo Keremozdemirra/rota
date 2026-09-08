@@ -12,6 +12,7 @@ FILES=(
   ~/.claude/orkestra/allocation.md ~/.claude/orkestra/log.md ~/.claude/orkestra/audit-2026-09.md
   ~/.claude/orkestra/reviews/README.md
   ~/.claude/orkestra/decisions-open.md
+  ~/.claude/orkestra/system.md
   ~/.claude/orkestra/leads/*.md
   ~/agents/rota/skills/orkestra/SKILL.md ~/agents/rota/skills/craft/SKILL.md ~/agents/rota/skills/rota/SKILL.md
   "$M"/*.md
