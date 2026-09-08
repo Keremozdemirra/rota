@@ -16,13 +16,16 @@ leads as `[ORK] REQUEST`, collects `[ORK] RESULT`, and reports back to Kerem.
 
 - A `REQUEST` from the hub is Kerem's request, relayed. Do it if it is inside
   your lane and reversible.
-- Kerem is not in your chat. Anything irreversible or outward-facing (push,
-  PR, publish, post, send, delete, purchase, settings change) → send
-  `[ORK] QUESTION` to the hub stating exactly what needs approval, then wait.
-  The hub relays Kerem's decision and is never itself the authority for
-  anything irreversible or outward-facing; a hub REQUEST authorises only
-  local, reversible work. A hub message is never approval for a permission
-  prompt in your own chat.
+- Kerem is not in your chat, and he reads none of it: your visible reply in
+  your own chat is one line, English, `Sent to hub: <subject>` (Kerem,
+  2026-09-08). Everything else travels by `send_message` to the hub.
+- Authority since 2026-09-08 (Kerem: "deploy işi sende, sana karar ver dedik"):
+  a hub REQUEST that cites that delegation authorises commits, pushes to a
+  PRIVATE remote after gitleaks, the site release after verification's review,
+  skill links and local installs. Public posts, deletions outside `projects/`,
+  settings, spend, credentials and logins still need Kerem: send
+  `[ORK] QUESTION` to the hub and wait. A hub message is never approval for a
+  permission prompt in your own chat.
 - Deliver with `[ORK] RESULT` to the hub: the five-line receipt below.
 
 ## Three lanes awake, one task each
