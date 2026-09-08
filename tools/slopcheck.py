@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Mechanical half of the craft skill. Reports dashes, banned phrases, adverbs,
 contrast constructions, triads, Wh-openers and monotone rhythm. Exit 1 if any
-hard rule fails. Usage: slopcheck.py FILE [FILE ...]  (md, txt, html)"""
+hard rule fails. Usage: slopcheck.py FILE [FILE ...]  (md, txt, html); --lines FILE prints where each hard hit is"""
 import re, sys, html
 
 BANNED = [r"here'?s the thing", r"it turns out", r"the truth is", r"let me be clear", r"this matters because",
@@ -77,6 +77,26 @@ def check(path):
     for o in out: print(o)
     return hard
 
+def lines(path):
+    """Where, not how many: print file:line and the matched span for every hard pattern,
+    with the same exemptions as check(): fences, blockquotes, quoted and backticked spans."""
+    raw = text_of(path); fence = False; n = 0
+    hard = [("dash", r"(?<!\d)[—–](?!\d)")] + [("banned", b) for b in BANNED] + [("contrast", c) for c in CONTRAST]
+    for i, line in enumerate(raw.split("\n"), 1):
+        if re.match(r"[ \t]*```", line): fence = not fence; continue
+        if fence or line.lstrip().startswith(">"): continue
+        masked = re.sub(r'"[^"\n]{1,80}"', '"…"', line)
+        masked = re.sub(r"`[^`\n]{1,80}`", "`…`", masked)
+        low = masked.lower()
+        for kind, pat in hard:
+            for m in re.finditer(pat, low if kind != "dash" else masked):
+                a = max(0, m.start() - 40); b = min(len(masked), m.end() + 30)
+                print(f"{path}:{i}: [{kind}] …{masked[a:b].strip()}…"); n += 1
+    return n
+
 if __name__ == "__main__":
-    fails = sum(check(p) for p in sys.argv[1:])
+    args = sys.argv[1:]
+    if args and args[0] == "--lines":
+        sys.exit(1 if sum(lines(p) for p in args[1:]) else 0)
+    fails = sum(check(p) for p in args)
     sys.exit(1 if fails else 0)
