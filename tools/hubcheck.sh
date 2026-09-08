@@ -13,6 +13,7 @@ FILES=(
   ~/.claude/orkestra/reviews/README.md
   ~/.claude/orkestra/decisions-open.md
   ~/.claude/orkestra/system.md
+  ~/.claude/orkestra/inbox/register.md
   ~/.claude/orkestra/leads/*.md
   ~/agents/rota/skills/orkestra/SKILL.md ~/agents/rota/skills/craft/SKILL.md ~/agents/rota/skills/rota/SKILL.md
   "$M"/*.md
