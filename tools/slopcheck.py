@@ -36,7 +36,7 @@ def check(path):
     t = text_of(path)
     # verbatim material is exempt: fenced blocks and markdown blockquotes (statute, OJ text,
     # source quotes) exist to be exact, so they are removed before any pattern runs
-    t = re.sub(r"```.*?```", " ", t, flags=re.S)
+    t = re.sub(r"(?ms)^[ \t]*```[^\n]*$.*?^[ \t]*```[^\n]*$", " ", t)  # fences open and close at a line start; an inline ``` in prose is text
     t = re.sub(r"(?m)^[ \t]*>.*$", " ", t)
     # quoted spans are examples, not usage: "not X, but Y" inside quotes is a citation
     t = re.sub(r'"[^"\n]{1,80}"', '"…"', t)
