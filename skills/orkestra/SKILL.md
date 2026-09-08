@@ -220,8 +220,8 @@ pointing somewhere you have not just listed.
 ## A deliverable is a PATH the other lane can open
 
 Scratchpad directories belong to the session that made them and do not survive it.
-A staged patch, a draft, a fixture handed to another lane goes somewhere durable: inside the repo it applies to, or under your lane's own tree: never under
-`/private/tmp/.../scratchpad/`.
+A staged patch, a draft, a fixture handed to another lane goes somewhere durable, inside the repo it applies to or under your lane's own tree.
+A path under `/private/tmp/.../scratchpad/` dies with the session.
 
 Proven 2026-09-06: a permit patch was staged, `git apply --check` passed, and the
 lane that had to apply it went looking and found nothing on disk.
