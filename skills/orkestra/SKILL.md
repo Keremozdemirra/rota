@@ -33,9 +33,10 @@ within the hour with nothing finished. The hub wakes at most three lanes at a
 time and waits for their RESULTs before the next. A lane takes one task, finishes
 it, sends the receipt, then takes the next. Split a large task into steps that
 each end in a verifiable state, so a limit that lands mid-task loses one step.
-When the hub's REQUEST lists numbered steps, the lane sends a RESULT per step
-and goes straight on to the next; it stops at the end of the list or on a
-QUESTION. Two lanes sat idle for 45 minutes on 2026-09-08 waiting for a nudge
+When the hub's REQUEST lists numbered steps, the lane sends each RESULT with
+`send_message` inside the same turn and keeps working; it ends the turn only at
+the end of the list or on a QUESTION. A turn that ends is a lane that waits: the
+harness gives it nothing until a message arrives. Two lanes sat idle for 45 minutes on 2026-09-08 waiting for a nudge
 the hub had not known it owed.
 
 ## Read it before you judge it
