@@ -23,14 +23,61 @@ import glob
 import json
 import os
 import sys
+import time
 
 PROJECTS = os.path.expanduser("~/.claude/projects")
 
 
-def newest_transcript() -> str | None:
-    files = glob.glob(f"{PROJECTS}/**/*.jsonl", recursive=True)
-    files = [f for f in files if "/subagents/" not in f]
-    return max(files, key=os.path.getmtime) if files else None
+FRESH_WINDOW = 6 * 3600  # a transcript touched this recently may be a live session
+
+
+class Ambiguous(Exception):
+    """More than one session could be the caller's, so no number is safe."""
+
+    def __init__(self, candidates):
+        super().__init__("ambiguous transcript")
+        self.candidates = candidates
+
+
+def transcripts(root: str | None = None) -> list[str]:
+    # Read the global at call time; a default bound at def time cannot be
+    # redirected, which made the resolver untestable and scanned the real machine.
+    root = PROJECTS if root is None else root
+    return [f for f in glob.glob(f"{root}/**/*.jsonl", recursive=True)
+            if "/subagents/" not in f]
+
+
+def resolve_transcript(session: str | None = None, root: str | None = None,
+                       window: int = FRESH_WINDOW, now: float | None = None) -> str | None:
+    """The transcript to measure, or Ambiguous when the machine cannot tell.
+
+    "Newest" resolves to a different session between two calls seconds apart
+    when several lanes run at once. On 2026-09-07 a --mark returned 1534 and the
+    next returned 1475, a decrease an append-only log cannot produce; on
+    2026-09-08 a lane's receipt carried 8,710k that belonged to another session,
+    because the earlier version warned on stderr and the caller was piping
+    through tail. A number that reads as measured and names the wrong session is
+    the failure this tool exists to prevent, so ambiguity is refused rather than
+    reported.
+    """
+    if session:
+        return session
+    files = transcripts(root)
+    if not files:
+        return None
+    now = time.time() if now is None else now
+    fresh = sorted((f for f in files if now - os.path.getmtime(f) <= window),
+                   key=os.path.getmtime, reverse=True)
+    if len(fresh) > 1:
+        raise Ambiguous(fresh)
+    if fresh:
+        return fresh[0]
+    # Nothing has been written for hours, so no other lane is live to confuse.
+    return max(files, key=os.path.getmtime)
+
+
+def session_id(path: str) -> str:
+    return os.path.basename(path)[:-len(".jsonl")] if path.endswith(".jsonl") else os.path.basename(path)
 
 
 def usages(path: str) -> list[dict]:
@@ -57,7 +104,18 @@ def main() -> int:
                     help="only calls after INDEX (from an earlier --mark)")
     args = ap.parse_args()
 
-    path = args.session or newest_transcript()
+    try:
+        path = resolve_transcript(args.session)
+    except Ambiguous as amb:
+        hours = FRESH_WINDOW // 3600
+        print(f"  refusing to guess: {len(amb.candidates)} transcripts were written "
+              f"in the last {hours} hours.")
+        print("  pass --session with your own; each session's scratchpad directory "
+              "is named for its transcript.")
+        for f in amb.candidates:
+            print(f"    {session_id(f)}")
+            print(f"      {f}")
+        return 2
     if not path or not os.path.exists(path):
         sys.exit("no transcript found")
 
