@@ -42,6 +42,17 @@ the end of the list or on a QUESTION. A turn that ends is a lane that waits: the
 harness gives it nothing until a message arrives. Two lanes sat idle for 45 minutes on 2026-09-08 waiting for a nudge
 the hub had not known it owed.
 
+## Rotate yourself; the successor inherits your model
+
+A session past 400 messages, or one whose last pass cost over 1,000k, rotates at
+its next task boundary, and the lane does it, because a chip inherits the model
+and effort of the session that spawns it (Kerem, 2026-09-09: the hub spawning
+put every lane on the hub's model). Steps: `python3 ~/agents/rota/tools/handoff.py <lane>`;
+`spawn_task` with cwd `/Users/keremozdemir/agents`, title your lane name, prompt
+"Read /Users/keremozdemir/.claude/orkestra/handoff/<lane>.md and do what it says";
+one RESULT to the hub saying "rotating, chip spawned"; then stop. The successor
+sends its receipt; the hub retires you with a leading "-" in the title.
+
 ## Read it before you judge it
 
 When Kerem forwards a link, repo, talk or list, the verdict comes after
