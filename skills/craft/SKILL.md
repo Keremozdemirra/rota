@@ -11,7 +11,7 @@ Kerem's rule, 2026-09-07: "sadece ai slop olmamak degil, direkt en iyi seyleri u
 
 The most common slop in this network's own files was the sentence that defines a thing by what it is not: "measured, never estimated", "a receipt, not a report", a rule titled "read the files, not the filenames". On 2026-09-08 the board carried 46 of them and the hub tree 556, after every dash had already been removed once. Kerem: "this not this tanımlarıyla dolu her yer."
 
-The fix is to write the positive half and stop. "Measured with spend.py." "A receipt." "Read the file." The reader supplies what that rules out. When the excluded thing has to be named because someone keeps doing it, give it its own sentence with its own verb: "A filename is a label; read the file." The checker now fails on the pattern; the quoted examples in this file are exempt because quoted spans are stripped before matching.
+The fix is to write the positive half and stop. One trap in that: a hedged finding ("ownership not conclusively established") is a hedge, and its positive half is a hedge too ("ownership is unconfirmed"), never the flat claim. research caught itself twice on 2026-09-08 turning an open question into an assertion while fixing style. Re-read every rewritten sentence that carried a doubt and check the doubt survived. "Measured with spend.py." "A receipt." "Read the file." The reader supplies what that rules out. When the excluded thing has to be named because someone keeps doing it, give it its own sentence with its own verb: "A filename is a label; read the file." The checker now fails on the pattern; the quoted examples in this file are exempt because quoted spans are stripped before matching.
 
 ## Prose: refuse
 

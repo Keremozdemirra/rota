@@ -237,7 +237,7 @@ overlap and each figure swallows the one before it. Proven 2026-09-06: one lane'
 nine receipts rose 120k → 325k monotonically, which looked like a heavy day and
 was actually the same work counted nine times.
 
-Do this instead: mark at the start, measure at the end:
+Mark at the start, measure at the end, and name the session: `spend.py` reads the newest transcript in the project by default, and a project with several transcripts measures somebody else's calls until `--session <id>` is passed (research, 2026-09-08, eight transcripts in one project):
 
     python3 ~/agents/rota/tools/spend.py --mark          # note the index
     …do the work…
