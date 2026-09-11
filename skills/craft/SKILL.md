@@ -5,6 +5,10 @@ description: Produce the best version of any text, page, deck or UI, and refuse 
 
 # Craft
 
+The understanding behind this checklist is in `TASTE.md` beside it: what taste,
+design and artistry are, why a model produces slop, what good work is, and the
+sources. Read it once before any work Kerem will see. This file is the list.
+
 Kerem's rule, 2026-09-07: "sadece ai slop olmamak degil, direkt en iyi seyleri uretmek." Two halves: a list of things to refuse, and a description of the bar. Run `python3 ~/agents/rota/tools/slopcheck.py FILE` before anything ships; it catches the mechanical half and prints a score.
 
 ## Definitions by contrast (Kerem, 2026-09-08)
