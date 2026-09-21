@@ -21,6 +21,11 @@ covered:
   orchestration:       [multi-agent, swarm, orchestrator, agent-framework]    # proje + rota + 31 agents
   spreadsheets:        [excel, xlsx, spreadsheet, openpyxl]                   # model-audit, xlsx
   slides:              [powerpoint, pptx, slide, deck]                        # storyline-first, pptx, plsfix
+  documents:           [pdf-reader, pdf-extraction, ocr, docx, ooxml]          # citra MCP, bun-docx, pdf and docx skills, poppler, tesseract (2026-09-21)
+  harness scanning:    [skill-scanner, security-scanner, mcp-scan, supply-chain-security]  # skillspector (static), mcp-scanner, dev-machine-guard (2026-09-21)
+  provenance:          [decision-graph, commit-provenance, attestation]           # brain0 (2026-09-21)
+  worktrees:           [worktree, git-worktree]                                   # worktrunk, Claude Code worktrees (2026-09-21)
+  calendar:            [calendar, caldav, ics]                                    # Google Calendar connector on claude.ai (2026-09-21)
 
 # 2. Categories decided against, with the reason. A new arrival matching one
 #    of these is not a new question — it is the same question with a new name,
@@ -46,20 +51,51 @@ declined:
 declined_repos:
   ruvnet/ruflo:                    "routes through third-party providers / unattended swarm (2026-08-25)"
   Alishahryar1/free-claude-code:   "same (2026-08-25)"
-  diegosouzapw/OmniRoute:          "installed, hardened, removed same day; shipped shared secrets, empty storage key, binds 0.0.0.0 — GHSA-wmgv-ph3p-rv57 (2026-08-31)"
-  thedotmack/claude-mem:           "six hooks, per-tool-call capture, no review gate before injection (2026-08-31)"
-  mem0ai/mem0:                     "hosted memory layer; ltm.py already does hybrid recall locally and the review gate is the point (2026-09-06)"
-  headroomlabs-ai/headroom:        "MCP mode cannot intercept so cannot compress; proxy mode is the ruled-out category (2026-08-31)"
-  DietrichGebert/ponytail:         "restates a rule already resident in CLAUDE.md §5 (2026-08-31)"
-  blader/humanizer:                "same (2026-09-01)"
-  gsd-build/get-shit-done:         "proje + four agents already is a spec-driven build system; 3 months stale (2026-08-31)"
-  max-sixty/worktrunk:             "duplicates Claude Code's native worktree isolation (2026-08-31)"
+  diegosouzapw/OmniRoute:          "DECLINE. Earlier (2026-08-31): installed, hardened, removed same day; shipped shared secrets, empty storage key, binds 0.0.0.0, GHSA-wmgv-ph3p-rv57. Re-checked 2026-09-21: shared secrets fixed in .env.example; STORAGE_ENCRYPTION_KEY still empty by default so DB encryption at rest is off; MAIN_SERVER_DEFAULT_HOST still 0.0.0.0 with REQUIRE_API_KEY false and the guard only warning; README ships a per-SNI CA trust-store installer; GHSA-wmgv-ph3p-rv57 now returns 404 and the repo publishes one advisory, GHSA-hf57-cqmx-p4gr (critical ACP RCE, patched 3.8.49). Ruled-out routing category over two Max seats (2026-09-21)"
+  thedotmack/claude-mem:           "DECLINE. Earlier (2026-08-31): six hooks, per-tool-call capture, no review gate before injection. Re-checked 2026-09-21 and stronger: 8 hook commands across 7 events in plugin/hooks/hooks.json, so every tool call routes through the worker service, and UserPromptSubmit plus SessionStart inject with no human step, against the memory protocol line in ~/agents/CLAUDE.md; the installer also provisions an account by email magic link, which I do not perform (2026-09-21)"
+  mem0ai/mem0:                     "DECLINE. Earlier (2026-09-06): hosted memory layer; ltm.py already does hybrid recall locally and the review gate is the point. Re-checked 2026-09-21: the first quickstart heading is now agent self-signup, minting an API key with no email and no OTP, which I do not perform; the library tier is the weakest of the three by the project own table; the self-hosted tier is a Docker stack with its own admin key (2026-09-21)"
+  headroomlabs-ai/headroom:        "DECLINE. Earlier (2026-08-31): MCP mode cannot intercept so cannot compress; proxy mode is the ruled-out category. Re-checked 2026-09-21: still true, and wrap mode points ANTHROPIC_BASE_URL at loopback while its own providers/claude/runtime.py records that Claude Code 2.1.196+ then disables Remote Control; the installed client is 2.1.251 and Kerem follows sessions from a second device; beacon telemetry on by default (2026-09-21)"
+  gsd-build/get-shit-done:         "archived by its owner 2026-05-31; proje covers spec-driven builds (2026-09-21)"
   Panniantong/Agent-Reach:         "unique half is authenticated social scraping (2026-09-01)"
-  usestrix/strix:                  "good active pentest tool, but nothing here is a running app to point it at — revisit if that changes (2026-09-01)"
-  amaancoderx/npxskillui:          "no licence file at all (2026-09-01)"
-  Paidax01/math-curve-loaders:     "no licence file at all (2026-09-01)"
-  multica-ai/andrej-karpathy-skills: "no licence file; readable, not redistributable (2026-09-01)"
+  usestrix/strix:                  "runs its agents on paid model APIs; no spending (Kerem 2026-09-11); revisit if a free provider route appears (2026-09-21)"
+  amaancoderx/npxskillui:          "no description, no licence, last push 2026-05-07 (2026-09-21)"
+  Paidax01/math-curve-loaders:     "CSS loader gallery, last push 2026-04-04, no fit with the site's own design (2026-09-21)"
+  multica-ai/andrej-karpathy-skills: "the karpathy-guidelines skill already carries it (2026-09-21)"
   chaitanyagiri/munder-difflin:    "clean architecture, but N parallel sessions on one subscription and a supervisor agent with standing authority (2026-09-04)"
+  affaan-m/ECC:                    "DECLINE. Earlier (2026-09-21): a second harness (hooks, memory and instincts for twenty agent CLIs) beside the one built here; skills can be cherry-picked on request. Measured the same day: 292 skill frontmatter blocks carry 88,660 characters, about 22,165 always-on tokens on a 97.700%-cache-read machine, and hooks.json materialises 24 hooks over 7 events, 9 of them PreToolUse, 2 landing on rtk Bash matcher (2026-09-21)"
+  NousResearch/hermes-agent:       "a separate agent runtime on API keys with unattended gateways; money and standing authority (2026-09-21)"
+  farion1231/cc-switch:            "switches Claude Code between providers; the routing category (2026-09-21)"
+  ridafkih/keeper.sh:              "calendar is reached through the Google Calendar connector; AGPL plus account OAuth for a job that works (2026-09-21)"
+  chigwell/telegram-mcp:           "authenticates as the user account (Telethon session); a bot-token server is the shape if Telegram is wanted (2026-09-21)"
+  Tencent/AI-Infra-Guard:          "a Docker web platform; skillspector and mcp-scanner do the two relevant checks as CLIs (2026-09-21)"
+  nexu-io/open-design:             "desktop app, so the install is Kerem's click: download from open-design.ai, then od mcp install claude (2026-09-21)"
+  Graphify-Labs/graphify:          "already installed as the graphify skill (2026-09-21)"
+  google-gemini/gemini-cli:        "a separate agent CLI on a Google account beside Claude Code; nothing here routes to it (2026-09-21)"
+  sansan0/TrendRadar:              "a deployed monitor with push channels and model API keys; money and a running service (2026-09-21)"
+  colbymchenry/codegraph:          "DECLINE. install.sh executes a 54 MB bundle with zero integrity checking (no sha256, shasum, checksum, cosign or attestation anywhere in it) while the release publishes a SHA256SUMS asset it never reads; telemetry defaults on (install, index, usage_rollup with per-tool call counts and the connecting agent name); the installer writes an MCP entry, permissions, a default-yes UserPromptSubmit hook and unconditionally upserts a marker-fenced block into ~/.claude/CLAUDE.md, which breaks the review gate. Same job as codebase-memory-mcp with weaker provenance. Revisit if install.sh verifies SHA256SUMS and the CLAUDE.md write becomes opt-in (2026-09-21)"
+  decolua/9router:                 "DECLINE. 19 published advisories, 6 critical and 11 high, including unauthenticated RCE via unprotected MCP plugin routes, unauthenticated CRUD on /api/providers with full API key leak via /api/usage/stats, unprotected DB import/export, and a hardcoded fallback JWT secret; one defect class recurs across all nineteen, a local-only gate that header spoofing walks through. It would hold every provider credential on the machine. Ruled-out routing category (2026-09-21)"
+  rohitg00/agentmemory:            "DECLINE on measured cost. Keyless by default, local embeddings, honest .env.example, and still 4 resident ports, 12 hooks and 54 MCP tool definitions in every session, plus a merge into ~/.claude/settings.json; the transcript-recall job it would do is now covered from a CLI at zero resident context. Revisit if the MCP tool count drops sharply or a hook-free capture path appears (2026-09-21)"
+  JuliusBrussee/caveman:           "DECLINE. The proxy half writes ANTHROPIC_BASE_URL and _CLAUDE_CODE_ASSUME_FIRST_PARTY_BASE_URL into ~/.claude/settings.json and its own INSTALL.md line 266 says this makes Claude Code Remote Control unavailable; it wants ANTHROPIC_AUTH_TOKEN, which a Max seat does not issue, and declares a second claude-pretooluse Bash hook beside rtk; CLI telemetry on by default to api.caveman.so. Engine, proxy and rewriter are BUSL-1.1, which forbids offering the functionality as a hosted service (2026-09-21)"
+  code-yeongyu/oh-my-openagent:    "DECLINE on two hard stops. Sustainable Use License 1.0 is not SPDX and allows use only for internal business or non-commercial purposes, failing the licence gate; and no edition runs inside Claude Code (plugin for OpenCode, plugin for Codex CLI installing into ~/.codex/, standalone omo binary). Its Claude Code Compatible row means it reads Kerem hooks, skills and MCP servers so OpenCode can run them. PostHog telemetry on by default (2026-09-21)"
+  obra/superpowers:                "DECLINE. A methodology framework filed under token reduction that adds burn: its SessionStart hook emits 3,405 characters, 851 tokens, resident and re-read every turn, and 15 bundled skills total 168,882 bytes. Its core loop is subagent-driven autonomous work, the unattended-swarms category declined 2026-08-25, and orchestration is covered by proje plus rota. Provenance is the strongest in the pack (Anthropic marketplace, MIT). Reopens only on a decision to replace proje and rota (2026-09-21)"
+
+# 2c. Repositories looked at and kept, scheduled or filed as reference. Written
+#     so a later pass does not re-derive a verdict that already has evidence.
+#     scout.py reads declined_repos alone, so a line here does not suppress a
+#     re-proposal; it records the reason the proposal will meet.
+vetted_repos:
+  upstash/context7:                "INSTALL NOW, incumbent kept. MCP over HTTP, MIT, 62,263 stars. Proved live by protocol: serverInfo Context7 4.1.1, protocolVersion 2025-06-18, 2 tools totalling 4,937 chars; the tools are deferred, so the resident cost is one index line. Zero invocations across every local transcript, so it is on notice: re-check 2026-12-21 and remove if still zero (2026-09-21)"
+  DeusData/codebase-memory-mcp:    "INSTALL AFTER. MIT, 43,930 stars, pushed the same day; install.sh verifies SHA-256 against a size-bounded checksums.txt, releases carry sigstore bundles and SLSA L3 provenance, and code search confirms no phone-home under src/ or internal/. It attacks the 97.700% cache-read row by displacing grep and read cycles. Held back because it starts a per-account coordination daemon with no opt-in; install with --skip-config after the running workflows end (2026-09-21)"
+  deepset-ai/haystack:             "REFERENCE. Apache-2.0, 26,565 stars. Resolution is a hedge: the pack gives a bare name and the top star hit is an unrelated Chinese NLP list. The deepset library ships no MCP server and no CLI an agent harness would call, and ltm.py holds hybrid recall in 391 lines with the review gate. Kept for retrieval patterns ltm.py lacks (2026-09-21)"
+  MemPalace/mempalace:             "INSTALL NOW, installed 2026-09-21 by uv tool, CLI route only with the MCP server and hooks refused. MIT, 59,189 stars. Fills a measured gap: 2,397 session transcripts, 2.4 GB, unindexed by ltm.py. Embeds through the local Ollama bge-m3 already serving ltm.py, so nothing leaves the machine and no second stack exists. Proved on real data: 821 drawers, Turkish prose recovered by an English query at cosine_sim 0.529 with bm25 0.0. Keep-or-drop check 2026-10-21 (2026-09-21)"
+  topoteretes/cognee:              "REFERENCE. Apache-2.0, 30,874 stars, active, and since v1.6.0 it builds text memory with local models and no cloud key. No target today: documents are ltm.py, transcripts are mempalace, graphs are graphify; its Claude Code route is a hook plugin. Revisit when a project here needs provenance across a document set (2026-09-21)"
+  gastownhall/beads:               "REFERENCE. MIT, 27,329 stars, Homebrew core, checksum-verified install, opt-in OpenTelemetry that refuses to auto-activate from a machine-global OTEL_ variable, and bd init --stealth disabling git hooks. No target: open work lives in NEXT.md and decisions-open.md as flat lists, so bd ready has no dependency graph. Revisit when a build here has one (2026-09-21)"
+  jarrodwatts/claude-hud:          "INSTALL NOW, installed 2026-09-21. MIT, 28,079 stars, Claude Code plugin. It draws the 5-hour and 7-day Max windows from the rate_limits field the existing statusline.sh ignores, verified present in the installed 2.1.220 binary. Measured cost: 0 skills, 0 agents, 0 hooks, 0 MCP, ~0 always-on tokens, zero network calls, zero runtime dependencies. settings.json changed by one extraKnownMarketplaces key; statusLine and all 6 hooks byte-identical. The status line swap is Kerem own action (2026-09-21)"
+  ccusage/ccusage:                 "INSTALL NOW, installed 2026-09-21 at 20.0.23. The LICENSE file is the 21-line MIT text verbatim while the GitHub API reports NOASSERTION; the file governs, and this line exists so the next pass does not re-open it. 18,658 stars. Offline CLI over local transcripts: no account, no key, no endpoint, no hook. Reproduces the baseline shares to three decimals in 0.72 s. It is the measuring instrument every other token claim is checked against (2026-09-21)"
+  steipete/CodexBar:               "INSTALL AFTER, Kerem own hands. MIT, 21,684 stars, Homebrew cask 0.63.0. It shows both Max seats windows with no session open, which claude-hud cannot. It is a GUI app prompting for macOS permissions and Keychain access, so no script accepts on his behalf. Set no provider API key: codexbar config set-api-key writes one in plain text into ~/.config/codexbar/config.json, which CLAUDE.md section 6 forbids. Decide after the status line swap has run a week (2026-09-21)"
+  rtk-ai/rtk:                      "INSTALL NOW, incumbent re-vetted and kept. Apache-2.0, 81,193 stars, 0.49.0 from Homebrew, running as a PreToolUse Bash hook. It rewrites Bash commands before they run and never sets ANTHROPIC_BASE_URL, so it is no API proxy and leaves Remote Control alone; it intercepts Bash alone, so no Read, Grep, MCP traffic or model output. Honest saving 36.4% (552 commands) once 23 cat build.log pipeline rows are excluded from the 84.7% headline. Homebrew build has no telemetry endpoint compiled in (2026-09-21)"
+  DietrichGebert/ponytail:         "INSTALL AFTER, skill route only. MIT, 143,297 stars. The 2026-08-31 decline (restates CLAUDE.md section 5) does not survive on its own: the repo now carries an agentic benchmark section 5 has no equivalent of (12 tickets, n=4, Haiku 4.5, 54% fewer LOC and 22% fewer tokens). The plugin route is refused on measurement: its SessionStart hook emits 5,825 characters at every session and every subagent start. The skill route costs nothing until dispatched, adds no hook and has zero egress. Deferred because it changes coding behaviour in workflows running now; paired ccusage measurement decides whether it stays (2026-09-21)"
+  bytedance/deer-flow:             "REFERENCE. MIT, 82,778 stars. It is no token tool and it would raise the bill it is filed under: make setup writes provider keys into .env and it runs its own model traffic on its own provider account, so money outside the two Max seats and a key on disk, while nothing in it compresses Claude Code context. Worth reading for the venture studio automation line as a maintained sandboxed multi-agent gateway (2026-09-21)"
 
 # 3. Where the work actually is. A candidate outside all of these needs a
 #    named target before it is worth reading, because a tool with nothing to
@@ -73,7 +109,9 @@ domains:
 
 # 4. Hard stops, checked before anything else.
 require:
-  licence: spdx        # no licence grants nothing, whatever the README invites
+  licence: spdx        # for anything proposed for install into the harness. A repository with
+                       # no licence file may still be used locally under ~/agents/vendor; it is
+                       # never copied into a public repository or a deliverable (Kerem, 2026-09-21).
   status: active       # pushed within 30 days
   not_fork: true
   not_archived: true

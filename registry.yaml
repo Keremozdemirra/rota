@@ -31,7 +31,7 @@ scout:
   max_age_days: 120
   per_topic: 8
   # Capability wishlist. A candidate repo matching one of these scores higher.
-  gaps: [pdf, ocr, calendar, telegram, embeddings]
+  gaps: [valuation, dcf, csrd, cbam, lead-generation, provenance]   # 2026-09-21: pdf, ocr, calendar, embeddings covered; telegram declined
 
 # ---------------------------------------------------------------------------
 # Routes. One per capability. Keys:

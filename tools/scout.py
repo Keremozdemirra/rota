@@ -35,6 +35,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 PROPOSALS = REPO_ROOT / "proposals"
 STATE_PATH = REPO_ROOT / "tools" / "scout_state.json"
 FIXTURE = REPO_ROOT / "tools" / "fixtures" / "scout_sample.json"
+VETTING = REPO_ROOT / "vetting.yaml"
 API = "https://api.github.com/search/repositories"
 GOOD_LICENSES = {"mit", "apache-2.0", "bsd-2-clause", "bsd-3-clause", "isc"}
 
@@ -63,6 +64,25 @@ def load_scout_config() -> dict:
                 else:
                     config[key] = int(value) if value.isdigit() else value
     return config
+
+
+def load_declined() -> set[str]:
+    """Repositories already decided in vetting.yaml. A decline is an answer, so the
+    scout must not offer the same repository again under a new date; ponytail was
+    re-proposed on 2026-09-14 after a decline on 2026-08-31 because this file never
+    read the list."""
+    if not VETTING.exists():
+        return set()
+    text = VETTING.read_text(encoding="utf-8")
+    try:
+        import yaml
+        return {str(k).lower() for k in (yaml.safe_load(text) or {}).get("declined_repos", {})}
+    except ImportError:
+        pass
+    block = re.search(r"^declined_repos:\n((?:[ \t]+.+\n?)+)", text, re.MULTILINE)
+    if not block:
+        return set()
+    return {m.group(1).lower() for m in re.finditer(r"^\s+([\w.-]+/[\w.-]+):", block.group(1), re.MULTILINE)}
 
 
 def fetch(topic: str, config: dict) -> list[dict]:
@@ -170,6 +190,7 @@ def main() -> int:
     gaps = [str(g) for g in config.get("gaps", [])]
     state = json.loads(STATE_PATH.read_text()) if STATE_PATH.exists() else {"seen": []}
     seen = set(state["seen"])
+    declined = load_declined()
 
     candidates: list[tuple[float, list[str], dict, str]] = []
     topics = [str(t) for t in config.get("topics", ["claude-skill"])]
@@ -189,7 +210,7 @@ def main() -> int:
     for total, reasons, item, topic in candidates:
         if written >= args.limit:
             break
-        if item["full_name"] in seen:
+        if item["full_name"] in seen or item["full_name"].lower() in declined:
             continue
         path = write_proposal(item, total, reasons, topic)
         seen.add(item["full_name"])
