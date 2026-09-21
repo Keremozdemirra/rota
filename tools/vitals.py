@@ -232,6 +232,27 @@ def show(r: dict, census_date: str) -> None:
     print(f"    census {census_date} — confirm at the source before anything load-bearing")
 
 
+def gap_hits(repos: list[dict], term: str, min_stars: int, have: set[str]) -> list[dict]:
+    """Alive, SPDX-licensed, popular enough, matching the term, not installed; by stars."""
+    hits = []
+    for r in repos:
+        if r.get("status") != "active" or r.get("archived") or r.get("is_fork"):
+            continue
+        if (r.get("license_state") or "") != "spdx":
+            continue
+        if r.get("stars", 0) < min_stars:
+            continue
+        hay = f"{r['full_name']} {r.get('description') or ''} {' '.join(r.get('topics') or [])}".lower()
+        if term not in hay:
+            continue
+        short = r["full_name"].split("/")[-1].lower()
+        if short in have or any(short in h or h in short for h in have if len(h) > 4):
+            continue
+        hits.append(r)
+    hits.sort(key=lambda r: -r.get("stars", 0))
+    return hits
+
+
 def main() -> int:
     args = sys.argv[1:]
     if not args:
@@ -330,6 +351,35 @@ def main() -> int:
             print("    filtered out: " + ", ".join(f"{n} {k}" for k, n in sorted(skipped.items())))
         return 0
 
+    if args[0] == "--candidates":
+        # Kerem, 2026-09-21: the census should surface repositories that could
+        # become a product, a component of one, or a place to contribute, without
+        # him forwarding links by hand. One term per domain word in vetting.yaml,
+        # written to the ledger so the weekly brief can link it.
+        out = ROOT / "rota" / "ledger" / "census-candidates.md"
+        terms = [w for group in (criteria().get("domains") or []) for w in group]
+        terms += ["automation", "n8n", "seo", "lead-generation", "linkedin", "game", "telemetry", "job-search"]
+        have = installed()
+        min_stars = int(args[args.index("--min-stars") + 1]) if "--min-stars" in args else 150
+        lines = [f"# Census candidates, {date}", "",
+                 "Written by `python3 rota/tools/vitals.py --candidates` (weekly). Active, SPDX-licensed, "
+                 f"{min_stars}+ stars, not installed, matched on name, description or topics. A row is evidence "
+                 "about a date; the tools chat vets before anything is installed. Product angle: a repository "
+                 "here is a possible product, a component of one, or a place to contribute.", ""]
+        seen: set[str] = set()
+        for term in terms:
+            hits = [r for r in gap_hits(repos, term.lower(), min_stars, have) if r["full_name"] not in seen]
+            if not hits:
+                continue
+            lines += [f"## {term}", ""]
+            for r in hits[:8]:
+                seen.add(r["full_name"])
+                lines.append(f"- {r.get('stars'):,}★ {r.get('license')} `{r['full_name']}`: {neutralise(r.get('description') or '', 110)}")
+            lines.append("")
+        out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        print(f"{out}: {len(seen)} repositories across {len(terms)} terms, census {date}")
+        return 0
+
     if args[0] == "--gaps":
         if len(args) < 2:
             sys.exit("usage: --gaps <substring> [--min-stars N] [--limit N]")
@@ -337,22 +387,7 @@ def main() -> int:
         min_stars = int(args[args.index("--min-stars") + 1]) if "--min-stars" in args else 200
         limit = int(args[args.index("--limit") + 1]) if "--limit" in args else 15
         have = installed()
-        hits = []
-        for r in repos:
-            if r.get("status") != "active" or r.get("archived") or r.get("is_fork"):
-                continue
-            if (r.get("license_state") or "") != "spdx":
-                continue
-            if r.get("stars", 0) < min_stars:
-                continue
-            hay = f"{r['full_name']} {r.get('description') or ''} {' '.join(r.get('topics') or [])}".lower()
-            if term not in hay:
-                continue
-            short = r["full_name"].split("/")[-1].lower()
-            if short in have or any(short in h or h in short for h in have if len(h) > 4):
-                continue
-            hits.append(r)
-        hits.sort(key=lambda r: -r.get("stars", 0))
+        hits = gap_hits(repos, term, min_stars, have)
         print(f"  '{term}' · active, SPDX-licensed, {min_stars}+ stars, not already installed"
               f"  ({len(hits)} found, census {date})")
         for r in hits[:limit]:

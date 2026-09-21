@@ -259,6 +259,12 @@ do_weekly() {
     python3 tools/vitals.py --summary 2>&1
     echo '```'
     echo
+    echo "## Census candidates — possible products, components or contributions"
+    echo '```'
+    python3 tools/vitals.py --candidates 2>&1
+    echo '```'
+    echo "Full list: ledger/census-candidates.md"
+    echo
     echo "## Arrivals — what the daily census brought, after vetting.yaml"
     echo '```'
     if [ -f "$ARRIVALS" ]; then tail -28 "$ARRIVALS"; else echo "(no daily run yet — rota setup installs it)"; fi
