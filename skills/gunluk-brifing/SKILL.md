@@ -1,13 +1,13 @@
 ---
 name: gunluk-brifing
-description: Günün tek sayfalık brifingini hazırlar — bekleyen e-postalar, taahhütler, bugün yapılması gerekenler ve dikkat isteyen tek şey. "Günlük brifing", "günü özetle", "bugün ne var", "beni bilgilendir", "neyi kaçırıyorum" dendiğinde kullan.
+description: Günün tek sayfalık brifingini hazırlar: bekleyen e-postalar, taahhütler, bugün yapılması gerekenler ve dikkat isteyen tek şey. "Günlük brifing", "günü özetle", "bugün ne var", "beni bilgilendir", "neyi kaçırıyorum" dendiğinde kullan.
 ---
 
 # Daily briefing
 
 ## Purpose
 Produce one page Kerem can read in two minutes in the morning and plan the day
-from. If it runs long it stops being useful — **cut hard.**
+from. If it runs long, it stops being useful. **Cut hard.**
 
 ## Steps
 
@@ -18,13 +18,14 @@ Use whichever connectors are attached; skip the rest silently:
   Search: `is:unread newer_than:2d -category:promotions -category:social`
   Also: within `is:sent newer_than:7d`, the things he is waiting on a reply for.
 - **Drive** → files changed in the last three days (`list_recent_files`).
+- **Calendar** → today's meetings (`list_events`).
 - **Scheduled tasks** → the ones running today (`list_scheduled_tasks`).
 - **CLAUDE.md** and `TASKS.md` if it exists → open commitments.
 
-### 2. Filter — this is the whole job
+### 2. Filter: this is the whole job
 For every item, ask: **"will Kerem do something about this today?"**
 If the answer is no, it does not go in the briefing. Newsletters,
-notifications, automated mail, FYI — all rubbish.
+notifications, automated mail, FYI: all rubbish.
 
 Surface:
 - Things someone is waiting on him for, where the time is nearly up
@@ -61,7 +62,7 @@ reason)
   link it where you can.
 - If a section is empty, do not write its heading at all. An empty heading is
   noise.
-- Tone: calm and neutral. Do not manufacture urgency — no "URGENT!!!".
+- Tone: calm and neutral. Do not manufacture urgency: no "URGENT!!!".
 - The last line is always: *"Which of these shall we start with?"*
 
 ## Variant
