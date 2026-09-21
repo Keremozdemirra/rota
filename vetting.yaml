@@ -27,6 +27,7 @@ covered:
   worktrees:           [worktree, git-worktree]                                   # worktrunk, Claude Code worktrees (2026-09-21)
   calendar:            [calendar, caldav, ics]                                    # Google Calendar connector on claude.ai (2026-09-21)
   linkedin:            [linkedin, linkedin-post, linkedin-profile]               # linkedin-skills plugin (sergebulaev), installed (2026-09-21)
+  design generation:   [design-tool, prototype-generator, landing-page-generator, mockup-generator]  # open-design 0.23.0 desktop app + MCP, installed 2026-09-21 (sha256 verified, notarized Developer ID; ships PostHog and Langfuse telemetry on by default, no toggle found)
 
 # 2. Categories decided against, with the reason. A new arrival matching one
 #    of these is not a new question — it is the same question with a new name,
@@ -69,7 +70,7 @@ declined_repos:
   ridafkih/keeper.sh:              "calendar is reached through the Google Calendar connector; AGPL plus account OAuth for a job that works (2026-09-21)"
   chigwell/telegram-mcp:           "authenticates as the user account (Telethon session); a bot-token server is the shape if Telegram is wanted (2026-09-21)"
   Tencent/AI-Infra-Guard:          "a Docker web platform; skillspector and mcp-scanner do the two relevant checks as CLIs (2026-09-21)"
-  nexu-io/open-design:             "desktop app, so the install is Kerem's click: download from open-design.ai, then od mcp install claude (2026-09-21)"
+
   Graphify-Labs/graphify:          "already installed as the graphify skill (2026-09-21)"
   google-gemini/gemini-cli:        "a separate agent CLI on a Google account beside Claude Code; nothing here routes to it (2026-09-21)"
   sansan0/TrendRadar:              "a deployed monitor with push channels and model API keys; money and a running service (2026-09-21)"
