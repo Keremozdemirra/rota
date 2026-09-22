@@ -25,7 +25,10 @@ model stays loaded between calls.
 
 A Claude Code run whose model is local. Same tools as a sub-agent (Read, Grep,
 Glob by default; add Write or Bash with `-t`), so it can find and read files on
-its own. Slower per turn; use it when the job needs to look things up.
+its own. Measured 2026-09-22: on qwen3:8b it hit its turn limit after four
+minutes, and on qwen3:30b it had not finished after twenty while another job
+held the GPU. Treat it as experimental; reach for it only when the GPU is idle
+and the job truly needs to look things up. local-ask.sh is the default.
 
 ```bash
 ~/agents/rota/tools/local-claude.sh -n 8 "Read every SKILL.md under ~/.claude/skills and list the ones that mention Make.com."
