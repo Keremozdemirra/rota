@@ -27,6 +27,7 @@ covered:
   worktrees:           [worktree, git-worktree]                                   # worktrunk, Claude Code worktrees (2026-09-21)
   calendar:            [calendar, caldav, ics]                                    # Google Calendar connector on claude.ai (2026-09-21)
   linkedin:            [linkedin, linkedin-post, linkedin-profile]               # linkedin-skills plugin (sergebulaev), installed (2026-09-21)
+  local models:        [ollama, local-llm, local-inference, self-hosted-llm]      # Ollama 0.34 with qwen3:30b, qwen3-coder:30b, qwen3:8b, bge-m3; tools/local-ask.sh and local-claude.sh; skill local-model (2026-09-22)
   design generation:   [design-tool, prototype-generator, landing-page-generator, mockup-generator]  # open-design 0.23.0 desktop app + MCP, installed 2026-09-21 (sha256 verified, notarized Developer ID; ships PostHog and Langfuse telemetry on by default, no toggle found)
 
 # 2. Categories decided against, with the reason. A new arrival matching one
