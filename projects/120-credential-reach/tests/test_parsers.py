@@ -50,7 +50,7 @@ class Yaml(unittest.TestCase):
 
     def test_malformed_raises_yaml_error(self):
         for bad in ("a:\n\tb: 1\n", "a: 'open\n", "a: [1, 2\n", "a: 1\n  b: 2\n c: 3\n", "just words\n",
-                    "- a\nb: 1\n"):
+                    "- a\nb: 1\n", "a: {{x\n", "a: {b: [c}\n"):  # the last two crashed before a fuzz run found them
             with self.assertRaises(cr.YamlError, msg=bad):
                 cr.yaml_load(bad)
 
@@ -308,6 +308,9 @@ class Npm(Isolated):
         self.assertEqual(f["empty.example"]["detail"], "_authToken empty")
         self.assertNotIn(token, text_of(sec))
         self.assertNotIn(path_key, text_of(sec))
+
+    def test_registry_key_that_is_not_a_url(self):
+        self.assertEqual(cr._npm_target("//[bad/"), "***")  # found by fuzzing: used to raise IndexError
 
     def test_empty_file_and_userconfig_env(self):
         self.write(".npmrc", "")

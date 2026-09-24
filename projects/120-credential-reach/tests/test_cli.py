@@ -111,6 +111,12 @@ class ExitCodes(Isolated):
         self.assertEqual(self.run_main(["--strict"])[0], 2)
         self.assertEqual(self.run_main([])[0], 0)
 
+    def test_a_bug_in_one_scanner_is_reported_not_raised(self):
+        with mock.patch.object(cr, "SCANNERS", (cr.scan_env, lambda ctx: 1 / 0)):
+            code, rep = self.report("--strict")
+        self.assertEqual(code, 2)
+        self.assertIn("internal error (ZeroDivisionError)", rep["sections"][-1]["errors"][0])
+
     def test_bad_project_path_is_an_error(self):
         code, _, err = self.run_main(["--project", str(self.tmp / "typo")])
         self.assertEqual(code, 2)
