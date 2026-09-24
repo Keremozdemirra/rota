@@ -71,6 +71,12 @@ POSITION_ONLY = frozenset({"ROW", "COLUMN", "ROWS", "COLUMNS", "AREAS", "ISREF",
 
 # Tool's choices, not standards.
 MAX_PART_BYTES = 2 * 1024 ** 3   # an XML part declaring more than this, uncompressed, is not read
+# A per-part cap alone still lets many small, highly compressible parts (a "shared strings" or
+# worksheet part of mostly one repeated character deflates at up to roughly 1000:1) each stay under
+# MAX_PART_BYTES while their sum forces gigabytes of decompression: a classic zip-bomb amplification
+# spread across parts instead of concentrated in one. This bounds the sum of every part's declared
+# uncompressed size read from one package, so the total work stays bounded regardless of sheet count.
+MAX_TOTAL_BYTES = 8 * 1024 ** 3
 TEXT_LIMIT = 80                  # characters of cell text shown in text and Markdown output
 REMOTE_LIMIT = 200               # characters of workbook text in JSON and MCP output
 FORMULA_LIMIT = 2000             # characters of a formula in text, Markdown, JSON and MCP output
@@ -850,6 +856,7 @@ class _Package:
         for info in self.zip.infolist():
             key = info.filename.replace("\\", "/").lstrip("/").translate(_ASCII_LOWER)
             self.index.setdefault(key, info)
+        self.total_declared = 0   # running sum of every opened part's declared uncompressed size
 
     def close(self):
         self.zip.close()
@@ -864,6 +871,12 @@ class _Package:
             raise _PartError(part, "missing from the package")
         if info.file_size > MAX_PART_BYTES:
             raise _PartError(part, f"declares {info.file_size} bytes uncompressed, over the {MAX_PART_BYTES}-byte limit")
+        # Charged before decompression starts, so a package built to cross the total budget is
+        # stopped at the part that crosses it, not after paying to inflate it first.
+        self.total_declared += info.file_size
+        if self.total_declared > MAX_TOTAL_BYTES:
+            raise _PartError(part, f"the package's parts declare {self.total_declared} bytes uncompressed in total, "
+                                    f"over the {MAX_TOTAL_BYTES}-byte total limit")
         try:
             return _Guarded(self.zip.open(info), part)
         except _ZIP_ERRORS + (NotImplementedError,) as e:

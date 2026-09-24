@@ -2,6 +2,7 @@
 import sys
 import zipfile
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from support import FIXTURES, NS, R_NS, Case, sheet_xml, workbook, xlsx_review as xr  # noqa: E402
@@ -166,3 +167,17 @@ class Broken(Case):
         wb = xr.load(self.book("m.xlsm", vba=b"\x01\x02 not real VBA"))
         self.assertEqual(len(wb.vba), 64)
         self.assertIn("vba-project", [f["code"] for f in xr.check(wb)["findings"]])
+
+    def test_many_parts_each_under_the_cap_are_still_capped_in_total(self):
+        """A per-part cap alone lets many parts that each stay just under it add up to an unbounded
+        decompression cost (a zip bomb spread across parts instead of concentrated in one); the
+        package-wide budget stops reading once the parts read so far cross it. Sizes are scaled down
+        with mock.patch so the test is fast; MAX_PART_BYTES/MAX_TOTAL_BYTES are the real (2 GiB / 8
+        GiB) limits in production."""
+        sheets = [{"name": f"S{i}", "cells": {"A1": "A" * 2500}} for i in range(1, 6)]
+        path = self.book(sheets=sheets, shared_strings=False)
+        with mock.patch.object(xr, "MAX_PART_BYTES", 3000), mock.patch.object(xr, "MAX_TOTAL_BYTES", 8000):
+            wb = xr.load(path)
+        self.assertEqual([len(s.cells) for s in wb.sheets], [1, 1, 0, 0, 0])  # first two fit, the rest are cut off
+        self.assertTrue(all("total limit" in (s.problem or "") for s in wb.sheets[2:]))
+        self.assertTrue(any("total limit" in m for _, m in wb.problems))

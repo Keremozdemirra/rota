@@ -278,7 +278,9 @@ the defined names that moved with it.
 - **Sends:** nothing. There is no network code.
 - **Writes:** nothing. It never modifies a workbook.
 - XML parts that declare a DTD are refused before parsing (ECMA-376 Part 2, §6.2.5: DTDs "enable Denial
-  of Service attacks", "shall not be used"). Parts larger than 2 GiB uncompressed are not read.
+  of Service attacks", "shall not be used"). Parts larger than 2 GiB uncompressed are not read, and a
+  package whose parts declare more than 8 GiB uncompressed in total is stopped part-way rather than let
+  many smaller, highly compressible parts add up to an unbounded decompression cost.
 - Output masks URL credentials and query strings (`https://***@host/file.xlsx?***`) in link targets and
   formulas, before anything is truncated, and shows control and invisible characters as escapes. In
   `--json` and MCP output, cell text, link targets and the "last saved by" property are stripped of
