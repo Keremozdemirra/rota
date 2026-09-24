@@ -59,7 +59,7 @@ class Packaging(unittest.TestCase):
     def test_module_names_do_not_collide(self):
         top = {p.stem for p in ROOT.glob("*.py")}
         self.assertEqual(top, {"vsme-kit"})  # a script, not an importable module
-        self.assertIn('packages = ["vsme_kit"]', read("pyproject.toml"))
+        self.assertIn('packages = ["vsme_kit", "vsme_kit.data"]', read("pyproject.toml"))
         self.assertIn('vsme-kit = "vsme_kit.cli:main"', read("pyproject.toml"))
 
     def test_sdist_carries_what_the_tests_read(self):
