@@ -3,11 +3,21 @@
 It speaks real HTTP on 127.0.0.1, so the client's redirect handling, error
 handling and timeouts run exactly as they do against GitHub.
 """
+import atexit
 import json
+import os
+import shutil
+import tempfile
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+
+# Nothing under test reads the home directory. Every test module imports this
+# one, so pointing HOME at an empty directory here makes sure of it.
+HOME = tempfile.mkdtemp(prefix="awesome-vitals-test-home-")
+os.environ["HOME"] = os.environ["USERPROFILE"] = HOME
+atexit.register(shutil.rmtree, HOME, True)
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 CENSUS = (FIXTURES / "census.json").as_uri()
@@ -40,7 +50,8 @@ class _Server(ThreadingHTTPServer):
 
 
 class FakeGitHub:
-    """`routes` maps a path (any case, as GitHub's) to a fixture file name or a fixture dict."""
+    """`routes` maps a path (any case, as GitHub's) to a fixture file name, a fixture dict,
+    or {"raw": text} written to the socket as it is."""
 
     def __init__(self, routes=None, default="sandbox.403.json", delay=0.0):
         self.routes = {k.lower(): v for k, v in (routes if routes is not None else SAMPLE_ROUTES).items()}
@@ -55,6 +66,10 @@ class FakeGitHub:
                     time.sleep(outer.delay)
                 fx = outer.routes.get(self.path.lower(), outer.default)
                 fx = fixture(fx) if isinstance(fx, str) else fx
+                if "raw" in fx:
+                    # bytes as they go on the wire, for broken responses send_response cannot produce
+                    self.wfile.write(fx["raw"].encode("latin-1"))
+                    return
                 body = fx["body"]
                 data = body.encode("utf-8") if isinstance(body, str) else json.dumps(body).encode("utf-8")
                 self.send_response(fx["status"])

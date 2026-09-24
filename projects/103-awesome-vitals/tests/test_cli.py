@@ -26,7 +26,9 @@ def run(args, server=None, env=None):
         if env is None:
             os.environ.pop("GITHUB_TOKEN", None)
             os.environ.pop("GH_TOKEN", None)
-        code = av.main(args + ["--census", CENSUS], today=TODAY,
+        if "--census" not in args:
+            args = args + ["--census", CENSUS]
+        code = av.main(args, today=TODAY,
                        api=server.url if server else "http://127.0.0.1:9", proxies={})
     return code, out.getvalue(), err.getvalue()
 
@@ -98,6 +100,16 @@ class Formats(unittest.TestCase):
         self.assertEqual((doc["github"]["state"], doc["census"]["date"]), ("ok", "2026-09-23"))
         self.assertIsNone(doc["fail_on"])
 
+    def test_census_url_credentials_are_masked(self):
+        url = "https://reader:s3cret-value@127.0.0.1:9/servers.json?sig=abc123"
+        code, out, _ = run([SAMPLE, "--only-lines", "16", "--json", "--source", "census", "--census", url])
+        self.assertNotIn("s3cret-value", out)
+        self.assertNotIn("abc123", out)
+        self.assertEqual(json.loads(out)["census"]["url"], "https://***@127.0.0.1:9/servers.json?***")
+        # an error message that echoes the URL, as a proxy's might
+        self.assertEqual(av.mask_text("Tunnel connection failed: reader:s3cret-value@127.0.0.1:9/x?sig=abc123 refused"),
+                         "Tunnel connection failed: ***@127.0.0.1:9/x?*** refused")
+
     def test_markdown_escapes_file_names_and_links_repositories(self):
         with tempfile.TemporaryDirectory() as d:
             p = Path(d) / "liste|données.md"
@@ -109,7 +121,8 @@ class Formats(unittest.TestCase):
         self.assertIn("#### Archived (1)", out)
         self.assertIn("| 1 | [octocat/archived-example](https://github.com/octocat/archived-example) | "
                       "2026-09-01 (23 days) | MIT | GitHub API |  |", out)
-        self.assertIn("This check fails on: archived, gone. 1 entry matched.", out)
+        self.assertIn("This check fails on an entry that is archived or gone, or one that could not be checked: "
+                      "1 matched, 0 not checked.", out)
 
 
 class ExitCodes(unittest.TestCase):
@@ -119,11 +132,29 @@ class ExitCodes(unittest.TestCase):
             self.assertEqual(run([SAMPLE, "--fail-on", "no-license"], server)[0], 1)       # alias, implies --strict
             self.assertEqual(run([SAMPLE, "--only-lines", "24", "--strict"], server)[0], 0)  # agent-vitals only
             self.assertEqual(run([SAMPLE, "--only-lines", "24", "--fail-on", ""], server)[0], 0)
+            self.assertEqual(run([SAMPLE, "--fail-on", "none"], server)[0], 0)
+
+    def test_could_not_check_is_exit_2_and_a_finding_wins(self):
+        # line 48 is octocat/reference-style: refused by the API stand-in and not in the census
+        with FakeGitHub() as server:
+            self.assertEqual(run([SAMPLE, "--only-lines", "48", "--strict"], server)[0], 2)
+            self.assertEqual(run([SAMPLE, "--only-lines", "48", "--strict", "--fail-on", "none"], server)[0], 2)
+            self.assertEqual(run([SAMPLE, "--only-lines", "48"], server)[0], 0)          # no --strict: a report
+            self.assertEqual(run([SAMPLE, "--only-lines", "11,48", "--strict"], server)[0], 1)  # archived wins
+            code, out, _ = run([SAMPLE, "--only-lines", "48", "--strict"], server)
+        self.assertIn("This check fails on an entry that is archived or gone, or one that could not be checked: "
+                      "0 matched, 1 not checked.", out)
+
+    def test_network_down_and_no_census_is_exit_2(self):
+        code, out, _ = run([SAMPLE, "--only-lines", "16", "--strict", "--census", "/nonexistent/census.json"])
+        self.assertEqual(code, 2)
+        self.assertIn("GitHub API unreachable", out)
 
     def test_unknown_finding_is_a_usage_error(self):
-        with self.assertRaises(SystemExit) as cm, redirect_stderr(io.StringIO()):
-            av.main([SAMPLE, "--fail-on", "archived,deprecated"])
-        self.assertEqual(cm.exception.code, 2)
+        for bad in ("archived,deprecated", "unchecked"):
+            with self.assertRaises(SystemExit) as cm, redirect_stderr(io.StringIO()):
+                av.main([SAMPLE, "--fail-on", bad])
+            self.assertEqual(cm.exception.code, 2)
 
     def test_missing_file(self):
         code, out, err = run(["/nonexistent/README.md"])

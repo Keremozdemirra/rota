@@ -1,0 +1,37 @@
+name: test
+
+# The unit tests run against recorded fixtures and a local stand-in for the
+# GitHub API: no network, no token. The second job runs this repository's own
+# action on its README, the one thing the unit tests cannot do.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests -t . -v
+      - run: pip install . && awesome-vitals --source census --census tests/fixtures/census.json tests/fixtures/sample.md
+
+  action:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          fetch-depth: 0
+      - uses: ./
+        with:
+          path: README.md
+          mode: ${{ github.event_name == 'pull_request' && 'pr' || 'full' }}
+          fail-on: none

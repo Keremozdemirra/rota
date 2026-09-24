@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "awesome-vitals"
+version = "0.1.0"
+description = "Check every GitHub repository linked from a Markdown list: archived, gone, renamed, abandoned or unlicensed entries, with line numbers."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["awesome-list", "awesome", "markdown", "github", "github-actions", "maintenance", "archived", "licence", "mcp"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Documentation",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/awesome-vitals"
+Issues = "https://github.com/Keremozdemirra/awesome-vitals/issues"
+Census = "https://github.com/Keremozdemirra/agent-vitals"
+
+[project.scripts]
+awesome-vitals = "awesome_vitals:main"
+
+[tool.setuptools]
+py-modules = ["awesome_vitals"]

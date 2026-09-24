@@ -1,0 +1,18 @@
+{
+ "url": "https://api.github.com/repos/left-pad/left-pad",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "cut to full_name, pushed_at, archived, stargazers_count, open_issues_count, license; GitHub search API item, recorded through the GitHub connector: the same repository object as GET /repos/{owner}/{repo}, which this recording sandbox cannot reach",
+ "body": {
+  "full_name": "left-pad/left-pad",
+  "pushed_at": "2019-04-19T14:16:20Z",
+  "archived": true,
+  "stargazers_count": 1304,
+  "open_issues_count": 10,
+  "license": {
+   "key": "mit",
+   "name": "MIT License",
+   "spdx_id": "MIT"
+  }
+ }
+}

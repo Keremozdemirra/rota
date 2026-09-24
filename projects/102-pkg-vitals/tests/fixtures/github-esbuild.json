@@ -1,0 +1,18 @@
+{
+ "url": "https://api.github.com/repos/evanw/esbuild",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "cut to full_name, pushed_at, archived, stargazers_count, open_issues_count, license; GitHub search API item, recorded through the GitHub connector: the same repository object as GET /repos/{owner}/{repo}, which this recording sandbox cannot reach",
+ "body": {
+  "full_name": "evanw/esbuild",
+  "pushed_at": "2026-08-09T17:20:12Z",
+  "archived": false,
+  "stargazers_count": 40067,
+  "open_issues_count": 622,
+  "license": {
+   "key": "mit",
+   "name": "MIT License",
+   "spdx_id": "MIT"
+  }
+ }
+}

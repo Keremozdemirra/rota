@@ -2,7 +2,7 @@
  "url": "https://registry.npmjs.org/@modelcontextprotocol%2Fserver-github",
  "recorded": "2026-09-24",
  "status": 200,
- "trimmed": "kept dist-tags, time.created/modified and 2 of 13 versions; each version cut to name, version, description, licence, repository, homepage, deprecated, install scripts",
+ "trimmed": "kept dist-tags, time.created/modified and 2 of 13 versions; each version cut to name, version, description, licence, repository, homepage, bugs, deprecated, install scripts",
  "body": {
   "name": "@modelcontextprotocol/server-github",
   "dist-tags": {
@@ -21,6 +21,9 @@
     "description": "MCP server for using the GitHub API",
     "license": "MIT",
     "homepage": "https://modelcontextprotocol.io",
+    "bugs": {
+     "url": "https://github.com/modelcontextprotocol/servers/issues"
+    },
     "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
     "scripts": {}
    },
@@ -30,12 +33,18 @@
     "description": "MCP server for using the GitHub API",
     "license": "MIT",
     "homepage": "https://modelcontextprotocol.io",
+    "bugs": {
+     "url": "https://github.com/modelcontextprotocol/servers/issues"
+    },
     "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
     "scripts": {}
    }
   },
   "description": "MCP server for using the GitHub API",
   "license": "MIT",
-  "homepage": "https://modelcontextprotocol.io"
+  "homepage": "https://modelcontextprotocol.io",
+  "bugs": {
+   "url": "https://github.com/modelcontextprotocol/servers/issues"
+  }
  }
 }

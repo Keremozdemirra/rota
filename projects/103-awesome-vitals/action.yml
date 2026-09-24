@@ -15,11 +15,11 @@ inputs:
     required: false
     default: full
   fail-on:
-    description: "Comma-separated findings that fail the step: archived, gone, renamed, abandoned, stale, no-licence, non-standard-licence, unchecked. Empty to report without failing."
+    description: "Comma-separated findings that fail the step: archived, gone, renamed, abandoned, stale, no-licence, non-standard-licence. The step also fails when an entry could not be checked. none to report without failing."
     required: false
     default: archived,gone
   token:
-    description: Token for the GitHub REST API. The default workflow token allows 1,000 requests an hour per repository; past that, facts come from the agent-vitals census.
+    description: Token for the GitHub REST API. The default workflow token allows 1,000 requests an hour per repository; past that, facts come from the agent-vitals census where it has them.
     required: false
     default: ${{ github.token }}
 

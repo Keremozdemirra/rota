@@ -2,7 +2,7 @@
  "url": "https://registry.npmjs.org/esbuild",
  "recorded": "2026-09-24",
  "status": 200,
- "trimmed": "kept dist-tags, time.created/modified and 3 of 482 versions; each version cut to name, version, description, licence, repository, homepage, deprecated, install scripts",
+ "trimmed": "kept dist-tags, time.created/modified and 3 of 482 versions; each version cut to name, version, description, licence, repository, homepage, bugs, deprecated, install scripts",
  "body": {
   "name": "esbuild",
   "dist-tags": {
@@ -26,6 +26,9 @@
      "type": "git"
     },
     "homepage": "https://github.com/evanw/esbuild#readme",
+    "bugs": {
+     "url": "https://github.com/evanw/esbuild/issues"
+    },
     "scripts": {
      "postinstall": "node install.js"
     }
@@ -40,6 +43,9 @@
      "type": "git"
     },
     "homepage": "https://github.com/evanw/esbuild#readme",
+    "bugs": {
+     "url": "https://github.com/evanw/esbuild/issues"
+    },
     "scripts": {
      "postinstall": "node install.js"
     }
@@ -54,6 +60,9 @@
      "type": "git"
     },
     "homepage": "https://github.com/evanw/esbuild#readme",
+    "bugs": {
+     "url": "https://github.com/evanw/esbuild/issues"
+    },
     "scripts": {
      "postinstall": "node install.js"
     }
@@ -65,6 +74,9 @@
    "url": "git+https://github.com/evanw/esbuild.git",
    "type": "git"
   },
-  "homepage": "https://github.com/evanw/esbuild#readme"
+  "homepage": "https://github.com/evanw/esbuild#readme",
+  "bugs": {
+   "url": "https://github.com/evanw/esbuild/issues"
+  }
  }
 }

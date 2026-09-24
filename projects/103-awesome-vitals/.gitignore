@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.DS_Store
+build/
+dist/
+*.egg-info/
+.venv/
+# The CLI reads GITHUB_TOKEN from the environment and writes it nowhere; one
+# .env written by hand is all it would take to publish one, so none is tracked.
+.env
+.env.*

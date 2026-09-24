@@ -2,7 +2,7 @@
  "url": "https://registry.npmjs.org/@modelcontextprotocol%2Fsdk",
  "recorded": "2026-09-24",
  "status": 200,
- "trimmed": "kept dist-tags, time.created/modified and 1 of 80 versions; each version cut to name, version, description, licence, repository, homepage, deprecated, install scripts",
+ "trimmed": "kept dist-tags, time.created/modified and 1 of 80 versions; each version cut to name, version, description, licence, repository, homepage, bugs, deprecated, install scripts",
  "body": {
   "name": "@modelcontextprotocol/sdk",
   "dist-tags": {
@@ -24,6 +24,9 @@
      "type": "git"
     },
     "homepage": "https://modelcontextprotocol.io",
+    "bugs": {
+     "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues"
+    },
     "scripts": {}
    }
   },
@@ -33,6 +36,9 @@
    "url": "git+https://github.com/modelcontextprotocol/typescript-sdk.git",
    "type": "git"
   },
-  "homepage": "https://modelcontextprotocol.io"
+  "homepage": "https://modelcontextprotocol.io",
+  "bugs": {
+   "url": "https://github.com/modelcontextprotocol/typescript-sdk/issues"
+  }
  }
 }

@@ -3,7 +3,6 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -76,6 +75,7 @@ class RunBlock(unittest.TestCase):
 
     def run_block(self, **env):
         base = {"PATH": f"{self.tmp / 'bin'}{os.pathsep}{os.environ['PATH']}", "FAKE_ARGV": str(self.argv),
+                "HOME": str(self.tmp),
                 "GITHUB_ACTION_PATH": str(ROOT), "GITHUB_STEP_SUMMARY": str(self.summary),
                 "AV_PATH": "README.md", "AV_MODE": "full", "AV_FAIL_ON": "archived,gone", "AV_BASE": ""}
         base.update(env)

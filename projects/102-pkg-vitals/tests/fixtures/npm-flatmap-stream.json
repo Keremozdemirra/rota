@@ -2,7 +2,7 @@
  "url": "https://registry.npmjs.org/flatmap-stream",
  "recorded": "2026-09-24",
  "status": 200,
- "trimmed": "kept dist-tags, time.created/modified and 1 of 1 versions; each version cut to name, version, description, licence, repository, homepage, deprecated, install scripts",
+ "trimmed": "kept dist-tags, time.created/modified and 1 of 1 versions; each version cut to name, version, description, licence, repository, homepage, bugs, deprecated, install scripts",
  "body": {
   "name": "flatmap-stream",
   "dist-tags": {
@@ -22,7 +22,10 @@
      "type": "git",
      "url": "git+https://github.com/npm/security-holder.git"
     },
-    "homepage": "https://github.com/npm/security-holder#readme"
+    "homepage": "https://github.com/npm/security-holder#readme",
+    "bugs": {
+     "url": "https://github.com/npm/security-holder/issues"
+    }
    }
   },
   "description": "security holding package",
@@ -30,6 +33,9 @@
    "type": "git",
    "url": "git+https://github.com/npm/security-holder.git"
   },
-  "homepage": "https://github.com/npm/security-holder#readme"
+  "homepage": "https://github.com/npm/security-holder#readme",
+  "bugs": {
+   "url": "https://github.com/npm/security-holder/issues"
+  }
  }
 }

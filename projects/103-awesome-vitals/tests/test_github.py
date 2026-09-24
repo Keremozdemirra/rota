@@ -1,5 +1,6 @@
 """Repository facts: GitHub answers, GitHub failures, and the census behind them."""
 import datetime as dt
+import json
 import socket
 import sys
 import tempfile
@@ -164,6 +165,63 @@ class Fallback(unittest.TestCase):
             gh, r = check(server, "n8n-io/n8n", source="github", census_url="file:///nonexistent/census.json")
         self.assertEqual((r["n8n-io/n8n"]["status"], r["n8n-io/n8n"]["github"]), ("unchecked", "GitHub API answered 403"))
         self.assertEqual(gh.census_error, "")  # never tried
+
+
+class Untrusted(unittest.TestCase):
+    def test_only_strict_owner_repo_names_reach_the_network(self):
+        bad = ["o/r?x=1", "o/r#x", "../../etc/passwd", "o/..", "o/.", "o/r/extra", "-o/r", "o/r%2F..", "o r/x",
+               "o/" + "r" * 101, "", "o", "o/r\n", "ö/r"]
+        with FakeGitHub() as server:
+            gh = av.GitHub(api=server.url, proxies={}, census_url=CENSUS)
+            for name in bad:
+                self.assertEqual(gh.facts(name)["note"], "not a repository name, not looked up", name)
+        self.assertEqual(server.requests, [])
+
+    def test_values_from_github_are_held_to_their_form(self):
+        odd = {"status": 200, "headers": {}, "body": {
+            "full_name": "o/odd", "archived": "yes", "pushed_at": "yesterday", "stargazers_count": "many",
+            "license": {"spdx_id": "MIT\n| <b>injected</b>"}}}
+        spoofed = {"status": 200, "headers": {}, "body": {"full_name": "o/r\u001b[31m | x", "pushed_at": "2026-09-01"}}
+        with FakeGitHub({"/repos/o/odd": odd, "/repos/o/spoofed": spoofed}) as server:
+            _, r = check(server, "o/odd", "o/spoofed")
+        self.assertEqual((r["o/odd"]["archived"], r["o/odd"]["pushed_at"], r["o/odd"]["stars"], r["o/odd"]["status"]),
+                         (False, None, None, "unknown"))
+        self.assertEqual((r["o/odd"]["license"], r["o/odd"]["license_state"]), (None, "non-standard"))
+        self.assertEqual(r["o/spoofed"]["github"], "GitHub API answered 200 without a repository in it")
+
+    def test_values_from_the_census_are_held_to_their_form(self):
+        rows = [{"full_name": "o/a", "license": "MIT | x", "license_state": "spdx", "archived": "no",
+                 "pushed_at": 20250101, "stars": "12"},
+                {"full_name": "o/b\n[x](y)", "license": "MIT", "license_state": "spdx"},
+                {"full_name": "o/c", "license": None, "license_state": "free-for-all", "pushed_at": "2026-09-20"}]
+        with tempfile.TemporaryDirectory() as d:
+            census = Path(d) / "census.json"
+            census.write_text(json.dumps({"generated_at": "not a date", "repositories": rows}), encoding="utf-8")
+            with FakeGitHub() as server:
+                gh, r = check(server, "o/a", "o/b", "o/c", source="census", census_url=str(census))
+        self.assertEqual({k: r["o/a"][k] for k in ("license", "license_state", "archived", "pushed_at", "stars")},
+                         {"license": None, "license_state": None, "archived": False, "pushed_at": None, "stars": None})
+        self.assertEqual(r["o/b"]["note"], "not in the census")  # a row whose name is not a name is dropped
+        self.assertEqual((r["o/c"]["license_state"], r["o/c"]["findings"]), (None, []))
+        self.assertEqual(gh.census_date, "")
+
+    def test_broken_responses_do_not_stop_the_run(self):
+        routes = {
+            "/repos/o/empty": {"status": 200, "headers": {}, "body": ""},
+            "/repos/o/null": {"status": 200, "headers": {}, "body": "null"},
+            "/repos/o/latin": {"raw": "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n\xff\xfe\xfd\xfc"},
+            "/repos/o/cut": {"raw": "HTTP/1.1 200 OK\r\nContent-Length: 400\r\n\r\n{\"full_name\": \"o/cut\""},
+            "/repos/o/garbled": {"raw": "SMTP ready\r\n\r\n"},
+        }
+        with FakeGitHub(routes) as server:
+            gh, r = check(server, "o/empty", "o/null", "o/latin", "o/cut", "o/garbled", "anthropics/skills")
+        for name in ("o/empty", "o/null", "o/latin"):
+            self.assertEqual(r[name]["github"], "GitHub API answered 200 without a repository in it", name)
+        # a response cut short or not HTTP at all says the connection is broken, not the repository
+        self.assertEqual(r["o/cut"]["status"], "unchecked")
+        self.assertTrue(gh.stop_reason.startswith("GitHub API unreachable"), gh.stop_reason)
+        self.assertEqual(r["anthropics/skills"]["source"], "census")
+        self.assertEqual(server.paths()[-1], "/repos/o/cut")  # nothing asked after that
 
 
 class Buckets(unittest.TestCase):

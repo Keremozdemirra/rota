@@ -56,6 +56,9 @@ FINDINGS = [
     ("unchecked", "not checked"),
 ]
 FINDING_KEYS = [k for k, _ in FINDINGS]
+# An entry that could not be checked is not a finding one chooses to fail on:
+# under --strict it is exit code 2, whatever --fail-on says.
+FAIL_ON_KEYS = [k for k in FINDING_KEYS if k != "unchecked"]
 LABEL = dict(FINDINGS)
 # People type the American spelling as often as not.
 ALIASES = {"no-license": "no-licence", "non-standard-license": "non-standard-licence"}
@@ -84,9 +87,7 @@ CONVERSATIONS = frozenset({"issues", "pull", "pulls", "discussions", "commit", "
 # autolinks, href values, bare URLs and scheme-less github.com/owner/repo.
 GITHUB_LINK = re.compile(
     r"(?:(?<![\w.@/:-])(?:https?:)?//|(?<![\w.@/:-]))(?:www\.)?github\.com/"
-    r"([A-Za-z0-9_.-]*)"          # owner, or a site section
-    r"(?:/([A-Za-z0-9_.-]*))?"    # repository
-    r"(?:/([A-Za-z0-9_.-]*))?",   # what follows: tree, blob, issues, pull...
+    r"(?P<owner>[A-Za-z0-9_.-]*)(?:/(?P<repo>[A-Za-z0-9_.-]*))?(?:/(?P<after>[A-Za-z0-9_.-]*))?",
     re.IGNORECASE,
 )
 IMAGE = re.compile(r"!\[[^\]]*\]\(\s*<?([^)\s>]+)")
@@ -96,11 +97,16 @@ CODE_SPAN = re.compile(r"(`+)(?!`).+?(?<!`)\1(?!`)")
 # nested items, and missing one would check a `git clone` line as an entry.
 FENCE_OPEN = re.compile(r"^\s*(`{3,}|~{3,})(.*)$")
 FENCE_CLOSE = re.compile(r"^\s*(`{3,}|~{3,})\s*$")
-OWNER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
-REPO = re.compile(r"^[A-Za-z0-9._-]{1,100}$")
+# Validators, always applied with fullmatch: "$" would also accept a trailing newline.
+OWNER = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]*")
+REPO = re.compile(r"[A-Za-z0-9._-]{1,100}")
+# The only strings ever put into an API URL, and the only names ever printed.
+REPO_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]{0,99}/(?!\.{1,2}\Z)[A-Za-z0-9._-]{1,100}")
+SPDX_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9.+-]{0,63}")
+CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f]")
 
 PROFILE, SITE_PAGE, CONVERSATION, IMAGE_LINK = "profile", "site-page", "conversation", "image"
-NOT_ENTRIES = {  # (one, several)
+NOT_ENTRIES = {
     PROFILE: ("link to a profile or organisation", "links to profiles or organisations"),
     SITE_PAGE: ("link to a GitHub page that is not a repository", "links to GitHub pages that are not repositories"),
     CONVERSATION: ("link to an issue, pull request, discussion or commit",
@@ -131,20 +137,22 @@ def classify(owner: str, repo: str | None, after: str | None) -> tuple[str | Non
     """(owner/repo, None) for a link to a repository, (None, reason) for anything else."""
     if not repo or not repo.strip("."):
         name = owner.rstrip(".")
-        if not name or name.lower() in SITE_SECTIONS or not OWNER.match(name):
+        if not name or name.lower() in SITE_SECTIONS or not OWNER.fullmatch(name):
             return None, SITE_PAGE
         return None, PROFILE
-    if owner.lower() in SITE_SECTIONS or not OWNER.match(owner):
+    if owner.lower() in SITE_SECTIONS or not OWNER.fullmatch(owner):
         return None, SITE_PAGE
     if after is None:
         # A bare URL at the end of a sentence carries the full stop with it.
         repo = repo.rstrip(".")
     if repo.lower().endswith(".git"):
         repo = repo[:-4]
-    if not REPO.match(repo) or repo in (".", ".."):
+    if not REPO.fullmatch(repo) or repo in (".", ".."):
         return None, SITE_PAGE
     if after and after.lower() in CONVERSATIONS:
         return None, CONVERSATION
+    if not REPO_NAME.fullmatch(f"{owner}/{repo}"):
+        return None, SITE_PAGE
     return f"{owner}/{repo}", None
 
 
@@ -174,7 +182,7 @@ def scan(text: str) -> tuple[list[tuple[int, str]], list[tuple[int, str, str]]]:
             if any(a <= m.start() < b for a, b in images):
                 skipped.append((n, m.group(0), IMAGE_LINK))
                 continue
-            name, reason = classify(m.group(1), m.group(2), m.group(3))
+            name, reason = classify(m.group("owner"), m.group("repo"), m.group("after"))
             if name:
                 found.append((n, name))
             else:
@@ -359,6 +367,40 @@ def _json(body: bytes):
         return None
 
 
+# Everything below that is printed comes from GitHub or from a census file the
+# user may point anywhere, so each value is held to its expected form first.
+def valid_name(value) -> bool:
+    return isinstance(value, str) and bool(REPO_NAME.fullmatch(value))
+
+
+def iso_date(value) -> str | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        return dt.date.fromisoformat(value[:10]).isoformat()
+    except ValueError:
+        return None
+
+
+def plain(text: object, limit: int = 80) -> str:
+    return CONTROL.sub(" ", str(text))[:limit]
+
+
+def mask_text(text: str) -> str:
+    """Error text with anything shaped like URL credentials or a query string hidden."""
+    return re.sub(r"\?[^\s'\"]*", "?***", re.sub(r"[^\s/@'\"]+@", "***@", text))
+
+
+def mask_url(url: str) -> str:
+    """A URL with any user:password@ and query string hidden, for printing."""
+    try:
+        u = urllib.parse.urlsplit(url)
+    except ValueError:
+        return "***"
+    netloc = "***@" + u.netloc.rsplit("@", 1)[1] if "@" in u.netloc else u.netloc
+    return urllib.parse.urlunsplit((u.scheme, netloc, u.path, "***" if u.query else "", ""))
+
+
 def licence_state(lic) -> tuple[str | None, str]:
     """(SPDX id or None, state), the three states the census distinguishes.
 
@@ -367,9 +409,9 @@ def licence_state(lic) -> tuple[str | None, str]:
     if not isinstance(lic, dict) or not lic:
         return None, "none"
     spdx = lic.get("spdx_id")
-    if spdx in (None, "", "NOASSERTION"):
+    if spdx == "NOASSERTION" or not isinstance(spdx, str) or not SPDX_ID.fullmatch(spdx):
         return None, "non-standard"
-    return str(spdx), "spdx"
+    return spdx, "spdx"
 
 
 class GitHub:
@@ -379,10 +421,9 @@ class GitHub:
                  api: str = API, timeout: float = 20.0, proxies: dict | None = None):
         self.token, self.census_url, self.source = token, census_url, source
         self.api, self.timeout = api.rstrip("/"), timeout
-        handlers: list = [_NoRedirect()]
-        if proxies is not None:
-            handlers.append(urllib.request.ProxyHandler(proxies))
-        self.opener = urllib.request.build_opener(*handlers)
+        proxy = [urllib.request.ProxyHandler(proxies)] if proxies is not None else []
+        self.opener = urllib.request.build_opener(_NoRedirect(), *proxy)
+        self.census_opener = urllib.request.build_opener(*proxy)
         self.requests = 0
         self.state = "not asked" if source == "census" else "ok"
         self.stop_reason = ""  # set once GitHub is given up on for the rest of the run
@@ -407,9 +448,11 @@ class GitHub:
             return e.code, {k.lower(): v for k, v in (e.headers or {}).items()}, body, ""
         except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError) as e:
             reason = getattr(e, "reason", e)
-            return None, {}, b"", (str(reason) or type(reason).__name__)[:80]
+            return None, {}, b"", plain(str(reason) or type(reason).__name__)
 
     def facts(self, name: str) -> dict:
+        if not valid_name(name):
+            return {**BLANK, "note": "not a repository name, not looked up"}
         if self.source == "census":
             return self.from_census(name, "")
         if self.stop_reason:
@@ -431,14 +474,14 @@ class GitHub:
             return self.from_census(name, self.stop_reason)
         data = _json(body)
         if status == 200:
-            if isinstance(data, dict) and isinstance(data.get("full_name"), str):
+            if isinstance(data, dict) and valid_name(data.get("full_name")):
                 spdx, state = licence_state(data.get("license"))
                 full = data["full_name"]
+                stars = data.get("stargazers_count")
                 return {**BLANK, "source": "github", "full_name": full, "http_status": 200,
                         "renamed_to": full if full.lower() != name.lower() else None,
-                        "archived": bool(data.get("archived")),
-                        "pushed_at": str(data.get("pushed_at") or "")[:10] or None,
-                        "license": spdx, "license_state": state, "stars": data.get("stargazers_count")}
+                        "archived": data.get("archived") is True, "pushed_at": iso_date(data.get("pushed_at")),
+                        "license": spdx, "license_state": state, "stars": stars if isinstance(stars, int) else None}
             return self.from_census(name, "GitHub API answered 200 without a repository in it")
         if status in (404, 410, 451):
             return {**BLANK, "source": "github", "gone": True, "http_status": status}
@@ -463,16 +506,17 @@ class GitHub:
             url = self.census_url if "://" in self.census_url else Path(self.census_url).resolve().as_uri()
             try:
                 req = urllib.request.Request(url, headers={"User-Agent": UA})
-                with urllib.request.urlopen(req, timeout=max(self.timeout, 60)) as resp:
+                with self.census_opener.open(req, timeout=max(self.timeout, 60)) as resp:
                     data = json.load(resp)
                 keep = ("full_name", "archived", "pushed_at", "license", "license_state", "stars")
                 self._census = {r["full_name"].lower(): {k: r.get(k) for k in keep}
                                 for r in data["repositories"]
-                                if isinstance(r, dict) and isinstance(r.get("full_name"), str)}
-                self.census_date = str(data.get("generated_at") or "")[:10]
-            except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError, KeyError, TypeError) as e:
+                                if isinstance(r, dict) and valid_name(r.get("full_name"))}
+                self.census_date = iso_date(data.get("generated_at")) or ""
+            except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError, KeyError, TypeError,
+                    AttributeError) as e:
                 reason = getattr(e, "reason", e)
-                self.census_error = (str(reason) or type(reason).__name__)[:80]
+                self.census_error = mask_text(plain(str(reason) or type(reason).__name__))
         return self._census
 
     def from_census(self, name: str, why: str) -> dict:
@@ -484,10 +528,14 @@ class GitHub:
         r = index.get(name.lower())
         if r is None:
             return {**BLANK, "github": why, "note": "not in the census"}
+        state = r["license_state"] if r["license_state"] in ("spdx", "none", "non-standard") else None
+        spdx = r["license"] if isinstance(r["license"], str) and SPDX_ID.fullmatch(r["license"]) else None
+        if state == "spdx" and spdx is None:
+            state = None  # the census says licensed but names no usable identifier: unknown, not a finding
         return {**BLANK, "source": "census", "source_date": self.census_date, "github": why,
-                "full_name": r["full_name"], "archived": bool(r["archived"]),
-                "pushed_at": str(r["pushed_at"] or "")[:10] or None, "license": r["license"],
-                "license_state": r["license_state"], "stars": r["stars"]}
+                "full_name": r["full_name"], "archived": r["archived"] is True, "pushed_at": iso_date(r["pushed_at"]),
+                "license": spdx if state == "spdx" else None, "license_state": state,
+                "stars": r["stars"] if isinstance(r["stars"], int) else None}
 
 
 # The census's thresholds (agent-vitals collect.py, bucket()), so an entry reads
@@ -550,19 +598,29 @@ def examine(entries: list[dict], gh: GitHub, today: dt.date, progress=None) -> l
 def parse_fail_on(text: str) -> set[str]:
     keys = set()
     for k in (p.strip().lower() for p in text.split(",")):
-        if not k:
+        if not k or k == "none":
             continue
         k = ALIASES.get(k, k)
-        if k not in LABEL:
-            raise ValueError(f"--fail-on: unknown finding {k!r}; choose from {', '.join(FINDING_KEYS)}")
+        if k == "unchecked":
+            raise ValueError("--fail-on: entries that could not be checked always give exit code 2 under --strict")
+        if k not in FAIL_ON_KEYS:
+            raise ValueError(f"--fail-on: unknown finding {k!r}; choose from {', '.join(FAIL_ON_KEYS)} or none")
         keys.add(k)
     return keys
+
+
+def strict_line(results: list[dict], fail_on: set[str]) -> str:
+    matched = sum(1 for r in results if fail_on & set(r["findings"]))
+    unchecked = sum(1 for r in results if r["status"] == "unchecked")
+    named = " or ".join(LABEL[k] for k in FAIL_ON_KEYS if k in fail_on)
+    what = f"an entry that is {named}, or one that could not be checked" if named else "an entry that could not be checked"
+    return f"This check fails on {what}: {matched} matched, {unchecked} not checked."
 
 
 def summary(results: list[dict]) -> dict:
     s = {"repositories": len(results), "links": sum(len(r["locations"]) for r in results)}
     s.update({k: sum(1 for r in results if k in r["findings"]) for k in FINDING_KEYS})
-    s["no finding"] = sum(1 for r in results if not r["findings"])
+    s["no-finding"] = sum(1 for r in results if not r["findings"])
     return s
 
 
@@ -646,12 +704,12 @@ def groups(results: list[dict]) -> list[tuple[str, list[dict]]]:
 def summary_line(s: dict) -> str:
     parts = [f"{s['repositories']} {'repository' if s['repositories'] == 1 else 'repositories'}"]
     parts += [f"{s[k]} {LABEL[k]}" for k in FINDING_KEYS if s[k]]
-    parts.append(f"{s['no finding']} with no finding")
+    parts.append(f"{s['no-finding']} with no finding")
     return " · ".join(parts)
 
 
 def render_text(results: list[dict], files: list[str], scope: str, today: dt.date,
-                gh: GitHub, ignored: dict[str, int]) -> str:
+                gh: GitHub, ignored: dict[str, int], fail_on: set[str] | None = None) -> str:
     many = len(files) > 1
     s = summary(results)
     head = f"awesome-vitals · {', '.join(files)} · {scope} · {today.isoformat()}"
@@ -676,6 +734,8 @@ def render_text(results: list[dict], files: list[str], scope: str, today: dt.dat
     else:
         lines += ["No finding.", ""]
     lines.append(summary_line(s))
+    if fail_on is not None:
+        lines.append(strict_line(results, fail_on))
     lines += source_notes(results, gh)
     if ignored_note(ignored):
         lines.append(ignored_note(ignored))
@@ -693,10 +753,8 @@ def render_markdown(results: list[dict], files: list[str], scope: str, today: dt
     s = summary(results)
     out = [f"### awesome-vitals: {esc(', '.join(files))}, {esc(scope)}, {today.isoformat()}", "",
            f"{s['links']} {'link' if s['links'] == 1 else 'links'} to {summary_line(s)}.", ""]
-    if fail_on:
-        failing = sum(1 for r in results if fail_on & set(r["findings"]))
-        out += [f"This check fails on: {', '.join(LABEL[k] for k in FINDING_KEYS if k in fail_on)}. "
-                f"{failing} {'entry' if failing == 1 else 'entries'} matched.", ""]
+    if fail_on is not None:
+        out += [strict_line(results, fail_on), ""]
     for k, rs in groups(results):
         out += [f"#### {LABEL[k].capitalize()} ({len(rs)})", "",
                 "| Line | Repository | Last push | Licence | Source | Note |",
@@ -722,7 +780,7 @@ def render_json(results: list[dict], files: list[str], scope: str, today: dt.dat
         "fail_on": sorted(fail_on, key=FINDING_KEYS.index) if fail_on is not None else None,
         "summary": summary(results),
         "github": {"state": gh.state, "requests": gh.requests, "stopped": gh.stop_reason or None},
-        "census": {"url": gh.census_url, "date": gh.census_date or None, "error": gh.census_error or None},
+        "census": {"url": mask_url(gh.census_url), "date": gh.census_date or None, "error": gh.census_error or None},
         "notes": source_notes(results, gh),
         "ignored": ignored,
         "repositories": results,
@@ -747,10 +805,11 @@ def main(argv: list[str] | None = None, *, today: dt.date | None = None, api: st
     fmt.add_argument("--markdown", action="store_true", help="print a Markdown report, for an issue or a job summary")
     fmt.add_argument("--json", action="store_true", help="print JSON")
     ap.add_argument("--strict", action="store_true",
-                    help=f"exit 1 if any entry has a finding named in --fail-on (default {DEFAULT_FAIL_ON})")
+                    help=f"exit 1 if an entry has a finding named in --fail-on (default {DEFAULT_FAIL_ON}), "
+                         "else 2 if an entry could not be checked")
     ap.add_argument("--fail-on", metavar="LIST",
-                    help="comma-separated findings that make --strict fail; implies --strict. "
-                         "One or more of: " + ", ".join(FINDING_KEYS))
+                    help="comma-separated findings that make --strict exit 1, or none; implies --strict unless none. "
+                         "One or more of: " + ", ".join(FAIL_ON_KEYS))
     sel = ap.add_mutually_exclusive_group()
     sel.add_argument("--only-lines", metavar="FILE:START-END,...",
                      help="report only entries on these lines, e.g. README.md:40-52,README.md:97")
@@ -772,7 +831,8 @@ def main(argv: list[str] | None = None, *, today: dt.date | None = None, api: st
         only = parse_only_lines(a.only_lines) if a.only_lines else None
     except ValueError as e:
         ap.error(str(e))
-    strict = a.strict or a.fail_on is not None
+    # --fail-on none reports without failing; --strict on top of it fails only on what could not be checked
+    strict = a.strict or bool(a.fail_on is not None and fail_on)
 
     sources = []
     for f in a.files:
@@ -790,7 +850,7 @@ def main(argv: list[str] | None = None, *, today: dt.date | None = None, api: st
         try:
             selected = git_added_lines(a.diff, a.files)
         except (ValueError, RuntimeError) as e:
-            print(f"awesome-vitals: {e}", file=sys.stderr)
+            print(f"awesome-vitals: {plain(e, 400)}", file=sys.stderr)
             return 2
         scope = f"lines added in {a.diff}"
 
@@ -815,9 +875,11 @@ def main(argv: list[str] | None = None, *, today: dt.date | None = None, api: st
     elif a.markdown:
         sys.stdout.write(render_markdown(results, a.files, scope, today, gh, ignored, fail_on if strict else None))
     else:
-        sys.stdout.write(render_text(results, a.files, scope, today, gh, ignored))
+        sys.stdout.write(render_text(results, a.files, scope, today, gh, ignored, fail_on if strict else None))
     if strict and any(fail_on & set(r["findings"]) for r in results):
         return 1
+    if strict and any(r["status"] == "unchecked" for r in results):
+        return 2
     return 0
 
 
