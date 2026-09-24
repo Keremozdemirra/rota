@@ -191,7 +191,7 @@ please keep volume low and use it with caution in production settings."
 via Climate TRACE under the Creative Commons Attribution 4.0 International License
 (CC BY 4.0), with the exception of external datasets listed below."
 (https://climatetrace.org/terms, checked 2026-09-24;
-https://creativecommons.org/licenses/by/4.0/). Every answer carries the line
+https://creativecommons.org/licenses/by/4.0/). Every tool result with data carries the line
 
     Source: Climate TRACE (climatetrace.org), CC BY 4.0, retrieved YYYY-MM-DD
 
@@ -259,6 +259,9 @@ XKX (Kosovo) and ZNC are Climate TRACE's codes, not ISO ones.
   `CLIMATE_TRACE_TIMEOUT` (1-60 seconds). It reads no configuration files and
   nothing in your home directory.
 - **Writes:** nothing, except `refresh`, which rewrites the snapshot (or `--out`).
+- **Owners:** only an owner's name, Climate TRACE id and (when present and valid)
+  LEI are passed on, as the API lists them; Climate TRACE compiles them from company
+  websites, news and aggregators.
 
 ## How it handles the API
 
@@ -311,8 +314,8 @@ trimmed real answers recorded on 2026-09-24 (German steel plants, one plant with
 its owners, Poland's power sector 2020-2024 and 2026, a cropland-fires record whose
 data lead is EDGAR, the API's `null`, 404 and 400 bodies). It also produces the
 failures that cannot be recorded politely: 429, 5xx, timeouts, dropped connections,
-short, empty, non-UTF-8 and malformed bodies. One test drives the MCP server as a
-subprocess over stdin and stdout. The live checks for this README were the commands
+short, empty, non-UTF-8 and malformed bodies. The MCP tests start the server as a
+subprocess and talk to it over stdin and stdout. The live checks for this README were the commands
 shown above, run on 2026-09-24.
 
 ## Licence

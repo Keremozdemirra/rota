@@ -27,10 +27,29 @@ CATEGORIES = {"Cement", "Electricity", "Fertilisers", "Iron and steel", "Alumini
 GASES = {"Carbon dioxide", "Carbon dioxide and nitrous oxide", "Carbon dioxide and perfluorocarbons"}
 
 
-def clean(text, n: int = MAX_TEXT) -> str:
-    s = "".join(" " if unicodedata.category(ch) in ("Cc", "Cf", "Cs", "Zl", "Zp") else ch for ch in str(text))
-    s = " ".join(s.split())
-    return s if len(s) <= n else s[: n - 3] + "..."
+def strip_controls(text) -> str:
+    """Control characters become spaces; format characters (bidi overrides, zero-width) go."""
+    out = []
+    for ch in str(text):
+        cat = unicodedata.category(ch)
+        if cat in ("Cc", "Zl", "Zp"):
+            out.append(" ")
+        elif cat not in ("Cf", "Cs"):
+            out.append(ch)
+    return "".join(out)
+
+
+def clean(text, n: int | None = MAX_TEXT) -> str:
+    words = []
+    # Most words are printable; only the others are looked at character by character,
+    # which keeps a 16 MB Official Journal text fast to clean.
+    for w in str(text).split():
+        if w.isprintable():
+            words.append(w)
+        else:
+            words.extend(strip_controls(w).split())
+    s = " ".join(words)
+    return s if n is None or len(s) <= n else s[: n - 3] + "..."
 
 
 def remote(text, n: int = MAX_TEXT):

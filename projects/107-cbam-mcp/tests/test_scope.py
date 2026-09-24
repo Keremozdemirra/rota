@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cbam_test_support import DataEnv  # noqa: E402
 from cbam_mcp import lookup  # noqa: E402
 from cbam_mcp.codes import InputError  # noqa: E402
+from cbam_mcp.remote import plain  # noqa: E402
 
 
 class Scope(unittest.TestCase):
@@ -23,7 +24,7 @@ class Scope(unittest.TestCase):
         self.assertEqual((r["goods_category"], r["greenhouse_gases"]), ("Iron and steel", "Carbon dioxide"))
         self.assertEqual(r["annex_i_line"]["cn_code"], "72")
         self.assertEqual(r["annex_ii"]["status"], "listed")
-        self.assertEqual(r["cn"]["label"], "Of a thickness exceeding 15 mm")
+        self.assertEqual(plain(r["cn"]["label"]), "Of a thickness exceeding 15 mm")
         self.assertTrue(r["de_minimis"]["applies_to_these_goods"])
         self.assertIn("50 tonnes of net mass", r["de_minimis"]["annex_vii_point_1"])
 
@@ -40,7 +41,8 @@ class Scope(unittest.TestCase):
             r = lookup.cbam_scope(code)
             self.assertEqual((r["status"], r["basis"]), ("partially_in_scope", "ex_code"), code)
             self.assertTrue(r["annex_i_line"]["ex"])
-            self.assertIn("only the goods that description covers", r["explanation"])
+            self.assertIn("only the goods its text describes", r["explanation"])
+            self.assertEqual(plain(r["annex_i_line"]["text"]), "Other kaolinic clays except non-calcined kaolinic clays")
         self.assertEqual(lookup.cbam_scope("2507 00 20")["status"], "not_in_scope")
 
     def test_heading_with_mixed_children_lists_them(self):

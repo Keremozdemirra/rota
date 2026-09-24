@@ -663,8 +663,9 @@ def firds_lookup(isin: str, include_terminated: bool = False) -> dict:
             "unknown": counts.get("unknown", 0) or None,
             "listed": "all" if include_terminated else "not_terminated",
             "as_of": now.date().isoformat(),
-            "rule": "derived by firds-mcp: terminated when FIRDS gives a termination date on or before the as-of "
-                    "time, cancelled when the FIRDS status is Cancelled, otherwise not_terminated",
+            "rule": "derived by firds-mcp: cancelled when the FIRDS status is Cancelled; terminated when FIRDS gives "
+                    "a termination date on or before the as-of time, or status Terminated without a date; unknown "
+                    "when the date cannot be read; otherwise not_terminated",
             "records_truncated": truncated or None,
             "records_found": found if truncated else None,
         }),
@@ -874,7 +875,7 @@ def _linked(lei: str, payload: dict, name: str, cache: dict, exceptions: bool = 
         if status == 200:
             return _exception(body)
     return {"state": "none_reported",
-            "note": "GLEIF holds neither a relationship record nor a reporting exception for this"}
+            "note": "GLEIF holds neither a relationship record nor a reporting exception for this link"}
 
 
 FUND_LINKS = ("fund-manager", "umbrella-fund", "master-fund")
@@ -1043,6 +1044,7 @@ def sources() -> dict:
                 "terms": ESMA_TERMS,
                 "terms_quote": "Reproduction of all information on this site (ESMA Library) is authorised except as "
                                "otherwise stated, provided the source is acknowledged",
+                "attribution_line": esma_source_line(),
                 "required_disclaimer": ESMA_DISCLAIMER,
                 "register_disclaimer_quote": "ESMA is not able to provide any representation or warranty that the "
                                              "available content is complete, accurate or up to date.",
@@ -1057,6 +1059,7 @@ def sources() -> dict:
                 "terms_quote": "The data available through the Access Service are provided under the CC0 licence",
                 "rate_limit": "'Rate limiting is currently set at 60 requests, per minute, per user, for all users.' "
                               "(https://api.gleif.org/docs). firds-mcp stays within it and backs off on HTTP 429.",
+                "attribution_line": gleif_source_line(),
                 "parent_definition": PARENT_NOTE,
                 "checked": "2026-09-24",
             },
@@ -1077,8 +1080,8 @@ TOOLS = [
     {"name": "isin_lookup",
      "description": "Look up an ISIN in ESMA FIRDS, the EU/EEA reference data that trading venues and systematic "
                     "internalisers report. Returns the instrument's full name, CFI code, notional currency, the LEI "
-                    "in FIRDS field 'Issuer or operator of the trading venue identifier' (issuer, or venue operator "
-                    "for exchange-traded derivatives), debt or derivative details under ESMA's field labels, and "
+                    "in FIRDS field 'Issuer or operator of the trading venue identifier' (the issuer, or for "
+                    "exchange-traded derivatives possibly the venue operator), debt or derivative details under ESMA's field labels, and "
                     "the venues by MIC with FIRDS's dates as given (ISO 8601, UTC): admission or first trade, "
                     "termination, publication. Only the latest record per venue is used. By default only venues "
                     "without a past termination date are listed; counts cover all. found=false when FIRDS has no "
@@ -1132,7 +1135,9 @@ TOOLS = [
 def _args(arguments: dict, allowed: set) -> dict:
     extra = sorted(set(arguments) - allowed)
     if extra:
-        raise InputError(f"unknown argument(s): {', '.join(clean(x, 40) for x in extra)}")
+        names = [x if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,40}", x) else "(a name that is not an identifier)"
+                 for x in extra]
+        raise InputError(f"unknown argument(s): {', '.join(names)}")
     return arguments
 
 
@@ -1201,7 +1206,7 @@ def handle(req) -> None:
         _reply(id_, {"tools": TOOLS})
     elif method == "tools/call":
         name = params.get("name")
-        if name not in HANDLERS:
+        if not isinstance(name, str) or name not in HANDLERS:
             _reply(id_, error={"code": -32602, "message": f"unknown tool {clean(name, 60)!r}"})
             return
         _reply(id_, call_tool(name, params.get("arguments") or {}))
@@ -1228,7 +1233,12 @@ def serve() -> int:
             except (UnicodeDecodeError, ValueError):
                 _reply(None, error={"code": -32700, "message": "parse error"})
                 continue
-            handle(req)
+            try:
+                handle(req)
+            except Exception as e:  # one malformed message must not end the session
+                id_ = req.get("id") if isinstance(req, dict) else None
+                _reply(id_ if isinstance(id_, (str, int)) else None,
+                       error={"code": -32603, "message": f"internal error ({type(e).__name__})"})
     except KeyboardInterrupt:
         pass
     return 0
@@ -1370,7 +1380,8 @@ def render(command: str, result: dict) -> str:
         lines += _linked_lines("Umbrella fund", result.get("umbrella_fund"))
         lines += _linked_lines("Master fund", result.get("master_fund"))
     elif command == "children":
-        lines.append(f"{result['lei']}: {result.get('total_reported_by_gleif', '?')} {result.get('relation')} "
+        total = result.get("total_reported_by_gleif")
+        lines.append(f"{result['lei']}: {'?' if total is None else total} {result.get('relation')} "
                      f"children in GLEIF; {result.get('returned')} shown")
         for c in result.get("children") or []:
             lines.append("  " + _entity_line(c))
@@ -1427,6 +1438,7 @@ def main(argv=None) -> int:
             result = lei_children(args.lei, limit=args.limit, relation="ultimate" if args.ultimate else "direct")
         else:
             result = sources()
+        text = json.dumps(result, ensure_ascii=False, indent=2) if args.json else render(args.command, result)
     except InputError as e:
         print(f"firds-mcp: {e}. Nothing was sent.", file=sys.stderr)
         return 2
@@ -1442,10 +1454,7 @@ def main(argv=None) -> int:
         except (ValueError, OSError):
             pass
     try:
-        if args.json:
-            print(json.dumps(result, ensure_ascii=False, indent=2))
-        else:
-            print(render(args.command, result))
+        print(text)
         sys.stdout.flush()
     except BrokenPipeError:
         return 0

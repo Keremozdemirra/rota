@@ -89,8 +89,10 @@ def split_codes(line: str):
     if not items:
         return None
     rest = line[pos:].strip()
-    if rest and rest[0].isdigit():
-        return None  # "95 % or more" style text, not a code list
+    # Annex descriptions start with a letter or a bracket; "2905 45 95 % ..." is
+    # a code followed by a number, not an eight-digit code.
+    if rest and not (rest[0].isalpha() or rest[0] in "(" + LQ):
+        return None
     return items, rest, tidy(line[:pos])
 
 

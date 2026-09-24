@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cbam_test_support import DataEnv  # noqa: E402
 from cbam_mcp import lookup  # noqa: E402
 from cbam_mcp.codes import InputError  # noqa: E402
+from cbam_mcp.remote import plain  # noqa: E402
 
 
 class Describe(unittest.TestCase):
@@ -19,7 +20,7 @@ class Describe(unittest.TestCase):
 
     def test_electricity(self):
         r = lookup.cn_describe("2716 00 00")
-        self.assertEqual((r["found"], r["label"], r["year"]), (True, "Electrical energy", 2026))
+        self.assertEqual((r["found"], plain(r["label"]), r["year"]), (True, "Electrical energy", 2026))
         self.assertEqual([h["cn_code"] for h in r["hierarchy"]], ["V", "27"])
         self.assertEqual(r["in_cn_2025"], "same label")
         self.assertIn("2025/1926", r["legally_binding_source"])
@@ -30,9 +31,9 @@ class Describe(unittest.TestCase):
 
     def test_hierarchy_includes_unnumbered_lines(self):
         r = lookup.cn_describe("7208.51.98")
-        labels = [h["label"] for h in r["hierarchy"]]
+        labels = [plain(h["label"]) for h in r["hierarchy"]]
         self.assertIn("Of a thickness exceeding 10 mm but not exceeding 15 mm, of a width of", labels)
-        self.assertEqual(r["label"], "Less than 2050 mm")
+        self.assertEqual(plain(r["label"]), "Less than 2050 mm")
         self.assertIn("Flat-rolled products of iron or non-alloy steel", r["self_explanatory_text"])
 
     def test_sub_codes(self):
@@ -41,7 +42,7 @@ class Describe(unittest.TestCase):
 
     def test_code_new_in_2026(self):
         r = lookup.cn_describe("7308 20 10")
-        self.assertEqual(r["label"], "Tubular wind turbine steel towers and tower-sections")
+        self.assertEqual(plain(r["label"]), "Tubular wind turbine steel towers and tower-sections")
         self.assertEqual(r["in_cn_2025"], "no such code")
         old = lookup.cn_describe("7308 20 00", year=2025)
         self.assertTrue(old["found"])

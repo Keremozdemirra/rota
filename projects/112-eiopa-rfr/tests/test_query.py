@@ -5,14 +5,13 @@ import datetime as dt
 import json
 from unittest import mock
 
-from tests.support import E, FakeWeb, Isolated, fixture, listing_urls
-
-TODAY = dt.datetime.now(dt.timezone.utc).date().isoformat()
-
+from tests.support import REAL_HTTP_GET, E, FakeWeb, Isolated, fixture, listing_urls
 
 class GetRate(Isolated):
     def test_eur_ten_years_with_and_without_va(self):
-        r = E.get_rate("EUR", 10, "2026-08")
+        noon = dt.datetime(2026, 9, 24, 12, 0, tzinfo=dt.timezone.utc)
+        with mock.patch.object(E, "_now", return_value=noon):
+            r = E.get_rate("EUR", 10, "2026-08")
         self.assertEqual(r["reference_date"], "2026-08-31")
         self.assertEqual((r["no_va"]["rate"], r["no_va"]["rate_percent"], r["no_va"]["cell"]),
                          (0.03268, 3.268, "RFR_spot_no_VA!C20"))
@@ -25,7 +24,7 @@ class GetRate(Isolated):
         self.assertIn("resolved to reference date 2026-08-31", r["date"]["note"])
         self.assertEqual(r["attribution"],
                          "Source: EIOPA - European Insurance and Occupational Pensions Authority, https://eiopa.europa.eu/, "
-                         f"risk-free interest rate term structures, EIOPA_RFR_20260831.zip, retrieved {TODAY}")
+                         "risk-free interest rate term structures, EIOPA_RFR_20260831.zip, retrieved 2026-09-24")
         self.assertIn("d491908e-9c02-427a-90ec-9dbd7b881ffe", r["source"]["url"])
         self.assertEqual(r["source"]["workbook"], "EIOPA_RFR_20260831_Term_Structures.xlsx")
         self.assertRegex(r["source"]["sha256"], r"^[0-9a-f]{64}$")
@@ -267,6 +266,47 @@ class CacheAndOffline(Isolated):
         r = E.get_rate("EUR", 10, "2026-08")
         self.assertEqual(r["no_va"]["rate"], 0.03268)
         self.assertEqual(json.loads(path.read_text())["format"], E.PARSER_VERSION)
+
+    def test_damaged_parsed_release_is_read_again_from_the_zip(self):
+        E.get_rate("EUR", 10, "2026-08")
+        path = self.cache / "releases" / "rfr_20260831.json"
+        data = json.loads(path.read_text())
+        data["curves"]["no_va"] = {"sheet": "RFR_spot_no_VA"}  # right version, wrong shape
+        path.write_text(json.dumps(data))
+        self.use_web(FakeWeb({}))
+        self.assertEqual(E.get_rate("EUR", 10, "2026-08")["no_va"]["rate"], 0.03268)
+
+    def test_unwritable_cache_still_answers(self):
+        import os
+        blocker = self.tmp / "not-a-directory"
+        blocker.write_text("x")
+        os.environ["EIOPA_RFR_CACHE"] = str(blocker / "cache")
+        r = E.get_rate("EUR", 10, "2026-08")
+        self.assertEqual(r["no_va"]["rate"], 0.03268)
+        self.assertTrue(any(w.startswith("not cached: cannot write") for w in r["warnings"]), r["warnings"])
+        self.assertTrue(any("release list not cached" in w for w in r["warnings"]), r["warnings"])
+
+    def test_tampered_release_list_entries_are_dropped(self):
+        E.list_releases()
+        path = self.cache / "listing.json"
+        data = json.loads(path.read_text())
+        data["releases"].insert(0, {"reference_date": "2099-12-31", "file": 42, "url": "https://evil.example/x.zip"})
+        data["releases"].insert(0, "junk")
+        data["releases"].append({"reference_date": "2030-01-31", "file": "x.zip", "url": "https://evil.example/x.zip"})
+        path.write_text(json.dumps(data))
+        self.assertEqual(E.list_releases()["latest"], "2030-01-31")  # well-formed, so kept and sorted first
+        opened = []
+
+        class NoNetwork:
+            def open(self, request, timeout=None):
+                opened.append(request.full_url)
+                raise AssertionError("the network was used")
+
+        with mock.patch.object(E, "http_get", REAL_HTTP_GET), mock.patch.object(E, "_OPENER", NoNetwork()):
+            with self.assertRaises(E.FetchError) as ctx:
+                E.get_rate("EUR", 10, "2030-01")  # its link is refused before any request
+        self.assertIn("outside https://www.eiopa.europa.eu/", str(ctx.exception))
+        self.assertEqual(opened, [])
 
     def test_garbage_in_the_cache_is_ignored(self):
         (self.cache / "releases").mkdir(parents=True)

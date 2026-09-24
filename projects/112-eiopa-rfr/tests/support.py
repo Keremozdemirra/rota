@@ -23,6 +23,8 @@ if str(ROOT) not in sys.path:
 
 import eiopa_rfr as E  # noqa: E402
 
+REAL_HTTP_GET = E.http_get  # before any test replaces it
+
 
 def fixture(name: str) -> bytes:
     return (FIXTURES / name).read_bytes()

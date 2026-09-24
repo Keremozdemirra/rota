@@ -1650,7 +1650,11 @@ def _pattern_findings(sheet: Sheet) -> list:
     """Hardcoded numbers in a run of formulas, and formulas that differ from the matching formulas
     on both sides. Formulas are compared in R1C1 form, where copies of one formula are identical
     (ECMA-376 §18.3.1.40: two formulas are the same when their R1C1 representations are).
-    A run of up to two odd cells is still seen as sitting between its neighbours (tool's choice)."""
+
+    Tool's choices: the cells on both sides must carry one pattern and at least one side must be
+    a run of two or more copies of it, so that two unrelated line items that happen to share a
+    shape (Gross profit = B2-B3 and EBITDA = B4-B5) do not make the row between them "odd"; and a
+    run of up to two odd cells still counts as sitting between its neighbours."""
     cells, info = sheet.cells, sheet.info
     out = []
 
@@ -1669,7 +1673,9 @@ def _pattern_findings(sheet: Sheet) -> list:
         r1, c1 = r + dr, c + dc
         if same(r1, c1):
             r1, c1 = r1 + dr, c1 + dc
-        return pattern(r1, c1), (r1, c1)
+        p = pattern(r1, c1)
+        run = p is not None and pattern(r1 + dr, c1 + dc) == p
+        return p, (r1, c1), run
 
     for (r, c), cell in cells.items():
         if cell.formula is None:
@@ -1677,9 +1683,9 @@ def _pattern_findings(sheet: Sheet) -> list:
                 continue
             found = None
             for dr, dc, axis in ((0, 1, "row"), (1, 0, "column")):
-                p1, a = probe(r, c, -dr, -dc, number)
-                p2, b = probe(r, c, dr, dc, number)
-                if p1 is not None and p1 == p2:
+                p1, a, run1 = probe(r, c, -dr, -dc, number)
+                p2, b, run2 = probe(r, c, dr, dc, number)
+                if p1 is not None and p1 == p2 and (run1 or run2):
                     found = ("between", axis, a, b, p1)
                     break
             if found is None:
@@ -1699,9 +1705,9 @@ def _pattern_findings(sheet: Sheet) -> list:
             continue
         for dr, dc, axis in ((0, 1, "row"), (1, 0, "column")):
             same = lambda rr, cc: pattern(rr, cc) == own  # noqa: E731
-            p1, a = probe(r, c, -dr, -dc, same)
-            p2, b = probe(r, c, dr, dc, same)
-            if p1 is not None and p1 == p2 and p1 != own:
+            p1, a, run1 = probe(r, c, -dr, -dc, same)
+            p2, b, run2 = probe(r, c, dr, dc, same)
+            if p1 is not None and p1 == p2 and p1 != own and (run1 or run2):
                 out.append(_finding("inconsistent-formula", "warning", sheet.name, r, c, formula="=" + cell.formula,
                                     axis=axis, neighbours=[_neighbour(sheet, *a), _neighbour(sheet, *b)],
                                     pattern="=" + p1, own_pattern="=" + own))
@@ -1899,6 +1905,7 @@ def _pair_block(bdicts: list, adicts: list):
     n, m = len(bdicts), len(adicts)
     anchors = []
     if n <= ALIGN_BLOCK and m <= ALIGN_BLOCK:
+        blabels, alabels = [_label(d) for d in bdicts], [_label(d) for d in adicts]
         sim = [[0.0] * m for _ in range(n)]
         for i, bd in enumerate(bdicts):
             for j, ad in enumerate(adicts):
@@ -1906,6 +1913,10 @@ def _pair_block(bdicts: list, adicts: list):
                 if total:
                     same = sum(1 for k, v in bd.items() if ad.get(k) == v)
                     s = same / total
+                    if blabels[i] is not None and blabels[i] == alabels[j]:
+                        # Same label in the first cell (a line item's name, a column's header):
+                        # the same row even when most of its formulas were rewritten.
+                        s = max(s, ALIGN_SIMILARITY) + 0.01
                     if s >= ALIGN_SIMILARITY:
                         sim[i][j] = s
         score = [[0.0] * (m + 1) for _ in range(n + 1)]
@@ -1937,6 +1948,13 @@ def _pair_block(bdicts: list, adicts: list):
             pairs.append((ai, aj))
         pi, pj = ai + 1, aj + 1
     return pairs, deleted, inserted
+
+
+def _label(d: dict):
+    if not d:
+        return None
+    first = d[min(d)]
+    return first[2] if first[0] == "v" and first[1] == "s" and first[2] else None
 
 
 def _align(bsig: list, asig: list):
@@ -2128,8 +2146,21 @@ class _Translator:
         return self.after.sheets[self.sheet_map[s.index]].name
 
     def ref(self, ref: Ref, host: int) -> str:
+        """The reference in the after workbook's coordinates, in comparison form."""
+        new = self._move(ref, host)
+        return ref_norm_a1(new if new is not None else ref)
+
+    def display(self, ref: Ref, host: int) -> str:
+        """The same, as Excel would write it."""
+        new = self._move(ref, host)
+        if new is None:
+            return ref.prefix + ref_body_a1(ref)
+        prefix = make_prefix(new.book, new.sheet, new.sheet2) if ref.sheet is not None else ""
+        return prefix + ref_body_a1(new)
+
+    def _move(self, ref: Ref, host: int):
         if ref.book is not None or ref.kind in ("name", "error"):
-            return ref_norm_a1(ref)
+            return None
         target = self.before.sheet(ref.sheet) if ref.sheet is not None else self.before.sheets[host]
         new = ref.copy()
         if ref.sheet is not None:
@@ -2159,7 +2190,7 @@ class _Translator:
                     new.kind = "error"
                 else:
                     new.c1, new.c2 = (nc1, nc2) if ref.c1 <= ref.c2 else (nc2, nc1)
-        return ref_norm_a1(new)
+        return new
 
 
 def _match_sheets(before: Workbook, after: Workbook):
@@ -2237,13 +2268,17 @@ def diff(before: Workbook, after: Workbook, align: bool = True) -> dict:
             if acell is None:
                 changes.append(_change("removed", a, b, (ar, ac), (r, c), bcell, None))
                 continue
-            kind = _compare(b, a, (r, c), (ar, ac), bcell, acell, tr, tok_cache)
+            kind, adjusted = _compare(b, a, (r, c), (ar, ac), bcell, acell, tr, tok_cache)
             if kind is None:
                 continue
             if kind == "cached":
                 cached_changed += 1
                 continue
-            changes.append(_change(kind, a, b, (ar, ac), (r, c), bcell, acell))
+            ch = _change(kind, a, b, (ar, ac), (r, c), bcell, acell)
+            if adjusted is not None:
+                ch["adjusted"] = "=" + adjusted
+                ch["reason"] = f"the formula text is unchanged but the cells it referred to moved; adjusted, it would read ={clip(adjusted, 120)}"
+            changes.append(ch)
         for key, acell in a.cells.items():
             if key not in seen:
                 changes.append(_change("added", a, b, key, None, None, acell))
@@ -2352,30 +2387,27 @@ def _compare(b: Sheet, a: Sheet, bkey, akey, bcell: Cell, acell: Cell, tr: _Tran
             if not same and not tr.identity and canonical(bt, ref_norm_a1) == after_text:
                 # Same text, but the rows, columns or sheet it named moved: a tool that does not
                 # adjust formulas (openpyxl's insert_rows, delete_rows, sheet renames) left it behind.
-                return "stale-reference"
+                return "stale-reference", render(bt, lambda ref: tr.display(ref, b.index))
         if not same:
-            return "formula-changed"
+            return "formula-changed", None
         if bcell.kind is not None and acell.kind is not None and (bcell.kind, bcell.value) != (acell.kind, acell.value):
-            return "cached"
-        return None
+            return "cached", None
+        return None, None
     if bf and not af:
-        if acell.member is not None:
-            return "formula-changed"
-        return "formula-to-value"
+        return ("formula-changed" if acell.member is not None else "formula-to-value"), None
     if af and not bf:
-        return "value-to-formula"
+        return "value-to-formula", None
     if bcell.member is not None or acell.member is not None:
         if bcell.member is not None and acell.member is not None:
-            return "cached" if (bcell.kind, bcell.value) != (acell.kind, acell.value) else None
-        return "value-to-formula" if acell.member is not None else "formula-to-value"
+            return ("cached" if (bcell.kind, bcell.value) != (acell.kind, acell.value) else None), None
+        return ("value-to-formula" if acell.member is not None else "formula-to-value"), None
     if (bcell.kind, bcell.value) != (acell.kind, acell.value):
-        return "value-changed"
-    return None
+        return "value-changed", None
+    return None, None
 
 
 _CHANGE_RISK = {"formula-to-value": ("warning", "a formula was replaced by a constant value"),
-                "stale-reference": ("warning", "the formula text is unchanged but the cells it referred to moved, "
-                                               "so it now reads different cells")}
+                "stale-reference": ("warning", "the formula text is unchanged but the cells it referred to moved")}
 
 
 def _change(kind, a: Sheet, b: Sheet, apos, bpos, bcell, acell) -> dict:
@@ -3009,6 +3041,8 @@ def _change_json(ch: dict) -> dict:
     out = {"cell": ch["cell"], "change": ch["kind"], "before": _content(ch["before"], True), "after": _content(ch["after"], True)}
     if ch["before_cell"] != ch["cell"]:
         out["before_cell"] = ch["before_cell"]
+    if ch.get("adjusted"):
+        out["adjusted"] = clip(mask(ch["adjusted"]), FORMULA_LIMIT)
     if ch.get("risk"):
         out["risk"] = ch["risk"]
         out["reason"] = ch["reason"]

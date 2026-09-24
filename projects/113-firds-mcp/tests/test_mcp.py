@@ -103,6 +103,20 @@ class InProcess(support.OfflineTest):
         self.assertEqual(replies[2]["error"]["code"], -32600)
         self.assertEqual(replies[3]["result"], {})
 
+    def test_tool_name_of_the_wrong_type(self):
+        [reply] = exchange({"jsonrpc": "2.0", "id": 13, "method": "tools/call", "params": {"name": ["isin_lookup"]}})
+        self.assertEqual(reply["error"]["code"], -32602)
+
+    def test_serve_survives_a_failing_handler(self):
+        original = fm.handle
+        self.addCleanup(setattr, fm, "handle", original)
+        fm.handle = lambda req: {}["boom"]
+        stdin = io.TextIOWrapper(io.BytesIO(b'{"jsonrpc": "2.0", "id": 7, "method": "ping"}\n'))
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out), unittest.mock.patch.object(sys, "stdin", stdin):
+            self.assertEqual(fm.serve(), 0)
+        self.assertEqual(json.loads(out.getvalue())["error"], {"code": -32603, "message": "internal error (KeyError)"})
+
     def test_serve_reads_utf8_lines_and_survives_garbage(self):
         lines = b"\n".join([b"{not json", b"", b"\xff\xfe", json.dumps({"jsonrpc": "2.0", "id": 1,
                                                                          "method": "ping"}).encode()]) + b"\n"

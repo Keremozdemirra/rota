@@ -14,6 +14,8 @@ import re
 import zipfile
 import xml.etree.ElementTree as ET
 
+from .remote import clean
+
 X = "{http://www.w3.org/1999/xhtml}"
 SML = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 DOC_REL = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
@@ -34,7 +36,7 @@ class ParseError(ValueError):
 
 
 def _clean(text: str) -> str:
-    return re.sub(r"\s+", " ", text.translate(_MARKERS)).strip()
+    return clean(text.translate(_MARKERS), None)
 
 
 def _xml(raw: bytes, what: str):

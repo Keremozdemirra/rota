@@ -400,6 +400,9 @@ class ReferenceToolsTest(ToolTest):
         self.assertIn("network_error", res["api_version_note"])
 
     def test_snapshot_unreadable_degrades_to_live_lists(self):
+        with open(self.home + "/list.json", "w") as f:
+            f.write("[1, 2]")
+        self.assertIn("not a JSON object", prov.Snapshot.load(self.home + "/list.json").error)
         svc = Service(client=self.client, snapshot=prov.Snapshot.load(self.home + "/missing.json"), today=lambda: TODAY)
         self.srv.route("/sources", fx.fixture("null.json"), {"year": 2024, "gas": "co2e_100yr", "sectors": "power", "limit": 20})
         res = svc.search_assets(sector="power", year=2024)

@@ -974,9 +974,10 @@ def get_listing(refresh: bool = False) -> dict:
     if cached is not None and (cached.get("format") != PARSER_VERSION or not isinstance(cached.get("releases"), list)):
         cached = None
     if cached is not None:
-        cached["releases"] = [r for r in cached["releases"] if isinstance(r, dict)
-                              and re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(r.get("reference_date")))
-                              and isinstance(r.get("file"), str) and isinstance(r.get("url"), (str, type(None)))]
+        cached["releases"] = sorted((r for r in cached["releases"] if isinstance(r, dict)
+                                     and re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(r.get("reference_date")))
+                                     and isinstance(r.get("file"), str) and isinstance(r.get("url"), (str, type(None)))),
+                                    key=lambda r: r["reference_date"], reverse=True)
     if offline():
         listing = cached or _listing_from_cache()
         listing["warnings"] = list(listing.get("warnings") or []) + [
@@ -1232,7 +1233,7 @@ def list_releases(refresh=False) -> dict:
 
 
 def get_curve(currency, date="latest", variant="no_va") -> dict:
-    variants = _variants(variant)
+    variants = _variants(variant or "no_va")
     rel, info = _resolve(date)
     out = {"reference_date": rel["reference_date"], "date": info}
     for v in variants:
@@ -1250,7 +1251,7 @@ def get_curve(currency, date="latest", variant="no_va") -> dict:
 
 
 def get_rate(currency, maturity_years, date="latest", variant="both") -> dict:
-    variants = _variants(variant)
+    variants = _variants(variant or "both")
     maturity = _maturity(maturity_years)
     rel, info = _resolve(date)
     out = {"maturity_years": maturity, "reference_date": rel["reference_date"], "date": info}
@@ -1292,7 +1293,7 @@ def get_parameters(currency, date="latest") -> dict:
 
 
 def compare(currency, maturity_years, date_a, date_b, variant="both") -> dict:
-    variants = _variants(variant)
+    variants = _variants(variant or "both")
     maturity = _maturity(maturity_years)
     rel_a, info_a = _resolve(date_a)
     rel_b, info_b = _resolve(date_b)
@@ -1341,6 +1342,8 @@ _PARAMS_TEXT = ("Parameters: coupon_freq, llp_years (last liquid point), converg
                 "forward rate, percent), alpha (Smith-Wilson convergence speed), cra_bp (credit risk adjustment, "
                 "basis points), va_bp (volatility adjustment, basis points; null without VA, 'n/a' where EIOPA "
                 "publishes none).")
+_CACHE_TEXT = (" The first use of a month downloads EIOPA's release zip (3 to 5 MB) once; later calls read the local "
+               "cache.")
 TOOLS = [
     {"name": "list_releases",
      "description": "List EIOPA's monthly Solvency II risk-free interest rate (RFR) term structure releases, found on "
@@ -1357,7 +1360,7 @@ TOOLS = [
                     "without ('no_va') or with ('with_va') the volatility adjustment, plus the curve parameters, "
                     "the workbook sheet and column, the source file and the attribution line to quote. "
                     + _PARAMS_TEXT + " Rates beyond the last liquid point are EIOPA's Smith-Wilson extrapolation; "
-                    "nothing is computed or interpolated here.",
+                    "nothing is computed or interpolated here." + _CACHE_TEXT,
      "inputSchema": {"type": "object", "properties": {
          "currency": _CURRENCY_PROP, "date": _DATE_PROP,
          "variant": {"type": "string", "enum": ["no_va", "with_va", "both"],
@@ -1366,7 +1369,7 @@ TOOLS = [
      "description": "The published EIOPA risk-free spot rate for one currency, one whole-year maturity and one "
                     "reference date, without and/or with volatility adjustment: decimal and percent, the workbook "
                     "cell it was read from, whether the maturity lies beyond the last liquid point, the curve "
-                    "parameters, the source file and the attribution line to quote. " + _PARAMS_TEXT,
+                    "parameters, the source file and the attribution line to quote. " + _PARAMS_TEXT + _CACHE_TEXT,
      "inputSchema": {"type": "object", "properties": {
          "currency": _CURRENCY_PROP, "maturity_years": _MATURITY_PROP, "date": _DATE_PROP,
          "variant": {"type": "string", "enum": ["no_va", "with_va", "both"], "description": "Default both."}},
@@ -1374,7 +1377,7 @@ TOOLS = [
     {"name": "get_parameters",
      "description": "The curve parameters EIOPA publishes above each spot curve, for the curves without and with "
                     "volatility adjustment. " + _PARAMS_TEXT + " currency 'all' returns every curve in the "
-                    "release with its code, name and identifier.",
+                    "release with its code, name and identifier." + _CACHE_TEXT,
      "inputSchema": {"type": "object", "properties": {
          "currency": {"type": "string", "description": _CURRENCY_PROP["description"] + " Or 'all'."},
          "date": _DATE_PROP}, "required": ["currency"]}},
@@ -1383,7 +1386,7 @@ TOOLS = [
                     "values with their workbook cells, the change (date_b minus date_a) in decimal and in basis "
                     "points, computed with exact decimal arithmetic and labelled as derived, and the parameters "
                     "that differ between the two releases. Includes both attribution lines and EIOPA's required "
-                    "disclaimer for derived output.",
+                    "disclaimer for derived output." + _CACHE_TEXT,
      "inputSchema": {"type": "object", "properties": {
          "currency": _CURRENCY_PROP, "maturity_years": _MATURITY_PROP,
          "date_a": dict(_DATE_PROP, description="The earlier date, same formats as date."),
