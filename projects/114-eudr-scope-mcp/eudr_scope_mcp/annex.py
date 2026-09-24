@@ -183,15 +183,26 @@ def _rows(table: Node) -> list:
 
 
 def amended_by(root: Node) -> list:
-    """CELEX numbers in the 'Amended by' list at the top of a consolidated text."""
-    out = []
-    for a in root.iter("a"):
-        text = a.text()
-        if re.fullmatch("[" + chr(0x25BA) + r"]\s*M\d+", text or ""):
-            celex = (a.attrs.get("title") or "").split(":")[0].strip()
-            if re.fullmatch(r"3\d{4}[A-Z]\d{4}", celex) and celex not in out:
-                out.append(celex)
-    return out
+    """CELEX numbers in the 'Amended by' table at the top of a consolidated text.
+
+    Only that table counts: arrows in the body ('32025R2650: DELETED') mark
+    passages, not the list of acts the consolidation includes.
+    """
+    for p in root.iter("p"):
+        if "hd-modifiers" in p.cls() and p.text().startswith("Amended by"):
+            siblings = p.parent.element_children()
+            after = siblings[siblings.index(p) + 1:]
+            table = next((n for n in after if n.tag == "table"), None)
+            if table is None:
+                raise AnnexError("'Amended by' heading without a table")
+            out = []
+            for a in table.iter("a"):
+                celex = (a.attrs.get("title") or "").strip()
+                if re.fullmatch("[" + chr(0x25BA) + r"]\s*M\d+", a.text() or "") \
+                        and re.fullmatch(r"3\d{4}[A-Z]\d{4}", celex) and celex not in out:
+                    out.append(celex)
+            return out
+    return []  # a consolidated text of an act never amended has no such table
 
 
 # ------------------------------------------------------ amending act annex
