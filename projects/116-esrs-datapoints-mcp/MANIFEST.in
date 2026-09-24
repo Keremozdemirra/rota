@@ -2,3 +2,4 @@ include README.md LICENSE server.json
 recursive-include tests *.py
 recursive-include tests/fixtures *.xlsx
 global-exclude __pycache__ *.pyc
+recursive-include .github *.yml

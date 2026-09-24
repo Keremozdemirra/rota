@@ -1,0 +1,11 @@
+{
+  "name": "Nordhafen Maschinenbau GmbH (fictional)",
+  "currency": "EUR",
+  "eu_undertaking": true,
+  "member_state": "DE",
+  "legal_form_in_annex_i_or_ii": true,
+  "financial_years": [
+    {"year": 2025, "net_turnover_eur": 505000000, "average_employees": 1320, "balance_sheet_total_eur": 410000000},
+    {"year": 2026, "net_turnover_eur": 520000000, "average_employees": 1450, "balance_sheet_total_eur": 430000000}
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Cascade Robotics Inc. (fictional)",
+  "currency": "EUR",
+  "eu_undertaking": false,
+  "financial_years": [
+    {"year": 2026, "eu_net_turnover_eur": 480000000,
+     "eu_subsidiaries": [{"name": "Cascade Robotics GmbH", "net_turnover_eur": 240000000}],
+     "eu_branches": [{"name": "Cascade Robotics, succursale France", "net_turnover_eur": 35000000}]},
+    {"year": 2027, "eu_net_turnover_eur": 515000000,
+     "eu_subsidiaries": [{"name": "Cascade Robotics GmbH", "net_turnover_eur": 262000000}],
+     "eu_branches": [{"name": "Cascade Robotics, succursale France", "net_turnover_eur": 38000000}]}
+  ]
+}

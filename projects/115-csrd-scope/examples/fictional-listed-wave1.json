@@ -1,0 +1,13 @@
+{
+  "name": "Brightwater Components NV (fictional)",
+  "currency": "EUR",
+  "eu_undertaking": true,
+  "member_state": "NL",
+  "legal_form_in_annex_i_or_ii": true,
+  "listed_on_eu_regulated_market": true,
+  "financial_years": [
+    {"year": 2023, "net_turnover_eur": 298000000, "average_employees": 790, "balance_sheet_total_eur": 280000000},
+    {"year": 2024, "net_turnover_eur": 310000000, "average_employees": 820, "balance_sheet_total_eur": 290000000},
+    {"year": 2025, "net_turnover_eur": 322000000, "average_employees": 845, "balance_sheet_total_eur": 301000000}
+  ]
+}
