@@ -155,33 +155,37 @@ ALIGNED_ACTIVITY = {
 
 # The tool's own choice, not a rule of the source. For aircraft operators (10), shipping companies
 # (50) and ETS2 regulated entities (70) the installation name is the operator itself, and the
-# Directive allows that to be a natural person (Art. 3(o), 3(w), 3(ae)). Such a name is kept only
-# when it is a code (aircraft operators are listed by code) or contains a company form or business
-# word; otherwise it is replaced, together with the city, before anything is stored.
+# Directive allows that to be a natural person (Art. 3(o), 3(w), 3(ae)); the 2026-09-24 file does
+# name sole traders among the regulated entities. Such a name is kept only when it is a code, or
+# contains a legal form of a company (all three), or a shipping or aviation business word (10 and
+# 50 only: sole traders among regulated entities name their trade, such as fuels). Otherwise the
+# name and the city are replaced before anything is stored.
 OPERATOR_NAMED = {10, 50, 70}
 WITHHELD = "[name withheld]"
 WITHHELD_NOTE = (f"{WITHHELD}: this operator is named after itself and may be a natural person, so this tool "
                  "does not show the name; the installation id and permit id identify it.")
 CODE_NAME = re.compile(r"^[a-z]{0,3}\d{1,9}$")
-BUSINESS_TOKENS = frozenset("""
-ab ad ae ag akcine aktiebolag anonim as asa aps bendrove bhd bv bvba co corp corporation cv cvba dac
-dd doo ead eg ehf eirl epe ev gbr gmbh hf ike inc is jsc kb kft kg kk kommanditbolag ks ky lda llc
-llp lp ltd ltda limited mbh nv nyrt oe ohg oo ood ooo ou oy oyj pjsc plc pp pt pte pvt sa sac sae
-sal sam sarl sas sau sca scarl se sia sirketi sl slu snc sp spa sprl sro srl srls spol sti ug uab
-vof zoo zrt
-air aircraft airline airlines airways aviation bank bulk capital carrier carriers charter chartering
-compagnie company compania companhia cooperative cie croisieres cruise cruises denizcilik dredging
-energia energie energy enterprises ferries ferry flight fund gas group holding holdings international
-investment investments jet jets kommune kommun leasing lineas lines line logistics management marine
-maritim maritima maritimas maritime municipality nakliyat naftiliaki naftiki navigation naviera
-offshore oil owning partners pelayaran petroli petroleum reederei rederi rederiet rederij salvage
-scheepvaart schiffahrt schifffahrt services shipco shipholding shipmanagement shipmanager
-shipmanagers shipowning shipping shpg ships societa societe sociedad stichting tanker tankers ticaret
-towage trading transport trust vesselco zegluga
+# Company forms after folding, dropping dots and joining single letters ("s. r. o." -> "sro").
+# Forms for sole traders (German e.K., Slovenian s.p.) are deliberately absent.
+LEGAL_FORMS = frozenset("""
+ab ad ae ag akciova aktiebolag anonim as asa aps bendrove bhd bv bvba co compagnie company compania
+companhia cooperative corp corporation cie cv cvba dac dd doo ead eg egen ehf eirl epe ev forening
+gbr gesmbh gmbh hf ike inc incorporated jsc kb kft kg kk kommanditbolag kommun kommune ks ky lda llc
+llp lp ltd ltda limited mbh municipality nv nyrt oe ohg oo ood ooo osauhing ou oy oyj pjsc plc pp pt
+pte pvt sa sac sae sal sam sarl sas sau sca scarl se sia sirketi sl slu snc societa societe sociedad
+spa spol spolecnost spolocnost sprl sro srl srls stichting sti ug uab vof zoo zrt
 """.split())
-# Legal forms and trades that also end compound words ("VertriebsgmbH", "Rederiaktiebolaget").
-BUSINESS_SUFFIXES = ("gmbh", "bolag", "bolaget", "gesellschaft", "reederei", "rederi", "rederiet", "shipping",
-                     "holding", "maritime", "company")
+BUSINESS_WORDS = frozenset("""
+air aircraft airline airlines airways aviation bulk carrier carriers charter chartering croisieres
+cruise cruises denizcilik dredging ferries ferry fleet flight jet jets lineas lines line logistics
+marine maritim maritima maritimas maritime mgmt nakliyat naftiliaki naftiki navigation naviera
+offshore pelayaran reederei rederi rederiet rederij salvage scheepvaart schiffahrt schifffahrt seaways
+ship shipco shipholding shipmanagement shipmanager shipmanagers shipowning shipping shpg ships tanker
+tankers towage vesselco zegluga
+""".split())
+# The same, ending compound words ("VertriebsgmbH", "Mineralölhandelsges.m.b.H.", "Rederiaktiebolaget").
+LEGAL_SUFFIXES = ("gmbh", "gesmbh", "bolag", "bolaget", "gesellschaft")
+BUSINESS_SUFFIXES = ("reederei", "rederi", "rederiet", "shipping", "maritime")
 
 # ------------------------------------------------------------------- errors
 
@@ -261,7 +265,10 @@ def name_is_safe(name: str, activity_code) -> bool:
             tokens.append(tok)
     if letters:
         tokens.append(letters)
-    return any(t in BUSINESS_TOKENS or (len(t) > 6 and t.endswith(BUSINESS_SUFFIXES)) for t in tokens)
+    if any(t in LEGAL_FORMS or (len(t) > 6 and t.endswith(LEGAL_SUFFIXES)) for t in tokens):
+        return True
+    return activity_code != 70 and any(t in BUSINESS_WORDS or (len(t) > 8 and t.endswith(BUSINESS_SUFFIXES))
+                                       for t in tokens)
 
 
 def cache_dir() -> Path:

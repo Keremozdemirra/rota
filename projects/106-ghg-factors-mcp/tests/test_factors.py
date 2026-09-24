@@ -148,10 +148,11 @@ class Convert(SnapshotTestCase):
         self.assertEqual(F.convert(1, "m3", DIESEL_L)["result"]["value_text"], "2583.54")
 
     def test_gas_parts_that_do_not_add_up_are_explained(self):
-        r = F.convert(1, "tonnes", "desnz-2026:1_101_1011_15_1")
-        self.assertEqual(r["result"]["value_text"], "3104.16462")
-        self.assertIn("rounds each published figure", r.get("gases_note", "")) if sum(
-            v["value"] for v in r["gases"].values()) != r["result"]["value"] else None
+        # Diesel per kWh (Gross CV): DESNZ publishes 0.2452 in total and 0.24207 + 0.00002 + 0.0031 = 0.24519.
+        r = F.convert(1000, "kWh (Gross CV)", "desnz-2026:1_101_1011_6_1")
+        self.assertEqual(r["result"]["value_text"], "245.2")
+        self.assertIn("add up to 245.19", r["gases_note"])
+        self.assertNotIn("gases_note", F.convert(1, "tonnes", "desnz-2026:1_101_1011_15_1"))
 
     def test_secr_rows_give_energy(self):
         r = F.convert(100, "km", "desnz-2026:6_300_3000_4_5")
@@ -219,7 +220,7 @@ class Grid(SnapshotTestCase):
         self.assertEqual(F.grid_intensity("Congo")["other_areas_matching"], ["Congo (DRC)"])
         r = F.grid_intensity("Atlantis")
         self.assertFalse(r["found"])
-        self.assertEqual(F.grid_intensity("PL")["did_you_mean"], [])
+        self.assertEqual(F.grid_intensity("PL")["did_you_mean"], ["Poland"])
 
     def test_uba_germany_only(self):
         r = F.grid_intensity("Germany", 2025, "uba")
