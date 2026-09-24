@@ -3,7 +3,7 @@
 # GitHub repository.
 #
 #   bash projects/publish.sh <project-dirname> <repo-name>
-#   bash projects/publish.sh 101-mcp-vitals mcp-vitals
+#   bash projects/publish.sh 101-mcp-upkeep mcp-upkeep
 #
 # Deterministic, like ship.sh: same secret scan, nothing forced, and it asks
 # before it creates anything public. Only what is committed on this branch is
