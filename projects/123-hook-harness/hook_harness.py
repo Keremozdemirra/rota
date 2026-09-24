@@ -575,8 +575,10 @@ def rule_fires(rule_text, tool: str, tool_input: dict, ctx: Context) -> Verdict:
         if not isinstance(value, str) or not value:
             return Verdict(False, f"the call has no {PATH_RULE_FIELDS[tool]}", "assumed")
         return path_rule(spec, value, ctx)
-    return Verdict(False, f"{rule.text}: a specifier other than * never matched a {tool} call in an `if` (observed "
-                   f"with WebFetch(domain:...), Agent(name) and MCP tools, {OBSERVED})", "observed")
+    observed = tool in ("WebFetch", "Agent") or tool.startswith("mcp__")
+    return Verdict(False, f"{rule.text}: a specifier other than * never matched a {tool} call in an `if` ("
+                   + (f"observed, {OBSERVED}" if observed else f"assumed: observed only for WebFetch, Agent and MCP "
+                      f"tools, {OBSERVED}") + ")", "observed" if observed else "assumed")
 
 
 # ---------------------------------------------------------------- Bash commands
@@ -584,8 +586,14 @@ def rule_fires(rule_text, tool: str, tool_input: dict, ctx: Context) -> Verdict:
 _ASSIGN = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\[[^\]]*\])?\+?=")
 _REDIR = re.compile(r"\d*(?:&>>|&>|>>|>&|>\||<>|<<<|<<-|<<|<&|>|<)")
 _VAR = re.compile(r"[A-Za-z_][A-Za-z0-9_]*|[0-9]|[?$!#@*_-]")
+_ONE_SUBST = re.compile(r"\$\((?:[^()]|\([^()]*\))*\)|`[^`]*`", re.S)
 _ONE_VAR = re.compile(r"\$(?:[A-Za-z_][A-Za-z0-9_]*|[0-9]|[?$!#@*_-])")
 _PREFIX_WORDS = {"!", "if", "then", "elif", "else", "do", "while", "until"}
+# Commands that run code or another command given as an argument: with an argument known only at run time, every
+# handler ran (observed, 2.1.281). npm, git, docker, make, ssh, sed, curl and the like did not trigger this.
+_RUNS_CODE = {"sh", "bash", "zsh", "dash", "ksh", "fish", "pwsh", "powershell", "cmd", "python", "python3", "node",
+              "deno", "bun", "ruby", "perl", "php", "lua", "awk", "eval", "exec", "source", ".", "env", "sudo",
+              "timeout", "nohup", "nice", "time", "command", "builtin", "xargs", "watch", "find"}
 _END_WORDS = {"fi", "done", "esac", "}"}
 _HEADER_WORDS = {"for", "select"}
 # Bash's analysis limit: "Commands longer than 10,000 characters always prompt because they exceed what the analysis
@@ -620,6 +628,7 @@ class ShellAnalysis:
 class _BashParser:
     def __init__(self, s: str, a: ShellAnalysis):
         self.s, self.i, self.n, self.a = s, 0, len(s), a
+        self.heredocs = []  # (delimiter, strip tabs) whose bodies start after the current line
 
     def every(self, why: str):
         if not self.a.every:
@@ -633,6 +642,16 @@ class _BashParser:
                 self.i += 2
             else:
                 return
+
+    def skip_heredoc_bodies(self):
+        for delim, tabs in self.heredocs:
+            while self.i < self.n:
+                j = self.s.find("\n", self.i)
+                line = self.s[self.i:self.n if j < 0 else j]
+                self.i = self.n if j < 0 else j + 1
+                if (line.lstrip("\t") if tabs else line) == delim:
+                    break
+        self.heredocs = []
 
     def comment(self):
         j = self.s.find("\n", self.i)
@@ -665,6 +684,7 @@ class _BashParser:
                 continue
             if c == "\n":
                 self.i += 1
+                self.skip_heredoc_bodies()
                 continue
             if c == ";":
                 if self.s.startswith((";;", ";&"), self.i):
@@ -718,7 +738,7 @@ class _BashParser:
         self.finish(words, targets, top)
 
     def simple(self) -> tuple[list, list]:
-        words, targets = [], []
+        words, targets, heredoc = [], [], False
         while True:
             self.blanks()
             if self.i >= self.n:
@@ -746,13 +766,23 @@ class _BashParser:
             m = _REDIR.match(self.s, self.i)
             if m:
                 self.i = m.end()
-                if m.group(0).lstrip("0123456789") in ("<<", "<<-"):
-                    self.every("a here-document")
+                op = m.group(0).lstrip("0123456789")
                 self.blanks()
+                if op in ("<<", "<<-"):
+                    delim = self.word() if self.i < self.n else _Word()
+                    if not any(q in delim.raw for q in "'\"\\"):
+                        self.every("a here-document with an unquoted delimiter")
+                    self.heredocs.append((delim.value, op == "<<-"))
+                    heredoc = True
+                    continue
                 if self.i < self.n and self.s[self.i] not in "\n;|&)":
                     targets.append(self.word())
                 continue
             words.append(self.word())
+        if heredoc and targets:
+            self.every("a here-document together with another redirection")
+        if heredoc:
+            targets.append(_Word())  # counts as a redirection for the checks in finish()
         return words, targets
 
     def word(self) -> _Word:
@@ -797,11 +827,14 @@ class _BashParser:
         return w
 
     def dquote(self, w: _Word):
+        start, subst_before = self.i, w.subst
         self.i += 1
         while self.i < self.n:
             c = self.s[self.i]
             if c == '"':
                 self.i += 1
+                if w.subst > subst_before and not _ONE_SUBST.fullmatch(self.s[start + 1:self.i - 1]):
+                    w.subst = subst_before  # interpolated into a longer string
                 return
             if c == "\\" and self.s[self.i + 1:self.i + 2] in ('$', '`', '"', '\\', '\n'):
                 if self.s[self.i + 1] != "\n":
@@ -958,6 +991,10 @@ class _BashParser:
         dyn = [w for w in rest[1:] + targets if w.dynamic and not _ASSIGN.match(w.raw)]
         if dyn and assigned:
             self.every("a variable assignment in front of a command that expands variables")
+        if dyn and targets:
+            self.every("an expansion in a command with a redirection")
+        if dyn and name.value in _RUNS_CODE:
+            self.every(f"{name.value} runs code, and an argument is only known when the command runs")
         for w in dyn:
             self.note(w)
         values = [w.value for w in rest]
