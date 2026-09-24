@@ -957,8 +957,11 @@ def interpret_nace(tax: Taxonomy, value) -> dict:
             as_listed = any(listed.replace(" ", "").upper() == shown.replace(" ", "").upper()
                             for codes in tax.codes.values() for listed, _, _ in codes)
             if not (as_listed and l2):
-                where = " and ".join(f"section {sec} in NACE Rev. {rev}" for rev, sec in (("2", l2), ("2.1", l21))
-                                     if sec)
+                if l2 and l2 == l21:
+                    where = f"section {l2} in both NACE Rev. 2 and NACE Rev. 2.1"
+                else:
+                    where = " and ".join(f"section {sec} in NACE Rev. {rev}" for rev, sec in (("2", l2), ("2.1", l21))
+                                         if sec)
                 raise ToolError(f"{letter}{code} is not a NACE code: division {digits[:2]} is in {where}")
             note = (f"{shown} is how the delegated act writes it; in NACE Rev. 2 division {digits[:2]} is in section "
                     f"{l2}, so it is read as {l2}{code}.")

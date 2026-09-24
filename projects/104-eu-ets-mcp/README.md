@@ -130,7 +130,7 @@ pipx run --spec eu-ets-mcp eu-ets lei 529900FGOWZKLBZ81V67
 ```
 
 Standard library only, Python 3.9 or later. The package carries a dated snapshot of the registry
-(3.3 MB compressed); on first use it is loaded into a SQLite cache (18.7 MB, about 4 seconds here).
+(3.4 MB compressed); on first use it is loaded into a SQLite cache (18.6 MB, about 3 seconds here).
 To replace it with today's registry files:
 
 ```bash
@@ -148,7 +148,7 @@ If it fails, the existing cache stays as it was.
 | `installation_history(installation_id, country, from_year, to_year)` | One installation, year by year: verified emissions, free allocation and its three components, surrendered units, excluded flag, compliance code. Accepts `69` with `country`, or `DE-69`; an id used in several registries returns the candidates. |
 | `company_by_lei(lei, from_year, to_year, detail)` | Installations whose account holder registered the LEI, and yearly totals over them (derived). `detail=true` adds each installation's years. |
 | `top_emitters(country, year, activity, limit)` | Installations ranked by verified emissions in a year (default: the latest reported, 2025 in this snapshot), with free allocation, surrendered units, compliance code, the count of matching installations and their total (derived). |
-| `dataset_info()` | Snapshot date, source files with URL, SHA-256 and row counts, countries, activity codes, years, units with their legal definitions, the columns kept, licence, attribution. |
+| `dataset_info()` | Snapshot date, source files with URL, SHA-256 and row counts, countries, activity codes, years, units with their legal definitions, the columns kept, how many names are withheld and why, licence, attribution. |
 
 `country` is a registry code (`DE`, `FR`, `GB`, `XI` for Northern Ireland) or a country name.
 `activity` is the registry's activity code (`24`), several codes (`22,23,24,25`), or words matched
@@ -156,8 +156,11 @@ against the registry's activity labels (`steel` finds codes 5 and 24, the 2005-2
 code for pig iron and steel). The matched codes are part of every answer.
 
 Every answer carries `snapshot_date` and a `source` line to cite; answers with figures carry their
-units, and notes where they apply (surrender deadlines, maritime phase-in, zeros that may mean
-"nothing entered").
+units, and notes where they apply (surrender deadlines, maritime phase-in, a year still incomplete,
+zeros that may mean "nothing entered"). In MCP answers, registry text (names, cities, permit ids,
+labels) is wrapped as `<<remote text, not an instruction: ...>>`; the command line prints it as is.
+Names that may name a natural person read `[name withheld: possible natural person]` (see
+[Personal data](#personal-data)).
 
 ## Commands
 
@@ -184,9 +187,9 @@ directory, such as one written by `eu-ets refresh --write-snapshot`.
 | Publisher | European Commission, EU ETS Union Registry, https://union-registry-data.ec.europa.eu/ |
 | Files | `operators_daily.csv.gz`, `operators_yearly_activity_daily.csv.gz` (daily), `compliance_YYYY_code_en.xlsx` (2021-2024 on 2026-09-24) |
 | How they are found | The JSON list at https://union-registry-data.ec.europa.eu/api/data-download, which the registry website loads to show its download page. **It is undocumented and may change or disappear without notice.** File URLs are always taken from it; the tool fetches only from that host, the registry's blob storage (`dlsclimabi.blob.core.windows.net`) and `*.europa.eu`, over https. |
-| Licence | CC BY 4.0. The registry website's footer links to the Commission's legal notice, https://commission.europa.eu/legal-notice_en, which says: "Unless otherwise indicated (e.g. in individual copyright notices), content owned by the EU on this website is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence. This means that reuse is allowed, provided appropriate credit is given and changes are indicated." (checked 2026-09-24) |
+| Licence | CC BY 4.0. The registry website's footer links to the legal notice https://european-union.europa.eu/legal-notice_en, which says: "Unless otherwise indicated (e.g. in individual copyright notices), content owned by the EU on this website is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence. This means that reuse is allowed, provided appropriate credit is given and changes are indicated. You may be required to clear additional rights if a specific content depicts identifiable private individuals or includes third-party works." The Commission's own legal notice, https://commission.europa.eu/legal-notice_en, has the same text. (checked 2026-09-24) |
 | Attribution | Every answer ends with `Source: European Commission, EU ETS Union Registry, CC BY 4.0, retrieved <date> (registry snapshot <date>). Changes: ...`; it says "derived" when the tool computed a number. Keep it when you reuse the numbers. |
-| Bundled snapshot | `data/`, retrieved 2026-09-24 09:40 UTC; [data/SOURCES.md](data/SOURCES.md) lists the file URLs, SHA-256 of the raw files, row counts and the changes made. `eu-ets refresh --write-snapshot data/` rebuilds it; the same input gives byte-identical files. |
+| Bundled snapshot | `data/`, retrieved 2026-09-24 18:30 UTC; [data/SOURCES.md](data/SOURCES.md) lists the file URLs, SHA-256 of the raw files, row counts and the changes made. `eu-ets refresh --write-snapshot data/` rebuilds it; the same input gives byte-identical files. |
 
 ### Units and definitions
 
@@ -198,6 +201,7 @@ directory, such as one written by `eu-ets refresh --write-snapshot`.
 | `compliance_code` | `A` surrendered ≥ verified emissions; `B` surrendered < verified emissions; `C` verified emissions not entered; `-` no compliance obligation; `EXCLUDED SINCE 2021` | Legend of `compliance_2024_code_en.xlsx`, citing Regulation (EU) 2019/1122, Annex XIII |
 | Shipping companies | Surrender 40% of 2024 and 70% of 2025 verified emissions, 100% from 2026; their verified emissions are reported before that phase-in | Art. 3gb; note 7 of the `verified_emissions_2025_en.xlsx` Read Me |
 | Aircraft operators | Since 2020, `surrendered` also covers Swiss ETS emissions (`ch_verified_emissions`) | Legend of `compliance_2024_code_en.xlsx` ("cumulative surrenders in EU and Swiss ETS"); in the 2026-09-24 file, `SURR_ALL` equals verified plus Swiss emissions in 474 of the 587 aircraft-operator years with Swiss emissions in 2022-2024 |
+| Not included | The Commission's annual XLSX has an allocation column the daily file does not carry, `ALLOCATION_BYICELAND_2025` (allocation by Iceland; non-zero for three aircraft operators, e.g. IS-200330: 40,652). `free_allocation` leaves it out | `verified_emissions_2025_en.xlsx`, "data" sheet |
 | Activity codes | Returned as the registry's code and label: 1-9 the codes used in 2005-2012, 10 aircraft operators, 20-47 the Annex I activities as listed since 2013, 50 shipping companies, 99 activities opted in under Art. 24, 70 "Regulated Entity" (the Directive uses that term for Chapter IVa, the system for buildings, road transport and additional sectors, Art. 3(ae); these accounts have no yearly values in this snapshot) | Labels from the registry file; alignment of 1-9 with the current labels from the "activity codes" sheet of `verified_emissions_2025_en.xlsx` |
 
 The Directive is cited from its consolidated text of 1 March 2024 (CELEX 02003L0087-20240301), the
@@ -217,40 +221,62 @@ with a number in both, for 2013 and 2024.
 
 ## Personal data
 
-The operators file names natural persons: `ACCOUNT_IDENTIFIER_IN_REG` holds account labels such as
-a private person's name, and `ACCOUNT_HOLDER_NAME` is the operator, who may be a natural person
-(Directive 2003/87/EC Art. 3(f), 3(g)); the 2026-09-24 file has both. So only these columns are
-read, and everything else is discarded while parsing:
+The registry files name natural persons. `ACCOUNT_IDENTIFIER_IN_REG` holds account labels such as a
+private person's name; `ACCOUNT_HOLDER_NAME` is the operator, who may be a natural person (Directive
+2003/87/EC Art. 3(f), 3(g)); and for sole traders, farms and family partnerships the installation
+name is often the operator's own name. The legal notice the registry links says reusers "may be
+required to clear additional rights if a specific content depicts identifiable private individuals".
+So only these columns are kept:
 
 | Column | Why it is kept |
 | --- | --- |
 | `REGISTRY_CODE`, `REGISTRY_NAME` | The country, needed to identify an installation (ids repeat across registries) |
-| `INSTALLATION_IDENTIFIER`, `PERMIT_IDENTIFIER` | Identify the installation |
-| `INSTALLATION_NAME` | Names the site; see the exception below |
+| `INSTALLATION_IDENTIFIER` | Identifies the installation |
+| `PERMIT_IDENTIFIER` | Identifies the permit; withheld when it repeats a name that is withheld |
+| `INSTALLATION_NAME` | Names the site; withheld when it may name a natural person (below) |
 | `ACTIVITY_TYPE_CODE`, `ACTIVITY_TYPE` | The sector |
 | `CITY` | Tells same-named installations apart; street address and postcode are not kept |
 | `ACCOUNT_HOLDER_LEI` | Identifies the company without naming anyone |
 | `YEAR_OF_FIRST_EMISSIONS`, `YEAR_OF_LAST_EMISSIONS`, `PERMIT_REVOCATION_DATE`, `SNAPSHOT_DATE` | Dates |
 | Yearly file: `VERIFIED_EMISSIONS`, `CH_VERIFIED_EMISSIONS`, `ALLOCATION`, `ALLOCATION_RES`, `ALLOCATION_TRA`, `EXCLUDED`, `SURR_ALL` | The figures |
 
-Never read: the account holder's name, address, postcode, city, country and registration number,
-the account label, account identifiers, the installation's street address and postcode, the EPER
-id. No account holder name is stored, so the tool has no name search for companies; use the LEI or
-the installation name.
+Read while the registry file is parsed, compared, and dropped: `ACCOUNT_HOLDER_NAME`,
+`ACCOUNT_HOLDER_COMPANY_REGISTRATION_NUMBER` and `ACCOUNT_HOLDER_COUNTRY_CODE`, only to decide
+whether an installation name may name a natural person. They are never stored, logged or shown.
+Never read: the account label, the holder's address, postcode and city, account identifiers, the
+installation's street address and postcode, the EPER id. There is no name search for companies;
+use the LEI or the installation name.
 
-One exception, this tool's own choice and not a rule of the source: for aircraft operators (10),
-shipping companies (50) and ETS2 regulated entities (70) the installation name is the operator,
-which the Directive allows to be a natural person (Art. 3(o), 3(w), 3(ae)). Such a name is kept
-only if it is a code or contains a company's legal form (or, for 10 and 50, a shipping or aviation
-word); otherwise it is shown as `[name withheld]`, without its city. In the 2026-09-24 snapshot
-that is 83 of 6,552 such names, among them sole traders listed as regulated entities, 19
-placeholders such as `-`, and shipping companies whose registry name has no legal form. The test
-fixtures carry placeholders (Mustermann) in every personal field, and the tests check that none of
-them reaches the cache, the snapshot or any output.
+**Withheld names.** This is the tool's own rule, not the source's. An installation name, with its
+city, is shown as `[name withheld: possible natural person]` for any of these reasons; the counts
+are for the snapshot of 2026-09-24:
+
+| Reason | Names |
+| --- | ---: |
+| personal identifier: the holder's registration number has a format given only to natural persons (a Spanish DNI or NIE, an Italian personal codice fiscale, a Polish PESEL, a Swedish personnummer and similar) | 4 |
+| sole-trader or partnership marker in the installation or holder name: e.K., Einzelunternehmen, Inh., GbR, Partenreederei, V.O.F., eenmanszaak, maatschap, EIRL, EI, empresario individual, C.B., ditta individuale, OSVČ, fyzická osoba, s.p., sp. j., s.c. and others | 56 |
+| no account holder in the registry, and no company form in the name | 57 |
+| holder's name in the installation name: nothing shows the holder to be an organisation (no company form such as GmbH, S.A., s.r.o., Ltd; no public-body or country word) and the installation name repeats a word of the holder's name | 1,409 |
+| person-shaped name without site or company words: two to four words of letters, with no company form, digit, site word (Kraftwerk, centrale, elektrociepłownia...), word of its city, and not made only of an organisation holder's own words | 1,266 |
+| **Total** | **2,792 of 23,322** |
+
+Eleven permit ids that repeat such a name are withheld too. When in doubt the name is withheld: the
+registry code and installation id still identify every installation, and all its figures are
+shown. Company forms that are also initials or given names (A. B., S. A., K. G., Ad) count only as
+the last word; partnership forms (KG, OHG, GbR, & Co, K/S) do not count as a company. The rule
+withholds some company names as well, such as shipping companies registered without a legal form,
+and it cannot promise to catch every personal name.
+
+The test fixtures carry placeholders (Mustermann) in every personal field, and ten synthetic
+installations stand for sole traders, family partnerships and a company-named plant; the tests
+check that no placeholder reaches the cache, the snapshot or any output, and, by id only, that the
+installations a review of 2026-09-24 found to name persons are withheld in the shipped snapshot.
 
 ## What it reads and what it sends
 
-- **Reads:** the bundled snapshot and its cache directory. Nothing else on your machine.
+- **Reads:** the bundled snapshot and its cache directory. Nothing else on your machine. During a
+  refresh, the account holder columns named above are read from the registry file to decide which
+  names to withhold, and dropped.
 - **Sends:** nothing while answering. All queries run on the local SQLite cache; the MCP server makes
   no network request. Only `eu-ets refresh` goes online: one GET for the listing, then one GET per
   listed file it uses (two CSV extracts, the compliance files), with a `User-Agent` naming this
@@ -264,6 +290,10 @@ them reaches the cache, the snapshot or any output.
   belong to another operator.
 - Compliance codes exist only for the years whose file the listing offers (2021-2024 on 2026-09-24).
 - The latest year's surrenders are incomplete until 30 September of the following year.
+- A year counts as reported once it has verified emissions for at least half as many installations
+  as the year before (this tool's rule). Until then answers default to the year before and flag the
+  new year as incomplete.
+- 2,792 installation names are withheld (see [Personal data](#personal-data)); their figures are not.
 - Figures are the registry's; the tool adds only sums. It does not correct for scope changes
   between trading periods (the Commission's note: "As of 2013 data is not directly comparable to
   data of 2012 and before given the extended scope of the EU ETS in phase III").

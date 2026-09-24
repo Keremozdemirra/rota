@@ -1,9 +1,10 @@
 """Shared test helpers: fixture loading, a fake HTTP opener, a snapshot built from fixtures.
 
-The fixtures are trimmed real responses from the Navigator backend, recorded on
-2026-09-24: seven of the 151 activities and their criteria. Activity 346's
-criteria were left out of matches_all.json on purpose, to stand for an activity
-the backend returns without criteria.
+The fixtures are trimmed real responses recorded on 2026-09-24: seven of the 151
+activities and their criteria from the Navigator backend (activity 346's criteria
+were left out of matches_all.json on purpose, to stand for an activity the backend
+returns without criteria), and excerpts of the two NACE annexes from Cellar
+(sections D and O/P, the codes under 35 and 84).
 """
 import io
 import json
@@ -90,8 +91,11 @@ class FakeOpener:
         url = req.full_url
         self.urls.append(url)
         self.headers.append(dict(req.header_items()))
-        assert url.startswith(API), url
-        path = url[len(API):]
+        if url.startswith(refresh.CELLAR):  # Official Journal documents, keyed "cellar:<CELEX>"
+            path = "cellar:" + url[len(refresh.CELLAR):]
+        else:
+            assert url.startswith(API), url
+            path = url[len(API):]
         answer = self.routes.get(path)
         if isinstance(answer, list):
             answer = answer.pop(0) if len(answer) > 1 else answer[0]
@@ -104,6 +108,15 @@ class FakeOpener:
         if isinstance(answer, tuple):  # (status, body) for a non-200 success code
             return FakeResponse(answer[1], answer[0])
         return FakeResponse(answer)
+
+
+def cellar_routes() -> dict:
+    return {"cellar:32006R1893": raw("cellar_32006R1893_annex_i_excerpt.html"),
+            "cellar:32023R0137": raw("cellar_32023R0137_annex_excerpt.html")}
+
+
+# The two Cellar fixtures are excerpts; the real tables are checked against this floor instead.
+EXCERPT_MINIMUM = {"sections": 2, "divisions": 2, "groups": 2, "classes": 4}
 
 
 def fetcher(opener) -> "refresh.Fetcher":
@@ -132,3 +145,13 @@ class SnapshotCase(unittest.TestCase):
     def tearDown(self):
         core.configure(None)
         self.tmp.cleanup()
+
+
+class ShippedCase(unittest.TestCase):
+    """Reads the snapshot and NACE table shipped in data/: for cases only the full data has."""
+
+    def setUp(self):
+        core.configure(str(ROOT / "data" / "taxonomy.json"))
+
+    def tearDown(self):
+        core.configure(None)
