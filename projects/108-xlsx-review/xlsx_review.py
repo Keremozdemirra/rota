@@ -1829,9 +1829,60 @@ class AxisMap:
         return None
 
 
-def _align(bkeys: list, akeys: list):
-    """Match rows (or columns) of two versions of a sheet by content, like a text diff matches
-    lines; identical ends are trimmed first so the matcher only sees the edited middle."""
+ALIGN_SIMILARITY = 0.5   # share of equal cells for an edited row to count as the same row moved (tool's choice)
+ALIGN_BLOCK = 300        # largest block of edited rows paired by similarity; beyond it, by position (tool's choice)
+
+
+def _pair_block(bdicts: list, adicts: list):
+    """Inside a block of rows that differ, pair each edited row with its counterpart by the share of
+    equal cells (a weighted longest common subsequence), then pair what is left by position."""
+    n, m = len(bdicts), len(adicts)
+    anchors = []
+    if n <= ALIGN_BLOCK and m <= ALIGN_BLOCK:
+        sim = [[0.0] * m for _ in range(n)]
+        for i, bd in enumerate(bdicts):
+            for j, ad in enumerate(adicts):
+                total = max(len(bd), len(ad))
+                if total:
+                    same = sum(1 for k, v in bd.items() if ad.get(k) == v)
+                    s = same / total
+                    if s >= ALIGN_SIMILARITY:
+                        sim[i][j] = s
+        score = [[0.0] * (m + 1) for _ in range(n + 1)]
+        for i in range(n - 1, -1, -1):
+            for j in range(m - 1, -1, -1):
+                best = max(score[i + 1][j], score[i][j + 1])
+                if sim[i][j]:
+                    best = max(best, score[i + 1][j + 1] + sim[i][j])
+                score[i][j] = best
+        i = j = 0
+        while i < n and j < m:
+            if sim[i][j] and score[i][j] == score[i + 1][j + 1] + sim[i][j]:
+                anchors.append((i, j))
+                i += 1
+                j += 1
+            elif score[i + 1][j] >= score[i][j + 1]:
+                i += 1
+            else:
+                j += 1
+    pairs, deleted, inserted = [], [], []
+    pi = pj = 0
+    for ai, aj in anchors + [(n, m)]:
+        gap_b, gap_a = list(range(pi, ai)), list(range(pj, aj))
+        k = min(len(gap_b), len(gap_a))
+        pairs += list(zip(gap_b[:k], gap_a[:k]))
+        deleted += gap_b[k:]
+        inserted += gap_a[k:]
+        if ai < n:
+            pairs.append((ai, aj))
+        pi, pj = ai + 1, aj + 1
+    return pairs, deleted, inserted
+
+
+def _align(bsig: list, asig: list):
+    """Match rows (or columns) of two versions of a sheet by content, as a text diff matches lines;
+    identical ends are trimmed first so the matcher only sees the edited middle."""
+    bkeys, akeys = [s[0] for s in bsig], [s[0] for s in asig]
     nb, na = len(bkeys), len(akeys)
     pre = 0
     while pre < nb and pre < na and bkeys[pre] == akeys[pre]:
@@ -1851,16 +1902,14 @@ def _align(bkeys: list, akeys: list):
         if tag == "equal":
             for k in range(i2 - i1):
                 pairs[pre + i1 + k + 1] = pre + j1 + k + 1
-        elif tag == "replace":
-            m = min(i2 - i1, j2 - j1)
-            for k in range(m):
-                pairs[pre + i1 + k + 1] = pre + j1 + k + 1
-            deleted += [pre + i1 + k + 1 for k in range(m, i2 - i1)]
-            inserted += [pre + j1 + k + 1 for k in range(m, j2 - j1)]
-        elif tag == "delete":
-            deleted += [pre + k + 1 for k in range(i1, i2)]
-        else:
-            inserted += [pre + k + 1 for k in range(j1, j2)]
+            continue
+        bd = [bsig[pre + i][1] for i in range(i1, i2)]
+        ad = [asig[pre + j][1] for j in range(j1, j2)]
+        p, d, ins = _pair_block(bd, ad)
+        for i, j in p:
+            pairs[pre + i1 + i + 1] = pre + j1 + j + 1
+        deleted += [pre + i1 + i + 1 for i in d]
+        inserted += [pre + j1 + j + 1 for j in ins]
     for k in range(suf):
         pairs[nb - suf + k + 1] = na - suf + k + 1
     if not deleted and not inserted and all(k == v for k, v in pairs.items()):
@@ -1868,69 +1917,73 @@ def _align(bkeys: list, akeys: list):
     return AxisMap(pairs, deleted, inserted, nb, na - nb)
 
 
-_ABS_ROW_RE = re.compile(r"R[0-9]+")
-_ABS_COL_RE = re.compile(r"C[0-9]+")
+_ROW_PART_RE = re.compile(r"R\[-?[0-9]+\]|R[0-9]+")
+_COL_PART_RE = re.compile(r"C\[-?[0-9]+\]|C[0-9]+")
 
 
-def _loose(sheet: Sheet, key, axis: str):
+def _loose(sheet: Sheet, key, axis: str, renames=()):
+    """A cell's content for matching rows (or columns): formulas in R1C1 with the row (or column)
+    parts left out, because inserting rows moves them, and renamed sheets under their new name."""
     cell = sheet.cells[key]
     if cell.formula is not None:
         fi = sheet.info.get(key)
         p = fi.r1c1 if fi else cell.formula
-        # Absolute row numbers move when rows are inserted above them; ignore them when matching rows.
-        return ("f", (_ABS_ROW_RE if axis == "row" else _ABS_COL_RE).sub("#", p))
+        p = (_ROW_PART_RE if axis == "row" else _COL_PART_RE).sub("R" if axis == "row" else "C", p)
+        for old, new in renames:
+            if old in p:
+                p = p.replace(old, new)
+        return ("f", p)
     if cell.member is not None:
         return ("m",)
     return ("v", cell.kind, cell.value)
 
 
-def _signatures(sheet: Sheet, axis: str, size: int) -> list:
+def _signatures(sheet: Sheet, axis: str, size: int, renames=()) -> list:
+    """Per row (or column): (hashable content key without positions, {position: content})."""
     groups: dict = {}
     for key in sheet.cells:
         r, c = key
         if axis == "row":
-            groups.setdefault(r, []).append((c, key))
+            groups.setdefault(r, {})[c] = _loose(sheet, key, axis, renames)
         else:
-            groups.setdefault(c, []).append((r, key))
-    out = [()] * size
-    for i, lst in groups.items():
-        lst.sort()
-        out[i - 1] = tuple(_loose(sheet, key, axis) for _, key in lst)
+            groups.setdefault(c, {})[r] = _loose(sheet, key, axis, renames)
+    out = [((), {})] * size
+    for i, d in groups.items():
+        out[i - 1] = (tuple(d[k] for k in sorted(d)), d)
     return out
 
 
-def _count_changes(b: Sheet, a: Sheet, rows: AxisMap, cols: AxisMap) -> int:
+def _count_changes(b: Sheet, a: Sheet, rows: AxisMap, cols: AxisMap, renames=()) -> int:
     seen = set()
     changes = 0
-    for (r, c), cell in b.cells.items():
+    for (r, c) in b.cells:
         ar, ac = rows.get(r), cols.get(c)
         if ar is None or ac is None:
             changes += 1
             continue
         seen.add((ar, ac))
-        other = a.cells.get((ar, ac))
-        if other is None or _loose(b, (r, c), "row") != _loose(a, (ar, ac), "row"):
+        if (ar, ac) not in a.cells or _loose(b, (r, c), "row", renames) != _loose(a, (ar, ac), "row"):
             changes += 1
     changes += sum(1 for k in a.cells if k not in seen)
     return changes
 
 
-def align_sheets(b: Sheet, a: Sheet):
+def align_sheets(b: Sheet, a: Sheet, renames=()):
     """Row and column maps for a pair of sheets: aligned where that explains the edit with fewer
     changed cells than comparing cell by cell at the same address, identity otherwise."""
     if not b.cells or not a.cells:
         return AxisMap(), AxisMap()
     (bmr, bmc), (amr, amc) = b.dims(), a.dims()
-    rows = _align(_signatures(b, "row", bmr), _signatures(a, "row", amr)) or AxisMap()
-    cols = _align(_signatures(b, "col", bmc), _signatures(a, "col", amc)) or AxisMap()
+    rows = _align(_signatures(b, "row", bmr, renames), _signatures(a, "row", amr)) or AxisMap()
+    cols = _align(_signatures(b, "col", bmc, renames), _signatures(a, "col", amc)) or AxisMap()
     if rows.identity and cols.identity:
         return rows, cols
     ident = AxisMap()
-    best = (_count_changes(b, a, ident, ident), ident, ident)
+    best = (_count_changes(b, a, ident, ident, renames), ident, ident)
     for rm, cm in ((rows, ident), (ident, cols), (rows, cols)):
         if rm.identity and cm.identity:
             continue
-        n = _count_changes(b, a, rm, cm)
+        n = _count_changes(b, a, rm, cm, renames)
         if n < best[0]:
             best = (n, rm, cm)
     return best[1], best[2]
@@ -2087,10 +2140,11 @@ def _match_sheets(before: Workbook, after: Workbook):
     return pairs, renames, added, removed
 
 
-def _formula_keys(sheet: Sheet, key, cache: dict):
-    toks = cache.get((sheet.index, key))
+def _formula_tokens(sheet: Sheet, key, cache: dict):
+    # Keyed by the sheet object: the before and after workbooks both have a sheet 0.
+    toks = cache.get((id(sheet), key))
     if toks is None:
-        toks = cache[(sheet.index, key)] = tokenize(sheet.cells[key].formula)
+        toks = cache[(id(sheet), key)] = tokenize(sheet.cells[key].formula)
     return toks
 
 
@@ -2099,9 +2153,10 @@ def diff(before: Workbook, after: Workbook, align: bool = True) -> dict:
     analyse(before)
     analyse(after)
     pairs, renames, added, removed = _match_sheets(before, after)
+    loose_renames = [(b.name.casefold() + "!", a.name.casefold() + "!") for b, a in renames]
     maps = {}
     for b, a in pairs:
-        maps[b.index] = align_sheets(b, a) if align else (AxisMap(), AxisMap())
+        maps[b.index] = align_sheets(b, a, loose_renames) if align else (AxisMap(), AxisMap())
     tr = _Translator(before, after, {b.index: a.index for b, a in pairs}, maps)
     tok_cache: dict = {}
     referenced = None
@@ -2146,7 +2201,7 @@ def diff(before: Workbook, after: Workbook, align: bool = True) -> dict:
             if ch.get("risk"):
                 risks.append({"severity": ch["risk"], "code": ch["code"], "sheet": a.name, "cell": ch["cell"],
                               "reason": ch["reason"]})
-        if changes or not rows.identity or not cols.identity or b.name != a.name or cached_changed:
+        if changes or not rows.identity or not cols.identity or cached_changed:
             sheets_out.append({"sheet": a.name, "before_sheet": b.name, "changes": changes,
                                "rows_inserted": rows.inserted, "rows_deleted": rows.deleted,
                                "columns_inserted": cols.inserted, "columns_deleted": cols.deleted,

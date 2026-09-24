@@ -377,6 +377,9 @@ class _Para:
 # ------------------------------------------------------------ number reading
 _SEP_CHARS = ",.'\u2019\u00a0\u202f\u2009"
 _SPACE_SEPS = "'\u2019\u00a0\u202f\u2009"
+# A letter, for "the word ends here" checks. Python's \w also matches superscript and
+# fraction digits (¹, ², ½), which may follow a unit ("€4.2bn¹"), so they are carved out.
+_LET = r"[^\W\d_\u00b2\u00b3\u00b9\u00bc-\u00be\u2070-\u209f]"
 NUM_RE = re.compile(r"(?<![0-9])[0-9]+(?:[,.'\u2019\u00a0\u202f\u2009][0-9]+)*")
 _MINUS = "-\u2212\u2013"
 _SP = " \u00a0\u202f\u2009"
@@ -421,7 +424,7 @@ def read_token(tok: str, locale: str):
 
 _MONTHS = (r"(?:jan(?:uary|uar)?|jän(?:ner)?|feb(?:ruary|ruar)?|mar(?:ch)?|märz|maerz|apr(?:il)?|may|mai|"
            r"jun[ei]?|jul[iy]?|aug(?:ust)?|sep(?:t(?:ember)?)?|o[ck]t(?:ober)?|nov(?:ember)?|de[cz](?:ember)?)"
-           r"\.?(?![^\W\d_])")
+           r"\.?(?!" + _LET + r")")
 _DAY = r"(?:0?[1-9]|[12][0-9]|3[01])"
 _LINK_RE = re.compile(r"(?i)\b(?:https?|ftp)://[^\s<>\"'«»]+|\bwww\.[^\s<>\"'«»]+|[\w.+-]+@[\w-]+(?:\.[\w-]+)+"
                       r"|\b(?:doi:\s*)?10\.\d{4,9}/[^\s\"<>]+")
@@ -438,9 +441,9 @@ _DATE_RES = [
 ]
 _TIME_RES = [
     re.compile(r"(?<![\d.,:])(?:[01]?\d|2[0-3]):[0-5]\d(?::[0-5]\d)?(?!\d)"),
-    re.compile(r"(?i)(?<![\d.,])(?:[01]?\d|2[0-3])[.:][0-5]\d\s?(?:h|uhr|am|pm|a\.m\.|p\.m\.)(?![^\W\d_])"),
-    re.compile(r"(?i)(?<![\d.,])(?:1[0-2]|0?[1-9])\s?(?:am|pm|a\.m\.|p\.m\.)(?![^\W\d_])"),
-    re.compile(r"(?i)(?<![\d.,])(?:[01]?\d|2[0-3])\s?uhr(?![^\W\d_])"),
+    re.compile(r"(?i)(?<![\d.,])(?:[01]?\d|2[0-3])[.:][0-5]\d\s?(?:h|uhr|am|pm|a\.m\.|p\.m\.)(?!" + _LET + r")"),
+    re.compile(r"(?i)(?<![\d.,])(?:1[0-2]|0?[1-9])\s?(?:am|pm|a\.m\.|p\.m\.)(?!" + _LET + r")"),
+    re.compile(r"(?i)(?<![\d.,])(?:[01]?\d|2[0-3])\s?uhr(?!" + _LET + r")"),
 ]
 _PHONE_RES = [
     re.compile(r"(?<![\w+])(?:\+|00)[1-9][0-9]{0,2}(?:[ \u00a0./-]?\(?[0-9]{1,5}\)?){2,6}(?![0-9])"),
@@ -500,24 +503,25 @@ _CODES = ("EUR|USD|GBP|CHF|JPY|CNY|RMB|AUD|CAD|SEK|NOK|DKK|PLN|CZK|HUF|INR|BRL|Z
           "AED|SAR|ILS|RUB")
 _PREFIX_CUR_RE = re.compile(r"(?:(?:US|AU|A|C|CA|NZ|HK|S|R|Mex)?\$|€|£|¥|₹|₩|₽|₺|₪|(?<![A-Za-z])(?:" + _CODES
                             + r")|(?<![A-Za-z])S?Fr\.)[ \u00a0\u202f\u2009]?$")
-_CUR_AFTER_RE = re.compile(r"(?:€|\$|£|¥|₹|₩|₽|₺|₪)|(?:" + _CODES + r")(?![^\W\d_])")
-_CUR_WORD_RE = re.compile(r"(?i)(?:euros?|dollars?|pounds?(?:\s+sterling)?|francs?|franken)(?![^\W\d_])")
-_COMBO_RE = re.compile(r"(?P<s>[TkKmM])(?P<c>EUR|USD|CHF|GBP|€|\$)(?![^\W\d_])")
+_CUR_AFTER_RE = re.compile(r"(?:€|\$|£|¥|₹|₩|₽|₺|₪)|(?:" + _CODES + r")(?!" + _LET + r")")
+_CUR_WORD_RE = re.compile(r"(?i)(?:euros?|dollars?|pounds?(?:\s+sterling)?|francs?|franken)(?!" + _LET + r")")
+_COMBO_RE = re.compile(r"(?P<s>[TkKmM])(?P<c>EUR|USD|CHF|GBP|€|\$)(?!" + _LET + r")")
 _SCALE_WORD_RE = re.compile(r"(?i)(?:thousands?|millions?|billions?|trillions?|tausend|tsd\.|tsd|millionen|million|"
-                            r"mio\.|mio|milliarden|milliarde|mrd\.|mrd|billionen|bio\.|bn|mn|tn|trn|mm)(?![^\W\d_])")
-_SCALE_LETTER_RE = re.compile(r"[kKmMbBT](?![^\W\d_])")
+                            r"mio\.|mio|milliarden|milliarde|mrd\.|mrd|billionen|bio\.|bn|mn|tn|trn|mm)(?!" + _LET + r")")
+_SCALE_LETTER_RE = re.compile(r"[kKmMbBT](?!" + _LET + r")")
 SCALE_EXP = {"thousand": 3, "thousands": 3, "tausend": 3, "tsd": 3, "tsd.": 3, "k": 3,
              "million": 6, "millions": 6, "millionen": 6, "mio": 6, "mio.": 6, "mn": 6, "mm": 6, "m": 6,
              "billion": 9, "billions": 9, "milliarde": 9, "milliarden": 9, "mrd": 9, "mrd.": 9, "bn": 9, "b": 9,
              "trillion": 12, "trillions": 12, "billionen": 12, "bio.": 12, "tn": 12, "trn": 12, "t": 12}
-_UNIT_RE = re.compile(r"""(?ix)
-   (?P<pp>percentage[\s-]points?(?![^\W\d_])|prozentpunkte?(?![^\W\d_])|%-?punkte?(?![^\W\d_])
-         |pp(?![^\W\d_]|\.)|ppt(?![^\W\d_])|p\.p\.|pts(?![^\W\d_]))
- | (?P<pct>%|per\s?cent(?![^\W\d_])|percent(?![^\W\d_])|pct(?![^\W\d_])|pc(?![^\W\d_])|prozent(?![^\W\d_])|v\.\s?h\.)
- | (?P<pm>‰|per\s?mille(?![^\W\d_])|promille(?![^\W\d_]))
- | (?P<bp>basis[\s-]points?(?![^\W\d_])|basispunkte?(?![^\W\d_])|bps(?![^\W\d_])|bp(?![^\W\d_])|‱)
- | (?P<x>[x×](?![^\W_]))
-""")
+_NL = r"(?!" + _LET + r")"   # the word ends here: no letter follows
+_UNIT_RE = re.compile(
+    r"(?i)(?P<pp>percentage[\s-]points?" + _NL + r"|prozentpunkte?" + _NL + r"|%-?punkte?" + _NL
+    + r"|pp(?!" + _LET + r"|\.)|ppt" + _NL + r"|p\.p\.|pts" + _NL + r")"
+    + r"|(?P<pct>%|per\s?cent" + _NL + r"|percent" + _NL + r"|pct" + _NL + r"|pc" + _NL + r"|prozent" + _NL
+    + r"|v\.\s?h\.)"
+    + r"|(?P<pm>‰|per\s?mille" + _NL + r"|promille" + _NL + r")"
+    + r"|(?P<bp>basis[\s-]points?" + _NL + r"|basispunkte?" + _NL + r"|bps" + _NL + r"|bp" + _NL + r"|‱)"
+    + r"|(?P<x>[x×](?![^\W_]))")
 _UNIT_NAMES = {"pct": "%", "pp": "pp", "pm": "‰", "bp": "bp", "x": "x"}
 _QUAL_RE = re.compile(r"""(?ix)(?:
    (?<![\w])(?P<approximate>approximately|approx\.?|around|about|roughly|some|circa|ca\.|c\.|nearly|almost
@@ -725,10 +729,10 @@ def _glued(n: Num, text: str):
     j = n.tok_end
     if n.end == n.tok_end and j < len(text) and text[j].isalpha():
         rest = text[j:j + 16]
-        if n.decimals == 0 and re.match(r"(?:st|nd|rd|th)(?![^\W\d_])", rest):
+        if n.decimals == 0 and re.match(r"(?:st|nd|rd|th)(?!" + _LET + r")", rest):
             return R_ORDINAL
         if len(n.tok) == 4 and n.tok.isdigit() and YEAR_MIN <= int(n.tok) <= YEAR_MAX \
-                and re.match(r"[EeFfAaBbPp](?![^\W\d_])", rest):
+                and re.match(r"[EeFfAaBbPp](?!" + _LET + r")", rest):
             return R_YEAR
         letters = re.match(r"[^\W\d_]+", rest).group()
         after = j + len(letters)
@@ -906,7 +910,7 @@ _DE_WORDS = re.compile(r"(?i)\b(?:der|die|das|und|ist|mit|für|nicht|eine?|den|d
                        r"sich|auch|nach|bei|gegenüber|sowie)\b")
 _EN_WORDS = re.compile(r"(?i)\b(?:the|and|is|with|for|not|of|to|was|were|by|on|this|that|from|at|which|compared)\b")
 _DE_SCALE = re.compile(r"(?<=\d)[ \u00a0]?(?:Mio\.|Mrd\.|Tsd\.|Millionen|Milliarden|TEUR)")
-_EN_SCALE = re.compile(r"(?<=\d)[ \u00a0]?(?:bn|mn|million|billion)(?![^\W\d_])")
+_EN_SCALE = re.compile(r"(?<=\d)[ \u00a0]?(?:bn|mn|million|billion)(?!" + _LET + r")")
 
 
 def detect_locale(segments) -> tuple:

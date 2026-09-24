@@ -20,7 +20,7 @@ def handlers(event):
     return [(g["matcher"], h) for g in hooks[event] for h in g["hooks"]]
 
 
-class Plugin(unittest.TestCase):
+class Plugin(Isolated):
     def load(self, rel):
         return json.loads((ROOT / rel).read_text(encoding="utf-8"))
 
@@ -78,7 +78,7 @@ class Plugin(unittest.TestCase):
             self.assertTrue((ROOT / rel).is_file(), rel)
 
 
-class Packaging(unittest.TestCase):
+class Packaging(Isolated):
     def test_module_names_do_not_collide(self):
         pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
         self.assertIn('py-modules = ["mcp_vitals", "mcp_vitals_hook"]', pyproject)

@@ -234,8 +234,8 @@ snapshot. Rebuilt from the same raw files, the data files are byte-identical;
 `manifest.json` and `SOURCES.md` also record the retrieval date. A source
 that fails (network down, HTTP 404 or 429, empty or non-UTF-8 body, a changed
 format, a malformed XLSX) keeps its previous snapshot and is reported; the exit code
-is then 2. DESNZ publishes a new set each June (the 2026 front page gives June 2027 as
-the next date): add the year with `--desnz-years 2027,2026`. The UBA figures are read
+is then 2. "An update is published each year" (GOV.UK page); the 2026 front page gives
+June 2027 as the next publication date. Add the new year with `--desnz-years 2027,2026`. The UBA figures are read
 from the text of a web page and stop refreshing, with an error, when the page changes.
 
 ## Scope 2: location-based only

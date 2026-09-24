@@ -86,6 +86,42 @@ def make_model(path):
         },
     }
     _inject_results(path, results)
+    _to_shared_strings(path)
+
+
+def _to_shared_strings(path):
+    """openpyxl writes text inline; Excel keeps it in a shared-strings table. Do what Excel does."""
+    cell = re.compile(r'<c r="([A-Z]+[0-9]+)"((?: s="[0-9]+")?) t="inlineStr"><is><t(?: xml:space="preserve")?>'
+                      r'(.*?)</t></is></c>')
+    strings = []
+
+    def swap(m):
+        if m.group(3) not in strings:
+            strings.append(m.group(3))
+        return '<c r="%s"%s t="s"><v>%d</v></c>' % (m.group(1), m.group(2), strings.index(m.group(3)))
+
+    tmp = path + ".tmp"
+    with zipfile.ZipFile(path) as zin, zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zout:
+        for item in zin.infolist():
+            data = zin.read(item.filename)
+            if item.filename.startswith("xl/worksheets/sheet"):
+                data = cell.sub(swap, data.decode("utf-8")).encode("utf-8")
+            elif item.filename == "xl/_rels/workbook.xml.rels":
+                data = data.decode("utf-8").replace(
+                    "</Relationships>",
+                    '<Relationship Id="rIdSst" Type="http://schemas.openxmlformats.org/officeDocument/2006/'
+                    'relationships/sharedStrings" Target="sharedStrings.xml"/></Relationships>').encode("utf-8")
+            elif item.filename == "[Content_Types].xml":
+                data = data.decode("utf-8").replace(
+                    "</Types>",
+                    '<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-'
+                    'officedocument.spreadsheetml.sharedStrings+xml"/></Types>').encode("utf-8")
+            zout.writestr(item, data)
+        sst = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<sst xmlns="http://schemas.openxmlformats.org/'
+               'spreadsheetml/2006/main" count="%d" uniqueCount="%d">' % (len(strings), len(strings))
+               + "".join("<si><t>%s</t></si>" % s for s in strings) + "</sst>")
+        zout.writestr("xl/sharedStrings.xml", sst)
+    os.replace(tmp, path)
 
 
 def _inject_results(path, results):

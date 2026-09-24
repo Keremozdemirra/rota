@@ -178,7 +178,7 @@ class Compare(Isolated):
         self.assertEqual(len(r["attribution"]), 2)
         self.assertIn("EIOPA_RFR_20260731.zip", r["attribution"][0])
         self.assertIn("EIOPA does not endorse this publication", r["disclaimer"])
-        self.assertIn("derived", r["derived"] + "derived")
+        self.assertIn("computed by eiopa-rfr from the two published values", r["derived"])
 
     def test_same_date_twice_is_no_change(self):
         r = E.compare("USD", 30, "2026-08", "2026-08-31", "no_va")
@@ -239,8 +239,7 @@ class CacheAndOffline(Isolated):
         page = fixture("rfr_page.html").replace(b"d491908e-9c02-427a-90ec-9dbd7b881ffe", b"0000aaaa-9c02-427a-90ec-9dbd7b881ffe")
         new_url = listing_urls()["2026-08-31"].replace("d491908e", "0000aaaa")
         self.web.routes[E.RFR_PAGE] = page
-        self.web.routes[new_url] = fixture("EIOPA_RFR_20260731.zip").replace(b"", b"") and fixture(
-            "EIOPA_RFR_20260831.zip")
+        self.web.routes[new_url] = fixture("EIOPA_RFR_20260831.zip")
         E.list_releases(refresh=True)
         r = E.get_rate("EUR", 10, "2026-08")
         self.assertEqual(self.web.count("0000aaaa"), 1)

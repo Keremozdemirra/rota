@@ -1,4 +1,5 @@
 """Aggregation, data-quality weighting, rounding, currencies and row validation."""
+import json
 import socket
 import sys
 import unittest
@@ -129,11 +130,13 @@ class Rounding(unittest.TestCase):
         self.assertEqual(fe.fmt_ratio(D("0.0625")), "0.0625")
         self.assertEqual(fe.fmt_ratio(D(2) / D(3)), "0.666667")
 
-    def test_huge_values_do_not_break_formatting(self):
-        result = run(["A,listed_equity,EUR,1,0.000000000000000001,1000000,0,1"])
+    def test_extreme_values_within_the_input_limits(self):
+        # The largest outstanding over the smallest denominator the parser accepts, times the largest emissions.
+        result = run(["A,listed_equity,EUR,9e23,0.000000000001,9e23,0,1"])
         self.assertTrue(result["flags"])
         text = fe.render(result, explain=True)
         self.assertIn("e+", text)
+        json.dumps(fe.to_json(result), allow_nan=False)
 
 
 class Currencies(unittest.TestCase):
@@ -205,6 +208,21 @@ class RowValidation(unittest.TestCase):
         result = run(["A,listed_equity,EUR,100,1000,5,0,1", "A,listed_equity,EUR,100,1000,5,0,1"])
         self.assertEqual(len(result["positions"]), 1)
         self.assertIn("already used on line 2", reasons(result))
+
+    def test_long_ids_are_compared_in_full(self):
+        a, b = "X" * 70 + "1", "X" * 70 + "2"
+        result = run([f"{a},listed_equity,EUR,100,1000,5,0,1", f"{b},listed_equity,EUR,100,1000,5,0,1"])
+        self.assertEqual(len(result["positions"]), 2)
+        self.assertLessEqual(len(result["positions"][0]["position_id"]), 60)
+
+    def test_markdown_escapes_file_text(self):
+        header = BASE + ",counterparty"
+        result = run(["A,listed_equity,EUR,100,1000,5,1,1,<img src=x onerror=alert(1)> | Co",
+                      "B,mortgage,EUR,1,,1,1,1,<b>x</b>"], header)
+        text = fe.render(result, markdown=True)
+        self.assertNotIn("<img", text)
+        self.assertNotIn("<b>", text)
+        self.assertIn("&lt;img", text)
 
     def test_unknown_and_out_of_scope_classes(self):
         result = run(["A,crypto,EUR,100,1000,5,0,1", "B,credit card,EUR,100,,,,", "C,,EUR,1,1,1,1,1"])

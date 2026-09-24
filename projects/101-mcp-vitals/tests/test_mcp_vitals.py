@@ -233,6 +233,16 @@ class Output(Isolated):
         self.assertIn("x\\|y", md)
         self.assertIn("1 server", md)
 
+    def test_github_and_census_both_unreachable(self):
+        self.serve({"https://registry.npmjs.org/@21st-dev%2Fmagic": fixture("npm-21st-dev-magic.json"),
+                    "https://api.github.com/repos/21st-dev/magic-mcp": 403, mcp_vitals.CENSUS: 503})
+        code, out, _ = self.run_main(["--strict", "--json", "npm:@21st-dev/magic"])
+        doc = json.loads(out)
+        self.assertEqual(code, 2)
+        self.assertIn("repository unknown", doc["servers"][0]["flags"])
+        self.assertEqual(doc["census"], {"used": False, "date": None})
+        self.assertIn("repository facts were not checked", doc["notes"][0])
+
     def test_json_shape(self):
         cfg = self.write_config({"mcpServers": {"a": {"command": "npx", "args": ["-y", "pkg@1.0.0"]}}})
         code, out, _ = self.run_main(["--offline", "--json", "--config", str(cfg)])

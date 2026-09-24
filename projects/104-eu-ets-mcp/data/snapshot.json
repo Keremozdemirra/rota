@@ -1,7 +1,7 @@
 {
  "format": 1,
  "snapshot_date": "2026-09-24",
- "retrieved_at": "2026-09-24T09:39:12Z",
+ "retrieved_at": "2026-09-24T09:40:45Z",
  "listing_url": "https://union-registry-data.ec.europa.eu/api/data-download",
  "licence": "CC BY 4.0",
  "licence_url": "https://creativecommons.org/licenses/by/4.0/",
@@ -13,7 +13,7 @@
    "bytes": 1831335,
    "sha256": "9b0da34a142fe6939fc262744b47d5776ba6279aff0cb7c24d94259e28f84fb9",
    "kind": "operators",
-   "seconds": 1.22,
+   "seconds": 1.39,
    "rows_read": 23322,
    "rows_kept": 23322,
    "malformed_rows": 0,
@@ -25,7 +25,7 @@
    "bytes": 5610802,
    "sha256": "76ed621b131bc613b0c4643d77e6bb37b08e0640aa9de482ce5501cf60f349e9",
    "kind": "yearly",
-   "seconds": 1.81,
+   "seconds": 1.92,
    "rows_read": 606372,
    "rows_kept": 276637,
    "malformed_rows": 0,
@@ -38,7 +38,7 @@
    "sha256": "26969b3486bf478574d1caefdd1e736f592e28a3fd83175b2063e9fe27c1f1e5",
    "kind": "compliance",
    "year": 2021,
-   "seconds": 1.15,
+   "seconds": 0.28,
    "rows_read": 10316,
    "rows_kept": 10316,
    "malformed_rows": 0
@@ -50,7 +50,7 @@
    "sha256": "d472efb7fc4fa4dfdb61b7a7526a7940979400aacf82c579bf5bf246984d30ab",
    "kind": "compliance",
    "year": 2022,
-   "seconds": 1.01,
+   "seconds": 0.61,
    "rows_read": 10445,
    "rows_kept": 10445,
    "malformed_rows": 0
@@ -62,7 +62,7 @@
    "sha256": "b81e1c4e17b1d682b25a77bd6c31f4165a8705335c25d22699d2fb5d19ff10f0",
    "kind": "compliance",
    "year": 2023,
-   "seconds": 0.84,
+   "seconds": 0.19,
    "rows_read": 10651,
    "rows_kept": 10651,
    "malformed_rows": 0
@@ -74,7 +74,7 @@
    "sha256": "a8b2191b56fa576b7d9e0ae000ddab24b5aa90e8511e4287203461ca4684dd7a",
    "kind": "compliance",
    "year": 2024,
-   "seconds": 5.46,
+   "seconds": 0.67,
    "rows_read": 14573,
    "rows_kept": 14573,
    "malformed_rows": 0
@@ -100,7 +100,9 @@
   "yearly_rows": 276637,
   "compliance_rows": 44717,
   "installations_with_lei": 5234,
-  "names_withheld": 83,
+  "names_withheld": 83
+ },
+ "dropped": {
   "compliance_rows_without_installation": 3
  },
  "compliance_years": [

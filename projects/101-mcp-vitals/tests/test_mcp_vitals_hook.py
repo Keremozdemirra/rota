@@ -23,7 +23,7 @@ def gh(pushed, archived=False, license=None):
     return doc
 
 
-class ParseAdd(unittest.TestCase):
+class ParseAdd(Isolated):
     def one(self, cmd, shell="bash"):
         got = hook.parse_add(cmd, shell)
         self.assertEqual(len(got), 1, got)

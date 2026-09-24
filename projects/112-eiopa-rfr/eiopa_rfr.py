@@ -299,8 +299,7 @@ def checked_url(url: str, base: str | None = None) -> str:
 
 class _SameHostRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        checked_url(newurl, req.full_url)
-        return super().redirect_request(req, fp, code, msg, headers, newurl)
+        return super().redirect_request(req, fp, code, msg, headers, checked_url(newurl, req.full_url))
 
 
 _OPENER = urllib.request.build_opener(_SameHostRedirect)

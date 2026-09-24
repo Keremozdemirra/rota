@@ -153,7 +153,8 @@ class Numbers(unittest.TestCase):
             self.assertEqual(fe.parse_decimal(raw), D(want), raw)
 
     def test_refused(self):
-        for raw in ("1,234", "12,5", "nan", "inf", "Infinity", "1e30", "€100", "1.2.3", "0x10", "1_000", "--1"):
+        for raw in ("1,234", "12,5", "nan", "inf", "Infinity", "1e30", "€100", "1.2.3", "0x10", "1_000", "--1",
+                    "1e-999", "0.0000000000001"):
             with self.assertRaises(ValueError, msg=raw):
                 fe.parse_decimal(raw)
 
@@ -163,6 +164,10 @@ class Numbers(unittest.TestCase):
             self.assertEqual(fe.parse_decimal(raw, decimal_comma=True), D(want), raw)
         with self.assertRaises(ValueError):
             fe.parse_decimal("1.5", decimal_comma=True)
+
+    def test_zero_in_any_notation_is_fine(self):
+        for raw in ("0", "0.0", "-0", "0e5"):
+            self.assertEqual(fe.parse_decimal(raw), 0)
 
     def test_blank(self):
         self.assertIsNone(fe.parse_decimal(""))

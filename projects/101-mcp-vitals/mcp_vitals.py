@@ -1004,10 +1004,17 @@ def notes(results: list[dict], net: Net | None) -> list[str]:
             reason = reg["deprecated"].partition(": ")[2]
             out.append(f"{r['name']}: PyPI marks {at} yanked" + (f": \"{clean(mask_text(reason))}\"" if reason else ""))
     if net and net.github_down:
-        when = f" of {net.census_date}" if net.census_date else ""
-        out.append(f"GitHub API unavailable or rate-limited; repository facts came from the agent-vitals census{when}. "
-                   "Set GITHUB_TOKEN for live ones." if net.use_census else "GitHub API unavailable or rate-limited.")
+        if census_used(results):
+            out.append(f"GitHub API unavailable or rate-limited; repository facts came from the agent-vitals census "
+                       f"of {net.census_date or 'unknown date'}. Set GITHUB_TOKEN for live ones.")
+        else:
+            out.append("GitHub API unavailable or rate-limited, and no census entry to fall back on; "
+                       "repository facts were not checked. Set GITHUB_TOKEN for live ones.")
     return out
+
+
+def census_used(results: list[dict]) -> bool:
+    return any(str((r["facts"].get("repository") or {}).get("source", "")).startswith("census") for r in results)
 
 
 def render_text(results: list[dict], searched: list[str], extra: list[str] = ()) -> str:
@@ -1071,10 +1078,10 @@ def to_json(results: list[dict], today: dt.date, searched: list[str], net: Net |
         reg = r["facts"].get("registry") or {}
         if reg.get("deprecated"):  # the skill hands this JSON to a model
             reg["deprecated"] = remote_text(reg["deprecated"], 300)
-    census = bool(net and net.github_down and net.use_census)
+    census = census_used(results)
     return {"checked": today.isoformat(), "configs": searched, "servers": servers,
             "notes": [n for n in notes(results, net) if n.startswith("GitHub API")],
-            "census": {"used": census, "date": net.census_date if census else None}}
+            "census": {"used": census, "date": (net.census_date or None) if census else None}}
 
 
 def target_entry(words: list[str]) -> dict:

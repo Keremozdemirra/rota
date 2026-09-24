@@ -295,8 +295,10 @@ NUMERIC_COLUMNS = ["outstanding", "denominator", "total_equity", "total_debt", "
                    "undrawn_commitment", "dq_score", "dq_score_scope3"]
 
 # Tool's choice, not a PCAF rule: no real position or economy reaches 10^24 in any currency unit or
-# tCO2e, and the bound keeps Decimal formatting exact.
+# tCO2e, and no real amount, rate or emission figure is below 10^-12 without being 0; within these bounds
+# every result stays exact in Decimal formatting and finite in JSON.
 MAX_ABS = Decimal("1e24")
+MIN_ABS = Decimal("1e-12")
 # Tool's choice: a portfolio file above this size is refused rather than read into memory.
 MAX_FILE_BYTES = 50 * 1024 * 1024
 
@@ -353,6 +355,8 @@ def parse_decimal(text, decimal_comma: bool = False):
     value = Decimal(s)
     if abs(value) >= MAX_ABS:
         raise ValueError(f"{_short(s)!r} is implausibly large (limit 1e24, a safeguard of this tool)")
+    if value != 0 and abs(value) < MIN_ABS:
+        raise ValueError(f"{_short(s)!r} is implausibly small (limit 1e-12, a safeguard of this tool)")
     return value
 
 
@@ -783,7 +787,8 @@ class _Env:
 def evaluate_row(line, row, env):
     """('ok', position) or ('failed', failure). Warnings travel inside either."""
     reasons, warnings = [], []
-    pid = clean_text(row.get("position_id"), 60)
+    raw_pid = (row.get("position_id") or "").strip()
+    pid = clean_text(raw_pid, 60)
     counterparty = clean_text(row.get("counterparty"))
     raw_class = clean_text(row.get("asset_class"), 60)
     sector = clean_text(row.get("sector"), 60)
@@ -793,10 +798,10 @@ def evaluate_row(line, row, env):
         reasons.append("the row has more cells than the header has columns")
     if not pid:
         reasons.append("position_id is blank")
-    elif pid in env.seen:
-        reasons.append(f"position_id {pid!r} is already used on line {env.seen[pid]}")
+    elif raw_pid in env.seen:
+        reasons.append(f"position_id {pid!r} is already used on line {env.seen[raw_pid]}")
     else:
-        env.seen[pid] = line
+        env.seen[raw_pid] = line
 
     inst = _resolve_instrument(raw_class) if raw_class else None
     spec = None
@@ -1291,12 +1296,17 @@ def to_json(result, max_positions=None, explain=True):
 
 
 # ----------------------------------------------------------------- text and Markdown
+def _md(text):
+    """Text from the file, safe inside Markdown: no raw HTML, no table breaks."""
+    return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("|", "\\|")
+
+
 def _table(headers, rows, align, markdown=False):
     if markdown:
         out = ["| " + " | ".join(headers) + " |",
                "| " + " | ".join("---:" if a == "r" else "---" for a in align) + " |"]
         for r in rows:
-            out.append("| " + " | ".join(str(c).replace("|", "\\|") for c in r) + " |")
+            out.append("| " + " | ".join(_md(c) for c in r) + " |")
         return "\n".join(out)
     widths = [max(len(str(h)), *(len(str(r[i])) for r in rows)) if rows else len(str(h)) for i, h in enumerate(headers)]
 
@@ -1429,7 +1439,7 @@ def render(result, markdown=False, explain=False):
         who = f["position_id"] or "(no id)"
         what = ", ".join(x for x in (f["asset_class"], f["counterparty"]) if x)
         text = f"line {f['line']}  {who}" + (f" ({what})" if what else "") + ": " + "; ".join(f["reasons"])
-        out.append(("- " + text) if md else "  " + text)
+        out.append(("- " + _md(text)) if md else "  " + text)
 
     for title, items in (("Flags", result["flags"]), ("Warnings", result["warnings"])):
         if items:
@@ -1439,7 +1449,7 @@ def render(result, markdown=False, explain=False):
                 out.append("")
             for w in items:
                 text = f"line {w['line']}  {w['position_id']}: {w['message']}"
-                out.append(("- " + text) if md else "  " + text)
+                out.append(("- " + _md(text)) if md else "  " + text)
     if result["notes"]:
         out.append("")
         out.append(h2("Notes"))

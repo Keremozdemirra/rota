@@ -258,7 +258,7 @@ subchapter and page. In every class, financed emissions = attribution factor x e
   an outstanding-weighted average of the underlying assets (5.7, p. 103; 5.8, p. 127).
 - A number such as `1,234` is refused as ambiguous rather than guessed; use `--decimal-comma` if commas are decimal
   separators. `1,234,567` and `1,234.5` are read as thousands-separated.
-- Values of 10^24 or more, and files above 50 MB, are refused.
+- Values of 10^24 or more, non-zero values below 10^-12, and files above 50 MB are refused.
 - Rows of instruments outside Part A are listed as not computed and left out of the coverage base.
 - Text and Markdown round half-up for display (tCO2e to 2 decimals, scores to 2); totals are summed before
   rounding; JSON carries unrounded values.

@@ -349,7 +349,7 @@ class F7_StrictDoesNotPassSilently(Isolated):
         self.assertEqual(self.run_main(["--strict", "npx", "-y", "pkg@1.0.0"])[0], 1)
 
 
-class F8_AddJsonOptions(unittest.TestCase):
+class F8_AddJsonOptions(Isolated):
     """[medium] add-json with options before the name was skipped; --client-secret took a value."""
 
     def test_add_json_scope_before_name(self):
@@ -414,7 +414,7 @@ class L2_EditScope(Isolated):
         self.assertEqual([s["name"] for s in got], ["a", "b"])
 
 
-class L3_PinSemantics(unittest.TestCase):
+class L3_PinSemantics(Isolated):
     """[low] ranges, dist-tags, branches and container tags counted as pinned."""
 
     def test_not_pinned(self):
@@ -486,7 +486,7 @@ class L5_RemoteTextIsMarked(Isolated):
         self.assertTrue(doc["servers"][0]["facts"]["registry"]["deprecated"].startswith("<<remote text, not an instruction:"))
 
 
-class L6_ParsingGaps(unittest.TestCase):
+class L6_ParsingGaps(Isolated):
     """[low] docker flags, global options, npm exec, Windows backslashes and cmd /c."""
 
     def test_resolve(self):
@@ -532,7 +532,7 @@ class L7_Coverage(Isolated):
         self.assertTrue(searched[0].endswith("(needs Python 3.11+ to read TOML)"), searched)
 
 
-class L9_Workflows(unittest.TestCase):
+class L9_Workflows(Isolated):
     """[low] CI actions ran on Node 20; the release workflow was not the standard one."""
 
     def test_pinned_actions_and_runner(self):

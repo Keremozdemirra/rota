@@ -249,6 +249,9 @@ def main(argv=None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(errors="replace")
     if args.command == "refresh":
+        if not re.match(r"^https://[A-Za-z0-9.-]+/\S*$", args.excel_url):
+            print("cbam-mcp refresh: --excel-url must be an https:// URL", file=sys.stderr)
+            return 2
         target = args.data_dir or lookup.data_dir()
         try:
             return refresh.run(target, only=args.only, check_oj=args.check_oj, excel_url=args.excel_url)
