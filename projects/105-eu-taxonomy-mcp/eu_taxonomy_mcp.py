@@ -1298,6 +1298,8 @@ def _print_result(command: str, r: dict) -> None:
             print("Do no significant harm (DNSH)")
             for d in r["dnsh_criteria"]:
                 _print_block(f"- {d['name']}", d)
+            for n in r.get("notes") or []:
+                print(f"\nNote: {n}")
     elif command == "sources":
         s = r["snapshot"]
         print(f"Snapshot: {s['path']}, retrieved {s['retrieved']}, sha256 {s['sha256']}")

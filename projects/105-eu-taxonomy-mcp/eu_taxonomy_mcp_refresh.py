@@ -91,10 +91,11 @@ class Fetcher:
     """GET requests to the Navigator backend, one at a time, with a pause in between."""
 
     def __init__(self, base: str = core.API_BASE, opener=None, delay: float = 1.0, timeout: float = 120.0,
-                 sleep=time.sleep, log=None):
+                 sleep=None, log=None):
         self.base = base
         self.opener = opener or urllib.request.urlopen
-        self.delay, self.timeout, self.sleep = delay, timeout, sleep
+        self.delay, self.timeout = delay, timeout
+        self.sleep = sleep or time.sleep
         self.log = log or (lambda msg: print(msg, file=sys.stderr))
         self.requests = 0
         self.bytes = 0

@@ -133,11 +133,12 @@ TOKEN_SHAPE = re.compile(r"(?:sk|pk|rk)[-_][A-Za-z0-9_-]{8,}|gh[pousr]_[A-Za-z0-
                          r"|AIza[A-Za-z0-9_-]{30,}|eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}")
 FLAG = re.compile(r"--?[A-Za-z][A-Za-z0-9_.-]*")
 CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f\u200b-\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069\ufeff]")
+ANSI = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]|\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)?")  # colour codes, terminal titles
 
 
 def clean(text, limit: int = 160) -> str:
     """Third-party or config text made safe to print: no control or bidi characters, one line, bounded."""
-    t = re.sub(r"\s+", " ", CONTROL.sub(" ", str(text))).strip()
+    t = re.sub(r"\s+", " ", CONTROL.sub(" ", ANSI.sub("", str(text)))).strip()
     return t if len(t) <= limit else t[:limit - 3].rstrip() + "..."
 
 
@@ -512,7 +513,10 @@ def py_spec(spec: str, custom: bool = False) -> dict:
     m = re.fullmatch(r"([A-Za-z0-9][A-Za-z0-9._-]*)\s*(?:\[[^\]]*\])?\s*(.*)", spec, re.S)
     if not m or not PYPI_NAME.fullmatch(m.group(1)):
         return {"detail": "not a PyPI package name"}
-    name, rest = m.group(1), m.group(2).split(";", 1)[0].strip()
+    name, rest = m.group(1), m.group(2).strip()
+    if rest and not re.match(r"(?:===?|!=|~=|<=?|>=?|@|;|\()", rest):
+        return {"detail": "not a PyPI requirement"}
+    rest = rest.split(";", 1)[0].strip()  # environment markers
     version, pin = None, "none"
     if rest.startswith("@"):  # uv: `pkg@1.2.3` means exactly that version, `pkg@latest` the newest
         v = rest[1:].strip()

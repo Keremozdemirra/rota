@@ -1,0 +1,18 @@
+position_id,counterparty,asset_class,sector,currency,fx_rate,outstanding,denominator_basis,denominator,total_equity,total_debt,instrument,scope1_tco2e,scope2_tco2e,scope3_tco2e,dq_score,dq_score_scope3,scope1_incl_lulucf_tco2e,removals_tco2e,undrawn_commitment,allocation_pct
+LE-01,Brightwater Utilities plc (fictional),listed_equity,Utilities,EUR,,12000000,evic,4800000000,,,,2400000,60000,900000,1,3,,,,
+CB-01,Kestrel Cement SE (fictional),corporate_bond,Cement,EUR,,8000000,evic,2000000000,,,,3100000,150000,700000,2,4,,,,
+BL-01,Haldor Logistics GmbH (fictional),business_loan,Transport,EUR,,15000000,total_equity_plus_debt,,40000000,110000000,,52000,4000,,3,,,,,
+BL-02,Vireo Foods BV (fictional),business_loan,Food,EUR,,5000000,total_equity_plus_debt,,-2000000,25000000,,18000,2500,95000,4,5,,,,
+UE-01,Solenne Biotech SAS (fictional),unlisted_equity,Health care,EUR,,3000000,total_equity_plus_debt,60000000,,,,900,1400,12000,2,4,,,,
+PF-01,Aurora Ridge Wind Park (fictional),project_finance,Power,EUR,,45000000,total_equity_plus_debt,300000000,,,debt,1200,300,,2,,,,5000000,
+PF-02,Tallow Creek Reforestation Project (fictional),project_finance,Forestry,EUR,,6000000,total_equity_plus_debt,20000000,,,debt,150,10,,2,,,42000,,
+CRE-01,Lindenhof Office Building (fictional),commercial_real_estate,Real estate,EUR,,18000000,property_value_at_origination,30000000,,,,410,620,,2,,,,,
+MG-01,Mortgage 0001 (fictional borrower),mortgage,Households,EUR,,240000,property_value_at_origination,400000,,,,2.1,1.3,,4,,,,,
+MG-02,Mortgage 0002 (fictional borrower),mortgage,Households,EUR,,190000,property_value_at_origination,,,,,1.8,1.1,,4,,,,,
+MG-03,Mortgage 0003 (fictional borrower),mortgage,Households,EUR,,315000,property_value_at_origination,300000,,,,3.4,0.9,,3,,,,,
+MV-01,Porter Vans Ltd fleet (fictional),motor_vehicle_loan,Transport,EUR,,400000,vehicle_value_at_origination,,,,,310,0,,4,,,,,
+UOP-01,Evergreen Infrastructure Debt Fund I (fictional),use_of_proceeds,Infrastructure,EUR,,50000000,total_equity_plus_debt,400000000,,,debt,36000,4000,9000,2.6,3.8,,,,80
+SEC-01,Harbour RMBS 2025-1 Class A (fictional),securitization,Households,EUR,,20000000,deal_outstanding,750000000,,,,5200,3100,,3.6,,,,,
+SOV-01,Republic of Examplia (fictional),sovereign_debt,Sovereign,USD,0.92,30000000,ppp_adjusted_gdp,950000000000,,,,410000000,,,1,,385000000,,,
+SUB-01,Province of Norvale (fictional),sub_sovereign_debt,Sub-sovereign,USD,0.92,10000000,ppp_adjusted_gdp,85000000000,,,,21000000,,,2,,,,,
+DER-01,Interest rate swap with Calder Bank (fictional),derivative,Financials,EUR,,5000000,,,,,,,,,,,,,,

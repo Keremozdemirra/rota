@@ -1453,7 +1453,7 @@ class Dataset:
                 key = (r["registry"], r["installation_id"])
                 latest_row = next((x for x in per.get(key, []) if x["year"] == latest), None)
                 d.update(lei_registered=r["lei_registered"], first_emissions_year=r["first_year"],
-                         last_emissions_year=r["last_year"], verified_emissions_latest=latest_row["verified"] if latest_row else 0)
+                         last_emissions_year=r["last_year"], verified_emissions_latest=latest_row["verified"] if latest_row else None)
                 if detail:
                     d["years"] = [{k: v for k, v in self._year_row(x, ycodes.get(key + (x["year"],)), latest).items()
                                    if k in ("year", "verified_emissions", "free_allocation", "surrendered", "excluded", "compliance_code")}
@@ -1587,7 +1587,7 @@ def _footer(result: dict) -> str:
 def _render(cmd: str, r: dict) -> str:
     if cmd == "search":
         head = f"{r['matches']} match{'es' if r['matches'] != 1 else ''}; verified emissions {r['emissions_year']}, t CO2e"
-        rows = [[i["country"], i["installation_id"], i["name"][:48], i["activity_code"], i["city"] or "",
+        rows = [[i["country"], str(i["installation_id"]), i["name"][:48], i["activity_code"], i["city"] or "",
                  i["lei"] or "", i["verified_emissions"]] for i in r["installations"]]
         return "\n\n".join([head, table(["country", "id", "name", "act", "city", "lei", "verified t CO2e"], rows, {1, 3, 6}), _footer(r)])
     if cmd == "history":
@@ -1602,7 +1602,7 @@ def _render(cmd: str, r: dict) -> str:
                 f"emissions {i['first_emissions_year'] or '?'}-{i['last_emissions_year'] or ''}")
         ch = any(y["ch_verified_emissions"] for y in r["years"])
         hdr = ["year", "verified t CO2e", "free allocation", "surrendered", "excluded", "compliance"] + (["CH verified"] if ch else [])
-        rows = [[y["year"], y["verified_emissions"], y["free_allocation"], y["surrendered"], y["excluded"],
+        rows = [[str(y["year"]), y["verified_emissions"], y["free_allocation"], y["surrendered"], y["excluded"],
                  y["compliance_code"]] + ([y["ch_verified_emissions"]] if ch else []) for y in r["years"]]
         extra = f"\nYears without values between the first and last: {', '.join(map(str, r['years_without_values']))}" \
             if r["years_without_values"] else ""
@@ -1610,28 +1610,31 @@ def _render(cmd: str, r: dict) -> str:
     if cmd == "lei":
         if not r["found"]:
             return "\n\n".join([f"{r['lei']}: {r['message']}", _footer(r)])
-        rows = [[i["country"], i["installation_id"], i["name"][:44], i["activity_code"], i["city"] or "",
-                 i["first_emissions_year"], i["last_emissions_year"], i["verified_emissions_latest"]] for i in r["installations"]]
+        rows = [[i["country"], str(i["installation_id"]), i["name"][:44], i["activity_code"], i["city"] or "",
+                 str(i["first_emissions_year"] or ""), str(i["last_emissions_year"] or ""), i["verified_emissions_latest"]]
+                for i in r["installations"]]
         parts = [f"LEI {r['lei']}: {r['installations_count']} installation(s); GLEIF record {r['gleif_record']}",
                  table(["country", "id", "name", "act", "city", "first", "last", f"verified {r['emissions_year']}"],
                        rows, {1, 3, 5, 6, 7}),
                  "Yearly totals over these installations (derived):",
                  table(["year", "verified t CO2e", "free allocation", "surrendered", "installations"],
-                       [[t["year"], t["verified_emissions"], t["free_allocation"], t["surrendered"],
+                       [[str(t["year"]), t["verified_emissions"], t["free_allocation"], t["surrendered"],
                          t["installations_with_values"]] for t in r["yearly_totals"]], {1, 2, 3, 4})]
         for i in r["installations"]:
             if "years" in i:
                 parts.append(f"{i['country']}-{i['installation_id']} {i['name']}\n" + table(
                     ["year", "verified t CO2e", "free allocation", "surrendered", "compliance"],
-                    [[y["year"], y["verified_emissions"], y["free_allocation"], y["surrendered"], y["compliance_code"]]
+                    [[str(y["year"]), y["verified_emissions"], y["free_allocation"], y["surrendered"], y["compliance_code"]]
                      for y in i["years"]], {1, 2, 3}))
         return "\n\n".join(parts + [_footer(r)])
     if cmd == "top":
-        what = ", ".join(f"{a['code']} {a['label']}" for a in r["activities"] or []) or "all activities"
-        head = (f"Top {r['returned']} of {r['matching_installations']} installations by verified emissions, {r['year']}, "
-                f"{r['country'] or 'all registries'}, {what}. Total of all {r['matching_installations']}: "
+        codes = ", ".join(str(a["code"]) for a in r["activities"] or []) or "all"
+        head = (f"Top {r['returned']} of {r['matching_installations']} installations by verified emissions in {r['year']}; "
+                f"registry {r['country'] or 'all'}; activity {codes}. All {r['matching_installations']} together: "
                 f"{r['total_verified_emissions']:,} t CO2e (derived).")
-        rows = [[i["rank"], i["country"], i["installation_id"], i["name"][:40], i["activity_code"], i["city"] or "",
+        for a in r["activities"] or []:
+            head += f"\n  {a['code']}: {a['label']}"
+        rows = [[i["rank"], i["country"], str(i["installation_id"]), i["name"][:40], i["activity_code"], i["city"] or "",
                  i["verified_emissions"], i["free_allocation"], i["surrendered"], i["compliance_code"] or ""]
                 for i in r["installations"]]
         return "\n\n".join([head, table(["#", "country", "id", "name", "act", "city", "verified t CO2e",

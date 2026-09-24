@@ -1,15 +1,15 @@
-"""hook.py: parsing `claude mcp add`, config edits, and the hook responses. No network."""
+"""mcp_vitals_hook.py: parsing `claude mcp add`, config edits, and the hook responses. No network."""
 import io
 import json
 import sys
-import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import hook  # noqa: E402
-from test_doctor import FakeNet  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from support import Isolated, bash, fixture  # noqa: E402
+
+import mcp_vitals_hook as hook  # noqa: E402
 
 GH = "https://api.github.com/repos/o/n"
 NPM = "https://registry.npmjs.org/@o%2Fserver"
@@ -18,12 +18,14 @@ NPM_DOC = {"dist-tags": {"latest": "1.0.0"}, "time": {"1.0.0": "2025-01-01T00:00
 
 
 def gh(pushed, archived=False, license=None):
-    return {"full_name": "o/n", "pushed_at": pushed, "archived": archived, "license": license}
+    doc = fixture("github-repo-agent-vitals.json")
+    doc.update(full_name="o/n", name="n", pushed_at=pushed, archived=archived, license=license)
+    return doc
 
 
 class ParseAdd(unittest.TestCase):
-    def one(self, cmd):
-        got = hook.parse_add(cmd)
+    def one(self, cmd, shell="bash"):
+        got = hook.parse_add(cmd, shell)
         self.assertEqual(len(got), 1, got)
         return got[0]
 
@@ -54,18 +56,27 @@ class ParseAdd(unittest.TestCase):
         e = self.one("cd /x && claude mcp add a -- npx pkg && echo done")
         self.assertEqual(e["args"], ["pkg"])
 
+    def test_wrappers_and_assignments(self):
+        for cmd in ("FOO=1 claude mcp add a -- npx pkg", "sudo -u root claude mcp add a -- npx pkg",
+                    "timeout -s KILL 30 claude mcp add a -- npx pkg", "/usr/local/bin/claude mcp add a -- npx pkg"):
+            self.assertEqual(self.one(cmd)["args"], ["pkg"], cmd)
+
+    def test_powershell(self):
+        e = self.one(r"& 'C:\Users\me\.local\bin\claude.exe' mcp add fs -- node C:\Users\me\srv\index.js", "powershell")
+        self.assertEqual((e["name"], e["command"], e["args"]), ("fs", "node", [r"C:\Users\me\srv\index.js"]))
+
     def test_not_an_add(self):
-        for cmd in ("claude mcp list", "echo claude mcp add", "npx -y pkg", "claude mcp add", "'unbalanced"):
+        for cmd in ("claude mcp list", "echo claude mcp add", "echo claude mcp add a b", "npx -y pkg", "claude mcp add",
+                    "'unbalanced", "claude mcp add-from-claude-desktop", "claude"):
             self.assertEqual(hook.parse_add(cmd), [], cmd)
 
 
-class Edits(unittest.TestCase):
+class Edits(Isolated):
     def test_only_servers_the_edit_touched(self):
-        with tempfile.TemporaryDirectory() as d:
-            p = Path(d) / ".mcp.json"
-            p.write_text(json.dumps({"mcpServers": {"old": {"command": "npx", "args": ["a"]},
-                                                    "new": {"command": "npx", "args": ["b"], "env": {"K": "secret"}}}}))
-            got = hook.added_by_edit({"file_path": str(p), "old_string": "x", "new_string": '"new": {"command": "npx"'})
+        p = self.tmp / ".mcp.json"
+        p.write_text(json.dumps({"mcpServers": {"old": {"command": "npx", "args": ["a"]},
+                                                "new": {"command": "npx", "args": ["b"], "env": {"K": "secret"}}}}))
+        got = hook.added_by_edit({"file_path": str(p), "old_string": "x", "new_string": '"new": {"command": "npx"'})
         self.assertEqual([s["name"] for s in got], ["new"])
         self.assertNotIn("secret", json.dumps(got))
 
@@ -73,49 +84,39 @@ class Edits(unittest.TestCase):
         self.assertEqual(hook.added_by_edit({"file_path": "/x/package.json", "content": "{}"}), [])
 
 
-class Run(unittest.TestCase):
-    def run_hook(self, payload, answers):
-        net = FakeNet(answers)
-        with mock.patch.object(hook.doctor, "Net", lambda *a, **k: net), \
-             mock.patch("sys.stdin", io.StringIO(json.dumps(payload))), \
-             mock.patch("sys.stdout", new_callable=io.StringIO) as out:
-            self.assertEqual(hook.main(), 0)
-        return json.loads(out.getvalue()) if out.getvalue().strip() else None
-
-    def bash(self, cmd):
-        return {"hook_event_name": "PreToolUse", "tool_name": "Bash", "tool_input": {"command": cmd}}
-
+class Run(Isolated):
     def test_abandoned_server_asks(self):
-        out = self.run_hook(self.bash("claude mcp add x -- npx -y @o/server"),
-                            {NPM: NPM_DOC, GH: gh("2024-01-01T00:00:00Z", license={"spdx_id": "MIT"})})
+        self.serve({NPM: NPM_DOC, GH: gh("2024-01-01T00:00:00Z", license={"spdx_id": "MIT"})})
+        out = self.run_hook(bash("claude mcp add x -- npx -y @o/server"))
         hso = out["hookSpecificOutput"]
         self.assertEqual(hso["permissionDecision"], "ask")
         self.assertIn("abandoned", hso["permissionDecisionReason"])
         self.assertIn("o/n", hso["permissionDecisionReason"])
 
     def test_healthy_server_is_silent(self):
-        self.assertIsNone(self.run_hook(self.bash("claude mcp add x -- npx -y @o/server"),
-                                        {NPM: NPM_DOC, GH: gh("2026-09-20T00:00:00Z", license={"spdx_id": "MIT"})}))
+        self.serve({NPM: NPM_DOC, GH: gh("2026-09-20T00:00:00Z", license={"spdx_id": "MIT"})})
+        self.assertIsNone(self.run_hook(bash("claude mcp add x -- npx -y @o/server")))
 
     def test_unreachable_network_is_silent(self):
-        self.assertIsNone(self.run_hook(self.bash("claude mcp add x -- npx -y @o/server"), {NPM: NPM_DOC}
-                                        | {GH: {"_error": 403}}))
+        web = self.serve({NPM: NPM_DOC, GH: 403})
+        self.assertIsNone(self.run_hook(bash("claude mcp add x -- npx -y @o/server")))
+        self.assertNotIn("agent-vitals", " ".join(web.urls))  # the hook never waits for the 26 MB census
 
     def test_other_bash_is_silent(self):
-        self.assertIsNone(self.run_hook(self.bash("ls -la"), {}))
+        self.assertIsNone(self.run_hook(bash("ls -la")))
 
     def test_post_edit_gives_context(self):
-        with tempfile.TemporaryDirectory() as d:
-            p = Path(d) / ".mcp.json"
-            p.write_text(json.dumps({"mcpServers": {"x": {"command": "npx", "args": ["-y", "@o/server"]}}}))
-            out = self.run_hook({"hook_event_name": "PostToolUse", "tool_name": "Write",
-                                 "tool_input": {"file_path": str(p), "content": p.read_text()}},
-                                {NPM: NPM_DOC, GH: gh("2026-09-20T00:00:00Z", archived=True)})
+        p = self.tmp / ".mcp.json"
+        p.write_text(json.dumps({"mcpServers": {"x": {"command": "npx", "args": ["-y", "@o/server"]}}}))
+        self.serve({NPM: NPM_DOC, GH: gh("2026-09-20T00:00:00Z", archived=True)})
+        out = self.run_hook({"hook_event_name": "PostToolUse", "tool_name": "Write",
+                             "tool_input": {"file_path": str(p), "content": p.read_text()}})
         self.assertIn("archived", out["hookSpecificOutput"]["additionalContext"])
 
     def test_garbage_stdin(self):
-        with mock.patch("sys.stdin", io.StringIO("not json")):
-            self.assertEqual(hook.main(), 0)
+        for payload in ("not json", "[]", "null", '{"tool_input": 5}'):
+            with mock.patch("sys.stdin", io.StringIO(payload)):
+                self.assertEqual(hook.main(), 0)
 
 
 if __name__ == "__main__":

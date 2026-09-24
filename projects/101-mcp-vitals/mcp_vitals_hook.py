@@ -234,15 +234,15 @@ def added_by_edit(tool_input: dict, tool: str = "Edit") -> list[dict]:
         before = _undo(path.read_text(encoding="utf-8"), edits)
     except (OSError, UnicodeDecodeError):
         before = None
-    if before is not None:
-        try:
-            old = json.loads(before)
-        except ValueError:
-            old = None
-        was = _servers(old, path) if isinstance(old, dict) else {}
+    try:
+        old = json.loads(before) if before is not None else None
+    except ValueError:
+        old = None
+    if isinstance(old, dict):
+        was = _servers(old, path)
         keys = ("command", "args", "url")
         return [s for n, s in now.items() if n not in was or any(was[n][k] != s[k] for k in keys)]
-    # The file could not be rewound: fall back to what the edit wrote. A server counts
+    # The file could not be rewound to a config: fall back to what the edit wrote. A server counts
     # as touched if its name, as a key, or one of its longer words appears in it.
     written = " ".join(new for _, new in edits)
     return [s for n, s in now.items() if _mentioned(written, n.split(" [")[0], s)]

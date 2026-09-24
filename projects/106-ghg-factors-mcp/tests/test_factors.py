@@ -58,7 +58,13 @@ class Search(SnapshotTestCase):
 
     def test_no_match_is_an_empty_list(self):
         r = F.search_factors("unobtainium smelting")
-        self.assertEqual((r["matches"], r["results"]), (0, []))
+        self.assertEqual((r["matches"], r["results"], r["query"]["ignored_words"]), (0, [], ["unobtainium", "smelting"]))
+        self.assertEqual(F.search_factors("diesel hovercraft")["results"], [])  # known + unknown word: no match
+
+    def test_words_absent_from_every_label_are_ignored_and_reported(self):
+        r = F.search_factors("please give me natural gas kwh gross numbers")
+        self.assertEqual(r["results"][0]["factor_id"], GAS_GROSS)
+        self.assertEqual(r["query"]["ignored_words"], ["please", "give", "me", "numbers"])
 
     def test_refusals(self):
         for kwargs, pattern in (({"text": "  "}, "empty"), ({"text": "CO2 factor per"}, "no searchable words"),
@@ -220,7 +226,8 @@ class Grid(SnapshotTestCase):
         self.assertEqual(F.grid_intensity("Congo")["other_areas_matching"], ["Congo (DRC)"])
         r = F.grid_intensity("Atlantis")
         self.assertFalse(r["found"])
-        self.assertEqual(F.grid_intensity("PL")["did_you_mean"], ["Poland"])
+        self.assertEqual(F.grid_intensity("Pola")["did_you_mean"], ["Poland"])
+        self.assertEqual(F.grid_intensity("PL")["did_you_mean"], [])  # two-letter codes are not guessed
 
     def test_uba_germany_only(self):
         r = F.grid_intensity("Germany", 2025, "uba")

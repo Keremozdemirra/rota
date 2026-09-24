@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>Risk-free interest rate term structures</title>
+    <link>https://www.eiopa.europa.eu/tools-and-data/risk-free-interest-rate-term-structures_en</link>
+    <atom:link href="https://www.eiopa.europa.eu/feed/53/rss_en" rel="self" type="application/rss+xml"/>
+    <description>European Insurance and Occupational Pensions Authority - Risk-free interest rate term structures</description>
+    <language>en</language>
+        <item>
+      <title>August 2026</title>
+      <link>https://www.eiopa.europa.eu/system/files/2026-09/EIOPA_RFR_20260831.zip</link>
+      <guid>https://www.eiopa.europa.eu/system/files/2026-09/EIOPA_RFR_20260831.zip</guid>
+      <pubDate>Thu, 03 Sep 2026 08:47:43 +0000</pubDate>
+    </item>
+    <item>
+      <title>July 2026</title>
+      <link>https://www.eiopa.europa.eu/system/files/2026-08/EIOPA_RFR_20260731.zip</link>
+      <guid>https://www.eiopa.europa.eu/system/files/2026-08/EIOPA_RFR_20260731.zip</guid>
+      <pubDate>Wed, 05 Aug 2026 11:38:02 +0000</pubDate>
+    </item>
+    <item>
+      <title>December 2022</title>
+      <link>https://www.eiopa.europa.eu/system/files/2023-01/eiopa_rfr_20221231.zip</link>
+      <guid>https://www.eiopa.europa.eu/system/files/2023-01/eiopa_rfr_20221231.zip</guid>
+      <pubDate>Thu, 05 Jan 2023 11:25:26 +0000</pubDate>
+    </item>
+    <item>
+      <title>Dual run - December 2021</title>
+      <link>https://www.eiopa.europa.eu/system/files/2022-01/dual_run_eiopa_rfr_20211231.zip</link>
+      <guid>https://www.eiopa.europa.eu/system/files/2022-01/dual_run_eiopa_rfr_20211231.zip</guid>
+      <pubDate>Thu, 06 Jan 2022 12:29:11 +0000</pubDate>
+    </item>
+    <item>
+      <title>9-12-2025 Updated RFR Technical Documentation.pdf</title>
+      <link>https://www.eiopa.europa.eu/system/files/2025-12/EIOPA-BoS-25-599%20-%20RFR%20Technical%20Documentation.pdf</link>
+      <guid>https://www.eiopa.europa.eu/system/files/2025-12/EIOPA-BoS-25-599%20-%20RFR%20Technical%20Documentation.pdf</guid>
+      <pubDate>Tue, 09 Dec 2025 16:08:45 +0000</pubDate>
+    </item>
+    <item>
+      <title>RFR for the purposes of Financial Stability reporting (S.38.01.11 – Duration of technical provisions)</title>
+      <link>https://www.eiopa.europa.eu/system/files/2026-07/EIOPA_FSR_RFR_20260630.zip</link>
+      <guid>https://www.eiopa.europa.eu/system/files/2026-07/EIOPA_FSR_RFR_20260630.zip</guid>
+      <pubDate>Mon, 06 Jul 2026 14:47:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>15 September 2020</title>
+      <link>https://www.eiopa.europa.eu/system/files/2020-09/eiopa_rfr_20200915.zip</link>
+      <guid>https://www.eiopa.europa.eu/system/files/2020-09/eiopa_rfr_20200915.zip</guid>
+      <pubDate>Fri, 18 Sep 2020 09:14:27 +0000</pubDate>
+    </item>
+  </channel>
+</rss>

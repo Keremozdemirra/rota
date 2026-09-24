@@ -38,7 +38,7 @@ class Refused(ValueError):
 
 _DASHES = dict.fromkeys(map(ord, "\u2010\u2011\u2012\u2013\u2014\u2015\u2212"), "-")
 _DASHES.update(dict.fromkeys(map(ord, "\u2018\u2019\u02bc\u00b4"), "'"))
-_STOP = {"per", "of", "the", "a", "an", "and", "for", "in", "on", "to", "factor", "factors", "conversion",
+_STOP = {"per", "of", "the", "a", "an", "and", "for", "in", "on", "to", "with", "factor", "factors", "conversion",
          "emission", "emissions", "ghg", "desnz", "defra", "co2e", "kgco2e", "split", "co2", "ch4", "n2o",
          "scope"}
 _GAS = re.compile(r"^kg CO2e of (\w+) per unit$")
@@ -120,6 +120,7 @@ class Snapshot:
         self.rows: dict[tuple[int, str], dict] = {}
         self.groups: dict[tuple[int, str], list[dict]] = {}
         self.index: list[tuple] = []
+        self.vocabulary: dict[int, set[str]] = {}
         self.activity: dict[tuple, list[tuple[str, str]]] = {}
         for year in self.years:
             self._load_desnz(year)
@@ -140,10 +141,10 @@ class Snapshot:
             group = self.groups.setdefault((year, prefix), [])
             group.append(row)
             if len(group) == 1:
-                name = [row["level_3"], row["level_4"], row["column_text"]]
-                self.index.append((year, prefix, order, set(words(" ".join(name))),
-                                   set(words(" ".join([row["scope"], row["level_1"], row["level_2"], row["uom"]]))),
-                                   fold(row["level_3"]), row["scope"].casefold()))
+                name = set(words(" ".join([row["level_3"], row["level_4"], row["column_text"]])))
+                context = set(words(" ".join([row["scope"], row["level_1"], row["level_2"], row["uom"]])))
+                self.index.append((year, prefix, order, name, context, fold(row["level_3"]), row["scope"].casefold()))
+                self.vocabulary.setdefault(year, set()).update(name, context)
             key = (year, row["scope"], row["level_1"], row["level_2"], row["level_3"], row["level_4"],
                    row["column_text"], row["ghg_unit"])
             self.activity.setdefault(key, []).append((row["uom"], row["id"]))
@@ -296,6 +297,11 @@ def search_factors(text: str, scope: str | None = None, year: int | None = None,
         raise Refused(f"year must be a number such as {snap.years[0]}") from None
     if year not in snap.years:
         raise Refused(f"DESNZ {year} is not in the snapshot; bundled sets: {', '.join(map(str, snap.years))}")
+    # A word that appears in no DESNZ label of that year cannot narrow the search; it is
+    # dropped and reported, so "split into" or "please" do not empty the result.
+    vocabulary = snap.vocabulary.get(year, set())
+    ignored = [t for t in tokens if not any(w.startswith(t) for w in vocabulary)]
+    tokens = [t for t in tokens if t not in ignored]
     want_unit = unit_key(unit) if unit else None
     try:
         limit = max(1, min(int(limit), MAX_LIMIT))
@@ -304,7 +310,7 @@ def search_factors(text: str, scope: str | None = None, year: int | None = None,
     phrase = fold(" ".join(tokens))
     hits = []
     for y, prefix, order, name_words, context_words, level3, row_scope in snap.index:
-        if y != year or (want_scope and row_scope != want_scope):
+        if not tokens or y != year or (want_scope and row_scope != want_scope):
             continue
         all_words = name_words | context_words
         if not all(any(w.startswith(t) for w in all_words) for t in tokens):
@@ -332,8 +338,10 @@ def search_factors(text: str, scope: str | None = None, year: int | None = None,
     if want_unit and any(unit_key(r["activity_unit"])[0] != want_unit[0] for r in results):
         note += (" The unit filter also matches factors published in another unit of the same kind "
                  "(e.g. kWh for MWh); convert scales between them exactly.")
-    return {"query": {"text": text, "scope": want_scope, "year": year, "unit": unit, "limit": limit},
-            "matches": len(hits), "returned": len(results), "results": results, "note": note,
+    query = {"text": text, "scope": want_scope, "year": year, "unit": unit, "limit": limit, "words": tokens}
+    if ignored:
+        query["ignored_words"] = ignored
+    return {"query": query, "matches": len(hits), "returned": len(results), "results": results, "note": note,
             "attribution": [attribution(f"desnz-{year}")]}
 
 

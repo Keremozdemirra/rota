@@ -801,7 +801,7 @@ def evaluate_row(line, row, env):
     if not raw_class:
         reasons.append("asset_class is blank")
     elif inst in OUT_OF_SCOPE:
-        reasons.append(OUT_OF_SCOPE[inst])
+        return "failed", dict(base, reasons=reasons + [OUT_OF_SCOPE[inst]], out_of_scope=True)
     elif inst not in INSTRUMENTS:
         reasons.append(f"asset_class {raw_class!r} is not one this calculator knows; use one of: " + ", ".join(INSTRUMENTS))
     else:
@@ -880,7 +880,7 @@ def evaluate_row(line, row, env):
                                f"international dollars ({spec['bases']['ppp_adjusted_gdp']}); give the exposure in "
                                f"USD with an fx_rate to the reporting currency")
             if scope2 is None:
-                warnings.append("scope 2 not supplied; PCAF says it should be reported for sovereign issuers "
+                warnings.append("scope 2 not supplied; PCAF says it should be reported for this issuer type "
                                 f"({spec['scopes_cite']}); scope 1+2 shows scope 1 only")
             if inst == "sovereign_debt" and v["scope1_incl_lulucf_tco2e"] is None:
                 warnings.append("scope 1 including LULUCF not supplied; PCAF requires sovereign scope 1 both "
@@ -965,7 +965,7 @@ def evaluate_row(line, row, env):
         results[key] = fe
         cite = spec["removals"] if key == "removals" else spec["fe_cite"]
         suffix = " (reported separately)" if key in ("scope3", "removals", "scope1_incl_lulucf") else ""
-        lines.append(f"financed {label:<9}= {expr} = {fmt_t(fe)} tCO2e{suffix} [{cite}]")
+        lines.append(f"financed {label} = {expr} = {fmt_t(fe)} tCO2e{suffix} [{cite}]")
     results["scope1_2"] = _add(results["scope1"], results["scope2"] or ZERO)
     lines.append(f"financed scope 1+2 = {fmt_t(results['scope1_2'])} tCO2e [6.1, p. 162]")
     if inst == "use_of_proceeds":
@@ -1023,8 +1023,9 @@ def _undrawn(inst, att, v, is_equity, rate, lines):
             continue
         fe, expr = financed(u, amount, e)
         out[key] = fe
-        lines.append(f"undrawn {key.replace('scope', 'scope ').replace('1_2', '1+2'):<10}= {expr} = {fmt_t(fe)} tCO2e "
-                     f"(unweighted, reported separately) [6.2, pp. 172-173]")
+        label = "scope 1+2" if key == "scope1_2" else "scope 3"
+        lines.append(f"undrawn {label} = {expr} = {fmt_t(fe)} tCO2e (unweighted, reported separately) "
+                     f"[6.2, pp. 172-173]")
     return out
 
 
@@ -1117,6 +1118,7 @@ def _group():
             "scope1_incl_lulucf": ZERO, "lulucf_positions": 0,
             "dq_num": ZERO, "dq_den": ZERO, "dq3_num": ZERO, "dq3_den": ZERO,
             "undrawn_amount": ZERO, "undrawn_scope1_2": ZERO, "undrawn_scope3": ZERO, "undrawn_positions": 0,
+            "undrawn_scope3_positions": 0,
             "not_computed": 0, "outstanding_not_computed": ZERO}
 
 
@@ -1152,6 +1154,7 @@ def _add_position(g, p):
             g["undrawn_scope1_2"] = _add(g["undrawn_scope1_2"], u["scope1_2"])
         if u["scope3"] is not None:
             g["undrawn_scope3"] = _add(g["undrawn_scope3"], u["scope3"])
+            g["undrawn_scope3_positions"] += 1
 
 
 def _finish(g):
@@ -1234,7 +1237,7 @@ def to_json(result, max_positions=None, explain=True):
         if g["undrawn_positions"]:
             out["undrawn"] = {"positions": g["undrawn_positions"], "amount": num(g["undrawn_amount"]),
                               "financed_tco2e_scope1_2": num(g["undrawn_scope1_2"]),
-                              "financed_tco2e_scope3": num(g["undrawn_scope3"])}
+                              "financed_tco2e_scope3": num(g["undrawn_scope3"]) if g["undrawn_scope3_positions"] else None}
         return out
 
     positions = []
@@ -1386,16 +1389,17 @@ def render(result, markdown=False, explain=False):
     t = result["totals"]
     separate = []
     if t["removals_positions"]:
-        separate.append(f"Emission removals, financed: {fmt_t(t['removals'])} tCO2e over {t['removals_positions']} "
-                        f"positions, reported separately and not netted (6.1, p. 165).")
+        separate.append(f"Emission removals, financed: {fmt_t(t['removals'])} tCO2e ({_n(t['removals_positions'])}), "
+                        f"reported separately and not netted (6.1, p. 165).")
     if t["lulucf_positions"]:
-        separate.append(f"Sovereign scope 1 including LULUCF, financed: {fmt_t(t['scope1_incl_lulucf'])} tCO2e over "
-                        f"{t['lulucf_positions']} positions (5.9, p. 141; 5.10, p. 154).")
+        separate.append(f"Sovereign scope 1 including LULUCF, financed: {fmt_t(t['scope1_incl_lulucf'])} tCO2e "
+                        f"({_n(t['lulucf_positions'])}; 5.9, p. 141; 5.10, p. 154).")
     if t["undrawn_positions"]:
-        separate.append(f"Undrawn loan commitments: {fmt_t(t['undrawn_amount'], 0)} {cur or ''} over "
-                        f"{t['undrawn_positions']} positions, {fmt_t(t['undrawn_scope1_2'])} tCO2e scope 1+2 and "
-                        f"{fmt_t(t['undrawn_scope3'])} tCO2e scope 3, unweighted, reported separately from financed "
-                        f"emissions (6.2, pp. 172-174).")
+        s3 = (f"{fmt_t(t['undrawn_scope3'])} tCO2e scope 3" if t["undrawn_scope3_positions"]
+              else "no scope 3 given")
+        separate.append(f"Undrawn loan commitments: {fmt_t(t['undrawn_amount'], 0)} {cur or ''} "
+                        f"({_n(t['undrawn_positions'])}), {fmt_t(t['undrawn_scope1_2'])} tCO2e scope 1+2, {s3}; "
+                        f"unweighted and reported separately from financed emissions (6.2, pp. 172-174).")
     if any(p["financed"]["scope2"] is None for p in positions):
         separate.append("Sovereign rows without scope 2 contribute scope 1 only to scope 1+2.")
     if separate:
@@ -1413,8 +1417,9 @@ def render(result, markdown=False, explain=False):
     if not fails:
         out.append("Every position was computed.")
     for f in fails:
-        who = " ".join(x for x in (f["position_id"] or "(no id)", f["counterparty"] or "", f["asset_class"] or "") if x)
-        text = f"line {f['line']}  {who}: " + "; ".join(f["reasons"])
+        who = f["position_id"] or "(no id)"
+        what = ", ".join(x for x in (f["asset_class"], f["counterparty"]) if x)
+        text = f"line {f['line']}  {who}" + (f" ({what})" if what else "") + ": " + "; ".join(f["reasons"])
         out.append(("- " + text) if md else "  " + text)
 
     for title, items in (("Flags", result["flags"]), ("Warnings", result["warnings"])):
@@ -1436,6 +1441,10 @@ def render(result, markdown=False, explain=False):
     out.append(f"Method: {SOURCE['cite_as']} {SOURCE['url']} (checked {SOURCE['checked']}); cited by subchapter and "
                f"page. Amounts, emissions and scores are the user's input; this tool fetched nothing.")
     return "\n".join(out) + "\n"
+
+
+def _n(count):
+    return f"{count} position" + ("" if count == 1 else "s")
 
 
 def _clip(s, n):
