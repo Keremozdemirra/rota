@@ -77,8 +77,14 @@ class CliTest(unittest.TestCase):
         with Registry() as reg:
             code, out, err = run("refresh", "--listing-url", reg.listing_url, "--no-compliance")
         self.assertEqual(code, 0, err)
-        self.assertIn("Snapshot 2026-09-24: 15 installations", out)
+        self.assertIn("Snapshot 2026-09-24: 25 installations", out)
         self.assertFalse(any("compliance" in p for p, _ in reg.requests))
+
+    def test_a_5000_digit_activity_is_a_usage_error(self):
+        code, out, err = run("top", "--activity", "9" * 5000)
+        self.assertEqual((code, out), (2, ""))
+        self.assertIn("activity codes have one to three digits", err)
+        self.assertNotIn("Traceback", err)
 
     def test_no_data_at_all(self):
         os.environ["EU_ETS_CACHE_DIR"] = str(self.env.path / "empty")

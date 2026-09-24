@@ -5,7 +5,9 @@ The fixtures in tests/fixtures were cut from the Union Registry files of 2026-09
 compliance_2024_code_en.xlsx a8b2191b...): fifteen installations, their yearly rows and their
 compliance rows. Account holder names, account labels, addresses and registration numbers were
 replaced by placeholders (Mustermann, Musterstraße, HRB 00000) before anything was saved, one
-shipping company was renamed to a placeholder person, and some rows were broken on purpose: a
+shipping company was renamed to a placeholder person, ten synthetic installations (ids 990001-990010,
+placeholder words only) stand for sole traders, family partnerships and a company-named plant, and
+some rows were broken on purpose: a
 short row, a non-numeric id, a registry name instead of a code, a duplicate, a Latin-1 byte, control
 and bidi characters in a name, a year "20x5", "n/a" as a number, an orphan yearly row, a blank and a
 broken compliance row. listing.json is the registry's listing as fetched on 2026-09-24.
@@ -27,7 +29,9 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures"
 sys.path.insert(0, str(ROOT))
 import eu_ets  # noqa: E402
 
-PLACEHOLDERS = ("Mustermann", "Musterstra", "Musterweg", "Musterstadt", "Musterhausen", "HRB 00000")
+# Every personal field of the fixtures holds one of these; none may reach the cache, a snapshot or an output.
+PLACEHOLDERS = ("Mustermann", "Musterfrau", "Musterson", "Beispiel", "Esempio", "Ejemplo", "Musterstra", "Musterweg",
+                "Musterstadt", "Musterhausen", "Musterhafen", "HRB 0000", "00000000T", "Nordwind")
 FILES = {
     "operators_daily.csv.gz": FIXTURES / "operators_daily.csv.gz",
     "operators_yearly_activity_daily.csv.gz": FIXTURES / "operators_yearly_activity_daily.csv.gz",
@@ -64,8 +68,9 @@ class Isolated:
         self._tmp.cleanup()
 
 
-def build_fixture_db(cache: Path) -> Path:
-    """The cache as a refresh from the fixtures would build it, without a server."""
+def build_fixture_db(cache: Path, snapshot_date: str = None, overrides: dict = None) -> Path:
+    """The cache as a refresh from the fixtures would build it, without a server. overrides maps
+    (registry, id, year) to verified emissions, to stage a year that is only partly reported."""
     op, yr, cp = eu_ets.Stats(eu_ets.OPERATORS_FILE), eu_ets.Stats(eu_ets.YEARLY_FILE), eu_ets.Stats("compliance")
     comp = list(eu_ets.read_compliance_xlsx(FILES["compliance_2024_code_en.xlsx"], 2024, cp))
     sources = [{"kind": k, "file": n, "url": f"https://example.invalid/{n}", "bytes": FILES[n].stat().st_size,
@@ -74,9 +79,10 @@ def build_fixture_db(cache: Path) -> Path:
     db = cache / eu_ets.DB_NAME
     eu_ets.build_database(
         db, eu_ets.read_operators(FILES["operators_daily.csv.gz"], op),
-        lambda known: eu_ets.read_yearly(FILES["operators_yearly_activity_daily.csv.gz"], yr, known), comp,
+        lambda known: (row[:3] + ((overrides or {}).get(row[:3], row[3]),) + row[4:]
+                       for row in eu_ets.read_yearly(FILES["operators_yearly_activity_daily.csv.gz"], yr, known)), comp,
         {"origin": "live", "listing_url": eu_ets.LISTING_URL, "retrieved_at": "2026-09-24T09:24:57Z"},
-        lambda meta: dict(meta, snapshot_date=eu_ets._snapshot_date(op), sources=sources, errors=[]))
+        lambda meta: dict(meta, snapshot_date=snapshot_date or eu_ets._snapshot_date(op), sources=sources, errors=[]))
     return db
 
 

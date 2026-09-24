@@ -1,21 +1,27 @@
 #!/usr/bin/env python3
-"""Rebuild the eu-taxonomy-mcp snapshot from the EU Taxonomy Navigator's backend.
+"""Rebuild the eu-taxonomy-mcp data files from their sources.
 
-The Navigator web app reads an undocumented JSON API. Three requests cover it:
-/sectors, /activities and /activities/matches/all (every activity's criteria in
-one response). If the bulk request fails, the crawler falls back to
-/activities/{id}/matches, one activity at a time, with a pause between requests.
+taxonomy.json comes from the EU Taxonomy Navigator's undocumented JSON API. Three
+requests cover it: /sectors, /activities and /activities/matches/all (every
+activity's criteria in one response). If the bulk request fails or lists nothing,
+the crawler falls back to /activities/{id}/matches, one activity at a time.
 
-Every response is checked before anything is written: a changed or broken
-backend ends the run with exit code 2 and leaves the existing snapshot as it was.
-The snapshot is written with sorted keys and a fixed order, so the same data
-always gives the same bytes. Standard library only.
+nace.json comes from the Official Journal: the NACE Rev. 2 table in Annex I to
+Regulation (EC) No 1893/2006 and the NACE Rev. 2.1 table in the Annex to Delegated
+Regulation (EU) 2023/137, read from the Publications Office's Cellar over https.
+
+Every response is checked before anything is written. A broken or changed source,
+an empty result, or a result less than half the size of the previous one ends the
+run with exit code 2 and leaves the existing files as they were. Output is written
+with sorted keys and a fixed order, so the same data always gives the same bytes.
+Standard library only.
 """
 from __future__ import annotations
 
 import datetime as dt
 import email.utils
 import hashlib
+import html.parser
 import http.client
 import json
 import os
@@ -23,18 +29,25 @@ import re
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
 import eu_taxonomy_mcp as core
 
 USER_AGENT = f"eu-taxonomy-mcp/{core.__version__} (+{core.REPO_URL})"
-# Tool's choices, not the source's: the bulk response was 2.4 MB on 2026-09-24, so
-# 64 MB means something else is being served; waits after a 429/503 are capped so
-# a run cannot hang for hours; requests are never closer together than MIN_DELAY.
+CELLAR = "https://publications.europa.eu/resource/celex/"
+# Tool's choices, not the sources': the bulk response was 2.4 MB on 2026-09-24, so
+# 64 MB means something else is being served; waits after a 429/503 are capped so a
+# run cannot hang for hours; requests are never closer together than MIN_DELAY; a
+# rebuild that shrinks the data to less than half is refused as a probable fault.
 MAX_BODY = 64 * 1024 * 1024
 RETRY_AFTER_CAP = 120.0
 MIN_DELAY = 0.5
+SHRINK_LIMIT = 0.5
+# Tool's choice: the smallest NACE table accepted as complete. The Official Journal
+# gives 21/88/272/615 (Rev. 2) and 22/87/287/651 (Rev. 2.1), counted 2026-09-24.
+NACE_MINIMUM = {"sections": 20, "divisions": 80, "groups": 250, "classes": 600}
 SOURCES_MARKER = "<!-- written by eu-taxonomy-mcp refresh -->"
 
 # The only fields that enter the snapshot. Anything else the backend adds later
@@ -45,7 +58,7 @@ MATCH_FIELDS = ("id", "objective", "activityContributionType", "contributionDesc
 
 
 class RefreshError(Exception):
-    """The backend could not be read or no longer looks as expected; nothing was written."""
+    """A source could not be read or no longer looks as expected; nothing was written."""
 
 
 class _Retryable(Exception):
@@ -88,13 +101,34 @@ def _error_detail(body: bytes) -> str:
     return (" (" + ", ".join(parts) + ")") if parts else ""
 
 
+class _HttpsOnlyRedirects(urllib.request.HTTPRedirectHandler):
+    """Follow redirects over https only.
+
+    Cellar answers an https request for a CELEX number with a redirect to a plain
+    http document URL; the same document is served over https, so that one host is
+    upgraded, and a redirect to http anywhere else is refused.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        parts = urllib.parse.urlsplit(newurl)
+        if parts.scheme == "http" and parts.hostname == "publications.europa.eu":
+            newurl = urllib.parse.urlunsplit(("https",) + tuple(parts[1:]))
+        elif parts.scheme != "https":
+            raise urllib.error.HTTPError(req.full_url, code, f"refused redirect to {parts.scheme}", headers, fp)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def default_opener():
+    return urllib.request.build_opener(_HttpsOnlyRedirects()).open
+
+
 class Fetcher:
-    """GET requests to the Navigator backend, one at a time, with a pause in between."""
+    """GET requests, one at a time, with a pause in between."""
 
     def __init__(self, base: str = core.API_BASE, opener=None, delay: float = 1.0, timeout: float = 120.0,
                  sleep=None, log=None):
         self.base = base
-        self.opener = opener or urllib.request.urlopen
+        self.opener = opener or default_opener()
         self.delay, self.timeout = delay, timeout
         self.sleep = sleep or time.sleep
         self.log = log or (lambda msg: print(msg, file=sys.stderr))
@@ -102,8 +136,9 @@ class Fetcher:
         self.bytes = 0
         self.responses: list[dict] = []
 
-    def _get(self, url: str) -> bytes:
-        req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
+    def _get(self, url: str, accept: str) -> bytes:
+        headers = {"User-Agent": USER_AGENT, "Accept": accept, "Accept-Language": "eng"}
+        req = urllib.request.Request(url, headers=headers)
         try:
             with self.opener(req, timeout=self.timeout) as r:
                 status = getattr(r, "status", None) or r.getcode()
@@ -118,7 +153,7 @@ class Fetcher:
                 raise _Retryable(f"HTTP {e.code}{detail}", _retry_after(e.headers)) from None
             if e.code >= 500:
                 raise _Retryable(f"HTTP {e.code}{detail}") from None
-            raise RefreshError(f"GET {url}: HTTP {e.code}{detail}") from None
+            raise RefreshError(f"GET {url}: HTTP {e.code}{detail or ' ' + core.one_line(e.reason, 80)}") from None
         except (urllib.error.URLError, http.client.HTTPException, OSError) as e:
             # URLError (DNS, refused, TLS), IncompleteRead, RemoteDisconnected, BadStatusLine, timeouts.
             reason = getattr(e, "reason", None) or e
@@ -131,8 +166,7 @@ class Fetcher:
             raise RefreshError(f"GET {url}: response larger than {MAX_BODY} bytes")
         return body
 
-    def get_json(self, path: str, retries: int = 1):
-        url = self.base + path
+    def _fetch(self, url: str, record: str, accept: str, parse, retries: int):
         attempt = 0
         while True:
             attempt += 1
@@ -140,33 +174,53 @@ class Fetcher:
                 self.sleep(self.delay)
             self.requests += 1
             try:
-                body = self._get(url)
+                body = self._get(url, accept)
                 if not body.strip():
                     raise _Retryable("empty response body")
                 try:
-                    data = json.loads(body.decode("utf-8"))
+                    text = body.decode("utf-8")
                 except UnicodeDecodeError:
                     raise _Retryable("response is not UTF-8") from None
-                except ValueError as e:
-                    raise _Retryable(f"response is not JSON ({e})") from None
-                if data is None:
-                    raise _Retryable("response is JSON null")
+                data = parse(text)
             except _Retryable as e:
                 if attempt <= retries:
                     wait = e.wait if e.wait is not None else max(self.delay, 1.0) * 5
-                    self.log(f"  GET {path}: {e}; retrying in {wait:.0f} s")
+                    self.log(f"  GET {record}: {e}; retrying in {wait:.0f} s")
                     self.sleep(wait)
                     continue
                 raise RefreshError(f"GET {url}: {e}") from None
             self.bytes += len(body)
-            self.responses.append({"path": path, "bytes": len(body), "sha256": _sha256(body)})
+            self.responses.append({"path": record, "bytes": len(body), "sha256": _sha256(body)})
             return data
+
+    def get_json(self, path: str, retries: int = 1):
+        def parse(text):
+            try:
+                data = json.loads(text)
+            except ValueError as e:
+                raise _Retryable(f"response is not JSON ({e})") from None
+            if data is None:
+                raise _Retryable("response is JSON null")
+            return data
+        return self._fetch(self.base + path, path, "application/json", parse, retries)
+
+    def get_act(self, celex: str, retries: int = 1) -> str:
+        """The English XHTML of one act from Cellar; celex must be one of the fixed identifiers."""
+        if not re.fullmatch(r"3[0-9]{4}[A-Z][0-9]{4}", celex):
+            raise RefreshError(f"refusing to request {celex!r}: not a CELEX number")
+
+        def parse(text):
+            if "oj-doc-ti" not in text:
+                raise _Retryable("response is not an Official Journal document")
+            return text
+        return self._fetch(CELLAR + celex, f"CELEX {celex}", "application/xhtml+xml;q=1, text/html;q=0.9", parse,
+                           retries)
 
 
 # ------------------------------------------------------------------ checks
 
 def _changed(what: str, detail: str) -> RefreshError:
-    return RefreshError(f"{what}: {detail}. The backend may have changed; nothing was written.")
+    return RefreshError(f"{what}: {detail}. The source may have changed; nothing was written.")
 
 
 def _id(value, what: str) -> int:
@@ -242,6 +296,8 @@ def _objective(value, what: str) -> dict:
 
 
 def check_matches(data, activity_ids: set, what: str = "/activities/matches/all") -> list[dict]:
+    # An empty list is valid here: one activity can have no criteria. Whether the
+    # whole result is too small is decided in run(), on the totals.
     out = []
     for m in _list(data, what, allow_empty=True):
         if not isinstance(m, dict):
@@ -323,8 +379,8 @@ def build_snapshot(sectors: list[dict], activities: list[dict], matches: list[di
     }
 
 
-def serialize(snapshot: dict) -> bytes:
-    return (json.dumps(snapshot, ensure_ascii=False, indent=1, sort_keys=True) + "\n").encode("utf-8")
+def serialize(data: dict) -> bytes:
+    return (json.dumps(data, ensure_ascii=False, indent=1, sort_keys=True) + "\n").encode("utf-8")
 
 
 def crawl(fetcher: Fetcher, per_activity: bool = False) -> tuple[list, list, list, str]:
@@ -335,14 +391,30 @@ def crawl(fetcher: Fetcher, per_activity: bool = False) -> tuple[list, list, lis
     if not per_activity:
         try:
             matches = check_matches(fetcher.get_json("/activities/matches/all"), set(ids))
+            if not matches:
+                raise RefreshError("GET /activities/matches/all: the bulk response lists no criteria")
         except RefreshError as e:
             fetcher.log(f"  bulk request failed ({e}); fetching criteria one activity at a time")
+            matches = None
     if matches is None:
         mode, matches = "per-activity", []
         for aid in ids:
             path = f"/activities/{_id(aid, 'activity')}/matches"
             matches.extend(check_matches(fetcher.get_json(path), {aid}, what=path))
     return sectors, activities, matches, mode
+
+
+def check_not_shrunk(new: dict, old: dict | None, keys: dict, where: Path) -> None:
+    """Refuse an empty result, or one less than half of the previous file's size (tool's choice)."""
+    before = (old or {}).get("counts") or {}
+    for key, label in keys.items():
+        if not new.get(key):
+            raise RefreshError(f"the source returned no {label}; nothing was written, and {where} is kept")
+        prev = before.get(key)
+        if isinstance(prev, int) and prev > 0 and new[key] < prev * SHRINK_LIMIT:
+            raise RefreshError(f"the source returned {new[key]} {label}, fewer than half of the {prev} in the previous "
+                               f"file; nothing was written, and {where} is kept. If the drop is real, move that file "
+                               f"away and run refresh again.")
 
 
 def diff(old: dict | None, new: dict) -> str:
@@ -366,11 +438,125 @@ def diff(old: dict | None, new: dict) -> str:
     return "; ".join(parts)
 
 
-def sources_md(snapshot: dict, payload: bytes, fetcher: Fetcher, mode: str, retrieved_at: str,
-               elapsed: float) -> str:
-    c = snapshot["counts"]
+# ------------------------------------------------------------------ NACE
+
+class _AnnexRows(html.parser.HTMLParser):
+    """Table rows between one annex heading of an Official Journal act and the next heading."""
+
+    def __init__(self, heading: str):
+        super().__init__(convert_charrefs=True)
+        self.heading = heading
+        self.state = "before"
+        self.in_title, self.title = False, []
+        self.rows: list[list[str]] = []
+        self.row: list[str] | None = None
+        self.cell: list[str] | None = None
+
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if tag == "p" and "oj-doc-ti" in (a.get("class") or ""):
+            self.in_title, self.title = True, []
+        elif self.state == "inside" and tag == "tr":
+            self.row = []
+        elif self.state == "inside" and tag in ("td", "th") and self.row is not None:
+            self.cell = []
+
+    def handle_endtag(self, tag):
+        if tag == "p" and self.in_title:
+            self.in_title = False
+            title = re.sub(r"\s+", " ", "".join(self.title)).strip()
+            if self.state == "before" and title == self.heading:
+                self.state = "inside"
+            elif self.state == "inside" and title.startswith("ANNEX") and title != self.heading:
+                self.state = "after"
+        elif tag in ("td", "th") and self.cell is not None and self.row is not None:
+            self.row.append(re.sub(r"\s+", " ", "".join(self.cell)).strip())
+            self.cell = None
+        elif tag == "tr" and self.row is not None:
+            if self.state == "inside" and any(self.row):
+                self.rows.append(self.row)
+            self.row = None
+
+    def handle_data(self, data):
+        if self.in_title:
+            self.title.append(data)
+        if self.cell is not None:
+            self.cell.append(data)
+
+
+def parse_nace_annex(xhtml: str, heading: str, rev: str) -> dict:
+    """Sections, division-to-section map and titles from one NACE annex table."""
+    parser = _AnnexRows(heading)
+    parser.feed(xhtml)
+    parser.close()
+    what = f"NACE Rev. {rev} annex"
+    if parser.state == "before":
+        raise _changed(what, f"no heading {heading!r} in the document")
+    sections, divisions, titles, current = {}, {}, {}, None
+    for row in parser.rows:
+        text = " ".join(c for c in row if c)
+        m = re.fullmatch(r"SECTION ([A-Z]) [\u2014\u2013-] (.+)", text)
+        if m:
+            current = m.group(1)
+            if current in sections:
+                raise _changed(what, f"section {current} appears twice")
+            sections[current] = m.group(2).strip()
+            continue
+        code = next((c for c in row[:3] if re.fullmatch(r"\d{2}(\.\d{1,2})?", c)), None)
+        if not code:
+            continue
+        title = row[3] if len(row) > 3 else ""
+        if not title:
+            raise _changed(what, f"code {code} has no title")
+        if code in titles:
+            raise _changed(what, f"code {code} appears twice")
+        if len(code) == 2:
+            if not current:
+                raise _changed(what, f"division {code} comes before any section")
+            divisions[code] = current
+        elif code[:len(code) - 1].rstrip(".") not in titles:
+            raise _changed(what, f"code {code} comes before its parent")
+        titles[code] = title
+    return {"sections": sections, "divisions": divisions, "titles": titles}
+
+
+def nace_counts(table: dict) -> dict:
+    return {"sections": len(table["sections"]), "divisions": len(table["divisions"]),
+            "groups": sum(1 for c in table["titles"] if len(c) == 4),
+            "classes": sum(1 for c in table["titles"] if len(c) == 5)}
+
+
+def build_nace(documents: dict, retrieved: str, minimum: dict | None = None) -> dict:
+    """nace.json from the two Official Journal documents, keyed by revision ("2", "2.1")."""
+    minimum = NACE_MINIMUM if minimum is None else minimum
+    revisions = {}
+    for rev, xhtml in documents.items():
+        act = core.NACE_ACTS[rev]
+        heading = "ANNEX I" if act["annex"] == "Annex I" else "ANNEX"
+        table = parse_nace_annex(xhtml, heading, rev)
+        counts = nace_counts(table)
+        short = [f"{counts[k]} {k}" for k in minimum if counts[k] < minimum[k]]
+        if short:
+            raise _changed(f"NACE Rev. {rev} annex", "only " + ", ".join(short) + " found")
+        revisions[rev] = dict(act, **table)
+    return {"schema": core.NACE_SCHEMA, "retrieved": retrieved, "revisions": revisions}
+
+
+# ------------------------------------------------------------------ SOURCES.md
+
+def _block_markers(name: str) -> tuple[str, str]:
+    return f"<!-- begin {name} -->", f"<!-- end {name} -->"
+
+
+def _existing_block(text: str, name: str) -> str | None:
+    begin, end = _block_markers(name)
+    m = re.search(re.escape(begin) + r"\n(.*?)\n" + re.escape(end), text, re.S)
+    return m.group(1) if m else None
+
+
+def _responses_table(fetcher: Fetcher) -> list[str]:
     rows = []
-    per = [r for r in fetcher.responses if r["path"].endswith("/matches") and r["path"] != "/activities/matches/all"]
+    per = [r for r in fetcher.responses if re.fullmatch(r"/activities/\d+/matches", r["path"])]
     for r in fetcher.responses:
         if r not in per:
             rows.append(f"| GET {r['path']} | {r['bytes']:,} | `{r['sha256']}` |")
@@ -380,11 +566,13 @@ def sources_md(snapshot: dict, payload: bytes, fetcher: Fetcher, mode: str, retr
             joined.update(bytes.fromhex(r["sha256"]))
         rows.append(f"| GET /activities/{{id}}/matches, {len(per)} requests | {sum(r['bytes'] for r in per):,} | "
                     f"`{joined.hexdigest()}` (SHA-256 over the per-response SHA-256 digests, in id order) |")
+    return ["| Request | Bytes | SHA-256 of the body |", "|---|---:|---|", *rows]
+
+
+def taxonomy_block(snapshot: dict, payload: bytes, fetcher: Fetcher, mode: str, retrieved_at: str,
+                   elapsed: float) -> str:
+    c = snapshot["counts"]
     return "\n".join([
-        f"# Sources of {core.SNAPSHOT_FILE}",
-        "",
-        SOURCES_MARKER,
-        "",
         "| | |",
         "|---|---|",
         f"| Source | EU Taxonomy Navigator, European Commission (DG FISMA): {core.NAVIGATOR_URL} |",
@@ -397,20 +585,16 @@ def sources_md(snapshot: dict, payload: bytes, fetcher: Fetcher, mode: str, retr
         f"{elapsed:.1f} s |",
         f"| Client | `User-Agent: {USER_AGENT}` |",
         "",
-        f"Licence terms, quoted from {core.TERMS_URL}: \"{core.LICENCE_QUOTE}\"",
+        f"Licence terms, quoted from {core.TERMS_URL} (read {core.READ_ON}): \"{core.LICENCE_QUOTE}\"",
         "",
         "Attribution line carried by every answer:",
         "",
         f"    Source: European Commission, EU Taxonomy Navigator ({core.NAVIGATOR_URL}), CC BY 4.0, retrieved "
         f"{snapshot['retrieved']}",
         "",
-        "## Raw responses",
+        "Raw responses:",
         "",
-        "| Request | Bytes | SHA-256 of the body |",
-        "|---|---:|---|",
-        *rows,
-        "",
-        "## Snapshot",
+        *_responses_table(fetcher),
         "",
         "| File | Bytes | SHA-256 |",
         "|---|---:|---|",
@@ -426,24 +610,124 @@ def sources_md(snapshot: dict, payload: bytes, fetcher: Fetcher, mode: str, retr
         f"| activities without NACE codes | {c['activities_without_nace_codes']} |",
         f"| activities without criteria | {c['activities_without_criteria']} |",
         "",
-        "## What the snapshot changes",
+        "What the snapshot changes:",
         "",
         f"- Keeps only these fields: activities {', '.join(ACTIVITY_FIELDS)}; criteria sets "
         f"{', '.join(MATCH_FIELDS)}; sectors and objectives as served. Nothing else from the backend is stored.",
         "- Nests each activity's criteria sets under the activity and refers to objectives by id.",
         "- Strips surrounding whitespace from NACE codes (the source serves codes such as ' F42.22'). Other code "
-        "quirks ('A2', 'M71.1.2') are stored as served and normalised only when answering.",
+        "forms ('A2', 'M71.1.2', 'Q84') are stored as served and read against NACE Rev. 2 only when answering.",
         "- Sorts sectors and activities by id, criteria sets and DNSH entries by objective order, and writes keys in "
         "sorted order, so the same data gives the same bytes.",
         "- Changes no text: names, descriptions and criteria are the HTML strings as served.",
         "",
-        "## Rebuild",
-        "",
-        "    python3 eu_taxonomy_mcp.py refresh            # in a source checkout: rewrites data/",
-        "    eu-taxonomy-mcp refresh --out DIR             # anywhere else; then --snapshot DIR/taxonomy.json",
-        "",
+        "Rebuild: `python3 eu_taxonomy_mcp.py refresh` in a source checkout (rewrites data/), or `eu-taxonomy-mcp "
+        "refresh --out DIR` anywhere else, then `--snapshot DIR/taxonomy.json`. A result with no criteria sets, or "
+        "with fewer than half the activities or criteria sets of the previous snapshot, is refused.",
     ])
 
+
+def nace_block(data: dict, payload: bytes, fetcher: Fetcher, retrieved_at: str, elapsed: float) -> str:
+    lines = [
+        "| | |",
+        "|---|---|",
+    ]
+    for rev in ("2", "2.1"):
+        act = core.NACE_ACTS[rev]
+        lines.append(f"| {act['name']} | {act['annex']} to {act['act']}, CELEX {act['celex']}, {act['eli']} "
+                     f"(English text from Cellar, {CELLAR}{act['celex']}) |")
+    lines += [
+        "| Terms | Official Journal text, re-used under Commission Decision 2011/833/EU; see \"Texts of EU law\" "
+        "below. Not labelled CC BY. |",
+        f"| Retrieved | {retrieved_at} |",
+        f"| Requests | {fetcher.requests} (at least {fetcher.delay:g} s apart), {fetcher.bytes:,} bytes, "
+        f"{elapsed:.1f} s |",
+        "",
+        "Raw responses:",
+        "",
+        *_responses_table(fetcher),
+        "",
+        "| File | Bytes | SHA-256 |",
+        "|---|---:|---|",
+        f"| {core.NACE_FILE} | {len(payload):,} | `{_sha256(payload)}` |",
+        "",
+        "| Revision | Sections | Divisions | Groups | Classes |",
+        "|---|---:|---:|---:|---:|",
+    ]
+    for rev in ("2", "2.1"):
+        c = nace_counts(data["revisions"][rev])
+        lines.append(f"| NACE Rev. {rev} | {c['sections']} | {c['divisions']} | {c['groups']} | {c['classes']} |")
+    lines += [
+        "",
+        "What the file changes: nothing in the titles. It keeps the section letters and titles, which section each "
+        "division belongs to, and the title of every division, group and class, as the annex tables give them; the "
+        "ISIC Rev. 4 column of Regulation (EC) No 1893/2006 is left out.",
+        "",
+        "Rebuild: `python3 eu_taxonomy_mcp.py refresh --nace` (two requests to Cellar).",
+    ]
+    return "\n".join(lines)
+
+
+def eu_law_section() -> str:
+    d = core.DECISION_2011_833
+    acts = [f"| {a['act']} | {a['celex']} | {a['eli']} |" for a in core.LEGAL_ACTS]
+    acts += [f"| {a['act']} ({a['name']}) | {a['celex']} | {a['eli']} |" for a in core.NACE_ACTS.values()]
+    return "\n".join([
+        "The tool quotes titles and passages of EU acts (in `sources()` and the notes) and the NACE titles "
+        "(`nace.json`) from the Official Journal, and one passage from a EUR-Lex consolidated text. Every answer "
+        "that carries them says so in `attribution_eu_law` or `attribution_consolidated_text`.",
+        "",
+        f"EUR-Lex legal notice, {core.EURLEX_NOTICE_URL}, read {core.READ_ON}:",
+        "",
+        f"> {core.EURLEX_REUSE_QUOTE}",
+        "",
+        f"> {core.EURLEX_CC_QUOTE}",
+        "",
+        f"> {core.EURLEX_AUTHENTIC_QUOTE}",
+        "",
+        f"{d['act']} ({d['oj']}, CELEX {d['celex']}), read in Cellar on {core.READ_ON}:",
+        "",
+        f"> Article 4: {d['article_4']}",
+        "",
+        f"> Article 6(2): {d['article_6_2']}",
+        "",
+        "So: Official Journal texts are re-used under Decision 2011/833/EU, with the source acknowledged and the "
+        "meaning not distorted; they are not labelled CC BY 4.0. The passage taken from the consolidated text of "
+        "Delegated Regulation (EU) 2021/2139 (CELEX 02021R2139-20260101) is CC BY 4.0. The Navigator's own content "
+        "is CC BY 4.0 under the Commission legal notice quoted above.",
+        "",
+        f"Acts read (English text from Cellar; titles, dates and ELI from the Publications Office SPARQL endpoint), "
+        f"{core.READ_ON}:",
+        "",
+        "| Act | CELEX | ELI |",
+        "|---|---|---|",
+        *acts,
+    ])
+
+
+def write_sources(out: Path, taxonomy: str | None = None, nace: str | None = None) -> bytes:
+    """SOURCES.md with one block replaced; the other file's block is kept as it was."""
+    path = out / "SOURCES.md"
+    old = path.read_text(encoding="utf-8") if path.exists() else ""
+    blocks = {}
+    for name, new, how in (("taxonomy.json", taxonomy, "python3 eu_taxonomy_mcp.py refresh"),
+                           ("nace.json", nace, "python3 eu_taxonomy_mcp.py refresh --nace")):
+        blocks[name] = new if new is not None else (_existing_block(old, name) or f"Not built here yet: run `{how}`.")
+    parts = [
+        "# Sources of the data in this directory",
+        "",
+        SOURCES_MARKER,
+        "",
+        "Two data files, each rebuilt by a `refresh` command. The terms for each are quoted with the date read.",
+    ]
+    for name, title in (("taxonomy.json", "EU Taxonomy Navigator"), ("nace.json", "NACE Rev. 2 and NACE Rev. 2.1")):
+        begin, end = _block_markers(name)
+        parts += ["", f"## {name}: {title}", "", begin, blocks[name], end]
+    parts += ["", "## Texts of EU law", "", eu_law_section(), ""]
+    return "\n".join(parts).encode("utf-8")
+
+
+# ------------------------------------------------------------------ runs
 
 def _write_atomic(path: Path, data: bytes) -> None:
     tmp = path.with_name(path.name + ".tmp")
@@ -456,13 +740,25 @@ def resolve_out(value: str | None) -> Path:
         return Path(value)
     if (core.HERE / "pyproject.toml").is_file() and (core.HERE / "data").is_dir():
         return core.HERE / "data"
-    raise RefreshError("--out DIR is required outside a source checkout (the bundled snapshot inside an installed "
+    raise RefreshError("--out DIR is required outside a source checkout (the bundled data inside an installed "
                        "package is not rewritten); then run with --snapshot DIR/taxonomy.json")
 
 
-def _guard(out: Path) -> dict | None:
-    """The previous snapshot in out, if any; refuses to overwrite files this tool did not write."""
-    snap, notes = out / core.SNAPSHOT_FILE, out / "SOURCES.md"
+def _read_ours(path: Path, schema: str) -> dict | None:
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_bytes().decode("utf-8"))
+    except (OSError, UnicodeDecodeError, ValueError):
+        data = None
+    if not isinstance(data, dict) or data.get("schema") != schema:
+        raise RefreshError(f"{path} exists and was not written by eu-taxonomy-mcp; choose another --out")
+    return data
+
+
+def _guard(out: Path) -> tuple[dict | None, dict | None]:
+    """The previous files in out, if any; refuses to overwrite files this tool did not write."""
+    notes = out / "SOURCES.md"
     if notes.exists():
         try:
             ours = SOURCES_MARKER in notes.read_text(encoding="utf-8", errors="replace")
@@ -470,58 +766,94 @@ def _guard(out: Path) -> dict | None:
             raise RefreshError(f"cannot read {notes}: {e}") from None
         if not ours:
             raise RefreshError(f"{notes} exists and was not written by eu-taxonomy-mcp; choose another --out")
-    if not snap.exists():
-        return None
+    return _read_ours(out / core.SNAPSHOT_FILE, core.SCHEMA), _read_ours(out / core.NACE_FILE, core.NACE_SCHEMA)
+
+
+def _save(out: Path, name: str, payload: bytes, sources: bytes) -> None:
     try:
-        old = json.loads(snap.read_bytes().decode("utf-8"))
-    except (OSError, UnicodeDecodeError, ValueError):
-        raise RefreshError(f"{snap} exists and is not an eu-taxonomy-mcp snapshot; choose another --out") from None
-    if not isinstance(old, dict) or old.get("schema") != core.SCHEMA:
-        raise RefreshError(f"{snap} exists and is not an eu-taxonomy-mcp snapshot; choose another --out")
-    return old
+        out.mkdir(parents=True, exist_ok=True)
+        _write_atomic(out / name, payload)
+        _write_atomic(out / "SOURCES.md", sources)
+    except OSError as e:
+        raise RefreshError(f"cannot write to {out}: {e}") from None
 
 
 def run(out: Path, fetcher: Fetcher, per_activity: bool = False, now=None, clock=time.monotonic) -> dict:
-    """Crawl, check, write. Returns a summary; raises RefreshError with nothing written."""
-    old = _guard(out)
+    """Crawl, check, write taxonomy.json. Returns a summary; raises RefreshError with nothing written."""
+    old, _ = _guard(out)
     started = clock()
     now = now or dt.datetime.now(dt.timezone.utc)
     sectors, activities, matches, mode = crawl(fetcher, per_activity)
     snapshot = build_snapshot(sectors, activities, matches, now.strftime("%Y-%m-%d"))
+    check_not_shrunk(snapshot["counts"], old, {"activities": "activities", "criteria_sets": "criteria sets"},
+                     out / core.SNAPSHOT_FILE)
     payload = serialize(snapshot)
     try:
-        core.Taxonomy(json.loads(payload.decode("utf-8")))
+        core.Taxonomy(json.loads(payload.decode("utf-8")), _nace_for_check(out))
     except core.SnapshotError as e:
         raise RefreshError(f"the new snapshot does not load: {e}; nothing was written") from None
     elapsed = clock() - started
-    notes = sources_md(snapshot, payload, fetcher, mode, now.strftime("%Y-%m-%dT%H:%M:%SZ"), elapsed)
-    try:
-        out.mkdir(parents=True, exist_ok=True)
-        _write_atomic(out / core.SNAPSHOT_FILE, payload)
-        _write_atomic(out / "SOURCES.md", notes.encode("utf-8"))
-    except OSError as e:
-        raise RefreshError(f"cannot write to {out}: {e}") from None
+    block = taxonomy_block(snapshot, payload, fetcher, mode, now.strftime("%Y-%m-%dT%H:%M:%SZ"), elapsed)
+    _save(out, core.SNAPSHOT_FILE, payload, write_sources(out, taxonomy=block))
     return {"requests": fetcher.requests, "bytes": fetcher.bytes, "elapsed": elapsed, "mode": mode,
             "counts": snapshot["counts"], "retrieved": snapshot["retrieved"], "changes": diff(old, snapshot),
             "path": str(out / core.SNAPSHOT_FILE), "sha256": _sha256(payload), "size": len(payload)}
 
 
+def _nace_for_check(out: Path):
+    try:
+        return core.Nace.load(core.nace_path_for(out / core.SNAPSHOT_FILE))
+    except core.SnapshotError as e:
+        raise RefreshError(f"no NACE table to check the snapshot against ({e}); run refresh --nace first") from None
+
+
+def run_nace(out: Path, fetcher: Fetcher, now=None, clock=time.monotonic, minimum: dict | None = None) -> dict:
+    """Fetch both NACE annexes from Cellar, check, write nace.json. Raises RefreshError with nothing written."""
+    _, old = _guard(out)
+    started = clock()
+    now = now or dt.datetime.now(dt.timezone.utc)
+    documents = {rev: fetcher.get_act(core.NACE_ACTS[rev]["celex"]) for rev in ("2", "2.1")}
+    data = build_nace(documents, now.strftime("%Y-%m-%d"), minimum)
+    for rev in ("2", "2.1"):
+        previous = {"counts": nace_counts(old["revisions"][rev])} if old else None
+        check_not_shrunk(nace_counts(data["revisions"][rev]), previous,
+                         {"divisions": f"NACE Rev. {rev} divisions", "classes": f"NACE Rev. {rev} classes"},
+                         out / core.NACE_FILE)
+    payload = serialize(data)
+    try:
+        core.Nace(json.loads(payload.decode("utf-8")))
+    except core.SnapshotError as e:
+        raise RefreshError(f"the new NACE table does not load: {e}; nothing was written") from None
+    elapsed = clock() - started
+    block = nace_block(data, payload, fetcher, now.strftime("%Y-%m-%dT%H:%M:%SZ"), elapsed)
+    _save(out, core.NACE_FILE, payload, write_sources(out, nace=block))
+    return {"requests": fetcher.requests, "bytes": fetcher.bytes, "elapsed": elapsed,
+            "counts": {rev: nace_counts(data["revisions"][rev]) for rev in ("2", "2.1")},
+            "path": str(out / core.NACE_FILE), "sha256": _sha256(payload), "size": len(payload)}
+
+
 def main(args) -> int:
     delay = max(float(args.delay), MIN_DELAY)
     fetcher = Fetcher(delay=delay, timeout=max(float(args.timeout), 1.0))
+    nace = getattr(args, "nace", False)
     try:
         out = resolve_out(args.out)
-        print(f"refresh: {core.API_BASE} -> {out}", file=sys.stderr)
-        s = run(out, fetcher, per_activity=args.per_activity)
+        print(f"refresh: {CELLAR if nace else core.API_BASE} -> {out}", file=sys.stderr)
+        s = run_nace(out, fetcher) if nace else run(out, fetcher, per_activity=args.per_activity)
     except RefreshError as e:
         print(f"eu-taxonomy-mcp refresh: {e}", file=sys.stderr)
-        print(f"({fetcher.requests} requests made; the existing snapshot, if any, is unchanged)", file=sys.stderr)
+        print(f"({fetcher.requests} requests made; the existing files, if any, are unchanged)", file=sys.stderr)
         return 2
-    c = s["counts"]
-    print(f"refresh: {s['requests']} requests ({s['mode']}), {s['bytes']:,} bytes, {s['elapsed']:.1f} s")
-    print(f"snapshot: {c['sectors']} sectors, {c['activities']} activities, {c['criteria_sets']} criteria sets, "
-          f"{c['dnsh_entries']} DNSH entries, {c['objectives']} objectives; retrieved {s['retrieved']}")
-    print(f"changes against the previous snapshot: {s['changes']}")
+    if nace:
+        print(f"refresh --nace: {s['requests']} requests, {s['bytes']:,} bytes, {s['elapsed']:.1f} s")
+        for rev, c in s["counts"].items():
+            print(f"NACE Rev. {rev}: " + ", ".join(f"{v} {k}" for k, v in c.items()))
+    else:
+        c = s["counts"]
+        print(f"refresh: {s['requests']} requests ({s['mode']}), {s['bytes']:,} bytes, {s['elapsed']:.1f} s")
+        print(f"snapshot: {c['sectors']} sectors, {c['activities']} activities, {c['criteria_sets']} criteria sets, "
+              f"{c['dnsh_entries']} DNSH entries, {c['objectives']} objectives; retrieved {s['retrieved']}")
+        print(f"changes against the previous snapshot: {s['changes']}")
     print(f"wrote {s['path']} ({s['size']:,} bytes, sha256 {s['sha256']}) and SOURCES.md")
     return 0
 
@@ -534,4 +866,5 @@ if __name__ == "__main__":
     p.add_argument("--delay", type=float, default=1.0)
     p.add_argument("--timeout", type=float, default=120.0)
     p.add_argument("--per-activity", action="store_true")
+    p.add_argument("--nace", action="store_true")
     raise SystemExit(main(p.parse_args()))

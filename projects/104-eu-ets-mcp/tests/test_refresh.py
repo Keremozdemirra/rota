@@ -27,7 +27,7 @@ class RefreshTest(unittest.TestCase):
 
     def test_refresh_builds_the_cache_and_tolerates_missing_compliance_files(self):
         meta = self.refresh()
-        self.assertEqual(meta["counts"]["installations"], 15)
+        self.assertEqual(meta["counts"]["installations"], 25)
         self.assertEqual(meta["compliance_years"], [2024])
         # the listing offers 2021-2023 too; the loopback registry answers 404 for them
         self.assertEqual(sorted(e["file"] for e in meta["errors"]),

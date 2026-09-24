@@ -1,5 +1,7 @@
 """The snapshot shipped in data/: what the manifest says is what the files hold, and nothing else."""
+import csv
 import gzip
+import io
 import json
 import os
 import sys
@@ -25,7 +27,8 @@ class BundledSnapshot(unittest.TestCase):
         sources = (DATA / "SOURCES.md").read_text(encoding="utf-8")
         for s in self.manifest["sources"]:
             self.assertIn(s["sha256"], sources)
-        self.assertIn("https://commission.europa.eu/legal-notice_en", sources)
+        self.assertIn(eu_ets.TERMS_URL, sources)
+        self.assertIn("identifiable private individuals", sources)
         self.assertEqual((self.manifest["licence"], self.manifest["snapshot_date"]), ("CC BY 4.0", "2026-09-24"))
 
     def test_only_allowlisted_columns(self):
@@ -36,6 +39,27 @@ class BundledSnapshot(unittest.TestCase):
             head = first(name)
             for col in ("ACCOUNT_HOLDER_NAME", "ACCOUNT_IDENTIFIER_IN_REG", "ADDRESS1", "POSTAL_CODE"):
                 self.assertNotIn(col, head)
+
+    def rows(self):
+        return list(csv.DictReader(io.StringIO(gzip.decompress((DATA / "installations.csv.gz").read_bytes()).decode("utf-8"))))
+
+    def test_installations_the_review_found_to_name_persons_are_withheld(self):
+        # The 2026-09-24 review found these installation names to name natural persons. Only ids are
+        # written here, and a failure reports only the id.
+        nine = {("ES", "287"), ("CZ", "310"), ("ES", "142"), ("IT", "1012"), ("NL", "423"), ("NL", "414"),
+                ("DE", "219960"), ("DE", "222989"), ("DE", "223061")}
+        found = {(r["REGISTRY_CODE"], r["INSTALLATION_IDENTIFIER"]): r for r in self.rows()
+                 if (r["REGISTRY_CODE"], r["INSTALLATION_IDENTIFIER"]) in nine}
+        self.assertEqual(set(found), nine)
+        for key, r in found.items():
+            self.assertTrue(r["INSTALLATION_NAME"] == eu_ets.WITHHELD and r["CITY"] == "", f"{key} is not withheld")
+
+    def test_withheld_counts_agree(self):
+        withheld = sum(1 for r in self.rows() if r["INSTALLATION_NAME"] == eu_ets.WITHHELD)
+        self.assertEqual(withheld, self.manifest["counts"]["names_withheld"])
+        ops = next(s for s in self.manifest["sources"] if s["kind"] == "operators")
+        self.assertEqual(sum(ops["names_withheld_by_reason"].values()), withheld)
+        self.assertIn(f"{withheld} installation names", (DATA / "SOURCES.md").read_text(encoding="utf-8"))
 
     def test_default_path_builds_the_cache_from_the_bundle(self):
         with Isolated() as env:

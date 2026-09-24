@@ -1303,8 +1303,10 @@ def sources_markdown(m: dict) -> str:
         f"- Listing: {m.get('listing_url')} (undocumented endpoint behind the registry website)",
         f"- Registry snapshot date (SNAPSHOT_DATE column): {m.get('snapshot_date')}",
         f"- Retrieved: {m.get('retrieved_at')}",
-        f"- Licence: {LICENCE} ({LICENCE_URL}), per the Commission's legal notice {TERMS_URL}: "
-        "\"reuse is allowed, provided appropriate credit is given and changes are indicated.\"",
+        f"- Licence: {LICENCE} ({LICENCE_URL}), per the legal notice the registry website links, {TERMS_URL}: "
+        "\"reuse is allowed, provided appropriate credit is given and changes are indicated. You may be required to "
+        "clear additional rights if a specific content depicts identifiable private individuals or includes "
+        "third-party works.\"",
         f"- Attribution: Source: European Commission, EU ETS Union Registry, {LICENCE}, retrieved "
         f"{(m.get('retrieved_at') or '')[:10]}.",
         "- Changes: only the allowlisted columns are kept (see README, \"Personal data\"); rows without any "

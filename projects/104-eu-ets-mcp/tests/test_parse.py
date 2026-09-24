@@ -21,7 +21,7 @@ class Operators(unittest.TestCase):
     def test_counts_and_malformed_rows(self):
         rows, st = operators()
         d = st.as_dict()
-        self.assertEqual((d["rows_read"], d["rows_kept"], d["malformed_rows"], d["duplicate_rows"]), (19, 15, 3, 1))
+        self.assertEqual((d["rows_read"], d["rows_kept"], d["malformed_rows"], d["duplicate_rows"]), (29, 25, 3, 1))
         self.assertEqual(d["rows_with_undecodable_bytes"], 1)
         self.assertIn("5 fields, expected 28", d["malformed_examples"][0])
 
@@ -38,7 +38,7 @@ class Operators(unittest.TestCase):
         rows, st = operators()
         ship = next(r for r in rows if r["installation_id"] == 223104)
         self.assertEqual((ship["name"], ship["name_withheld"], ship["city"]), (eu_ets.WITHHELD, 1, None))
-        self.assertEqual(st.withheld, 1)
+        self.assertEqual(st.withheld, 10)
         kept = next(r for r in rows if r["installation_id"] == 232740)  # "Tropic 4 Limited"
         self.assertEqual(kept["name_withheld"], 0)
 
@@ -146,15 +146,54 @@ class Helpers(unittest.TestCase):
         self.assertFalse(eu_ets.lei_check_digits_ok("43700H0UCVNPOGDUF25"))  # 19 characters, in the registry
 
     def test_name_guard(self):
-        ok, withheld = eu_ets.name_is_safe, lambda n, c: not eu_ets.name_is_safe(n, c)
-        self.assertTrue(withheld("Peter Mockovčiak", 70))  # a sole trader among ETS2 regulated entities
-        self.assertTrue(withheld("Pavel Gútai - Obchod s palivami", 70))
-        self.assertTrue(withheld("Janez Novak s.p.", 50))  # Slovenian sole proprietor
-        self.assertTrue(ok("SPP Mobilita s. r. o.", 70))
-        self.assertTrue(ok("Rederiaktiebolaget Eckerö", 50))
-        self.assertTrue(ok("AVIA Mineralölhandelsges.m.b.H.", 70))
-        self.assertTrue(ok("f11407", 10))  # aircraft operators are listed by code
-        self.assertTrue(ok("Erika Mustermann", 20))  # stationary installations name a site, not an operator
+        why = eu_ets.withhold_reason
+        org = ("Nordwind Energie GmbH", "HRB 00001", "DE")
+        # withheld: a holder who may be a person, and every sole-trader or partnership marker
+        self.assertTrue(why("Ziegelei Erika Musterfrau", 20, "DE", "Musterstadt", "Erika Musterfrau", "", "DE"))
+        self.assertTrue(why("Erika Musterfrau", 20, "DE", "", *org))  # a person-shaped name, whatever the holder
+        for name in ("Hof Musterfrau e.K.", "Musterfrau Einzelunternehmen", "Kwekerij Musterfrau V.O.F.",
+                     "Musterfrau eenmanszaak", "Tuilerie Musterfrau EIRL", "Juan Ejemplo empresario individual",
+                     "Jan Musterfrau OSVČ", "Jana Musterfrau fyzická osoba", "Fornace Esempio ditta individuale",
+                     "Partenreederei MS Beispiel", "Janez Musterfrau s.p."):
+            self.assertEqual(why(name, 20, "DE", "", "Irgendwer", "", "DE"), "sole-trader or partnership marker", name)
+        self.assertEqual(why("Ceramica Ejemplo", 32, "ES", "", "Juan Ejemplo", "00000000T", "ES"), "personal identifier")
+        self.assertIsNone(why("Heizkraftwerk Nordhafen", 20, "DE", "Nordhafen", "Stadtwerke Nordhafen GmbH", "", "DE"))
+        self.assertIsNone(why("f11407", 10, "AT", "", "Max Musterfrau", "", "AT"))  # aircraft operators are codes
+        self.assertIsNone(why("X Power Plant", 20, "GB", "", *org))
+
+    def test_guard_list_holes_from_the_review(self):
+        form = eu_ets.has_legal_form
+        # initials are not company forms, only a trailing form is
+        self.assertFalse(form("A. B. Musterson"))
+        self.assertFalse(form("S. A. Ejemplo"))
+        self.assertFalse(form("K. G. Musterfrau"))
+        self.assertTrue(form("SPP Mobilita s. r. o."))
+        self.assertTrue(form("Volvo AB"))
+        self.assertTrue(form("Rederiaktiebolaget Eckerö"))
+        self.assertTrue(form("AVIA Mineralölhandelsges.m.b.H."))
+        self.assertTrue(form("Musterfrau Sp. z o.o."))
+        # "& Co", EIRL and partnership forms show no legal person
+        for name in ("Janez Beispiel & Co", "Musterfrau & Cie", "Musterfrau EIRL", "Musterfrau GbR", "Musterfrau OHG"):
+            self.assertFalse(form(name), name)
+        self.assertFalse(form("Musterfrau sas", "IT"))  # an Italian s.a.s. is a partnership
+        self.assertTrue(form("Musterfrau SAS", "FR"))
+        # words that are also personal names do not explain a name
+        for name in ("Marine Musterfrau", "Line Musterfrau", "Jet Musterfrau", "Anna Power"):
+            self.assertTrue(eu_ets.withhold_reason(name, 50, "DK", "", "Nordwind Shipping A/S", "", "DK"), name)
+        self.assertTrue(eu_ets.withhold_reason("Janez Beispiel & Co", 20, "SI", "", "Janez Beispiel & Co", "", "SI"))
+
+    def test_greek_and_cyrillic_names_are_tokenised(self):
+        self.assertTrue(eu_ets.has_legal_form("ΠΑΡΑΔΕΙΓΜΑ Α.Ε."))
+        self.assertTrue(eu_ets.has_legal_form("Пример ЕООД"))
+        self.assertEqual(eu_ets._words("ΠΑΡΑΔΕΙΓΜΑ ΜΟΝΟΠΡΟΣΩΠΗ"), ["παραδειγμα", "μονοπροσωπη"])
+
+    def test_personal_identifier_formats(self):
+        self.assertTrue(eu_ets.personal_id("00000000T", "ES"))
+        self.assertFalse(eu_ets.personal_id("B00000000", "ES"))  # a company's CIF
+        self.assertTrue(eu_ets.personal_id("RSSMRA80A01H501U", "IT"))
+        self.assertFalse(eu_ets.personal_id("00000000000", "IT"))  # a partita IVA
+        self.assertTrue(eu_ets.personal_id("800101-1234", "SE"))
+        self.assertFalse(eu_ets.personal_id("556000-1234", "SE"))  # an organisation number
 
 
 class Listing(unittest.TestCase):

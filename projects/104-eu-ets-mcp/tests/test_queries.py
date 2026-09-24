@@ -154,8 +154,8 @@ class QueryTest(unittest.TestCase):
     # --- info and every output
     def test_dataset_info(self):
         r = self.ds.dataset_info()
-        self.assertEqual((r["licence"], r["terms_url"]), ("CC BY 4.0", "https://commission.europa.eu/legal-notice_en"))
-        self.assertEqual(r["counts"]["installations"], 15)
+        self.assertEqual((r["licence"], r["terms_url"]), ("CC BY 4.0", "https://european-union.europa.eu/legal-notice_en"))
+        self.assertEqual(r["counts"]["installations"], 25)
         self.assertEqual(r["compliance_years"], [2024])
         self.assertNotIn("ACCOUNT_HOLDER_NAME", r["columns_kept"]["operators_daily"])
         self.assertIn("Art. 3(a)", r["units"]["free_allocation"])
@@ -174,6 +174,72 @@ class QueryTest(unittest.TestCase):
         self.assertIn("derived", outputs[4]["source"])
         withheld = self.ds.installation_history("DE-223104")
         self.assertEqual((withheld["installation"]["name"], withheld["installation"]["city"]), (eu_ets.WITHHELD, None))
+
+
+class ReviewRegressions(unittest.TestCase):
+    """Findings of the 2026-09-24 review, one test each."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.env = Isolated().__enter__()
+        build_fixture_db(cls.env.cache)
+        cls.ds = eu_ets.Dataset()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.env.__exit__()
+
+    def test_search_shows_null_not_zero_for_a_year_without_value(self):
+        r = self.ds.search_installations("voestalpine kokerei", country="AT")
+        self.assertEqual([(i["installation_id"], i["verified_emissions"]) for i in r["installations"]], [(14, None)])
+        self.assertTrue(any("null where the registry file has no value" in n for n in r["notes"]))
+
+    def test_lei_latest_emissions_do_not_depend_on_the_range(self):
+        r = self.ds.company_by_lei(VOEST, to_year=2020)
+        latest = {i["installation_id"]: i["verified_emissions_latest"] for i in r["installations"]}
+        self.assertEqual(latest[16], int(yearly("AT", "16")[2025]["VERIFIED_EMISSIONS"]))
+        self.assertEqual(max(t["year"] for t in r["yearly_totals"]), 2020)
+
+    def test_numbers_too_long_are_usage_errors(self):
+        for call in (lambda: self.ds.top_emitters(activity="9" * 5000), lambda: self.ds.top_emitters(year="9" * 5000),
+                     lambda: self.ds.search_installations("x", limit="9" * 5000),
+                     lambda: self.ds.installation_history("9" * 5000)):
+            with self.assertRaises(eu_ets.UsageError):
+                call()
+
+    def test_withheld_names_in_rankings(self):
+        r = self.ds.top_emitters(country="DE", year=2025, limit=100)
+        by = {i["installation_id"]: i for i in r["installations"]}
+        self.assertEqual((by[990001]["name"], by[990001]["city"]), (eu_ets.WITHHELD, None))
+        self.assertIsNone(by[990006]["permit_id"])  # the permit id repeated the withheld name
+        self.assertEqual(by[990009]["name"], "Heizkraftwerk Nordhafen")
+        self.assertIn(eu_ets.WITHHELD_NOTE, r["notes"])
+
+
+class IncompleteYear(unittest.TestCase):
+    """A snapshot taken before the reporting deadline, with one early entry for the new year."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.env = Isolated().__enter__()
+        build_fixture_db(cls.env.cache, snapshot_date="2027-02-10", overrides={("DE", 53, 2026): 12345})
+        cls.ds = eu_ets.Dataset()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.env.__exit__()
+
+    def test_default_year_stays_on_the_last_complete_year(self):
+        self.assertEqual(self.ds.top_emitters(country="DE")["year"], 2025)
+        self.assertEqual(self.ds.dataset_info()["years"]["latest_verified_emissions_year"], 2025)
+
+    def test_the_incomplete_year_is_flagged(self):
+        r = self.ds.top_emitters(year=2026)
+        self.assertEqual(r["matching_installations"], 1)
+        self.assertTrue(any(n.startswith("2026 is incomplete") for n in r["notes"]))
+        h = self.ds.installation_history("DE-53", from_year=2025, to_year=2027)
+        self.assertEqual({y["year"]: y["verified_emissions"] for y in h["years"]}, {2025: 3901188, 2026: 12345, 2027: None})
+        self.assertTrue(any(n.startswith("2026 is incomplete") for n in h["notes"]))
 
 
 if __name__ == "__main__":
