@@ -102,7 +102,7 @@ class Layout(unittest.TestCase):
     def test_unknown_columns_are_noted(self):
         text = HEADER + ",internal_rating\n" + ROW + ",AA\n"
         result = fe.compute(text.encode("utf-8"))
-        self.assertTrue(any("ignored columns: internal_rating" in n for n in result["notes"]))
+        self.assertTrue(any("ignored columns: 'internal_rating'" in n for n in result["notes"]))
 
     def test_more_cells_than_columns(self):
         result = fe.compute((HEADER + "\n" + ROW + ",surplus\n").encode("utf-8"))

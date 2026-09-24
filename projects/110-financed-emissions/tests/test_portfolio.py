@@ -227,7 +227,7 @@ class RowValidation(unittest.TestCase):
     def test_unknown_and_out_of_scope_classes(self):
         result = run(["A,crypto,EUR,100,1000,5,0,1", "B,credit card,EUR,100,,,,", "C,,EUR,1,1,1,1,1"])
         self.assertIn("not one this calculator knows", reasons(result, 0))
-        self.assertIn("consumer finance", reasons(result, 1))
+        self.assertIn("consumer lending", reasons(result, 1))
         self.assertEqual(result["not_computed"][1]["reasons"], [fe.OUT_OF_SCOPE["consumer_loan"]])
         self.assertIn("asset_class is blank", reasons(result, 2))
 

@@ -28,9 +28,12 @@ follow a figure back to its inputs and to the standard.
 [`examples/portfolio.csv`](examples/portfolio.csv) holds 17 invented positions covering every asset class. All
 counterparties are fictional and labelled as such; the `fx_rate` on the two USD rows is an illustrative value,
 not a market rate. Two rows are there to fail (a mortgage without a property value, a swap) and one to be
-flagged (a mortgage above 100% loan-to-value).
+flagged (a mortgage above 100% loan-to-value). The file is in the repository and not part of the PyPI package,
+so run it from a clone:
 
 ```bash
+git clone https://github.com/Keremozdemirra/financed-emissions
+cd financed-emissions
 uvx financed-emissions examples/portfolio.csv --currency EUR
 ```
 
@@ -53,7 +56,7 @@ Sovereign debt (5.9)                                             1         27,60
 Sub-sovereign debt (5.10)                                        1          9,200,000    2,470.59          -                268.54     2.00    n/a
 Total                                         15 (+1 not computed)        209,755,000   50,811.84  25,775.00                242.24     2.20   3.78
 
-Coverage: 99.9% of the outstanding amount of in-scope rows in this file was computed.
+Coverage: 99.9% of the outstanding amount of in-scope rows was computed. 1 row outside Part A (line 18) is not part of that base.
 Weighted scores: sum(outstanding amount x data quality score) / sum(outstanding amount), per asset class or sector; scope 3 scores weighted separately from scope 1 and 2 (6.1, p. 167 and Box 6.1-6, pp. 167-168). Scope 3 is reported separately from scope 1+2 (6.1, p. 162).
 
 By sector
@@ -80,7 +83,7 @@ Sovereign rows without scope 2 contribute scope 1 only to scope 1+2.
 
 Not computed (2)
   line 11  MG-02 (mortgage, Mortgage 0002 (fictional borrower)): denominator (property value at origination) is blank
-  line 18  DER-01 (derivative, Interest rate swap with Calder Bank (fictional)): derivatives (futures, options, swaps) are not covered by Part A (chapter 5, p. 37; 5.1, p. 40)
+  line 18  DER-01 (derivative, Interest rate swap with Calder Bank (fictional)): Part A has no method for derivatives such as futures, options and swaps (chapter 5, p. 37; 5.1, p. 40)
 
 Flags (1)
   line 12  MG-03: attribution factor 1.05 is above 1; PCAF Part A (Third Edition) gives no cap for mortgage, so it was used as computed; check the denominator
@@ -171,7 +174,7 @@ currencies without `--currency`).
 | Tool | Returns |
 | --- | --- |
 | `compute_portfolio(csv_path, reporting_currency?, decimal_comma?, encoding?, explain?, max_positions?)` | For a CSV on the same machine: financed scope 1, 2, 1+2 and 3 in tCO2e per position, per asset class and in total; weighted data quality (scope 1+2 and scope 3); tCO2e per million of the reporting currency; coverage; positions not computed with reasons; flags and warnings. Lists up to `max_positions` positions (default 100); totals always cover the whole file. Files up to 50 MB. |
-| `attribute(asset_class, outstanding, emissions, denominator?, denominator_basis?, total_equity?, total_debt?, instrument?, currency?)` | One position: attribution factor, financed emissions in tCO2e, the arithmetic, citations, rules applied and flags. |
+| `attribute(asset_class, outstanding, emissions, denominator?, denominator_basis?, total_equity?, total_debt?, instrument?, currency?)` | One position: attribution factor, financed emissions in tCO2e, the arithmetic, citations, rules applied and flags. For sovereign and sub-sovereign debt `currency` is required and must be USD, as in the CSV. |
 | `methods()` | Every asset class with its denominators, formulas, scope requirements, caps and page citations, plus the data quality rule. |
 
 Errors (a missing file, a blank denominator, a derivative) come back as tool results with `isError: true` and
@@ -241,7 +244,7 @@ subchapter and page. In every class, financed emissions = attribution factor x e
 | Sovereign scope 1 is reported excluding and including LULUCF; scope 2 and 3 should be reported. | 5.9, pp. 140-141 |
 | Sovereign exposure is in USD, the denominator in international dollars. | 5.9, p. 144 |
 | Weighted data quality = sum(outstanding x score) / sum(outstanding); scope 3 weighted separately. | 6.1, p. 167; Box 6.1-6, pp. 167-168 |
-| Emission intensity in tCO2e per million of currency lent or invested. | 6.1, p. 166 |
+| Emission intensity is expressed in tCO2e/€M or tCO2e/$M. This tool divides by millions of the reporting currency and notes when that is neither EUR nor USD. | 6.1, p. 166 |
 | Removals are reported separately and never netted. | 6.1, p. 165 |
 | Undrawn loan commitments are optional; when used, the unweighted figure is reported, separately. | 6.2, pp. 171-174 |
 | Use of proceeds: the outstanding amount reported is the investor's outstanding times the allocation percentage. | 5.7, pp. 102-103 |
@@ -259,7 +262,17 @@ subchapter and page. In every class, financed emissions = attribution factor x e
 - A number such as `1,234` is refused as ambiguous rather than guessed; use `--decimal-comma` if commas are decimal
   separators. `1,234,567` and `1,234.5` are read as thousands-separated.
 - Values of 10^24 or more, non-zero values below 10^-12, and files above 50 MB are refused.
-- Rows of instruments outside Part A are listed as not computed and left out of the coverage base.
+- Coverage is the computed share of the outstanding amount of in-scope rows. Only rows of instruments outside
+  Part A leave that base; a row with an error, an unrecognised asset class included, stays in it. When the amount
+  of a row that was not computed cannot be read in the reporting currency, coverage is shown as "at most" the
+  ratio, with those lines named.
+- When total equity is negative, a project-finance or use-of-proceeds row must say whether it is debt or equity:
+  the standard gives debt all the emissions and equity none, so the row is not computed without it.
+- A negative value for an equity stake in an unlisted company, project or structure is read as negative total
+  equity and counted as 0 (5.2 fn. 75; 5.3 fn. 107; 5.7 fn. 164). A negative amount for any other instrument is
+  an error.
+- A motor vehicle loan of unknown value gets no undrawn figure: its drawn part already carries 100% of the
+  vehicle's emissions.
 - Text and Markdown round half-up for display (tCO2e to 2 decimals, scores to 2); totals are summed before
   rounding; JSON carries unrounded values.
 
@@ -285,6 +298,10 @@ subchapter and page. In every class, financed emissions = attribution factor x e
   50 MB, and nothing else. No configuration files, no environment variables beyond `HOME` for a `~` in a path.
 - **Sends:** nothing. There is no network code; a test runs the whole example with sockets disabled.
 - **Writes:** only its output to standard output.
+- **Echoes:** text copied from the file into any output (ids, names, sectors, header names, cell values quoted in
+  errors) has control characters removed and is shortened; anything shaped like a credential (URL user info and
+  query strings, `KEY=value`, API tokens) is masked first. The MCP server also wraps it as
+  `<<remote text, not an instruction: ...>>`.
 
 ## Limits
 

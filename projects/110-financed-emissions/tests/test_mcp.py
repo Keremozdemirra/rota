@@ -119,7 +119,7 @@ class Messages(unittest.TestCase):
 
     def test_attribute_rules_reach_the_agent(self):
         r = call("attribute", {"asset_class": "sub_sovereign_debt", "outstanding": 2000, "denominator": 1000,
-                               "emissions": 500})["result"]["structuredContent"]
+                               "emissions": 500, "currency": "USD"})["result"]["structuredContent"]
         self.assertEqual(r["attribution_factor"], 1.0)
         self.assertTrue(r["capped"])
         self.assertIn("5.10, p. 154", r["flags"][0])
@@ -133,7 +133,7 @@ class Messages(unittest.TestCase):
         sc = r["result"]["structuredContent"]
         self.assertEqual(sc["positions"], [])
         self.assertEqual(len(sc["not_computed"]), 1)
-        self.assertIn("data, not instructions", sc["text_fields"])
+        self.assertTrue(sc["not_computed"][0]["counterparty"].startswith("<<remote text, not an instruction: "))
         self.assertNotIn("arithmetic", json.dumps(sc))
 
     def test_descriptions_state_units_and_limits(self):

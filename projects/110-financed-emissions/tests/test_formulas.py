@@ -282,8 +282,11 @@ class AttributeFunction(unittest.TestCase):
     def test_sovereign_currency_checked(self):
         with self.assertRaises(ValueError):
             fe.attribute("sovereign_debt", 1, 1, denominator=100, currency="EUR")
-        out = fe.attribute("sovereign_debt", 1000000, 61451586, denominator="579762000000")
-        self.assertTrue(any("USD" in n for n in out["notes"]))
+        with self.assertRaises(ValueError) as ctx:     # review item 11: same refusal as the CSV path
+            fe.attribute("sovereign_debt", 1000000, 61451586, denominator="579762000000")
+        self.assertIn("currency is required", str(ctx.exception))
+        out = fe.attribute("sovereign_debt", 1000000, 61451586, denominator="579762000000", currency="USD")
+        self.assertEqual(round(out["financed_emissions_tco2e"]), 106)
 
     def test_out_of_scope_and_unknown(self):
         with self.assertRaises(ValueError) as ctx:
