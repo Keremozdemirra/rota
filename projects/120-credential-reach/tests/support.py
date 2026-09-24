@@ -3,8 +3,9 @@
 Every test built on `Isolated` runs with the whole process environment replaced
 by a minimal one (HOME, USERPROFILE, APPDATA and XDG_CONFIG_HOME pointing at a
 temporary directory, PATH to find git), `Path.home()` and `Path.cwd()` patched
-to temporary directories, and `urllib.request.urlopen` replaced: a request
-nobody prepared an answer for fails the test instead of reaching the network.
+to temporary directories, and `urllib.request.urlopen` and every opener's `open`
+replaced: a request nobody prepared an answer for fails the test instead of
+reaching the network.
 """
 from __future__ import annotations
 
@@ -27,6 +28,10 @@ for _p in (str(ROOT), str(HERE)):
 
 import credential_reach as cr  # noqa: E402
 import synthetic  # noqa: E402
+
+# the real ones, for tests that run urllib's handler chain over a fake transport (see test_probe.Transport)
+REAL_OPENER_OPEN = urllib.request.OpenerDirector.open
+REAL_URLOPEN = urllib.request.urlopen
 
 
 class Tty(io.StringIO):
@@ -93,7 +98,8 @@ class Isolated(unittest.TestCase):
         patches = [mock.patch.dict(os.environ, env, clear=True),
                    mock.patch("pathlib.Path.home", return_value=self.home),
                    mock.patch("pathlib.Path.cwd", return_value=self.project),
-                   mock.patch("urllib.request.urlopen", self._urlopen)]
+                   mock.patch("urllib.request.urlopen", self._urlopen),
+                   mock.patch("urllib.request.OpenerDirector.open", self._opener_open)]
         for p in patches:
             p.start()
             self.addCleanup(p.stop)
@@ -101,6 +107,9 @@ class Isolated(unittest.TestCase):
 
     def _urlopen(self, req, timeout=None):
         return (self.web or _refuse)(req, timeout)
+
+    def _opener_open(self, req, data=None, timeout=None):
+        return self._urlopen(req, timeout)
 
     def serve(self, *answers) -> Web:
         self.web = Web(*answers)

@@ -54,6 +54,19 @@ class BundledSnapshot(unittest.TestCase):
         for key, r in found.items():
             self.assertTrue(r["INSTALLATION_NAME"] == eu_ets.WITHHELD and r["CITY"] == "", f"{key} is not withheld")
 
+    def test_withheld_installations_carry_no_lei(self):
+        # The second review found 482 withheld rows still carrying the holder's LEI, CZ-310 among them;
+        # an LEI's public record names the holder. A failure reports only ids, never a name or an LEI.
+        rows = self.rows()
+        cz = next(r for r in rows if (r["REGISTRY_CODE"], r["INSTALLATION_IDENTIFIER"]) == ("CZ", "310"))
+        self.assertTrue(cz["INSTALLATION_NAME"] == eu_ets.WITHHELD and cz["ACCOUNT_HOLDER_LEI"] == "", "CZ-310 carries an LEI")
+        leaks = [f"{r['REGISTRY_CODE']}-{r['INSTALLATION_IDENTIFIER']}" for r in rows
+                 if r["INSTALLATION_NAME"] == eu_ets.WITHHELD and r["ACCOUNT_HOLDER_LEI"]]
+        self.assertEqual(leaks, [])
+        self.assertEqual(sum(1 for r in rows if r["ACCOUNT_HOLDER_LEI"]), self.manifest["counts"]["installations_with_lei"])
+        ops = next(s for s in self.manifest["sources"] if s["kind"] == "operators")
+        self.assertIn(f"account-holder LEIs of {ops['leis_withheld']} of them", (DATA / "SOURCES.md").read_text(encoding="utf-8"))
+
     def test_withheld_counts_agree(self):
         withheld = sum(1 for r in self.rows() if r["INSTALLATION_NAME"] == eu_ets.WITHHELD)
         self.assertEqual(withheld, self.manifest["counts"]["names_withheld"])

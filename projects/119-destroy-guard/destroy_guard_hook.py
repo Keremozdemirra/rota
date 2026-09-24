@@ -49,7 +49,7 @@ def _main() -> int:
         return 0
     tool_input = payload.get("tool_input")
     command = tool_input.get("command") if isinstance(tool_input, dict) else None
-    if not isinstance(command, str) or not dg.QUICK.search(command):
+    if not isinstance(command, str) or not dg.quick(command):
         return 0  # the cheap test first: most commands name none of the tools
     cwd = payload.get("cwd")
     cwd = cwd if isinstance(cwd, str) and os.path.isdir(cwd) else os.getcwd()

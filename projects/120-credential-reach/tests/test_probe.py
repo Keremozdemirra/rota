@@ -4,15 +4,74 @@ import io
 import json
 import os
 import socket
+import ssl
 import sys
 import unittest
 import urllib.error
+import urllib.request
+import urllib.response
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import support  # noqa: E402
 from support import Isolated, Response, cr, synthetic  # noqa: E402
 
 rand = synthetic.rand
+
+
+class Transport(Isolated):
+    """urllib's real handler chain (proxy, TLS context, redirects) over a fake wire: nothing leaves the machine."""
+
+    def setUp(self):
+        super().setUp()
+        self.tok = "ghp_" + rand(36)
+        self.sent, self.answers = [], []
+        for target, new in (("urllib.request.OpenerDirector.open", support.REAL_OPENER_OPEN),
+                            ("urllib.request.urlopen", support.REAL_URLOPEN),
+                            ("urllib.request.HTTPSHandler.https_open", self._wire),
+                            ("urllib.request.HTTPHandler.http_open", self._wire)):
+            p = mock.patch(target, new)
+            p.start()
+            self.addCleanup(p.stop)
+
+    def _wire(self, req):
+        self.sent.append({"url": req.full_url, "host": req.host, "tunnel": getattr(req, "_tunnel_host", None),
+                          "token_sent": any(self.tok in v for v in dict(req.header_items()).values()),
+                          "unredirected": "Authorization" in req.unredirected_hdrs})
+        code, headers = self.answers.pop(0) if self.answers else (200, {"X-OAuth-Scopes": "repo"})
+        msg = http.client.HTTPMessage()
+        for k, v in headers.items():
+            msg[k] = v
+        resp = urllib.response.addinfourl(io.BytesIO(b"{}"), msg, req.full_url, code)
+        resp.msg = "fake"
+        return resp
+
+    def test_a_redirect_to_another_host_is_not_followed(self):
+        self.answers = [(302, {"Location": "https://collector.example/x"})]
+        r = cr.probe_one(self.tok, ["$GITHUB_TOKEN"], 5)
+        self.assertEqual([s["url"] for s in self.sent], ["https://api.github.com/user"])
+        self.assertEqual((r["checked"], r["result"]), (False, "GitHub answered 302 (a redirect, not followed)"))
+
+    def test_a_redirect_to_plain_http_is_not_followed(self):
+        self.answers = [(301, {"Location": "http://api.github.com/user"})]
+        r = cr.probe_one(self.tok, ["$GITHUB_TOKEN"], 5)
+        self.assertEqual(len(self.sent), 1)
+        self.assertFalse(r["checked"])
+
+    def test_the_token_is_an_unredirected_header(self):
+        cr.probe_one(self.tok, ["$GITHUB_TOKEN"], 5)
+        self.assertEqual([(s["token_sent"], s["unredirected"]) for s in self.sent], [(True, True)])
+
+    def test_tls_is_verified(self):
+        ctx = next(h._context for h in cr._opener().handlers if isinstance(h, urllib.request.HTTPSHandler))
+        self.assertEqual((ctx.verify_mode, ctx.check_hostname), (ssl.CERT_REQUIRED, True))
+
+    def test_the_environment_proxy_tunnels_to_github(self):
+        os.environ["HTTPS_PROXY"] = "http://proxy.invalid:3128"
+        r = cr.probe_one(self.tok, ["$GITHUB_TOKEN"], 5)
+        self.assertEqual([(s["host"], s["tunnel"]) for s in self.sent], [("proxy.invalid:3128", "api.github.com")])
+        self.assertEqual(r["scopes"], ["repo"])
 
 
 class Probe(Isolated):

@@ -29,9 +29,12 @@ FIXTURES = Path(__file__).resolve().parent / "fixtures"
 sys.path.insert(0, str(ROOT))
 import eu_ets  # noqa: E402
 
+# The LEI registered for DE-990001, a synthetic sole trader whose name is withheld: its public record
+# would name the holder, so it goes with the name.
+WITHHELD_LEI = "TEST00SYNTHETIC00102"
 # Every personal field of the fixtures holds one of these; none may reach the cache, a snapshot or an output.
 PLACEHOLDERS = ("Mustermann", "Musterfrau", "Musterson", "Beispiel", "Esempio", "Ejemplo", "Musterstra", "Musterweg",
-                "Musterstadt", "Musterhausen", "Musterhafen", "HRB 0000", "00000000T", "Nordwind")
+                "Musterstadt", "Musterhausen", "Musterhafen", "HRB 0000", "00000000T", "Nordwind", WITHHELD_LEI)
 FILES = {
     "operators_daily.csv.gz": FIXTURES / "operators_daily.csv.gz",
     "operators_yearly_activity_daily.csv.gz": FIXTURES / "operators_yearly_activity_daily.csv.gz",

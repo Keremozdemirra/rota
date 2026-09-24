@@ -52,15 +52,19 @@ MAX_REASON = 1800
 # Words that make an option's value, or an assignment, worth hiding.
 SECRET_WORD = re.compile(r"(?i)key|token|secret|passw|pwd|auth|credential|cookie|session|bearer|signature|"
                          r"private|access|(?:^|[_-])pw(?:$|[_-])")
-# The shapes of common API keys, found anywhere in a value.
-TOKEN_SHAPE = re.compile(r"(?:sk|pk|rk)[-_][A-Za-z0-9_-]{8,}|gh[pousr]_[A-Za-z0-9]{16,}|github_pat_[A-Za-z0-9_]{20,}"
-                         r"|glpat-[A-Za-z0-9_-]{8,}|xox[abeprs]-[A-Za-z0-9-]{10,}|AKIA[A-Z0-9]{16}"
-                         r"|AIza[A-Za-z0-9_-]{30,}|eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}")
+# The shapes of common API keys, found anywhere in a value. Each starts at a word boundary, so that
+# ordinary names such as disk-cleanup-worker or network-monitoring are not taken for keys.
+TOKEN_SHAPE = re.compile(r"(?<![A-Za-z0-9])(?:(?:sk|pk|rk)[-_][A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9]{16,}"
+                         r"|github_pat_[A-Za-z0-9_]{20,}|glpat-[A-Za-z0-9_-]{8,}|xox[abeprs]-[A-Za-z0-9-]{10,}"
+                         r"|AKIA[A-Z0-9]{16}|AIza[A-Za-z0-9_-]{30,}|eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,})")
 URL_IN_TEXT = re.compile(r"[A-Za-z][A-Za-z0-9+.-]*://[^\s\"'<>`]+")
 ASSIGN = re.compile(r"([A-Za-z_][A-Za-z0-9_]*)=(.*)", re.S)
 ENV_NAME = re.compile(r"[A-Z_][A-Z0-9_]*")
 FLAG = re.compile(r"-{1,2}[A-Za-z][A-Za-z0-9_.-]*")
 FLAG_VALUE = re.compile(r"(-{1,2}[A-Za-z][A-Za-z0-9_.-]*)=(.*)", re.S)
+# Options whose values name what is deleted (label selectors, namespaces, contexts). A label key such
+# as `authz` is not a credential, and hiding it would leave a backup command that cannot work.
+NAME_FLAGS = {"-l", "--selector", "--field-selector", "-n", "--namespace", "--context", "--kube-context"}
 # Variables that name a target, not a credential. Every other environment
 # assignment in front of a command is printed as NAME=***.
 SHOWN_ENV = {"TF_WORKSPACE", "TF_DATA_DIR", "KUBECONFIG", "HELM_NAMESPACE", "HELM_KUBECONTEXT",
@@ -70,8 +74,11 @@ CONTROL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f\u200b-\u200f\u2028\u2029\u20
 
 
 def clean(text, limit: int = 300) -> str:
-    """Text made safe to print on one line: no control or bidi characters, bounded."""
-    t = re.sub(r"\s+", " ", CONTROL.sub(" ", str(text))).strip()
+    """Text made safe to print on one line: no control or bidi characters, bounded.
+
+    Runs of spaces are kept: a quoted path such as '/srv/two  spaces' must reach the reader as it is.
+    """
+    t = re.sub(r"[\t\n\r\f\v]", " ", CONTROL.sub(" ", str(text))).strip()
     return t if len(t) <= limit else t[:limit - 3].rstrip() + "..."
 
 
@@ -92,10 +99,15 @@ def mask_text(text: str) -> str:
     return TOKEN_SHAPE.sub("***", URL_IN_TEXT.sub(lambda m: mask_url(m.group(0)), str(text)))
 
 
-def mask_word(w: str, env_prefix: bool = False) -> str:
+def mask_word(w: str, env_prefix: bool = False, names: bool = False) -> str:
+    """One word as it may be printed; with `names`, the value of an option in NAME_FLAGS."""
+    if names:
+        return mask_text(w)
     m = FLAG_VALUE.fullmatch(w)
     if m:  # --flag=value, -var=name=value
         flag, val = m.groups()
+        if flag in NAME_FLAGS:
+            return flag + "=" + mask_text(val)
         key = val.split("=", 1)[0] if "=" in val else ""
         if SECRET_WORD.search(flag) or (key and SECRET_WORD.search(key)) or TOKEN_SHAPE.search(val):
             return flag + "=***"
@@ -113,7 +125,7 @@ def mask_word(w: str, env_prefix: bool = False) -> str:
 
 def mask_words(words, tool: str = "", n_assign: int = 0) -> list[str]:
     """Words as they may be printed: credentials in URLs, flags and assignments replaced by ***."""
-    out, hide_next = [], False
+    out, hide_next, name_next = [], False, False
     for k, w in enumerate(str(x) for x in words):
         if hide_next and not w.startswith("-"):
             out.append("***")
@@ -123,8 +135,9 @@ def mask_words(words, tool: str = "", n_assign: int = 0) -> list[str]:
             out.append("-p***")
             hide_next = False
             continue
-        out.append(mask_word(w, env_prefix=k < n_assign))
+        out.append(mask_word(w, env_prefix=k < n_assign, names=name_next))
         hide_next = bool(FLAG.fullmatch(w) and SECRET_WORD.search(w))  # `--token VALUE`
+        name_next = w in NAME_FLAGS  # `-l authz=on`
     return out
 
 
@@ -144,24 +157,82 @@ PLAIN_CONTEXT = re.compile(r"[A-Za-z0-9_.:/@+-]{1,253}")
 PLAIN_REF = re.compile(r"[A-Za-z0-9_./@+-]{1,200}")
 
 
+# In the line itself, a command substitution becomes this one word: its value is known only when it
+# runs. The `$` makes every target it reaches unresolved; the substitution is analysed on its own.
+SUBSTITUTION = "$(...)"
+SPAN_KINDS = ("sub", "bt")
+ANSI_C_ESCAPE = re.compile(r"\\(?:([abeEfnrtv\\'\"?])|x([0-9A-Fa-f]{1,2})|u([0-9A-Fa-f]{1,4})|U([0-9A-Fa-f]{1,8})"
+                           r"|([0-7]{1,3})|c(.))", re.S)
+ANSI_C_SIMPLE = {"a": "\a", "b": "\b", "e": "\x1b", "E": "\x1b", "f": "\f", "n": "\n", "r": "\r", "t": "\t",
+                 "v": "\v"}
+
+
+def _ansi_c(text: str, i: int):
+    """Bash's $'...' read from text[i], just after the opening quote: (the string, index after it)."""
+    out, n = [], len(text)
+    while i < n:
+        c = text[i]
+        if c == "'":
+            return "".join(out), i + 1
+        m = ANSI_C_ESCAPE.match(text, i) if c == "\\" else None
+        if m is None:
+            out.append(c)
+            i += 1
+            continue
+        simple, x, u, big_u, octal, ctl = m.groups()
+        try:
+            if simple is not None:
+                out.append(ANSI_C_SIMPLE.get(simple, simple))
+            elif ctl is not None:
+                out.append(chr(ord(ctl) & 0x1F))
+            elif octal is not None:
+                out.append(chr(int(octal, 8)))
+            else:
+                out.append(chr(int(x or u or big_u, 16)))
+        except (ValueError, OverflowError):
+            out.append(m.group(0))
+        i = m.end()
+    return "".join(out), n
+
+
 def _prepass(text: str, shell: str = "bash", body: bool = False):
-    """Heredoc bodies and comments out of a command line; substitutions noted.
+    """Heredoc bodies, comments, line continuations and substitutions out of a command line.
 
     Returns (line, bodies, spans): the line with each heredoc body removed and
     its delimiter replaced by a placeholder, a map placeholder -> (body, expands),
-    and the outermost `$(...)` and backtick spans, which run as command lines
-    of their own even inside double quotes. With `body`, `text` is a heredoc
-    body: quotes are literal, only substitutions count.
+    and the outermost `$(...)`, backtick and `<(...)` spans, which run as command
+    lines of their own even inside double quotes. In the line, each span becomes
+    the one word SUBSTITUTION, so the command around it stays whole. Bash's
+    `$'...'` is decoded; a PowerShell script block `{ ... }` is read as commands
+    of the line. With `body`, `text` is a heredoc body: quotes are literal, only
+    substitutions count.
     """
     posix, ps = shell == "bash", shell == "powershell"
     out, bodies, spans, pending = [], {}, [], []
-    stack = [["hd", 0]] if body else []  # [kind, start]: sq, dq, hd, sub, par, bt
+    # [kind, start, length of out when it opened]: sq, dq, hd, sub, bt, par, var (PowerShell ${...})
+    stack = [["hd", 0, 0]] if body else []
+    depth = 0  # sub and bt entries on the stack: counted, so that a deep nesting costs no rescans
     i, n = 0, len(text)
 
-    def close(i):
-        kind, start = stack.pop()
-        if kind in ("sub", "bt") and not any(k in ("sub", "bt") for k, _ in stack):
-            spans.append(text[start:i])
+    def push(kind, start):
+        nonlocal depth
+        stack.append([kind, start, len(out)])
+        depth += kind in SPAN_KINDS
+
+    def close(end) -> bool:
+        """Pop the innermost entry at text[end]; True when a whole substitution became one word."""
+        nonlocal depth
+        kind, start, mark = stack.pop()
+        if kind not in SPAN_KINDS:
+            return False
+        depth -= 1
+        if depth:
+            return False
+        spans.append(text[start:end])
+        del out[mark:]
+        quoted = bool(stack) and stack[-1][0] in ("dq", "hd")
+        out.append(SUBSTITUTION if quoted else "'" + SUBSTITUTION + "'")
+        return True
 
     while i < n:
         c = text[i]
@@ -173,44 +244,75 @@ def _prepass(text: str, shell: str = "bash", body: bool = False):
                 stack.pop()
             continue
         if c == "\\" and posix and i + 1 < n:
-            out.append(text[i:i + 2])
+            if text[i + 1] != "\n":  # backslash-newline joins two lines into one
+                out.append(text[i:i + 2])
             i += 2
             continue
-        if c == "`" and ps and i + 1 < n:  # PowerShell's escape character
-            out.append(text[i:i + 2])
-            i += 2
+        if c == "`" and ps and i + 1 < n:  # PowerShell's escape character; before a newline, a continuation
+            if text[i + 1] == "\n" or text.startswith("\r\n", i + 1):
+                out.append(" ")
+                i += 2 if text[i + 1] == "\n" else 3
+            else:
+                out.append(text[i:i + 2])
+                i += 2
             continue
         if top in ("dq", "hd"):
             if c == '"' and top == "dq":
                 stack.pop()
             elif text.startswith("$(", i):
-                stack.append(["sub", i + 2])
+                push("sub", i + 2)
                 out.append("$(")
                 i += 2
                 continue
             elif c == "`" and posix:
-                stack.append(["bt", i + 1])
+                push("bt", i + 1)
             out.append(c)
             i += 1
             continue
         if c == "'":
-            stack.append(["sq", i])
+            push("sq", i)
         elif c == '"':
-            stack.append(["dq", i])
+            push("dq", i)
         elif c == "`" and posix:
             if top == "bt":
                 close(i)
-            else:
-                stack.append(["bt", i + 1])
-        elif text.startswith("$(", i):
-            stack.append(["sub", i + 2])
-            out.append("$(")
+                i += 1
+                continue
+            push("bt", i + 1)
+        elif text.startswith("$(", i) or (posix and c in "<>" and text.startswith("(", i + 1)):
+            push("sub", i + 2)  # a command substitution, or a process substitution <(...) >(...)
+            out.append(text[i:i + 2])
             i += 2
             continue
+        elif posix and text.startswith("$'", i):
+            s, i = _ansi_c(text, i + 2)
+            out.append("'" + s.replace("'", "'\\''") + "'")
+            continue
+        elif posix and text.startswith('$"', i):
+            i += 1  # a translated string: only its quotes matter
+            continue
+        elif ps and c == "{":
+            if i and text[i - 1] == "$":
+                push("var", i)  # ${name} is a variable, not a script block
+                out.append(c)
+            else:
+                out.append(" ; ")  # a script block's commands are read like the line's own
+            i += 1
+            continue
+        elif ps and c == "}":
+            if top == "var":
+                stack.pop()
+                out.append(c)
+            else:
+                out.append(" ; ")
+            i += 1
+            continue
         elif c == "(" and top in ("sub", "par"):
-            stack.append(["par", i])
+            push("par", i)
         elif c == ")" and top in ("sub", "par"):
-            close(i)
+            if close(i):
+                i += 1
+                continue
         elif c == "#" and (i == 0 or text[i - 1] in " \t\n;&|()"):
             j = text.find("\n", i)  # a comment runs to the end of its line
             i = n if j < 0 else j
@@ -246,10 +348,11 @@ def _prepass(text: str, shell: str = "bash", body: bool = False):
         out.append(c)
         i += 1
     while stack:  # unterminated: what is open still runs
-        kind, start = stack[-1]
-        if kind in ("sub", "bt") and not any(k in ("sub", "bt") for k, _ in stack[:-1]):
-            spans.append(text[start:])
-        stack.pop()
+        kind, start, _ = stack.pop()
+        if kind in SPAN_KINDS:
+            if depth == 1:
+                spans.append(text[start:])
+            depth -= 1
     return "".join(out), bodies, spans
 
 
@@ -350,12 +453,27 @@ WRAPPERS = {
     "builtin": set(),
     "xargs": {"-I", "-L", "-n", "-P", "-s", "-d", "-E", "-a", "--max-args", "--max-procs", "--delimiter",
               "--arg-file", "--max-lines", "--max-chars", "--eof"},
+    "caffeinate": {"-t", "-w"}, "setsid": set(), "chronic": set(), "unbuffer": set(), "busybox": set(),
+    "noglob": set(), "nocorrect": set(),
 }
+# Programs that run a command with credentials or settings of their own: name -> the subcommand that
+# does it ("" when the program takes the command directly). The backup needs the same credentials,
+# so the printed backup command runs inside the same program.
+RUNNERS = {"aws-vault": "exec", "doppler": "run", "op": "run", "infisical": "run", "chamber": "exec",
+           "saml2aws": "exec", "dotenvx": "run", "teller": "run", "berglas": "exec", "direnv": "exec",
+           "dotenv": "", "summon": ""}
 KEYWORDS = {"if", "then", "else", "elif", "fi", "do", "done", "while", "until", "!", "{", "}"}
-SHELLS = {"bash", "sh", "zsh", "dash", "ksh", "mksh", "ash"}
+SHELLS = {"bash", "sh", "zsh", "dash", "ksh", "mksh", "ash", "fish"}
 PWSH = {"powershell", "pwsh"}
 CD = {"cd", "pushd", "chdir", "set-location", "sl", "push-location"}
 EVAL = {"eval", "iex", "invoke-expression"}
+WATCH_VALUE = {"-n", "--interval", "-q", "--equexit"}
+# PowerShell's Start-Process: its parameters that take a value, its switches, and their aliases.
+START_PROCESS = {"start-process", "saps", "start"}
+SP_VALUE = ("filepath", "argumentlist", "workingdirectory", "verb", "windowstyle", "redirectstandardoutput",
+            "redirectstandarderror", "redirectstandardinput", "credential", "environment")
+SP_SWITCH = ("wait", "nonewwindow", "passthru", "loaduserprofile", "usenewenvironment")
+SP_ALIAS = {"path": "filepath", "pspath": "filepath", "lp": "filepath", "args": "argumentlist"}
 
 
 class _Line:
@@ -367,22 +485,24 @@ class _Line:
         self.vars = {}  # assigned without export: a child process does not see them
         self.tf_ws = {}  # directory -> workspace selected on this line
         self.plans = set()  # plan files written by `plan -destroy -out=...` on this line
+        self.prefix = []  # the RUNNERS words a nested command line runs inside
         # Shared by every copy, subshells included: after any `cd` on the line, where a
         # substitution runs is not certain.
         self.moved = moved if moved is not None else [False]
 
     def copy(self) -> "_Line":
         c = _Line(self.cwd, self.env, self.moved)
-        c.vars, c.tf_ws, c.plans = dict(self.vars), dict(self.tf_ws), set(self.plans)
+        c.vars, c.tf_ws, c.plans, c.prefix = dict(self.vars), dict(self.tf_ws), set(self.plans), list(self.prefix)
         return c
 
 
 class _Ctx:
     """One simple command that runs a tool."""
 
-    def __init__(self, line, cwd, env_local, cleared, stdin_args, exe, words, shell):
+    def __init__(self, line, cwd, env_local, cleared, stdin_args, exe, words, shell, prefix=()):
         self.line, self.cwd, self.env_local, self.cleared = line, cwd, env_local, cleared
         self.stdin_args, self.exe, self.words, self.shell = stdin_args, exe, words, shell
+        self.prefix = list(prefix)
 
     def env(self) -> dict:
         env = {} if self.cleared else dict(os.environ)
@@ -470,6 +590,7 @@ def _command(it, prev, line: _Line, bodies, shell: str, depth: int) -> list[dict
             line.env[m.group(1)] = value
         return []
     env_local, cwd, cleared, stdin_args, i = {}, line.cwd, False, False, 0
+    prefix = list(line.prefix)
     while i < len(words):
         w = words[i]
         m = ASSIGN.fullmatch(w)
@@ -478,6 +599,13 @@ def _command(it, prev, line: _Line, bodies, shell: str, depth: int) -> list[dict
             i += 1
             continue
         name = _basename(w)
+        if name in RUNNERS:
+            k = _runner_start(name, words[i + 1:])
+            if k is None:
+                break
+            prefix += words[i:i + 1 + k]
+            i += 1 + k
+            continue
         if name not in WRAPPERS:
             break
         i += 1
@@ -493,6 +621,11 @@ def _command(it, prev, line: _Line, bodies, shell: str, depth: int) -> list[dict
                 cleared = True
             elif name == "env" and key in ("-u", "--unset"):
                 env_local[val] = None
+            elif name == "env" and key in ("-S", "--split-string"):
+                try:  # `env -S 'terraform destroy'` splits the string into the words that run
+                    words[i + 1:i + 1] = shlex.split(val)
+                except ValueError:
+                    pass
             i += 1
         if name == "timeout" and i < len(words) and re.fullmatch(r"[0-9.]+[smhd]?", words[i]):
             i += 1  # the duration
@@ -509,7 +642,7 @@ def _command(it, prev, line: _Line, bodies, shell: str, depth: int) -> list[dict
         return []
     exe, args = words[i], words[i + 1:]
     tool = _basename(exe)
-    ctx = _Ctx(line, cwd, env_local, cleared, stdin_args, exe, words[i:], shell)
+    ctx = _Ctx(line, cwd, env_local, cleared, stdin_args, exe, words[i:], shell, prefix)
 
     if tool in CD:
         target = _cd_target(tool, args)
@@ -529,11 +662,16 @@ def _command(it, prev, line: _Line, bodies, shell: str, depth: int) -> list[dict
 
     stdin = _stdin_texts(it, prev, bodies)
     nested = _nested_scripts(tool, args, stdin, shell)
+    workdir = None
+    if nested is None and shell == "powershell" and tool in START_PROCESS:
+        started = _start_process(args)
+        nested, workdir = ([(started[0], "powershell")], started[1]) if started else ([], None)
     if nested is not None:
         ops = []
         child = line.copy()
-        child.cwd = cwd
+        child.cwd = cwd if workdir is None else _join(cwd, workdir)
         child.env.update(env_local)
+        child.prefix = prefix
         for script, sh in nested:
             ops += analyse(script, sh, None, child.copy(), depth + 1)
         return ops
@@ -543,21 +681,74 @@ def _command(it, prev, line: _Line, bodies, shell: str, depth: int) -> list[dict
     return parser(ctx, tool, args, stdin)
 
 
-def _stdin_texts(it, prev, bodies) -> list[str]:
-    """What a command reads on standard input, when the line itself spells it out."""
+def _redirect_texts(it, bodies) -> list[str]:
+    """The heredocs and here-strings a command's own redirections feed it."""
     texts = []
     for op, target in it["redirects"]:
         if op == "<<" and target in bodies:
             texts.append(bodies[target][0])
         elif op == "<<<":
             texts.append(target)
+    return texts
+
+
+def _stdin_texts(it, prev, bodies) -> list[str]:
+    """What a command reads on standard input, when the line itself spells it out."""
+    texts = _redirect_texts(it, bodies)
     if it["piped"] and isinstance(prev, dict) and prev["words"]:
         first, rest = _basename(prev["words"][0]), prev["words"][1:]
         if first == "echo":
             texts.append(" ".join(a for a in rest if not re.fullmatch(r"-[neE]+", a)))
         elif first == "printf" and rest:
             texts.append(rest[0].replace("\\n", "\n"))
+        elif first == "cat" and all(a.startswith("-") for a in rest):  # `cat <<EOF | sh` passes its heredoc on
+            texts += _redirect_texts(prev, bodies)
     return texts
+
+
+def _known(name: str) -> bool:
+    """A command destroy-guard reads: a tool it parses, or something that runs one."""
+    return (name in PARSERS or name in SHELLS or name in PWSH or name in WRAPPERS or name in RUNNERS
+            or name in EVAL or name in ("cmd", "watch"))
+
+
+def _runner_start(name: str, args: list[str]):
+    """Where the command a RUNNERS program runs starts among its arguments, or None when it runs none."""
+    sub, j = RUNNERS[name], 0
+    if sub:
+        if not args or args[0] != sub:
+            return None
+        j = 1
+    if "--" in args[j:]:
+        k = args.index("--", j) + 1
+        return k if k < len(args) else None
+    return next((k for k in range(j, len(args)) if _known(_basename(args[k]))), None)
+
+
+def _start_process(args: list[str]):
+    """PowerShell's Start-Process: (the command line it starts, its -WorkingDirectory or None), or None."""
+    named, pos, j = {}, [], 0
+    while j < len(args):
+        a = args[j]
+        if a.startswith("-") and len(a) > 1:
+            key, colon, val = a[1:].partition(":")
+            key = key.lower()
+            found = [p for p in SP_VALUE + SP_SWITCH if p.startswith(key)]
+            full = SP_ALIAS.get(key) or (key if key in SP_VALUE + SP_SWITCH else found[0] if len(found) == 1 else "")
+            if full in SP_VALUE:
+                if not colon:
+                    val = args[j + 1] if j + 1 < len(args) else ""
+                    j += 1
+                named[full] = val
+        else:
+            pos.append(a)
+        j += 1
+    program = named.get("filepath") or (pos[0] if pos else "")
+    if not program:
+        return None
+    arglist = named.get("argumentlist", pos[1] if len(pos) > 1 else "")
+    words = [program] + [w for part in arglist.split(",") for w in part.split()]  # `'destroy','-auto-approve'`
+    return shlex.join(words), named.get("workingdirectory")
 
 
 def _nested_scripts(tool: str, args: list[str], stdin: list[str], shell: str):
@@ -570,7 +761,8 @@ def _nested_scripts(tool: str, args: list[str], stdin: list[str], shell: str):
                 j += 2
                 continue
             if not a.startswith("--") and "c" in a[1:]:
-                return [(args[j + 1], "bash")] if j + 1 < len(args) else []
+                k = j + 1 + (args[j + 1:j + 2] == ["--"])  # `bash -c -- 'script'`
+                return [(args[k], "bash")] if k < len(args) else []
             j += 1
         if j < len(args) and args[j] not in ("-", "--"):
             return []  # a script file: not read
@@ -594,6 +786,12 @@ def _nested_scripts(tool: str, args: list[str], stdin: list[str], shell: str):
         return []
     if tool in EVAL:
         return [(" ".join(args), shell)] if args else []  # eval joins its words with spaces and parses again
+    if tool == "watch":  # watch passes its words, joined, to `sh -c` and runs them again and again
+        j = 0
+        while j < len(args) and args[j].startswith("-") and args[j] != "--":
+            j += 2 if args[j] in WATCH_VALUE else 1
+        j += args[j:j + 1] == ["--"]
+        return [(" ".join(args[j:]), "bash")] if j < len(args) else []
     return None
 
 
@@ -1267,6 +1465,16 @@ def _sql(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
 PARSERS = {"terraform": _terraform, "tofu": _terraform, "kubectl": _kubectl, "helm": _helm, "git": _git,
            "psql": _sql, "mysql": _sql, "mariadb": _sql, "dropdb": _sql, "mysqladmin": _sql}
 QUICK = re.compile(r"(?i)terraform|tofu|kubectl|helm|git|psql|mysql|mariadb|dropdb")
+QUOTES_AND_ESCAPES = re.compile(r"[\\'\"`]")
+
+
+def quick(command: str) -> bool:
+    """Whether a command line may run one of the tools: the hook's cheap first test.
+
+    A shell drops quotes and escapes inside a word (`terr''aform`, `ku\\bectl`), so the test also runs
+    on the line without them; `$'...'` can spell a name in escapes, so a line with it is always read.
+    """
+    return "$'" in command or bool(QUICK.search(command) or QUICK.search(QUOTES_AND_ESCAPES.sub("", command)))
 
 
 # ---------------------------------------------------------------- store and manifests

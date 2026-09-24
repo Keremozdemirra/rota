@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _support import PLACEHOLDERS, Isolated, build_fixture_db, eu_ets, fixture_rows  # noqa: E402
+from _support import PLACEHOLDERS, WITHHELD_LEI, Isolated, build_fixture_db, eu_ets, fixture_rows  # noqa: E402
 
 VOEST = "529900FGOWZKLBZ81V67"  # voestalpine Stahl GmbH at GLEIF; three installations in the fixtures
 
@@ -188,6 +188,18 @@ class ReviewRegressions(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.env.__exit__()
+
+    def test_a_withheld_installation_shows_no_lei_and_its_lei_finds_nothing(self):
+        # Second review: the LEI of a withheld name links to a GLEIF record that names the holder.
+        h = self.ds.installation_history("DE-990001")["installation"]
+        self.assertEqual((h["name"], h["lei"], h["lei_registered"], h["lei_check_digits_ok"]), (eu_ets.WITHHELD, None, None, None))
+        r = self.ds.company_by_lei(WITHHELD_LEI)
+        self.assertEqual((r["found"], r["installations_count"]), (False, 0))
+        self.assertIn("LEI", eu_ets.WITHHELD_NOTE)
+        self.assertIn(eu_ets.WITHHELD_NOTE, self.ds.installation_history("DE-990001")["notes"])
+        for row in self.ds.search_installations("", country="DE", limit=100)["installations"]:
+            if row.get("name_withheld"):
+                self.assertIsNone(row["lei"], row["installation_id"])
 
     def test_search_shows_null_not_zero_for_a_year_without_value(self):
         r = self.ds.search_installations("voestalpine kokerei", country="AT")

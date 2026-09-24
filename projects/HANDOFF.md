@@ -66,7 +66,7 @@ licences, packaging from the sdist, CI pins); every finding was fixed with a reg
 | 102 | `102-pkg-vitals` → `pkg-vitals` | Check an npm or PyPI package before a coding agent installs it: does the name exist, is it brand new, deprecated or yanked, is its repository archived? | CLI, plugin with hook | 173 |
 | 103 | `103-awesome-vitals` → `awesome-vitals` | Check every GitHub repository linked from a Markdown list: archived, gone, renamed, abandoned or unlicensed entries, with line numbers. | CLI, GitHub Action | 90 |
 | 104 | `104-eu-ets-mcp` → `eu-ets-mcp` | EU ETS installations from the Union Registry: verified emissions, free allocation and surrendered units by installation, LEI, country or sector. | MCP server, CLI | (fixing) |
-| 105 | `105-eu-taxonomy-mcp` → `eu-taxonomy-mcp` | EU Taxonomy activities, NACE codes and technical screening criteria, from a dated snapshot of the EU Taxonomy Navigator. | MCP server, CLI | (fixing) |
+| 105 | `105-eu-taxonomy-mcp` → `eu-taxonomy-mcp` | EU Taxonomy activities, NACE codes and technical screening criteria, from a dated snapshot of the EU Taxonomy Navigator. | MCP server, CLI | 95 |
 | 107 | `107-cbam-mcp` → `cbam-mcp` | EU CBAM scope, default values and CN descriptions from dated official sources. | MCP server, CLI | 135 |
 | 108 | `108-xlsx-review` → `xlsx-review` | A pull-request-style review for spreadsheets: formula-level diffs of .xlsx files and the edits that usually break models. | MCP server, CLI, plugin | 84 |
 | 110 | `110-financed-emissions` → `financed-emissions` | Financed emissions (Scope 3 category 15) by the PCAF Part A methods, with the arithmetic shown for every position. | MCP server, CLI | 163 |

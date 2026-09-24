@@ -9,7 +9,7 @@ import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _support import FILES, FIXTURES, PLACEHOLDERS, eu_ets, gz  # noqa: E402
+from _support import FILES, FIXTURES, PLACEHOLDERS, WITHHELD_LEI, eu_ets, gz  # noqa: E402
 
 
 def operators():
@@ -41,6 +41,26 @@ class Operators(unittest.TestCase):
         self.assertEqual(st.withheld, 10)
         kept = next(r for r in rows if r["installation_id"] == 232740)  # "Tropic 4 Limited"
         self.assertEqual(kept["name_withheld"], 0)
+
+    def test_a_withheld_name_takes_the_holders_lei_with_it(self):
+        rows, st = operators()
+        by = {(r["registry"], r["installation_id"]): r for r in rows}
+        sole = by[("DE", 990001)]
+        self.assertEqual((sole["name_withheld"], sole["lei"], sole["lei_registered"], sole["lei_ok"]), (1, None, None, None))
+        self.assertEqual(st.as_dict()["leis_withheld"], 1)
+        self.assertEqual(by[("AT", 16)]["lei"], "529900FGOWZKLBZ81V67")  # a shown name keeps its LEI
+        self.assertFalse(any(r["lei"] for r in rows if r["name_withheld"]))
+        # A snapshot written before this rule could still pair the two; reading it drops the LEI too.
+        head = ",".join(eu_ets.OPERATOR_COLUMNS)
+        row = {c: "" for c in eu_ets.OPERATOR_COLUMNS}
+        row.update(REGISTRY_CODE="DE", REGISTRY_NAME="Germany", INSTALLATION_IDENTIFIER="990001",
+                   INSTALLATION_NAME=eu_ets.WITHHELD, ACTIVITY_TYPE_CODE="20", ACCOUNT_HOLDER_LEI=WITHHELD_LEI)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "installations.csv.gz"
+            path.write_bytes(gz(head + "\n" + ",".join(row.values()) + "\n"))
+            st = eu_ets.Stats("snapshot")
+            (r,) = eu_ets.read_operators(path, st, source="snapshot")
+        self.assertEqual((r["name_withheld"], r["lei"], r["lei_registered"], st.leis_withheld), (1, None, None, 1))
 
     def test_control_and_bidi_characters_are_stripped(self):
         rows, _ = operators()

@@ -41,10 +41,12 @@ import os
 import platform
 import re
 import shutil
+import ssl
 import stat
 import subprocess
 import sys
 import tempfile
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -2032,14 +2034,29 @@ def _header(headers, name: str):
     return v
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """urllib's own handler copies the Authorization header into a redirected request, to any host and to
+    plain http. /user never redirects, so any redirect is refused and reported instead."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def _opener() -> urllib.request.OpenerDirector:
+    # ProxyHandler is added by build_opener and reads the environment's proxy settings; the context is explicit so
+    # that an interpreter patched to skip verification (PYTHONHTTPSVERIFY=0) still verifies.
+    return urllib.request.build_opener(urllib.request.HTTPSHandler(context=ssl.create_default_context()),
+                                       _NoRedirect())
+
+
 def probe_one(token: str, sources: list, timeout: float) -> dict:
     r = {"sources": sources, "token_type": token_type(token)}
     req = urllib.request.Request(GITHUB_USER_API, headers={
-        "Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28", "User-Agent": UA})
+        "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28", "User-Agent": UA})
+    req.add_unredirected_header("Authorization", f"Bearer {token}")
     body, headers = b"", None
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        with _opener().open(req, timeout=timeout) as resp:
             status = getattr(resp, "status", None) or 200
             headers = resp.headers
             body = resp.read(65536) or b""
@@ -2054,7 +2071,8 @@ def probe_one(token: str, sources: list, timeout: float) -> dict:
         return r
     if status != 200:
         limited = _header(headers, "X-RateLimit-Remaining") == "0"
-        r.update(result=f"GitHub answered {status}" + (" (rate limit)" if limited else ""), checked=False)
+        r.update(result=f"GitHub answered {status}" + (" (rate limit)" if limited else "")
+                 + (" (a redirect, not followed)" if 300 <= status < 400 else ""), checked=False)
         return r
     r.update(checked=True, valid=True, result="valid")
     try:
@@ -2084,7 +2102,7 @@ def probe_github(ctx: Context, timeout: float = 10.0) -> dict:
     tokens = dict(ctx.github_tokens)
     out = {"endpoint": GITHUB_USER_API, "results": []}
     if urllib.request.getproxies().get("https"):
-        # seen in a hosted sandbox: its proxy replaced the Authorization header with the session's own credential
+        # a proxy that terminates TLS can add or replace the Authorization header before GitHub sees it
         out["note"] = ("Sent through the HTTPS proxy set in the environment. A proxy that adds its own GitHub "
                        "credentials changes what GitHub answers, and the scopes shown would then be the proxy's.")
     if not tokens:
