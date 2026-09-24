@@ -40,8 +40,12 @@ class QueryTest(unittest.TestCase):
         self.assertEqual(r["activities"], [{"code": 24, "label": "Production of pig iron or steel"}])
         self.assertEqual(self.ds.search_installations("linz", country="at")["matches"], 3)
         self.assertEqual(self.ds.search_installations("", activity="22,24")["matches"], 4)
-        r = self.ds.search_installations("duisburg", limit="1")
-        self.assertEqual((r["matches"], r["returned"], r["installations"][0]["installation_id"]), (2, 1, 69))
+        for limit in ("1", 1.0):
+            r = self.ds.search_installations("duisburg", limit=limit)
+            self.assertEqual((r["matches"], r["returned"], r["installations"][0]["installation_id"]), (2, 1, 69))
+        with self.assertRaises(eu_ets.UsageError):
+            self.ds.search_installations("duisburg", limit=1.5)
+        self.assertTrue(self.ds.installation_history(69.0, "DE")["found"])
 
     def test_search_empty_result_and_bad_arguments(self):
         self.assertEqual(self.ds.search_installations("no such works")["matches"], 0)

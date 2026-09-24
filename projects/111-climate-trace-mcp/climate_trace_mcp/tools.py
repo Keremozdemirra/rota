@@ -15,7 +15,7 @@ from datetime import date, datetime, timezone
 from . import countries
 from . import provenance as prov
 from .client import ApiError, BadPayload, Client
-from .safety import clean, fold
+from .safety import clean, echo, fold
 
 # Year limits from the OpenAPI document 7.2.0 (checked 2026-09-24):
 # /v7/sources "Annual data is available for 2021 through the current year";
@@ -46,6 +46,11 @@ def _utc_today() -> date:
     return datetime.now(timezone.utc).date()
 
 
+def _list(value) -> list:
+    """A list field as a list; anything else (drift, null) as empty."""
+    return value if isinstance(value, list) else []
+
+
 # ------------------------------------------------------------------ arguments
 
 def _int(value, name: str, lo: int, hi: int) -> int:
@@ -58,7 +63,7 @@ def _int(value, name: str, lo: int, hi: int) -> int:
     elif isinstance(value, str) and re.fullmatch(r"\s*\d{1,13}\s*", value):
         n = int(value)
     else:
-        raise ToolError("%s must be an integer, got %s" % (name, clean(repr(value), 40)))
+        raise ToolError("%s must be an integer, got %s" % (name, echo(repr(value), 40)))
     if not lo <= n <= hi:
         raise ToolError("%s must be between %d and %d, got %d" % (name, lo, hi, n))
     return n
@@ -104,7 +109,7 @@ def _slug(value, name: str) -> str:
         raise ToolError("%s must be a string" % name)
     s = value.strip().lower().replace("_", "-").replace(" ", "-")
     if not _SLUG.match(s) or len(s) > 80:
-        raise ToolError("%s %r is not a valid name; see the sectors tool" % (name, clean(value, 60)))
+        raise ToolError("%s %r is not a valid name; see the sectors tool" % (name, echo(value)))
     return s
 
 
@@ -243,7 +248,7 @@ class Service:
         country = rec.get("country") if isinstance(rec.get("country"), str) and _A3.match(rec.get("country")) else None
         row = {
             "asset_id": aid,
-            "name": clean(rec.get("name"), 200) or None,
+            "name": clean(rec.get("name"), 200) if isinstance(rec.get("name"), str) else None,
             "country": country,
             "sector": rec.get("sector") if isinstance(rec.get("sector"), str) and _SLUG.match(rec.get("sector")) else None,
             "subsector": sub,
@@ -319,7 +324,7 @@ class Service:
     # ---------------------------------------------------------------- tools
     def search_assets(self, name=None, country=None, sector=None, subsector=None, year=None, limit=20) -> dict:
         today = self._today()
-        y = _int(year, "year", MIN_YEAR_ASSETS, today.year) if year is not None else today.year - 1
+        y = _int(year, "year", MIN_YEAR_ASSETS, today.year) if year is not None else max(MIN_YEAR_ASSETS, today.year - 1)
         lim = _int(limit, "limit", 1, PAGE)
         gas = "co2e_100yr"
         params = {"year": y, "gas": gas}
@@ -390,7 +395,7 @@ class Service:
         aid = _int(asset_id, "asset_id", 1, 10 ** 12)
         today = self._today()
         ys = _years(years, MIN_YEAR_ASSETS, today.year, today.year - MIN_YEAR_ASSETS + 1,
-                    list(range(MIN_YEAR_ASSETS, today.year)))
+                    list(range(MIN_YEAR_ASSETS, max(MIN_YEAR_ASSETS + 1, today.year))))
         g = _gas(gas)
         data, day = self.client.get("/sources/%d" % aid, {"start": min(ys), "end": max(ys),
                                                          "timeGranularity": "year", "gas": g})
@@ -403,14 +408,14 @@ class Service:
         dataset = prov.describe(self.snapshot, sub, g, "source")
         conf_key = prov.GASES[g]["confidence_key"]
         by_year = {}
-        for e in data.get("emissions") or []:
+        for e in _list(data.get("emissions")):
             if isinstance(e, dict) and isinstance(e.get("year"), int) and e["year"] in ys:
                 if e.get("gas") not in (None, g):
                     missing.append("emissions[%d].gas (the API answered %s)" % (e["year"], clean(e.get("gas"), 20)))
                     continue
                 by_year[e["year"]] = e
-        confidence = {c["year"]: c for c in data.get("confidence") or [] if isinstance(c, dict) and isinstance(c.get("year"), int)}
-        ranks = {r["year"]: r.get("rank") for r in data.get("subsectorRanks") or []
+        confidence = {c["year"]: c for c in _list(data.get("confidence")) if isinstance(c, dict) and isinstance(c.get("year"), int)}
+        ranks = {r["year"]: r.get("rank") for r in _list(data.get("subsectorRanks"))
                  if isinstance(r, dict) and isinstance(r.get("year"), int) and isinstance(r.get("rank"), int)}
         series = []
         for y in ys:
@@ -444,7 +449,8 @@ class Service:
             notes.append("subsector_rank_global is Climate TRACE's global rank of this asset within its subsector "
                          "(OpenAPI: \"for total CO2 emissions produced by the parent source/asset\").")
         country = data.get("country") if isinstance(data.get("country"), str) and _A3.match(data.get("country")) else None
-        out = {"tool": "asset", "asset_id": aid, "name": clean(data.get("name"), 200) or None,
+        out = {"tool": "asset", "asset_id": aid,
+               "name": clean(data.get("name"), 200) if isinstance(data.get("name"), str) else None,
                "country": country, "country_name": countries.name_of(country) if country else None,
                "sector": data.get("sector") if isinstance(data.get("sector"), str) and _SLUG.match(data.get("sector")) else None,
                "subsector": sub, "asset_type": clean(data.get("assetType"), 80) or None,
@@ -521,8 +527,8 @@ class Service:
 
         def block(name):
             b = data.get(name) if isinstance(data.get(name), dict) else {}
-            return ([s for s in b.get("summaries") or [] if isinstance(s, dict)],
-                    [t for t in b.get("timeseries") or [] if isinstance(t, dict)])
+            return ([s for s in _list(b.get("summaries")) if isinstance(s, dict)],
+                    [t for t in _list(b.get("timeseries")) if isinstance(t, dict)])
 
         tot_sums, tot_ts = block("totals")
         sec_sums, _ = block("sectors")
@@ -542,6 +548,10 @@ class Service:
                             "unexpected_response")
         total = next((s for s in tot_sums if s.get("gas") == g), None)
         months = sorted({t.get("month") for t in tot_ts if t.get("year") == y and isinstance(t.get("month"), int)})
+        if total is None and tot_sums:
+            return {"year": y, "total": None, "missing_fields": missing + ["totals for gas %s" % g],
+                    "note": "the API returned totals for another gas (%s), not %s; not reporting them" % (
+                        ", ".join(sorted(clean(t.get("gas"), 20) for t in tot_sums)), g)}
         if total is None or not months:
             got_value = total.get("emissionsQuantity") if total else None
             return {"year": y, "total": None,
@@ -590,7 +600,7 @@ class Service:
         aid = _int(asset_id, "asset_id", 1, 10 ** 12)
         today = self._today()
         # Same request as asset() with its defaults, so the two share one cached answer.
-        data, day = self.client.get("/sources/%d" % aid, {"start": MIN_YEAR_ASSETS, "end": today.year - 1,
+        data, day = self.client.get("/sources/%d" % aid, {"start": MIN_YEAR_ASSETS, "end": max(MIN_YEAR_ASSETS, today.year - 1),
                                                          "timeGranularity": "year", "gas": "co2e_100yr"})
         if data is None:
             raise ToolError("the API returned no record for asset %d" % aid, "not_found")

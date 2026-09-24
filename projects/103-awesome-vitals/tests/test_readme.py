@@ -66,8 +66,9 @@ class Review(unittest.TestCase):
                         mock.patch.dict(os.environ, {}, clear=False), redirect_stdout(out), redirect_stderr(io.StringIO()):
                     os.environ.pop("GITHUB_TOKEN", None)
                     os.environ.pop("GH_TOKEN", None)
-                    code = av.main(command.split()[2:] + ["--census", CENSUS], today=dt.date(2026, 9, 24),
-                                   api=server.url, proxies={})
+                    args = command.split()[2:]
+                    args[args.index("--"):args.index("--")] = ["--census", CENSUS]  # an option, so before --
+                    code = av.main(args, today=dt.date(2026, 9, 24), api=server.url, proxies={})
             finally:
                 os.chdir(cwd)
         self.assertEqual(out.getvalue().rstrip("\n").split("\n"), expected)

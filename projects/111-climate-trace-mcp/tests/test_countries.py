@@ -61,11 +61,19 @@ class ResolveTest(fx.HomeIsolated):
             with self.assertRaises(C.CountryError):
                 C.resolve(bad)
         with self.assertRaises(C.CountryError) as cm:
-            C.resolve("Germ\x1b[2Jany‮" + "x" * 500)
+            C.resolve("Germ\x1b[2Jany\u202e" + "x" * 500)
         msg = str(cm.exception)
         self.assertNotIn("\x1b", msg)
-        self.assertNotIn("‮", msg)
+        self.assertNotIn("\u202e", msg)
         self.assertLess(len(msg), 400)
+
+    def test_secrets_typed_by_mistake_are_not_echoed(self):
+        for typed, secret in (("https://user:pw123@example.org/?token=abc", "pw123"), ("--api-key=sk-live-999", "sk-live-999"),
+                              ("GITHUB_TOKEN=ghp_secretvalue", "ghp_secretvalue")):
+            with self.assertRaises(C.CountryError) as cm:
+                C.resolve(typed)
+            self.assertNotIn(secret, str(cm.exception))
+            self.assertIn("***", str(cm.exception))
 
     def test_table_shape(self):
         self.assertEqual(len(C.BY_ALPHA3), 251)

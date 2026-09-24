@@ -1,4 +1,4 @@
 include LICENSE README.md server.json
 recursive-include data *.py *.csv.gz *.json *.md
 recursive-include tests *.py *.json *.gz *.xlsx
-global-exclude __pycache__ *.pyc
+global-exclude *.py[co]

@@ -1099,8 +1099,8 @@ TOOLS = [
                     "periods, corroboration), state=reporting_exception (GLEIF's reason code such as "
                     "NO_KNOWN_PERSON, NATURAL_PERSONS or NON_CONSOLIDATING, with the LEI ROC's wording for those "
                     "three), or state=none_reported. For funds also fund_manager, umbrella_fund and master_fund "
-                    "when GLEIF links them. These are accounting parents, not beneficial owners. Three to eight "
-                    "GLEIF requests.",
+                    "when GLEIF links them. These are accounting parents, not beneficial owners. Typically three to "
+                    "seven GLEIF requests.",
      "inputSchema": {"type": "object", "properties": {"lei": _LEI_PROP}, "required": ["lei"]}},
     {"name": "lei_children",
      "description": "Entities that report this LEI to GLEIF as their direct (default) or ultimate "
@@ -1119,7 +1119,7 @@ TOOLS = [
                     "GLEIF record of the LEI FIRDS reports; direct_parent and ultimate_parent as in lei_parents; "
                     "for funds the fund manager, umbrella fund and the fund manager's ultimate parent. If GLEIF "
                     "cannot be reached the FIRDS part is still returned, with gleif_error. One ESMA request and "
-                    "two to eight GLEIF requests.",
+                    "typically three to nine GLEIF requests.",
      "inputSchema": {"type": "object", "properties": {"isin": _ISIN_PROP}, "required": ["isin"]}},
     {"name": "sources",
      "description": "Where the data comes from: endpoints, licences and terms with quotes, the attribution lines, "

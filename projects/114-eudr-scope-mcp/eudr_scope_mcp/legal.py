@@ -9,7 +9,7 @@ from __future__ import annotations
 import datetime as dt
 import re
 
-from .annex import DATE_RE, LQ, RQ, find_date, iso_date
+from .annex import DATE_RE, LQ, RQ, find_date, iso_date, strip_markers
 from .xhtml import Node, tidy
 
 _PARA = re.compile(r"^(\d+)\.\s*(.*)$")
@@ -26,7 +26,7 @@ def article_lines(root: Node, number: str) -> list:
     node = root.find_id(f"art_{number}")
     if node is None:
         raise LegalTextError(f"Article {number} (id art_{number}) not found")
-    lines = [tidy(line) for line in node.lines()]
+    lines = [x for x in (strip_markers(line) for line in node.lines()) if x]
     if not lines or lines[0] != f"Article {number}":
         raise LegalTextError(f"element art_{number} is not headed 'Article {number}'")
     return lines

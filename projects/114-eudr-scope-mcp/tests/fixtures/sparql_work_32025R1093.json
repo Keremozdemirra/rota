@@ -1,0 +1,81 @@
+{
+ "head": {
+  "link": [],
+  "vars": [
+   "p",
+   "o"
+  ]
+ },
+ "results": {
+  "distinct": false,
+  "ordered": true,
+  "bindings": [
+   {
+    "p": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_date_entry-into-force"
+    },
+    "o": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-05-26"
+    }
+   },
+   {
+    "p": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_eli"
+    },
+    "o": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+     "value": "http://data.europa.eu/eli/reg_impl/2025/1093/oj"
+    }
+   },
+   {
+    "p": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#resource_legal_in-force"
+    },
+    "o": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+     "value": "1"
+    }
+   },
+   {
+    "p": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#work_date_document"
+    },
+    "o": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-05-22"
+    }
+   },
+   {
+    "p": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#official-journal-act_date_publication"
+    },
+    "o": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-05-23"
+    }
+   },
+   {
+    "p": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/ontology/cdm#expression_title"
+    },
+    "o": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Commission Implementing Regulation (EU) 2025/1093 of 22 May 2025 laying down rules for the application of Regulation (EU) 2023/1115 of the European Parliament and of the Council as regards a list of countries that present a low or high risk of producing relevant commodities for which the relevant products do not comply with Article 3, point (a)"
+    }
+   }
+  ]
+ }
+}

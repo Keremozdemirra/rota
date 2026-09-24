@@ -115,6 +115,11 @@ Q_NAL_VERSION = """PREFIX owl: <http://www.w3.org/2002/07/owl#>
 SELECT ?v WHERE { <http://publications.europa.eu/resource/authority/country> owl:versionInfo ?v }"""
 
 
+# The authority table has about 250 current countries and territories; far
+# fewer means a truncated answer, not a smaller world. Tests lower it.
+MIN_COUNTRIES = 200
+
+
 class RefreshError(RuntimeError):
     pass
 
@@ -354,7 +359,7 @@ def build(today: str | None = None, log=lambda msg: None) -> dict:
     nal_alt = cellar.sparql(Q_NAL_ALT)
     nal_version = next((r["v"] for r in cellar.sparql(Q_NAL_VERSION) if r.get("v")), None)
     country_list = countries.build_countries(nal_rows, nal_alt)
-    if len(country_list) < 200:
+    if len(country_list) < MIN_COUNTRIES:
         raise RefreshError(f"authority table returned only {len(country_list)} countries")
     by_iso3 = {c["iso3"]: c for c in country_list}
 

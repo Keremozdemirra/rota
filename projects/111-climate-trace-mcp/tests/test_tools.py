@@ -108,6 +108,14 @@ class SearchAssetsTest(ToolTest):
         self.assertEqual(self.srv.paths(), ["/v7/definitions/sectors"])
         self.assertTrue(all("nonsense" not in str(r["query"]) for r in self.srv.requests))
 
+    def test_rejected_input_is_echoed_with_secrets_masked(self):
+        for kwargs in (dict(subsector="token=abc123"), dict(limit="--password hunter2"), dict(year="https://u:p4ss@x.org")):
+            with self.assertRaises(ToolError) as cm:
+                self.svc.search_assets(**kwargs)
+            for secret in ("abc123", "hunter2", "p4ss"):
+                self.assertNotIn(secret, cm.exception.message)
+        self.assertEqual(self.srv.requests, [])
+
     def test_new_subsector_in_the_live_list_is_accepted(self):
         self.srv.route("/definitions/subsectors", fx.Reply(fx.load_json("definitions_subsectors.json") + ["hydrogen-plants"]))
         self.srv.route("/sources", fx.fixture("null.json"), {"year": 2024, "gas": "co2e_100yr", "subsectors": "hydrogen-plants", "limit": 20})
@@ -206,6 +214,14 @@ class AssetTest(ToolTest):
         self.assertIn("IEA-EDGAR CO2", res["licence_note"])
         self.assertEqual(res["emissions"][0]["confidence"], "very low")
 
+    def test_wrong_typed_fields_are_drift_not_a_crash(self):
+        data = fx.load_json("source_1566771_2022-2024.json")
+        data.update(emissions=5, confidence="high", subsectorRanks={"2024": 1}, owners="Thyssenkrupp", name=["x"])
+        self.srv.route("/sources/1566771", fx.Reply(data), {"start": 2024, "end": 2024, "timeGranularity": "year", "gas": "co2e_100yr"})
+        res = self.svc.asset(1566771, years=2024)
+        self.assertEqual((res["emissions"], res["years_without_data"], res["owners"]), ([], [2024], []))
+        self.assertIsNone(res["name"])
+
     def test_not_found(self):
         with self.assertRaises(NotFound) as cm:
             self.svc.asset(999999999, years=2024)
@@ -285,6 +301,18 @@ class CountryEmissionsTest(ToolTest):
         self.assertNotIn("iron-and-steel", res["source_datasets"])  # own models are summarised, not repeated
         self.assertIn("FAOSTAT", res["external_dataset_terms"])
         self.assertTrue(any("forestry-and-land-use" in n for n in res["notes"]))
+
+    def test_totals_for_another_gas_or_of_the_wrong_type(self):
+        data = fx.load_json("emissions_POL_power_2024.json")
+        data["totals"]["summaries"][0]["gas"] = "co2"
+        self.srv.route("/sources/emissions", fx.Reply(data), {"year": 2024, "gas": "co2e_100yr", "gadmId": "POL", "sectors": "power"})
+        y = self.svc.country_emissions("POL", sector="power", years=2024)["years"][0]
+        self.assertIsNone(y["total"])
+        self.assertIn("another gas (co2)", y["note"])
+        data["totals"] = {"summaries": 7, "timeseries": "monthly"}
+        self.srv.route("/sources/emissions", fx.Reply(data), {"year": 2023, "gas": "co2e_100yr", "gadmId": "POL", "sectors": "power"})
+        y = self.svc.country_emissions("POL", sector="power", years=2023)["years"][0]
+        self.assertIsNone(y["total"])
 
     def test_answer_for_another_country_is_refused(self):
         data = fx.load_json("emissions_POL_power_2024.json")

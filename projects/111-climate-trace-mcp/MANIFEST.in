@@ -1,5 +1,6 @@
 include LICENSE README.md server.json
 recursive-include climate_trace_mcp/data *.json *.md
 recursive-include tests *.py *.json *.yaml
+recursive-include .github *.yml
 global-exclude *.pyc
 prune tests/__pycache__

@@ -20,6 +20,7 @@ def entries(*names):
 
 
 def check(server, *names, **kw):
+    kw.setdefault("sleep", lambda seconds: None)  # the one retry waits, the tests need not
     gh = av.GitHub(api=server.url, proxies={}, census_url=kw.pop("census_url", CENSUS), **kw)
     return gh, {r["repository"]: r for r in av.examine(entries(*names), gh, TODAY)}
 
@@ -96,7 +97,7 @@ class Fallback(unittest.TestCase):
     def test_secondary_rate_limit_429(self):
         with FakeGitHub({"/repos/n8n-io/n8n": "secondary.429.json"}) as server:
             gh, r = check(server, "n8n-io/n8n", "anthropics/skills")
-        self.assertEqual((gh.state, len(server.requests)), ("rate-limited", 1))
+        self.assertEqual((gh.state, len(server.requests)), ("rate-limited", 2))  # retry-after 60, one retry
         self.assertEqual(r["n8n-io/n8n"]["findings"], ["non-standard-licence"])
         self.assertEqual(r["anthropics/skills"]["findings"], ["no-licence"])
 
@@ -118,17 +119,17 @@ class Fallback(unittest.TestCase):
         self.assertEqual(r["anthropics/skills"]["source"], "census")
 
     def test_network_down(self):
-        gh = av.GitHub(api=f"http://127.0.0.1:{closed_port()}", proxies={}, census_url=CENSUS)
+        gh = av.GitHub(api=f"http://127.0.0.1:{closed_port()}", proxies={}, census_url=CENSUS, sleep=lambda s: None)
         r = {x["repository"]: x for x in av.examine(entries("BrowserMCP/mcp", "anthropics/skills"), gh, TODAY)}
-        self.assertEqual((gh.state, gh.requests), ("unreachable", 1))
+        self.assertEqual((gh.state, gh.requests), ("unreachable", 2))  # the first request and its one retry
         self.assertTrue(gh.stop_reason.startswith("GitHub API unreachable"))
         self.assertEqual(r["BrowserMCP/mcp"]["status"], "abandoned")
 
     def test_timeout(self):
         with FakeGitHub(delay=2.0) as server:
-            gh = av.GitHub(api=server.url, proxies={}, census_url=CENSUS, timeout=0.3)
+            gh = av.GitHub(api=server.url, proxies={}, census_url=CENSUS, timeout=0.3, sleep=lambda s: None)
             r = av.examine(entries("appcypher/awesome-mcp-servers", "BrowserMCP/mcp"), gh, TODAY)
-        self.assertEqual((gh.state, gh.requests), ("unreachable", 1))
+        self.assertEqual((gh.state, gh.requests), ("unreachable", 2))  # the first request and its one retry
         self.assertIn("timed out", gh.stop_reason)
         self.assertEqual(r[0]["findings"], ["archived", "no-licence"])
 

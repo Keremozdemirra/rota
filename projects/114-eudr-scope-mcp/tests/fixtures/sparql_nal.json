@@ -1,0 +1,571 @@
+{
+ "head": {
+  "link": [],
+  "vars": [
+   "c",
+   "a2",
+   "a3",
+   "pref",
+   "status",
+   "broader"
+  ]
+ },
+ "results": {
+  "distinct": false,
+  "ordered": true,
+  "bindings": [
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/AUT"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "AT"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "AUT"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Austria"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/BRA"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "BR"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "BRA"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Brazil"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/BUR"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "BU"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "BUR"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Burma"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/DEPRECATED"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/BLR"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "BY"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "BLR"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Belarus"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/COD"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "CD"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "COD"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Democratic Republic of the Congo"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/COG"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "CG"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "COG"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Congo"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/CIV"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "CI"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "CIV"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Côte d’Ivoire"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/CHN"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "CN"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "CHN"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "China"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/DEU"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "DE"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "DEU"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Germany"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/EUR"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "EU"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "European Union"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/FRA"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "FR"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "FRA"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "France"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/GUF"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "GF"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "GUF"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "French Guiana"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    },
+    "broader": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/FRA"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/HKG"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "HK"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "HKG"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Hong Kong"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/XIC"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "IC"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Canary Islands"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    },
+    "broader": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/ESP"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/IRN"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "IR"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "IRN"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Iran"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/PRK"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "KP"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "PRK"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "North Korea"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/MMR"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "MM"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "MMR"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Myanmar/Burma"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/NLD"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "NL"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "NLD"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Netherlands"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/RUS"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "RU"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "RUS"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Russia"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/SLB"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "SB"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "SLB"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Solomon Islands"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/TUR"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "TR"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "TUR"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Türkiye"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/USA"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "US"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "USA"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "United States"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/VNM"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "VN"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "VNM"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Viet Nam"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/YUG"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "YU"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "YUG"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Yugoslavia"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/DEPRECATED"
+    }
+   }
+  ]
+ }
+}

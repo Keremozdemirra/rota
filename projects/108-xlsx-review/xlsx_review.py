@@ -1302,13 +1302,34 @@ F_REFERR, F_STRUCT, F_EXTERNAL = 1, 2, 4
 
 
 class FInfo:
-    __slots__ = ("r1c1", "refs", "funcs", "flags")
+    __slots__ = ("r1c1", "_refs", "funcs", "flags", "base", "dr", "dc")
 
-    def __init__(self, r1c1, refs, funcs, flags):
+    def __init__(self, r1c1, refs, funcs, flags, base=None, dr=0, dc=0):
         self.r1c1 = r1c1
-        self.refs = refs      # [(Ref, counts as a dependency)]
+        self._refs = refs     # [(Ref, counts as a dependency)]
         self.funcs = funcs    # frozenset of function names, _xlfn. prefixes removed
         self.flags = flags
+        self.base = base      # a copy of a shared formula keeps its master's references, shifted on use
+        self.dr = dr
+        self.dc = dc
+
+    @property
+    def refs(self) -> list:
+        if self.base is None:
+            return self._refs
+        dr, dc = self.dr, self.dc
+        return [(shift_ref(ref, dr, dc), dep) for ref, dep in self.base._refs]
+
+
+def _shift_stays_on_grid(ref: Ref, dr: int, dc: int) -> bool:
+    k = ref.kind
+    if k in ("name", "error"):
+        return True
+    r1 = ref.r1 + (0 if ref.ra1 or k == "cols" else dr)
+    r2 = ref.r2 + (0 if ref.ra2 or k == "cols" else dr)
+    c1 = ref.c1 + (0 if ref.ca1 or k == "rows" else dc)
+    c2 = ref.c2 + (0 if ref.ca2 or k == "rows" else dc)
+    return 1 <= r1 <= MAX_ROW and 1 <= r2 <= MAX_ROW and 1 <= c1 <= MAX_COL and 1 <= c2 <= MAX_COL
 
 
 _EMPTY = frozenset()
@@ -1366,11 +1387,10 @@ def analyse(wb: Workbook) -> None:
                     fi = minfo
                 else:
                     dr, dc = r - mr, c - mc
-                    refs = [(shift_ref(ref, dr, dc), dep) for ref, dep in minfo.refs]
-                    if any(ref.kind == "error" for ref, _ in refs) and not (minfo.flags & F_REFERR):
-                        fi = _info(tokenize(cell.formula), r, c)
+                    if all(_shift_stays_on_grid(ref, dr, dc) for ref, _ in minfo._refs):
+                        fi = FInfo(minfo.r1c1, None, minfo.funcs, minfo.flags, minfo, dr, dc)
                     else:
-                        fi = FInfo(minfo.r1c1, refs, minfo.funcs, minfo.flags)
+                        fi = _info(tokenize(cell.formula), r, c)  # the copy falls off the grid: #REF!
             if fi is None:
                 fi = _info(tokenize(cell.formula), r, c)
             fi.r1c1 = patterns.setdefault(fi.r1c1, fi.r1c1)
@@ -1514,36 +1534,50 @@ def _tarjan(adj) -> list:
     return comps
 
 
+def _pack(si: int, r: int, c: int) -> int:
+    # rows < 2**21 and columns < 2**15 (MAX_ROW, MAX_COL): one int per cell keeps the graph small.
+    return (si << 36) | (r << 15) | c
+
+
+def _unpack(k: int):
+    return k >> 36, (k >> 15) & 0x1FFFFF, k & 0x7FFF
+
+
 def find_cycles(wb: Workbook) -> list:
     """Circular references: strongly connected groups of formula cells, following cell, range,
     cross-sheet, 3-D and defined-name references. Returns [(cells in the group, one path)]."""
     analyse(wb)
     nodes, ids = [], {}
     for s in wb.sheets:
+        si = s.index
         for (r, c), cell in s.cells.items():
             if cell.formula is not None or cell.member is not None:
-                ids[(s.index, r, c)] = len(nodes)
-                nodes.append((s.index, r, c))
+                k = _pack(si, r, c)
+                ids[k] = len(nodes)
+                nodes.append(k)
     n_real = len(nodes)
     if not n_real:
         return []
     adj = [[] for _ in range(n_real)]
     by_col: dict = {}
-    for (si, r, c), i in ids.items():
+    for k, i in ids.items():
+        si, r, c = _unpack(k)
         by_col.setdefault((si, c), []).append((r, i))
     colidx, cols_of = {}, {}
     for (si, c), lst in by_col.items():
         lst.sort()
         colidx[(si, c)] = ([r for r, _ in lst], [i for _, i in lst])
         cols_of.setdefault(si, []).append(c)
+    del by_col
     for v in cols_of.values():
         v.sort()
     trees = {}
-    for (si, r, c), i in ids.items():
+    for k, i in ids.items():
+        si, r, c = _unpack(k)
         sheet = wb.sheets[si]
         cell = sheet.cells[(r, c)]
         if cell.formula is None:
-            anchor = ids.get((si,) + cell.member)
+            anchor = ids.get(_pack(si, *cell.member))
             if anchor is not None:
                 adj[i].append(anchor)
             continue
@@ -1556,7 +1590,7 @@ def find_cycles(wb: Workbook) -> list:
                 continue
             for ts, r1, c1, r2, c2 in targets(wb, ref, si, r, c):
                 if r1 == r2 and c1 == c2:
-                    j = ids.get((ts, r1, c1))
+                    j = ids.get(_pack(ts, r1, c1))
                     if j is not None:
                         out.append(j)
                     continue
@@ -1573,13 +1607,14 @@ def find_cycles(wb: Workbook) -> list:
                         if tree is None:
                             tree = trees[(ts, col)] = _SegTree(cids, adj)
                         out.extend(tree.query(a, b))
+    del colidx, trees
     result = []
     for comp in _tarjan(adj):
-        real = sorted(nodes[x] for x in comp if x < n_real)
+        real = sorted(_unpack(nodes[x]) for x in comp if x < n_real)
         if not real:
             continue
         members = set(comp)
-        start = ids[real[0]]
+        start = ids[_pack(*real[0])]
         prev = {start: None}
         queue = deque([start])
         end = None
@@ -1598,7 +1633,7 @@ def find_cycles(wb: Workbook) -> list:
             path.append(v)
             v = prev[v]
         path.reverse()
-        cyc = [nodes[x] for x in path if x < n_real] + [nodes[start]]
+        cyc = [_unpack(nodes[x]) for x in path if x < n_real] + [_unpack(nodes[start])]
         result.append((real, cyc))
     result.sort()
     return result
@@ -1708,6 +1743,12 @@ def check(wb: Workbook) -> dict:
             found.append(_finding("ref-error-in-name", "error", wb.sheets[nm.scope].name if nm.scope is not None
                                   and nm.scope < len(wb.sheets) else None, name=nm.name, refers_to="=" + nm.formula))
 
+    for nm in wb.names:
+        missing = _missing_sheets(wb, nm.refs())
+        if missing:
+            found.append(_finding("missing-sheet-reference", "error", None, name=nm.name, sheets=missing,
+                                  formula="=" + nm.formula))
+
     volatile: dict = {}
     structured = []
     no_cache = 0
@@ -1729,6 +1770,10 @@ def check(wb: Workbook) -> dict:
                 continue
             if fi.flags & F_REFERR:
                 found.append(_finding("ref-error", "error", s.name, r, c, formula="=" + cell.formula))
+            missing = _missing_sheets(wb, fi.base._refs if fi.base is not None else fi._refs)
+            if missing:
+                found.append(_finding("missing-sheet-reference", "error", s.name, r, c, sheets=missing,
+                                      formula="=" + cell.formula))
             if fi.flags & F_STRUCT:
                 structured.append(where(s.name, r, c))
             if fi.flags & F_EXTERNAL:
@@ -1774,6 +1819,18 @@ def check(wb: Workbook) -> dict:
     sheet_order = {s.name: s.index for s in wb.sheets}
     found.sort(key=lambda f: (order[f["severity"]], f["code"], sheet_order.get(f["sheet"], -1), f["pos"] or (0, 0)))
     return {"workbook": _wb_summary(wb), "findings": found, "problems": list(wb.problems)}
+
+
+def _missing_sheets(wb: Workbook, refs) -> list:
+    """Sheet names a formula refers to that the workbook does not have (Excel shows #REF!)."""
+    out = []
+    for ref, _ in refs:
+        if ref.book is not None:
+            continue
+        for name in (ref.sheet, ref.sheet2):
+            if name is not None and wb.sheet(name) is None and name not in out:
+                out.append(name)
+    return out
 
 
 def _wb_summary(wb: Workbook) -> dict:
@@ -2290,7 +2347,12 @@ def _compare(b: Sheet, a: Sheet, bkey, akey, bcell: Cell, acell: Cell, tr: _Tran
         if not same:
             bt = _formula_tokens(b, bkey, cache)
             at = _formula_tokens(a, akey, cache)
-            same = canonical(bt, lambda ref: tr.ref(ref, b.index)) == canonical(at, ref_norm_a1)
+            after_text = canonical(at, ref_norm_a1)
+            same = canonical(bt, lambda ref: tr.ref(ref, b.index)) == after_text
+            if not same and not tr.identity and canonical(bt, ref_norm_a1) == after_text:
+                # Same text, but the rows, columns or sheet it named moved: a tool that does not
+                # adjust formulas (openpyxl's insert_rows, delete_rows, sheet renames) left it behind.
+                return "stale-reference"
         if not same:
             return "formula-changed"
         if bcell.kind is not None and acell.kind is not None and (bcell.kind, bcell.value) != (acell.kind, acell.value):
@@ -2311,12 +2373,14 @@ def _compare(b: Sheet, a: Sheet, bkey, akey, bcell: Cell, acell: Cell, tr: _Tran
     return None
 
 
-_CHANGE_RISK = {"formula-to-value": ("warning", "a formula was replaced by a constant value")}
+_CHANGE_RISK = {"formula-to-value": ("warning", "a formula was replaced by a constant value"),
+                "stale-reference": ("warning", "the formula text is unchanged but the cells it referred to moved, "
+                                               "so it now reads different cells")}
 
 
 def _change(kind, a: Sheet, b: Sheet, apos, bpos, bcell, acell) -> dict:
     risk, reason = _CHANGE_RISK.get(kind, (None, None))
-    if kind in ("formula-changed", "value-to-formula", "added") and acell is not None and acell.formula is not None:
+    if kind in ("formula-changed", "value-to-formula", "added", "stale-reference") and acell is not None and acell.formula is not None:
         fi = a.info.get(apos)
         bfi = b.info.get(bpos) if bpos is not None and bcell is not None and bcell.formula is not None else None
         if fi is not None and fi.flags & F_REFERR and not (bfi is not None and bfi.flags & F_REFERR):
@@ -2435,8 +2499,8 @@ def _findings_delta(fb: list, fa: list, before: Workbook, after: Workbook, tr: _
         if code in ("structured-reference", "data-table", "no-cached-values", "vba-project", "manual-calculation",
                     "missing-shared-strings"):
             return (code,)
-        if code == "ref-error-in-name":
-            return code, d.get("name", "").casefold()
+        if code == "ref-error-in-name" or (code == "missing-sheet-reference" and pos is None):
+            return code, (d.get("name") or "").casefold()
         return code, (sheet or "").casefold(), pos, d.get("value")
 
     bkeys = {key(f, "before") for f in fb}
@@ -2646,6 +2710,11 @@ def describe(f: dict, wrap: bool = False) -> str:
                 f"{a['cell']} {fm(a['formula'])} and {b['cell']} {fm(b['formula'])} (R1C1 {fm(d['pattern'][1:])})")
     if code == "ref-error":
         return f"{loc} {fm(d['formula'])} contains #REF! (it pointed at cells that were deleted)"
+    if code == "missing-sheet-reference":
+        names = ", ".join(txt(x) for x in d["sheets"])
+        if f.get("pos"):
+            return f"{loc} {fm(d['formula'])} refers to sheet(s) {names}, which the workbook does not have"
+        return f"defined name {visible(d['name'])} ({fm(d['formula'])}) refers to sheet(s) {names}, which the workbook does not have"
     if code == "ref-error-in-name":
         return f"defined name {visible(d['name'])} refers to {fm(d['refers_to'])}"
     if code == "error-value":
@@ -2793,6 +2862,7 @@ def check_markdown(result: dict, limit: int) -> str:
 # ---------------------------------------------------------------- rendering: diff
 
 _CHANGE_WORDS = {"formula-changed": "formula changed", "formula-to-value": "formula -> value",
+                 "stale-reference": "refs not moved",
                  "value-to-formula": "value -> formula", "value-changed": "value changed",
                  "added": "added", "removed": "removed"}
 

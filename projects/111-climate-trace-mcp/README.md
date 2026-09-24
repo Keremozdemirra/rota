@@ -306,7 +306,7 @@ country aliases (`UK`, `Ivory Coast`), and the wording of the labels.
 python3 -m unittest discover -s tests
 ```
 
-78 tests, offline. The client runs against a local HTTP server that replays
+85 tests, offline. The client runs against a local HTTP server that replays
 trimmed real answers recorded on 2026-09-24 (German steel plants, one plant with
 its owners, Poland's power sector 2020-2024 and 2026, a cropland-fires record whose
 data lead is EDGAR, the API's `null`, 404 and 400 bodies). It also produces the

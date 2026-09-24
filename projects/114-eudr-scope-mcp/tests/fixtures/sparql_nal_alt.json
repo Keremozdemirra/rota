@@ -1,0 +1,774 @@
+{
+ "head": {
+  "link": [],
+  "vars": [
+   "c",
+   "alt"
+  ]
+ },
+ "results": {
+  "distinct": false,
+  "ordered": true,
+  "bindings": [
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/AUT"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Republic of Austria"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/DEU"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "FRG"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/DEU"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Federal Republic of Germany"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/FRA"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "French Republic"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/NLD"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Kingdom of the Netherlands"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/RUS"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Russian Federation"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/VNM"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Socialist Republic of Viet Nam"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/BRA"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Federative Republic of Brazil"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/CIV"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Republic of Côte d’Ivoire"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/EUR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "EU"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/TUR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Republic of Turkey"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/TUR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Republic of Türkiye"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/TUR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Turkey"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/CHN"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "People’s Republic of China"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/COG"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Congo-Brazzaville"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/COG"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Republic of the Congo"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/USA"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "US"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/USA"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "USA"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/USA"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "United States of America"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/YUG"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Federal People’s Republic of Yugoslavia"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/YUG"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Federal Republic of Yugoslavia"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/YUG"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Socialist Federal Republic of Yugoslavia"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/HKG"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Hong Kong SAR"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/HKG"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Hong Kong Special Administrative Region"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/HKG"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Hong Kong Special Administrative Region of the People’s Republic of China"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/IRN"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Islamic Republic of Iran"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/BLR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Republic of Belarus"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/COD"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Congo-Kinshasa"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/PRK"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "DPRK"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/PRK"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Democratic People’s Republic of Korea"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/BUR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Union of Burma"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/XIC"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Autonomous Community of the Canary Islands"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/DEU"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "German"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/DEU"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "West Germany"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/AUT"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Austrian"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/FRA"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "French"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/NLD"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Dutch"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/NLD"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Netherlands"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/VNM"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Vietnamese"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/VNM"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "South Vietnam"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/VNM"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Vietnam"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/RUS"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Russian"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/BRA"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Brazilian"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/VNM"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Republic of Vietnam"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/CIV"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Ivorian"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/EUR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "European Union"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/EUR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "of the European Union"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/TUR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Turkish"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/COG"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Congolese"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/CHN"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Chinese"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/USA"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "American"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/USA"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "United States"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/USA"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "of the United States"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/IRN"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Iranian"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/HKG"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Hong Kong Chinese"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/BLR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Belarusian"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/MMR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Burma/Myanmar"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/MMR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Myanmar/Burma"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/MMR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Myanmar"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/MMR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "of Myanmar/Burma"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/MMR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Burma"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/MMR"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Union of Myanmar"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/SLB"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Solomon Islands"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/SLB"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "of the Solomon Islands"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/COD"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Democratic Republic of the Congo"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/COD"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "of the Democratic Republic of the Congo"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/PRK"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "North Korean"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/GUF"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Guianese"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/GUF"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "French Guiana"
+    }
+   }
+  ]
+ }
+}

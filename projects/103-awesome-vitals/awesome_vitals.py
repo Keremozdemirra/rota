@@ -33,6 +33,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -610,12 +611,34 @@ def licence_state(lic) -> tuple[str | None, str]:
     return spdx, "spdx"
 
 
+# What a token can hold: printable ASCII, no spaces. Anything else would either break the
+# request header or be quoted back in an error message.
+TOKEN_FORM = re.compile(r"[\x21-\x7e]{1,1000}")
+# The longest wait this tool accepts before its one retry of a rate-limited request. The
+# tool's choice: a person may be waiting.
+MAX_WAIT = 60
+
+
+def is_rate_limit(status: int | None, headers: dict, data) -> bool:
+    """GitHub signals both its primary and its secondary limits with 403 or 429:
+    docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api (checked 2026-09-24)."""
+    message = str(data.get("message", "")) if isinstance(data, dict) else ""
+    return status == 429 or (status == 403 and (headers.get("x-ratelimit-remaining") == "0"
+                                                or "retry-after" in headers or "rate limit" in message.lower()))
+
+
 class GitHub:
     """Repository facts from the GitHub REST API, with the agent-vitals census behind it."""
 
     def __init__(self, token: str | None = None, census_url: str = CENSUS, source: str = "auto",
-                 api: str = API, timeout: float = 20.0, proxies: dict | None = None):
-        self.token, self.census_url, self.source = token, census_url, source
+                 api: str = API, timeout: float = 20.0, proxies: dict | None = None,
+                 token_name: str = "GITHUB_TOKEN", sleep=None):
+        usable = token is None or bool(TOKEN_FORM.fullmatch(token))
+        self.token = token if usable else None
+        self.token_note = "" if usable else (f"{token_name} is set but is not a token (it holds characters no token has); "
+                                             "it was not sent.")
+        self.census_url, self.source = census_url, source
+        self.sleep = sleep or time.sleep
         self.api, self.timeout = api.rstrip("/"), timeout
         proxy = [urllib.request.ProxyHandler(proxies)] if proxies is not None else []
         self.opener = urllib.request.build_opener(_NoRedirect(), *proxy)
@@ -642,9 +665,39 @@ class GitHub:
             except (OSError, http.client.HTTPException):
                 body = b""
             return e.code, {k.lower(): v for k, v in (e.headers or {}).items()}, body, ""
-        except (urllib.error.URLError, http.client.HTTPException, OSError, ValueError) as e:
-            reason = getattr(e, "reason", e)
-            return None, {}, b"", plain(str(reason) or type(reason).__name__)
+        except urllib.error.URLError as e:
+            # A socket's own error names the network problem; anything else may quote the
+            # request back, headers and all, so only its kind is kept.
+            why = str(e.reason) if isinstance(e.reason, OSError) else ""
+            return None, {}, b"", mask_text(plain(why or type(e.reason).__name__))
+        except http.client.HTTPException as e:
+            return None, {}, b"", type(e).__name__
+        except OSError as e:
+            return None, {}, b"", mask_text(plain(str(e) or type(e).__name__))
+        except ValueError as e:
+            return None, {}, b"", f"request not sent, {type(e).__name__}"
+
+    def _ask(self, url: str) -> tuple[int | None, dict, bytes, str]:
+        """_get, with one retry after a short wait when the failure may pass: no answer, a 5xx,
+        or a rate limit whose retry-after is short. GitHub's advice is to wait and retry:
+        docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api
+        (checked 2026-09-24)."""
+        answer = self._get(url)
+        status, headers, body, _ = answer
+        wait = None
+        if status is None or status in (500, 502, 503, 504):
+            wait = 1
+        elif is_rate_limit(status, headers, _json(body)) and headers.get("x-ratelimit-remaining") != "0":
+            # A primary limit resets within the hour, too long to wait for; a secondary one
+            # names its wait in retry-after, or else asks for at least a minute.
+            after = headers.get("retry-after", "60").strip()
+            wait = int(after) if after.isdigit() and int(after) <= MAX_WAIT else None
+        if wait is None:
+            return answer
+        if wait >= 5:
+            print(f"awesome-vitals: GitHub API asked to wait {wait} s; waiting once", file=sys.stderr)
+        self.sleep(wait)
+        return self._get(url)
 
     def facts(self, name: str) -> dict:
         if not valid_name(name):
@@ -654,17 +707,19 @@ class GitHub:
         if self.stop_reason:
             return self.from_census(name, self.stop_reason)
         url = f"{self.api}/repos/{name}"
-        status, headers, body, err = self._get(url)
+        status, headers, body, err = self._ask(url)
         # A renamed or transferred repository answers 301 with a Location on
         # /repositories/{id}. Follow it, but never take the token off the API host.
         for _ in range(3):
             if status not in (301, 302, 307, 308):
                 break
-            target = urllib.parse.urljoin(url, headers.get("location", ""))
-            if not target.startswith(self.api + "/"):
+            if not headers.get("location"):
+                return self.from_census(name, f"GitHub API answered {status} without a Location")
+            target = urllib.parse.urljoin(url, headers["location"])
+            if not target.startswith(self.api + "/") or target == url:
                 break
             url = target
-            status, headers, body, err = self._get(url)
+            status, headers, body, err = self._ask(url)
         if status is None:
             self.state, self.stop_reason = "unreachable", f"GitHub API unreachable ({err})"
             return self.from_census(name, self.stop_reason)
@@ -681,11 +736,7 @@ class GitHub:
             return self.from_census(name, "GitHub API answered 200 without a repository in it")
         if status in (404, 410, 451):
             return {**BLANK, "source": "github", "gone": True, "http_status": status}
-        message = str(data.get("message", "")) if isinstance(data, dict) else ""
-        # GitHub signals both its primary and its secondary limits with 403 or 429:
-        # docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api (checked 2026-09-24).
-        if status == 429 or (status == 403 and (headers.get("x-ratelimit-remaining") == "0"
-                                                or "retry-after" in headers or "rate limit" in message.lower())):
+        if is_rate_limit(status, headers, data):
             self.state = "rate-limited"
             self.stop_reason = f"GitHub API rate limit reached ({status})"
             return self.from_census(name, self.stop_reason)
@@ -831,6 +882,8 @@ def source_notes(results: list[dict], gh: GitHub) -> list[str]:
     if by[None]:
         parts.append(f"{by[None]} not checked")
     notes = ["Facts: " + ", ".join(parts) + "."] if parts else []
+    if gh.token_note:
+        notes.append(gh.token_note)
     if gh.source == "census":
         notes.append("GitHub API not asked (--source census).")
     elif gh.stop_reason:
@@ -849,6 +902,10 @@ def ignored_note(ignored: dict[str, int]) -> str:
         return ""
     return "Not entries, not checked: " + ", ".join(f"{n} {NOT_ENTRIES[why][n != 1]}"
                                                   for why, n in sorted(ignored.items(), key=lambda kv: -kv[1])) + "."
+
+
+def warning_lines(warnings: list[dict]) -> list[str]:
+    return [f"Warning: {w['file']}:{w['line']}: {w['message']}." for w in warnings]
 
 
 def where(r: dict, many_files: bool, limit: int | None = 6) -> str:
@@ -905,7 +962,8 @@ def summary_line(s: dict) -> str:
 
 
 def render_text(results: list[dict], files: list[str], scope: str, today: dt.date,
-                gh: GitHub, ignored: dict[str, int], fail_on: set[str] | None = None) -> str:
+                gh: GitHub, ignored: dict[str, int], fail_on: set[str] | None = None,
+                warnings: list[dict] = ()) -> str:
     many = len(files) > 1
     s = summary(results)
     head = f"awesome-vitals · {', '.join(files)} · {scope} · {today.isoformat()}"
@@ -916,11 +974,12 @@ def render_text(results: list[dict], files: list[str], scope: str, today: dt.dat
              for k, rs in groups(results)]
     if table:
         rows = [row for _, rs in table for row in rs]
-        widths = [min(max(len(cols[i]), *(len(row[i]) for row in rows)), 48) for i in range(len(cols) - 1)]
+        # Columns are as wide as their widest cell and nothing is cut: a shortened name or
+        # line list would point at the wrong repository or hide where it is.
+        widths = [max(len(cols[i]), *(len(row[i]) for row in rows)) for i in range(len(cols) - 1)]
 
         def fmt(cells):
-            # every column but the note is cut to its width; the note is the explanation, so it never is
-            return ("  " + "  ".join([c[:w].ljust(w) for c, w in zip(cells[:-1], widths)] + [cells[-1]])).rstrip()
+            return ("  " + "  ".join([c.ljust(w) for c, w in zip(cells[:-1], widths)] + [cells[-1]])).rstrip()
 
         lines += [fmt(cols), fmt(["-" * w for w in widths] + ["-" * 4])]
         for k, rs in table:
@@ -935,6 +994,7 @@ def render_text(results: list[dict], files: list[str], scope: str, today: dt.dat
     lines += source_notes(results, gh)
     if ignored_note(ignored):
         lines.append(ignored_note(ignored))
+    lines += warning_lines(warnings)
     return "\n".join(lines) + "\n"
 
 
@@ -944,7 +1004,8 @@ def esc(text: object) -> str:
 
 
 def render_markdown(results: list[dict], files: list[str], scope: str, today: dt.date,
-                    gh: GitHub, ignored: dict[str, int], fail_on: set[str] | None) -> str:
+                    gh: GitHub, ignored: dict[str, int], fail_on: set[str] | None,
+                    warnings: list[dict] = ()) -> str:
     many = len(files) > 1
     s = summary(results)
     out = [f"### awesome-vitals: {esc(', '.join(files))}, {esc(scope)}, {today.isoformat()}", "",
@@ -963,6 +1024,8 @@ def render_markdown(results: list[dict], files: list[str], scope: str, today: dt
     out += [" ".join(source_notes(results, gh))]
     if ignored_note(ignored):
         out += ["", ignored_note(ignored)]
+    for line in warning_lines(warnings):
+        out += ["", esc(line)]
     out += ["", f"<sub>Checked with [awesome-vitals](https://github.com/Keremozdemirra/awesome-vitals) {VERSION}. "
                 "Dates, flags and licence identifiers from public repository metadata, "
                 "not a verdict on anyone's work.</sub>"]
@@ -970,7 +1033,8 @@ def render_markdown(results: list[dict], files: list[str], scope: str, today: dt
 
 
 def render_json(results: list[dict], files: list[str], scope: str, today: dt.date,
-                gh: GitHub, ignored: dict[str, int], fail_on: set[str] | None) -> str:
+                gh: GitHub, ignored: dict[str, int], fail_on: set[str] | None,
+                warnings: list[dict] = ()) -> str:
     doc = {
         "tool": "awesome-vitals", "version": VERSION, "checked": today.isoformat(), "files": files, "scope": scope,
         "fail_on": sorted(fail_on, key=FINDING_KEYS.index) if fail_on is not None else None,
@@ -979,6 +1043,7 @@ def render_json(results: list[dict], files: list[str], scope: str, today: dt.dat
         "census": {"url": mask_url(gh.census_url), "date": gh.census_date or None, "error": gh.census_error or None},
         "notes": source_notes(results, gh),
         "ignored": ignored,
+        "warnings": list(warnings),
         "repositories": results,
     }
     return json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
@@ -990,8 +1055,8 @@ def _progress(i: int, n: int) -> None:
 
 
 def main(argv: list[str] | None = None, *, today: dt.date | None = None, api: str = API,
-         proxies: dict | None = None) -> int:
-    """The command line. `today`, `api` and `proxies` exist for the tests."""
+         proxies: dict | None = None, sleep=None) -> int:
+    """The command line. `today`, `api`, `proxies` and `sleep` exist for the tests."""
     ap = argparse.ArgumentParser(
         prog="awesome-vitals",
         description="Check every GitHub repository linked from a Markdown list and report which entries are "
@@ -1016,7 +1081,7 @@ def main(argv: list[str] | None = None, *, today: dt.date | None = None, api: st
                          "(default: the published agent-vitals index)")
     ap.add_argument("--source", choices=["auto", "github", "census"], default="auto",
                     help="auto: GitHub API, census when it cannot answer (default); "
-                         "github: GitHub API only; census: census only, nothing sent to GitHub")
+                         "github: GitHub API only; census: census only, nothing sent to the GitHub API")
     ap.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):  # a console that cannot print a character should not crash the run
@@ -1057,9 +1122,12 @@ def main(argv: list[str] | None = None, *, today: dt.date | None = None, api: st
             return 2
         scope = f"lines added in {a.diff}"
 
-    entries, ignored = collect(sources, selected)
-    token = (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or "").strip() or None
-    gh = GitHub(token=token, census_url=a.census, source=a.source, api=api, proxies=proxies)
+    warnings: list[dict] = []
+    entries, ignored = collect(sources, selected, warnings)
+    token_name = "GITHUB_TOKEN" if os.environ.get("GITHUB_TOKEN") else "GH_TOKEN"
+    token = (os.environ.get(token_name) or "").strip() or None
+    gh = GitHub(token=token, census_url=a.census, source=a.source, api=api, proxies=proxies,
+                token_name=token_name, sleep=sleep)
     today = today or dt.date.today()
     try:
         results = examine(entries, gh, today, _progress if sys.stderr.isatty() and entries else None)
@@ -1067,18 +1135,22 @@ def main(argv: list[str] | None = None, *, today: dt.date | None = None, api: st
         return 130
 
     if a.json:
-        sys.stdout.write(render_json(results, a.files, scope, today, gh, ignored, fail_on if strict else None))
+        sys.stdout.write(render_json(results, a.files, scope, today, gh, ignored, fail_on if strict else None,
+                                     warnings))
     elif not entries:
         msg = f"No links to GitHub repositories {'on those lines' if selected is not None else 'found'}."
         if a.markdown:
             msg = f"### awesome-vitals: {esc(', '.join(a.files))}, {esc(scope)}, {today.isoformat()}\n\n{msg}"
         else:
             msg = f"awesome-vitals · {', '.join(a.files)} · {scope} · {today.isoformat()}\n{msg}"
-        sys.stdout.write(msg + "\n" + (ignored_note(ignored) + "\n" if ignored_note(ignored) else ""))
+        extra = ([ignored_note(ignored)] if ignored_note(ignored) else []) + warning_lines(warnings)
+        sys.stdout.write(msg + "\n" + "".join((esc(x) if a.markdown else x) + "\n" for x in extra))
     elif a.markdown:
-        sys.stdout.write(render_markdown(results, a.files, scope, today, gh, ignored, fail_on if strict else None))
+        sys.stdout.write(render_markdown(results, a.files, scope, today, gh, ignored, fail_on if strict else None,
+                                         warnings))
     else:
-        sys.stdout.write(render_text(results, a.files, scope, today, gh, ignored, fail_on if strict else None))
+        sys.stdout.write(render_text(results, a.files, scope, today, gh, ignored, fail_on if strict else None,
+                                     warnings))
     if strict and any(fail_on & set(r["findings"]) for r in results):
         return 1
     if strict and any(r["status"] == "unchecked" for r in results):

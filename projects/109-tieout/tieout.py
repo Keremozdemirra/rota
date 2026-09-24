@@ -474,7 +474,7 @@ _LABEL_WORDS = (r"(?:scope|tier|phase|stage|step|level|wave|round|option|scenari
                 r"paragraph|para\.|clause|figure|fig\.|table|tab\.|exhibit|chart|appendix|annex|schedule|note|"
                 r"footnote|item|no\.|nr\.|number|version|ver\.|release|iso|sdg|ifrs|ias|gri|question|priority|"
                 r"pillar|principle|goal|kapitel|abschnitt|artikel|absatz|abs\.|ziffer|nummer|abbildung|abb\.|"
-                r"tabelle|anhang|anlage|anmerkung|fußnote|szenario|stufe|schritt|welle|runde|säule|§|#)")
+                r"tabelle|anhang|anlage|anmerkung|fußnote|szenario|stufe|schritt|welle|runde|säule|§|(?<!#)#(?=\d))")
 _LNUM = r"\d+(?:[.,]\d+)*"
 _LABEL_RE = re.compile(r"(?i)(?<![\w])" + _LABEL_WORDS + r"[ \u00a0]*" + _LNUM
                        + r"(?:(?:[ \u00a0]*,[ \u00a0]*" + _LNUM + r")*[ \u00a0]*,?[ \u00a0]*(?:and|und|or|oder|&)[ \u00a0]*" + _LNUM

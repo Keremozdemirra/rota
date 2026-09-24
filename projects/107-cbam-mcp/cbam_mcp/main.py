@@ -21,6 +21,7 @@ from pathlib import Path
 
 from . import __version__, lookup, mcp_stdio, refresh
 from .codes import InputError
+from .remote import unwrap
 
 _CODE_TOKEN = re.compile(r"^(?:ex|cn)?[0-9.\-]+$", re.IGNORECASE)
 
@@ -50,7 +51,7 @@ def _legal_lines(r: dict) -> list[str]:
     status = r.get("legal_status_of_data")
     if isinstance(status, dict):
         lines.append(_wrap("Commission says", f"\"{status['quote']}\""))
-    lines.append(_wrap("Data", r["data_version"]))
+    lines.append(_wrap("Data", r["data_version"] + (f" ({r['data_version_note']})" if r.get("data_version_note") else "")))
     if r.get("checked_against_official_journal"):
         lines.append(_wrap("Checked", r["checked_against_official_journal"]))
     for w in r.get("warnings") or []:
@@ -65,7 +66,7 @@ def render_scope(r: dict) -> str:
         line = r["annex_i_line"]
         text = f"{line['cn_code']} – {line['text']}"
         if line.get("except"):
-            text += " (except " + "; ".join(line["except"]) + ")"
+            text += " (except " + "; ".join(f"{x['cn_code']} – {x['text']}" for x in line["except"]) + ")"
         out.append(_wrap("Annex I line", text))
         out.append(_wrap("Goods category", r.get("goods_category")))
         out.append(_wrap("Greenhouse gases", r.get("greenhouse_gases")))
@@ -74,7 +75,7 @@ def render_scope(r: dict) -> str:
                                                    for x in r["annex_i_lines_below"])))
     out.append(_wrap("Why", r["explanation"]))
     if r.get("annex_ii"):
-        out.append(_wrap("Annex II", f"{r['annex_ii']['status']} in Annex II. Article 7(1): \"{r['annex_ii']['meaning']}\""))
+        out.append(_wrap("Annex II", f"{r['annex_ii']['status']} in Annex II. Article 7(1): \"{r['annex_ii']['article_7_1']}\""))
     cn = r.get("cn") or {}
     if cn.get("found"):
         out.append(_wrap("CN 2026", f"{cn['cn_code']} {cn['label']}" + (f". {cn['self_explanatory_text']}"
@@ -94,7 +95,7 @@ def render_scope(r: dict) -> str:
         for key, tag in (("in_scope", "in"), ("partially_in_scope", "part"), ("not_in_scope", "not")):
             for item in sub.get(key, []):
                 extra = f" [excluded by {item['excluded_by']}]" if item.get("excluded_by") else ""
-                extra += f" [{item['ex_code']}]" if item.get("ex_code") else ""
+                extra += f" [{item['ex_line']}]" if item.get("ex_line") else ""
                 out.append(f"    {tag:<5} {item['cn_code']:<11} {item['description'][:70]}{extra}")
     out += _legal_lines(r)
     return "\n".join(out)
@@ -127,6 +128,9 @@ def render_value(r: dict) -> str:
     out = [f"{r['cn_code']} from {r['country']}: {r.get('status', '').replace('_', ' ')}, unit {r['unit']}"]
     if r.get("explanation"):
         out.append(_wrap("Why", r["explanation"]))
+    for key, label in (("article_2_1", "Article 2(1)"), ("article_2_4", "Article 2(4)")):
+        if r.get(key):
+            out.append(_wrap(label, f"\"{r[key]}\""))
     for item in r["lines"]:
         out += _value_block(item)
     for n in r.get("notes") or []:
@@ -282,7 +286,8 @@ def main(argv=None) -> int:
     except lookup.DataError as e:
         print(f"cbam-mcp: data unavailable: {e}", file=sys.stderr)
         return 2
-    print(json.dumps(result, ensure_ascii=False, indent=1) if args.json else render(result))
+    # --json is what an MCP client gets (remote text marked); the text view is for a person.
+    print(json.dumps(result, ensure_ascii=False, indent=1) if args.json else render(unwrap(result)))
     return 0
 
 

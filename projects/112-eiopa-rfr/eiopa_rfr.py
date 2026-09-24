@@ -90,10 +90,11 @@ PARSER_VERSION = 1                  # bump when the parsed-release format change
 # results are #N/A or 0.01 in the 2026 files, so they are not read.
 SHEETS = {"no_va": "RFR_spot_no_VA", "with_va": "RFR_spot_with_VA"}
 # Output keys carry the unit. Units: EIOPA RFR Technical Documentation
-# EIOPA-BoS-25-599 (December 2025): LLP in years (9.2), convergence period in
-# years (9.4.1), UFR in percent (9.5, "4.2%"), alpha to six decimals with a
-# floor of 0.05 (9.4.2), CRA in whole basis points (7.3.14), VA in whole basis
-# points (13.1.5, 15.1.2); coupon frequency is Table 2 "SWP FREQ".
+# EIOPA-BoS-25-599 (December 2025): integer maturities 1 to 150 years (9.1.6),
+# annual rates r with factor 1 + r (9.5.1), LLP in years (9.2.1), convergence
+# period in years (9.4.1), UFR in percent (9.7.3, "4.2%"), alpha to six
+# decimals with a floor of 0.05 (9.4.2), CRA in whole basis points (7.3.14), VA
+# in whole basis points (13.1.5, 15.1.2); coupon frequency is Table 2 "SWP FREQ".
 PARAMETERS = (("Coupon_freq", "coupon_freq"), ("LLP", "llp_years"), ("Convergence", "convergence_years"),
               ("UFR", "ufr_percent"), ("alpha", "alpha"), ("CRA", "cra_bp"), ("VA", "va_bp"))
 UNITS = {

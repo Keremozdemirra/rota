@@ -125,11 +125,11 @@ class ClientTest(fx.HomeIsolated):
                 self.client.get("/sources")
 
     def test_control_and_bidi_characters_are_stripped_from_error_text(self):
-        self.srv.route("/sources/5", fx.Reply({"detail": "gone\x1b[31m‮evil\nline"}, 404))
+        self.srv.route("/sources/5", fx.Reply({"detail": "gone\x1b[31m\u202eevil\nline"}, 404))
         with self.assertRaises(C.NotFound) as cm:
             self.client.get("/sources/5")
         msg = cm.exception.message
-        for ch in ("\x1b", "‮", "\n"):
+        for ch in ("\x1b", "\u202e", "\n"):
             self.assertNotIn(ch, msg)
 
     def test_cache_serves_repeats_and_expires(self):

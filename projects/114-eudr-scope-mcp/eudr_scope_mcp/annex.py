@@ -46,6 +46,11 @@ class AnnexError(ValueError):
     """The document does not have the structure this parser relies on."""
 
 
+def strip_markers(text: str) -> str:
+    """Remove the consolidation arrows (e.g. 'M2' with its arrow) from a line of text."""
+    return tidy(_MARKERS.sub(" ", text))
+
+
 def iso_date(day: str, month: str, year: str) -> str:
     return dt.date(int(year), MONTHS[month], int(day)).isoformat()
 

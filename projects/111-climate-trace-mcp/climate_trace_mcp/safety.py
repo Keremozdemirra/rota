@@ -13,7 +13,7 @@ import urllib.parse
 
 # C0/C1 controls, zero-width characters and bidi overrides: they can hide or
 # reorder text in a terminal and in a model's context.
-_UNSAFE = re.compile("[\x00-\x1f\x7f-\x9f​-‏‪-‮⁠-⁤⁦-⁩﻿]")
+_UNSAFE = re.compile("[\x00-\x1f\x7f-\x9f\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]")
 
 # Letters that Unicode decomposition does not reduce to ASCII, so "Belchatow"
 # (as the API spells it) still matches "Bełchatów" typed by a person.
@@ -33,6 +33,22 @@ def clean(value, limit: int = 200) -> str:
     if len(s) > limit:
         s = s[: max(1, limit - 3)].rstrip() + "..."
     return s
+
+
+_URL = re.compile(r"(?i)\b[a-z][a-z0-9+.-]*://\S+")
+# --api-key=x, --token x, GITHUB_TOKEN=x, password: x, and any SHOUTING_NAME=x.
+_SECRET_ARG = re.compile(r"(?i)(--?[a-z0-9_-]*(?:api[-_]?key|token|secret|passw(?:or)?d|auth)[a-z0-9_-]*)(=|\s+)\S+")
+_SECRET_KV = re.compile(r"(?i)\b([a-z0-9_]*(?:api[-_]?key|token|secret|passw(?:or)?d|auth)[a-z0-9_]*)(\s*[=:]\s*|\s+)\S+")
+_ENV_KV = re.compile(r"\b([A-Z][A-Z0-9_]{2,})=\S+")
+
+
+def echo(value, limit: int = 60) -> str:
+    """User input quoted back in an error: shortened, with URLs and secret-looking values masked."""
+    s = clean(value, limit)
+    s = _URL.sub(lambda m: mask_url(m.group(0)), s)
+    s = _SECRET_ARG.sub(lambda m: m.group(1) + m.group(2) + "***", s)
+    s = _SECRET_KV.sub(lambda m: m.group(1) + m.group(2) + "***", s)
+    return _ENV_KV.sub(lambda m: m.group(1) + "=***", s)
 
 
 def remote_text(value, limit: int = 200) -> str:

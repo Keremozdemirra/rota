@@ -162,6 +162,9 @@ EU_MEMBER_STATES_SOURCE = "https://european-union.europa.eu/principles-countries
 
 # ISO codes for the countries in point 1 of Annex III, which refresh parses by name.
 ANNEX_III_ISO = {"Iceland": "IS", "Liechtenstein": "LI", "Norway": "NO", "Switzerland": "CH"}
+# The names point 1 of Annex III listed in the consolidated text of 2025-10-20 (checked 2026-09-24);
+# names outside this set, after a refresh, are shown as remote text.
+ANNEX_III_NAMES = frozenset(ANNEX_III_ISO) | {"Büsingen", "Heligoland", "Livigno", "Ceuta", "Melilla"}
 
 # --------------------------------------------------------------- CN
 

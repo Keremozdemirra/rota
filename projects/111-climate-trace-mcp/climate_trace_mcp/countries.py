@@ -26,7 +26,7 @@ from __future__ import annotations
 
 import re
 
-from .safety import clean, fold
+from .safety import clean, echo, fold
 
 # alpha-2 | alpha-3 | name in the Climate TRACE API | UN M49 name where different
 _TABLE = """\
@@ -358,7 +358,7 @@ def resolve(value) -> tuple:
         a3 = _INDEX[key]
         return a3, BY_ALPHA3[a3]
     hints = sorted({BY_ALPHA3[a3] for k, a3 in _INDEX.items() if key and len(key) >= 3 and (key in k or k in key)})
-    msg = "unknown country %r: use an ISO 3166-1 alpha-3 code (DEU), alpha-2 (DE) or an English name (Germany)" % s
+    msg = "unknown country %r: use an ISO 3166-1 alpha-3 code (DEU), alpha-2 (DE) or an English name (Germany)" % echo(s)
     if hints:
         msg += "; did you mean: " + ", ".join(hints[:5])
     raise CountryError(msg)

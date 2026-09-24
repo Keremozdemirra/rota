@@ -8,8 +8,9 @@ unlicensed, with the line of each one.**
 
 Curated lists keep entries long after anyone maintains them. The
 [agent-vitals](https://github.com/Keremozdemirra/agent-vitals) census of
-2026-09-23 counted 39,963 repositories in the agent-tooling ecosystem: 2,385 with
-no push in over a year, 636 archived, and 6,664 with no licence file.
+2026-09-23 counted 39,963 repositories in the agent-tooling ecosystem: 2,385 not
+archived and with no push in over a year, 636 archived, and 6,664 with no licence
+file.
 
 The lists that point people at those repositories grow by pull request. On the
 same day, the most-starred MCP list in the census,
@@ -79,6 +80,8 @@ This check fails on an entry that is archived or gone, or one that could not be 
 | 18 | [Keremozdemirra/mcp-vitals](https://github.com/Keremozdemirra/mcp-vitals) |  |  |  | GitHub API answered 403; not in the census |
 
 Facts: 1 not checked. GitHub API answered 403 for 1 repository.
+
+<sub>Checked with [awesome-vitals](https://github.com/Keremozdemirra/awesome-vitals) 0.1.0. Dates, flags and licence identifiers from public repository metadata, not a verdict on anyone's work.</sub>
 ```
 
 ## Install
@@ -108,7 +111,7 @@ A personal access token in `GITHUB_TOKEN` (or `GH_TOKEN`) raises GitHub's limit 
 | `--fail-on LIST` | Comma-separated findings for `--strict` (default `archived,gone`); implies `--strict`. `none` alone reports without failing; with `--strict`, only entries that could not be checked fail. |
 | `--diff BASE...HEAD` | Pull-request mode: only entries on lines added in that range. Runs `git diff --unified=0` and reads the hunks. The second revision should be what is checked out, because the files are read from disk. |
 | `--only-lines FILE:START-END,...` | Only entries on these lines, e.g. `README.md:40-52,README.md:97`. A range without `FILE:` applies to every file. |
-| `--source auto\|github\|census` | `auto` (default) asks GitHub and falls back to the census; `github` never uses the census; `census` sends nothing to GitHub. |
+| `--source auto\|github\|census` | `auto` (default) asks GitHub and falls back to the census; `github` never uses the census; `census` sends nothing to the GitHub API (the census itself comes from `raw.githubusercontent.com` unless `--census` names another place). |
 | `--census URL` | Another census index: `https://`, `file://` or a plain path. |
 
 Exit codes: `0` clean (always, without `--strict`); `1` a `--fail-on` finding under
@@ -212,27 +215,42 @@ Counted, and reduced to `owner/repo`:
 - Markdown links, reference definitions (`[id]: https://...`), autolinks
   (`<https://...>`), bare URLs with or without `https://` or `www.`, and HTML
   `href` values.
-- Any page of a repository: `/tree/...`, `/blob/...`, `/releases`, `#readme`,
-  `?tab=...`, a `.git` suffix. A full stop after a bare URL ends the sentence, not
-  the name.
+- Any page of a repository: `/tree/...`, `/blob/...`, `/releases`, `/issues`,
+  `/security`, `#readme`, `?tab=...`, a `.git` suffix.
+- The server pages of the GitHub MCP Registry: `github.com/mcp/github/github-mcp-server`
+  is `github/github-mcp-server`.
+- In a bare URL, trailing `?`, `!`, `.`, `,`, `:`, `*`, `_` and `~` end the sentence
+  or the emphasis, not the name, as in GitHub's own rendering: `_https://github.com/o/r_`
+  is `o/r`. A link destination (`[x](...)`, `<...>`, `href`) is taken as written.
 - The same repository under another letter case: GitHub names are
   case-insensitive, so it is one entry with all its lines.
 
 Not counted, and tallied on the last line of the report:
 
 - Profiles and organisations (`github.com/octocat`), and github.com pages that are
-  not repositories: `topics`, `orgs`, `sponsors`, `marketplace`, `apps`,
-  `features` and the like.
-- Links to an issue, pull request, discussion, commit or comparison of a
-  repository (`/issues/42`, `/pull/7`). Such a link cites one conversation or one
-  change inside an entry's description; the entry is the repository, linked on its
-  own. A link to a repository's other pages is counted.
-- Images and badges: `![...](...)` and `<img src>` targets, so a CI badge hosted
-  on github.com is not an entry (the link around it is). `img.shields.io`,
+  not repositories: any path that starts with a name GitHub reserves (`topics`,
+  `orgs`, `sponsors`, `marketplace`, `apps`, `github-copilot`, `mcp` and some 300
+  more, from [github-reserved-names](https://github.com/Mottie/github-reserved-names)
+  2.2.0, MIT licence, checked 2026-09-24), plus `models`, `premium-support` and
+  `solutions`. That list says it is not complete; a page it misses would show as
+  `gone`.
+- A link to one issue, pull request, discussion, commit, comparison or security
+  advisory of a repository (`/issues/42`, `/pull/7`, `/commit/1a2b3c4`,
+  `/security/advisories/GHSA-...`). Such a link cites one item inside an entry's
+  description; the entry is the repository, linked on its own.
+- Images and badges: the target of `![...](...)`, a reference definition used only
+  as an image (`[![CI][badge]][runs]` with `[badge]: https://...`), and every
+  `src` or `srcset` value, in any tag and on any line of it. A CI badge hosted on
+  github.com is not an entry (the link around it is). `img.shields.io`,
   `gist.github.com`, `raw.githubusercontent.com` and `*.github.io` are other hosts.
 - Anything in a fenced code block (backticks or tildes, at any indentation), in
-  inline code, or in an HTML comment: a commented-out entry is not on the list.
+  inline code, or in an HTML comment: a commented-out entry is not on the list. As
+  on GitHub, a comment ends at the first `-->` (backticks or not), `<!-->` is a
+  whole comment, and a fence inside a list item ends with the item.
 - A GitHub URL nested in another URL's path, such as a `web.archive.org` snapshot.
+
+A code fence or comment that is never closed hides the rest of the file, on GitHub
+as here. The report names its line in a warning.
 
 Indented code blocks are not recognised, because in a list four spaces of
 indentation also mark a nested item.
@@ -245,16 +263,26 @@ indentation also mark a nested item.
 | A personal access token in `GITHUB_TOKEN` | 5,000 requests an hour | same page |
 | The GitHub Actions workflow token (the action's default) | 1,000 requests an hour per repository | same page |
 
-A repository costs one request, a renamed one two. Requests go one at a time:
+A repository costs one request, a renamed one two, and a retry (below) one more.
+Requests go one at a time:
 GitHub asks clients to "make requests serially instead of concurrently" to stay
 under its secondary limits
 ([best practices](https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api),
 checked 2026-09-24).
 
-When GitHub answers 403 with `x-ratelimit-remaining: 0`, or 429, or cannot be
-reached, the rest of the run uses the agent-vitals census index instead. Past
-either its primary or its secondary limit, "you will receive a 403 or 429
-response" (rate limits page above). Any other refusal (for example an organisation's IP allow
+A request that gets no answer or a 5xx is asked once more after a second. A
+secondary rate limit is asked once more after its `retry-after`, or after a minute
+when it names none: "If the retry-after response header is present, you should not
+retry your request until after that many seconds has elapsed", and "Otherwise,
+wait for at least one minute before retrying" (rate limits page above). The tool
+waits at most 60 seconds, its own choice; a longer wait, or a primary limit
+(`x-ratelimit-remaining: 0`, which resets within the hour), is not waited for.
+
+When the retry gets no answer either or meets the rate limit again, or GitHub
+answers 403 with `x-ratelimit-remaining: 0`, the rest of the run uses the
+agent-vitals census index instead. Past either its primary or its secondary limit,
+"you will receive a 403 or 429 response" (rate limits page above). Any other
+refusal (a 5xx that outlasts its retry, or for example an organisation's IP allow
 list) falls back for that repository only. The census is downloaded once per run
 and only when needed: one file of about 26 MB, some 40,000 repositories of agent
 tooling (MCP servers, agent frameworks, skills). A repository outside it is
@@ -287,10 +315,11 @@ column says which rows came from where, and the lines under the table say why.
   `git diff` for them. Nothing else on disk.
 - **Sends:** `owner/repo` names to `api.github.com`, and only names that match
   GitHub's form (letters, digits, `-`, `_`, `.`; nothing else reaches a URL), with
-  `GITHUB_TOKEN` or `GH_TOKEN` when set. The token goes to the API host only: a
-  redirect to any other host is not followed. When GitHub cannot answer, one
+  `GITHUB_TOKEN` or `GH_TOKEN` when set and shaped like a token (printable ASCII, no
+  spaces; anything else is not sent, and the report says so without printing it).
+  The token goes to the API host only: a redirect to any other host is not followed. When GitHub cannot answer, one
   download of the census index, without the token. `--source census` sends nothing
-  to GitHub.
+  to the GitHub API.
 - **Prints:** repository names, dates and licence identifiers, each checked against
   its expected form first, since they come from GitHub or from a census file you may
   point anywhere; a value that does not fit is dropped. Credentials and query strings

@@ -1,0 +1,239 @@
+{
+ "head": {
+  "link": [],
+  "vars": [
+   "rel",
+   "celex",
+   "date",
+   "eif",
+   "title"
+  ]
+ },
+ "results": {
+  "distinct": false,
+  "ordered": true,
+  "bindings": [
+   {
+    "rel": {
+     "type": "literal",
+     "value": "amends"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32024R3234"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2024-12-19"
+    },
+    "eif": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2024-12-26"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Regulation (EU) 2024/3234 of the European Parliament and of the Council of 19 December 2024 amending Regulation (EU) 2023/1115 as regards provisions relating to the date of application"
+    }
+   },
+   {
+    "rel": {
+     "type": "literal",
+     "value": "amends"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32025R2650"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-12-19"
+    },
+    "eif": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-12-26"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Regulation (EU) 2025/2650 of the European Parliament and of the Council of 19 December 2025 amending Regulation (EU) 2023/1115 as regards certain obligations of operators and traders"
+    }
+   },
+   {
+    "rel": {
+     "type": "literal",
+     "value": "amends"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32026R2102"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2026-07-13"
+    },
+    "eif": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2026-09-18"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Commission Delegated Regulation (EU) 2026/2102 of 13 July 2026 amending Regulation (EU) 2023/1115 of the European Parliament and of the Council as regards the list of relevant commodities and relevant products"
+    }
+   },
+   {
+    "rel": {
+     "type": "literal",
+     "value": "corrects"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32023R1115R(01)"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2024-10-01"
+    }
+   },
+   {
+    "rel": {
+     "type": "literal",
+     "value": "corrects"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32023R1115R(03)"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-03-28"
+    }
+   },
+   {
+    "rel": {
+     "type": "literal",
+     "value": "corrects"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32023R1115R(02)"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-02-28"
+    }
+   },
+   {
+    "rel": {
+     "type": "literal",
+     "value": "corrects"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32023R1115R(04)"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-12-22"
+    }
+   },
+   {
+    "rel": {
+     "type": "literal",
+     "value": "corrects"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32023R1115R(05)"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2026-07-02"
+    }
+   },
+   {
+    "rel": {
+     "type": "literal",
+     "value": "proposes_to_amend"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "52024PC0452"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2024-10-02"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL amending Regulation (EU) 2023/1115 as regards provisions relating to the date of application"
+    }
+   },
+   {
+    "rel": {
+     "type": "literal",
+     "value": "proposes_to_amend"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "52025PC0652"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2025-10-21"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL amending Regulation (EU) 2023/1115 as regards certain obligations of operators and traders"
+    }
+   },
+   {
+    "rel": {
+     "type": "literal",
+     "value": "proposes_to_amend"
+    },
+    "celex": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "52026PC0661"
+    },
+    "date": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#date",
+     "value": "2026-09-10"
+    },
+    "title": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Proposal for a COUNCIL REGULATION amending Regulations (EU) No 1380/2013, (EU) No 1308/2013, (EU) 2023/1115 and (EU) 2024/1348 of the European Parliament and of the Council, and Council Regulation (EU) 2023/2720 as regards adaptation of certain requirements and reduction of administrative burden in the Union outermost regions"
+    }
+   }
+  ]
+ }
+}

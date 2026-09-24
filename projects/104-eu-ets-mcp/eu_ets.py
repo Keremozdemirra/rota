@@ -1168,6 +1168,8 @@ def _as_int(value, name: str, lo: int, hi: int, default=None):
         return default
     if isinstance(value, bool):
         raise UsageError(f"{name} must be a whole number")
+    if isinstance(value, float) and value.is_integer():  # JSON clients may send 5.0 for 5
+        value = int(value)
     if isinstance(value, str) and re.match(r"^\s*-?\d+\s*$", value):
         value = int(value)
     if not isinstance(value, int):
@@ -1363,6 +1365,8 @@ class Dataset:
             con.close()
 
     def _resolve(self, con, installation_id, country):
+        if isinstance(installation_id, float) and installation_id.is_integer():
+            installation_id = int(installation_id)
         if isinstance(installation_id, bool) or not isinstance(installation_id, (str, int)):
             raise UsageError("installation_id must be the registry's installation id, e.g. 69 or DE-69")
         m = _REF.match(str(installation_id))

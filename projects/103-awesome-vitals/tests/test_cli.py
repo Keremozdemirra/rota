@@ -29,8 +29,8 @@ def run(args, server=None, env=None):
         os.environ.update(env or {})
         if "--census" not in args:
             args = args + ["--census", CENSUS]
-        code = av.main(args, today=TODAY,
-                       api=server.url if server else "http://127.0.0.1:9", proxies={})
+        code = av.main(args, today=TODAY, api=server.url if server else "http://127.0.0.1:9", proxies={},
+                       sleep=lambda seconds: None)
     return code, out.getvalue(), err.getvalue()
 
 
@@ -79,7 +79,8 @@ class FullReport(unittest.TestCase):
         self.assertIn("Facts: 7 from the GitHub API, 6 from the agent-vitals census of 2026-09-23, 2 not checked.", self.out)
         self.assertIn("GitHub API answered 403 for 8 repositories.", self.out)
         self.assertIn("Not entries, not checked: 5 links to GitHub pages that are not repositories, 3 images, "
-                      "3 links to profiles or organisations, 2 links to issues, pull requests, discussions or commits.",
+                      "3 links to profiles or organisations, "
+                      "2 links to single issues, pull requests, discussions, commits, comparisons or advisories.",
                       self.out)
 
     def test_one_request_per_repository_plus_the_redirect(self):
@@ -257,6 +258,18 @@ class Review(unittest.TestCase):
         rows = [line for line in out.split("\n") if long_name in line]
         self.assertEqual(len(rows), 1, out)
         self.assertIn(f"{files[0]}:1, {files[0]}:2, {files[0]}:3, {files[1]}:1, {files[1]}:2, {files[1]}:3 +3", rows[0])
+
+    def test_6_every_report_names_a_fence_left_open(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "list.md"
+            p.write_text("- [a](https://github.com/octocat/archived-example)\n```\n- [b](https://github.com/o/b)\n",
+                         encoding="utf-8")
+            with FakeGitHub() as server:
+                outputs = [run([str(p)] + fmt, server)[1] for fmt in ([], ["--markdown"], ["--json"])]
+        warning = f"{p}:2: a code fence opened here is never closed; nothing after it was read"
+        self.assertIn(f"Warning: {warning}.", outputs[0])
+        self.assertIn(f"Warning: {warning}.", outputs[1])
+        self.assertEqual(json.loads(outputs[2])["warnings"], [{"file": str(p), "line": 2, "message": warning.split(": ", 1)[1]}])
 
     def test_4_a_token_that_cannot_be_a_header_is_neither_sent_nor_printed(self):
         for token in ("ghp_SECRETpart1\nghp_SECRETpart2", "ghp_SECRET\u2019quote", "ghp_SECRET part"):
