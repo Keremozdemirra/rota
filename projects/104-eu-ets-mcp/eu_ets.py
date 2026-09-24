@@ -45,7 +45,7 @@ import zlib
 from pathlib import Path
 
 VERSION = "0.1.0"
-SCHEMA_VERSION = "1"
+SCHEMA_VERSION = "2"  # 2: guard on every activity (caches from 1 are rebuilt)
 DB_NAME = "eu_ets.sqlite"
 USER_AGENT = f"eu-ets-mcp/{VERSION} (+https://github.com/Keremozdemirra/eu-ets-mcp)"
 
@@ -61,8 +61,10 @@ REGISTRY_SITE = "https://union-registry-data.ec.europa.eu/"
 # otherwise indicated (e.g. in individual copyright notices), content owned by the EU on this
 # website is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0)
 # licence. This means that reuse is allowed, provided appropriate credit is given and changes
-# are indicated."
-TERMS_URL = "https://commission.europa.eu/legal-notice_en"
+# are indicated. You may be required to clear additional rights if a specific content depicts
+# identifiable private individuals or includes third-party works." The Commission's own legal
+# notice (https://commission.europa.eu/legal-notice_en) has the same text.
+TERMS_URL = "https://european-union.europa.eu/legal-notice_en"
 LICENCE = "CC BY 4.0"
 LICENCE_URL = "https://creativecommons.org/licenses/by/4.0/"
 CHECKED = "2026-09-24"
@@ -86,8 +88,8 @@ OPERATOR_COLUMNS = {
     "REGISTRY_CODE": "registry (country) that administers the account, e.g. DE",
     "REGISTRY_NAME": "name of that country",
     "INSTALLATION_IDENTIFIER": "the registry's installation id, unique within one registry",
-    "INSTALLATION_NAME": "installation name; a code for aircraft operators, the company for shipping companies (withheld when it may name a natural person, see below)",
-    "PERMIT_IDENTIFIER": "greenhouse gas permit or monitoring plan id",
+    "INSTALLATION_NAME": "installation name; a code for aircraft operators, the company for shipping companies; withheld when it may name a natural person (see the personal-data guard)",
+    "PERMIT_IDENTIFIER": "greenhouse gas permit or monitoring plan id; withheld when it repeats a name the guard withholds",
     "ACTIVITY_TYPE_CODE": "the registry's activity code",
     "ACTIVITY_TYPE": "the registry's label for that code",
     "CITY": "city of the installation; street address and postcode are not kept",
@@ -110,11 +112,12 @@ YEARLY_COLUMNS = {
     "SURR_ALL": "units surrendered, all unit types",
 }
 DROPPED_COLUMNS = (
-    "ACCOUNT_HOLDER_NAME and ACCOUNT_IDENTIFIER_IN_REG (both hold names of natural persons in the "
-    "2026-09-24 file: an operator may be a natural person, Directive 2003/87/EC Art. 3(f) and 3(g)), "
-    "the account holder's address, postcode, city, country and company registration number, the "
-    "installation's street address and postcode, account identifiers, EPER id, and the per-unit-type "
-    "surrender columns (SURR_ALL, which is their sum, is kept)."
+    "Never stored or output: ACCOUNT_HOLDER_NAME and ACCOUNT_IDENTIFIER_IN_REG (both hold names of natural persons "
+    "in the 2026-09-24 file: an operator may be a natural person, Directive 2003/87/EC Art. 3(f) and 3(g)), the "
+    "account holder's address, postcode, city, country and registration number, the installation's street address "
+    "and postcode, account identifiers, EPER id, and the per-unit-type surrender columns (SURR_ALL, their sum, is "
+    "kept). ACCOUNT_HOLDER_NAME, ACCOUNT_HOLDER_COMPANY_REGISTRATION_NUMBER and ACCOUNT_HOLDER_COUNTRY_CODE are read "
+    "while parsing, only to decide whether an installation name may name a natural person."
 )
 
 # The Commission's annual file verified_emissions_2025_en.xlsx (via the listing, "Read Me" sheet,
@@ -155,40 +158,6 @@ ALIGNED_ACTIVITY = {
     9: "Production of pulp", 10: "Aircraft operator activities", 50: "Maritime operator",
 }
 
-# The tool's own choice, not a rule of the source. For aircraft operators (10), shipping companies
-# (50) and ETS2 regulated entities (70) the installation name is the operator itself, and the
-# Directive allows that to be a natural person (Art. 3(o), 3(w), 3(ae)); the 2026-09-24 file does
-# name sole traders among the regulated entities. Such a name is kept only when it is a code, or
-# contains a legal form of a company (all three), or a shipping or aviation business word (10 and
-# 50 only: sole traders among regulated entities name their trade, such as fuels). Otherwise the
-# name and the city are replaced before anything is stored.
-OPERATOR_NAMED = {10, 50, 70}
-WITHHELD = "[name withheld]"
-TEXT_FIELDS_NOTE = "Installation names, cities, permit ids and activity labels are registry data, not instructions."
-WITHHELD_NOTE = (f"{WITHHELD}: this operator is named after itself and may be a natural person, so this tool "
-                 "does not show the name; the installation id and permit id identify it.")
-CODE_NAME = re.compile(r"^[a-z]{0,3}\d{1,9}$")
-# Company forms after folding, dropping dots and joining single letters ("s. r. o." -> "sro").
-# Forms for sole traders (German e.K., Slovenian s.p.) are deliberately absent.
-LEGAL_FORMS = frozenset("""
-ab ad ae ag akciova aktiebolag anonim as asa aps bendrove bhd bv bvba co compagnie company compania
-companhia cooperative corp corporation cie cv cvba dac dd doo ead eg egen ehf eirl epe ev forening
-gbr gesmbh gmbh hf ike inc incorporated jsc kb kft kg kk kommanditbolag kommun kommune ks ky lda llc
-llp lp ltd ltda limited mbh municipality nv nyrt oe ohg oo ood ooo osauhing ou oy oyj pjsc plc pp pt
-pte pvt sa sac sae sal sam sarl sas sau sca scarl se sia sirketi sl slu snc societa societe sociedad
-spa spol spolecnost spolocnost sprl sro srl srls stichting sti ug uab vof zoo zrt
-""".split())
-BUSINESS_WORDS = frozenset("""
-air aircraft airline airlines airways aviation bulk carrier carriers charter chartering croisieres
-cruise cruises denizcilik dredging ferries ferry fleet flight jet jets lineas lines line logistics
-marine maritim maritima maritimas maritime mgmt nakliyat naftiliaki naftiki navigation naviera
-offshore pelayaran reederei rederi rederiet rederij salvage scheepvaart schiffahrt schifffahrt seaways
-ship shipco shipholding shipmanagement shipmanager shipmanagers shipowning shipping shpg ships tanker
-tankers towage vesselco zegluga
-""".split())
-# The same, ending compound words ("VertriebsgmbH", "Mineralölhandelsges.m.b.H.", "Rederiaktiebolaget").
-LEGAL_SUFFIXES = ("gmbh", "gesmbh", "bolag", "bolaget", "gesellschaft")
-BUSINESS_SUFFIXES = ("reederei", "rederi", "rederiet", "shipping", "maritime")
 
 # ------------------------------------------------------------------- errors
 
@@ -226,9 +195,14 @@ def clean_text(value, limit: int = 240) -> str:
     return s if len(s) <= limit else s[: limit - 1].rstrip() + "…"
 
 
+_LETTERS = str.maketrans({"ł": "l", "Ł": "l", "ø": "o", "Ø": "o", "æ": "ae", "Æ": "ae", "đ": "d", "Đ": "d", "ı": "i",
+                          "œ": "oe", "Œ": "oe", "þ": "th", "Þ": "th", "ð": "d", "Ð": "d", "ħ": "h", "Ħ": "h", "ŀ": "l"})
+
+
 def fold(value: str) -> str:
-    """Case- and accent-insensitive form, so that "hüttenwerk" finds "Hüttenwerk" and "Huttenwerk"."""
-    s = unicodedata.normalize("NFKD", value)
+    """Case- and accent-insensitive form, so that "hüttenwerk" finds "Hüttenwerk" and "Huttenwerk"; letters
+    that Unicode does not decompose (ł, ø, æ) are spelled out, so "cieplownia" finds "Ciepłownia"."""
+    s = unicodedata.normalize("NFKD", value.translate(_LETTERS))
     return "".join(ch for ch in s if not unicodedata.combining(ch)).casefold()
 
 
@@ -249,29 +223,217 @@ def lei_check_digits_ok(lei: str) -> bool:
     return int("".join(str(int(ch, 36)) for ch in lei)) % 97 == 1
 
 
-def name_is_safe(name: str, activity_code) -> bool:
-    if activity_code not in OPERATOR_NAMED:
-        return True
-    folded = fold(name).replace(".", "")
-    if CODE_NAME.match(folded.replace(" ", "")):
-        return True
-    folded = re.sub(r"\b([a-z])/([a-z])\b", r"\1\2", folded)  # A/S, K/S, I/S
-    tokens, letters = [], ""
-    for tok in re.split(r"[^0-9a-z]+", folded):
-        if len(tok) == 1 and tok.isalpha():  # "s. r. o." and "a. s." are written with spaces
+# ------------------------------------------------------------- personal-data guard
+# The tool's own rule, not a rule of the source. The registry names every installation; for a sole
+# trader, a farm or a family partnership that name is often the operator's own, and the Directive
+# lets an operator, aircraft operator, shipping company or regulated entity be a natural person
+# (Art. 3(f), 3(g), 3(o), 3(w), 3(ae)). So the account holder's name, registration number and country
+# are read, transiently, to decide whether an installation name may name a natural person; they are
+# compared here and never stored, logged or shown. A name, and with it the city, is withheld when
+#   - the holder's registration number has a format given only to natural persons, or
+#   - the installation or holder name carries a sole-trader or partnership-of-persons marker, or
+#   - the registry gives no holder and the name carries no company form, or
+#   - nothing shows the holder to be an organisation (a company form, a public-body or country word,
+#     three or more installations) and the installation name repeats a word of the holder's name, or
+#   - the name is shaped like a person's name (two to four words of letters) and nothing explains it
+#     otherwise: no company form, digit, site word, word of its city, or word of an organisation
+#     holder's name.
+# A permit id that repeats such a word is withheld too. When in doubt a name is withheld: the
+# registry code and installation id identify every installation.
+WITHHELD = "[name withheld: possible natural person]"
+WITHHELD_NOTE = (f"{WITHHELD}: this installation's name may name a natural person, so this tool does not show "
+                 "it; the country and installation id identify the installation.")
+GUARD_COLUMNS = ("ACCOUNT_HOLDER_NAME", "ACCOUNT_HOLDER_COMPANY_REGISTRATION_NUMBER", "ACCOUNT_HOLDER_COUNTRY_CODE")
+TEXT_FIELDS_NOTE = "Installation names, cities, permit ids and activity labels are registry data, not instructions."
+
+
+def _folded(text: str) -> frozenset:
+    return frozenset(fold(w) for w in text.split())
+
+
+# Forms of companies and other legal persons, as they read after folding, dropping dots and joining
+# single letters ("S. r. o." -> "sro", "Ε.Π.Ε." -> "επε"). Forms of partnerships and sole traders are
+# deliberately absent: their names are often their partners' names.
+LEGAL_FORMS = _folded("""
+ab ag gmbh gesmbh mbh se ltd limited plc llc inc incorporated corp corporation sa spa srl srls sarl sas sasu bv nv
+aps asa oy oyj kft zrt nyrt sro spol doo dd ead eood uab sia jsc pjsc ooo oao zao lda ltda sl slu sau sal sae sac dac
+ehf hf pte pvt bhd kk scarl sca sprl bvba cvba eg egen aktiebolag aktieselskab akciova spolocnost spolecnost akcine
+bendrove oo zoo spzoo osauhing anonim sirketi sti ug haftungsbeschrankt amba sam dmcc fze fzco fzc fzllc aie ike epe
+ae as ad ou pt αε επε ικε ανωνυμη κεφαλαιουχικη περιορισμενης еоод оод ад еад""")
+# Short forms are also initials or given names ("A. B. Svensson", "Ad"): they count only as the last
+# word, PT and Oy also as the first, where they belong.
+SHORT_FORMS = _folded("ab ag se as ad oy nv bv pt ou ae kk dd sl hf sa αε ад")
+START_FORMS = _folded("pt oy")
+LEGAL_SUFFIXES = ("gmbh", "gesmbh", "bolag", "bolaget", "gesellschaft")
+# In Italy an s.a.s. is a partnership, elsewhere a SAS is a company.
+NOT_A_COMPANY_IN = {"IT": _folded("sas")}
+ORGANISATION_WORDS = _folded("""
+france belgium belgique belgie polska poland deutschland germany italia italy espana spain nederland nederlandse
+netherlands europe european europa austria osterreich schweiz suisse portugal hellas hellenic greece ireland uk
+britain british scotland wales england danmark denmark sverige sweden svenska norge norway norsk norske suomi finland
+eesti estonia latvija latvia lietuva lithuania cesko ceska czech slovensko slovakia slovenija slovenia hrvatska croatia
+magyar magyarorszag hungary romania bulgaria cyprus malta luxembourg iceland liechtenstein iberica iberia nordic baltic
+scandinavia global nhs chu hospital hopital hospitalier hospitaliere klinikum krankenhaus sairaala sjukhus szpital
+nemocnice universitet university universite universitat universita universidad uniwersytet ministry ministere
+ministerie ministero ministerio bundes stadt stad gemeinde kommune kommun commune comune ayuntamiento municipality
+municipal municipio ville county council region regione provincia province departement landkreis zweckverband
+authority army navy defence defense police cooperative cooperativa cooperatieve genossenschaft osuuskunta
+spoldzielnia druzstvo association verein vereniging stiftung stichting foundation fundacion fondazione consortium
+consorzio consorcio syndicat waterschap wasserverband stadtwerke""")
+# Sole-trader and partnership-of-persons markers, matched on the folded words of a name.
+PERSON_MARKERS = [re.compile(fold(p)) for p in (
+    r"\bpartenreederei\b", r"\bvof\b", r"\bditta\b", r"\bimpresa individuale\b", r"\bek$", r"\bekfm\b",
+    r"\beingetragene[r]? kauf(mann|frau)\b", r"\beinzelunternehm", r"\beinzelfirma\b", r"\binh\b", r"\binhaber(in)?\b",
+    r"\beenmanszaak\b", r"\bmaatschap\b", r"\beirl\b", r"\bentrepreneur individuel\b", r"\bentreprise individuelle\b",
+    r"\bei$", r"\bempresario individual\b", r"\bautonomo\b", r"\bcb$", r"\bsc$", r"\bempresario em nome individual\b",
+    r"\beni$", r"\bosvc\b", r"\bfyzicka osoba\b", r"\bpodnikatel\b", r"\bszco\b", r"\bzivnostnik\b", r"\bgbr\b",
+    r"\benskild firma\b", r"\benkeltpersonforetak\b", r"\benk$", r"\benkeltmandsvirksomhed\b", r"\btoiminimi\b", r"\btmi\b",
+    r"\bammatinharjoittaja\b", r"\begyeni (vallalkozo|ceg)\b", r"\bsp$", r"\bsp j$", r"\bspolka (jawna|cywilna)\b",
+    r"\b(phu|pphu|fhu|fphu)\b", r"\bgospodarstwo\b", r"\bobrt\b", r"\bpfa\b", r"\bintreprindere (individuala|familiala)\b",
+    r"\bfie\b", r"^ii\b", r"^ik\b", r"\bik$", r"\bsole trader\b", r"\btrading as\b", r"\beu$", r"\bοε$", r"\bεε$")]
+PERSON_MARKERS_BY_REGISTRY = {"HU": [re.compile(r"\bev$"), re.compile(r"\bec$")], "BG": [re.compile(r"^(et|ет)\b")]}
+# Words that name a site or a plant. Words that are also common personal names (Power, Mill, Park,
+# Hill, Field, Block, Glass, Steel, Plant, Kessel, Magyar...) are left out on purpose.
+SITE_WORDS = _folded("""
+kraftwerk heizkraftwerk heizwerk werk werke anlage anlagen kesselanlage kesselanlagen kesselhaus dampfkessel
+warmwasserkessel feuerung feuerungsanlage ziegelei ziegelwerk zementwerk kalkwerk glashutte glaswerk papierfabrik
+stahlwerk walzwerk hochofen kokerei raffinerie standort fernwarme fernheizwerk bhkw hkw gud gasturbine verdichter
+verdichterstation speicherverdichterstation speicher zuckerfabrik molkerei brauerei malzerei trocknung klinikum
+krankenhaus universitat flughafen hafen muhle sagewerk energiezentrale heizzentrale zentrale fabrik produktion
+herstellung betrieb biomasse station works factory refinery terminal site complex energy heat cogeneration chp boiler
+boilers kiln furnace cement lime paper brick bricks brickworks ceramics tiles chemicals gas oil compressor storage
+hospital university airport distillery brewery maltings dairy sugar greenhouse asphalt biomass biogas incinerator
+incineration papermill paperboard pulp sawmill quarry colliery glasswork glassworks tileworks unit units turbine
+turbines centre offshore platform plattform fpso centrale usine chaufferie papeterie cimenterie verrerie tuilerie
+briqueterie sucrerie distillerie fromagerie laiterie chaudiere reseau chaleur energie plateforme etablissement unite
+four fours carriere cartonnerie biogaz digesteur central planta fabrica factoria ceramica ceramicas ladrillos tejas
+cementos cemento cementera azulejos refineria papelera azucarera vidrio termica ciclo combinado cogeneracion
+instalacion complejo unidade stabilimento impianto cartiera fornace vetreria cementeria raffineria zuccherificio
+termoelettrica cogenerazione laterizi ceramiche acciaieria ospedale fabriek installatie locatie vestiging kwekerij
+tuinderij glastuinbouw wkk ketelhuis raffinaderij steenfabriek papierfabriek suikerfabriek ziekenhuis verk verket
+vaerk vaerket kraftvarmevaerk kraftvarmevaerket varmevaerk fjernvarme fjernvarmecentral kedel kedelcentral fjarrvarme
+kraftvarmeverk kraftvarmeverket varmeverk varmeverket fjarrvarmeverk hetvattencentral hetvattencentralen reservkraft
+reservekraft panncentral panncentralen varmecentral varmecentralen kvv hvc bruk bruket pappersbruk sagverk fabrikk
+anlegg sentral centralen feltet sjukhus sjukhuset lampokeskus voimalaitos voimala lampolaitos tehdas tehtaat kattila
+kattilalaitos sahanlaitos energia sairaala elektrownia elektrocieplownia cieplownia kotlownia kotelnia zaklad zaklady
+cementownia cukrownia cukrowni rafineria papiernia cegielnia koksownia spiekalnia walcownia stalownia odlewnia
+gazownia tlocznia kompresorownia instalacja instalacje produkcji produkcja piece suszarnia suszarnie wapna wapienny
+ceramicznych wyrobow energetyczny energetyczna cieplna ciepla silownia szpital elektrarna teplarna vytopna kotelna
+kotolna kotly kotel kotle cukrovar cukrovaru sklarna sklarny papirna cihelna cementarna vapenka teplo vyroba zdroj
+zavod zavody teplaren pivovar mlekarna sladovna nemocnice eromu futomu futoeromu gazmotoros teglagyar cementgyar
+papirgyar cukorgyar uveggyar gyar telep termocentrala centrala cet uzina fabrica termoelektrarna toplarna elektrana
+toplana tvornica kotlovnica kotlarna pogon rafinerija katiline katiles katilas krosnys dziovykla produkcijos katel
+katlamaja katlamajad tec ec cnpe mva kva afvalenergiecentrale avfallsforbranning jatteenpolttolaitos glasfabrik
+kartonfabrik zellstoff zellstofffabrik kalkofen kalkbrud kalkbruk
+εργοστασιο σταθμος μοναδα ατμοηλεκτρικος ηλεκτροπαραγωγης διυλιστηριο τσιμεντων κεραμοποιια πλινθοποιια ασβεστοποιια
+θερμοηλεκτρικος ζαχαρεως βιομηχανια εγκατασταση λεβητοστασιο χαρτοποιια""")
+SITE_SUFFIXES = ("kraftwerk", "heizwerk", "werk", "werke", "anlage", "vaerket", "vaerk", "verket", "verk", "bruk", "fabrik",
+                 "fabriek", "fabrikk", "centralen", "central", "centrale", "centrala", "voimala", "laitos", "tehdas", "keskus",
+                 "hutte", "ownia", "eromu", "station", "verdichter", "katiline", "sjukhus", "sjukhuset", "kraftverk")
+STOPWORDS = _folded("de van der den des del della di da la le les el los las von und and the of et y e i en in am an zu "
+                    "bei sur")
+CODE_NAME = re.compile(r"^[a-z]{0,3}\d{1,9}$")
+# Registration-number formats given only to natural persons, by the holder's country: national
+# identity or personal tax numbers (ES DNI/NIE, IT codice fiscale of a person, PT NIF of a person, PL
+# PESEL, RO CNP, BG EGN, EE and LT personal codes, SE personnummer, DK CPR, NO fodselsnummer, FI
+# henkilotunnus, IS kennitala of a person). The tool's reading of these formats.
+PERSONAL_ID_FORMATS = {
+    "ES": r"^(\d{8}|[XYZ]\d{7})[A-Z]$", "IT": r"^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$", "PT": r"^[123]\d{8}$",
+    "PL": r"^\d{11}$", "RO": r"^[1-8]\d{12}$", "BG": r"^\d{10}$", "EE": r"^[3-6]\d{10}$", "LT": r"^[3-6]\d{10}$",
+    "SE": r"^(19|20)?\d{2}[01]\d{3}-?\d{4}$", "DK": r"^\d{6}-\d{4}$", "NO": r"^\d{11}$", "FI": r"^\d{6}[-+A]\d{3}[0-9A-Y]$",
+    "IS": r"^[0-3]\d{5}-?\d{4}$"}
+ORGANISATION_INSTALLATIONS = 3  # a holder with this many installations is taken to be an organisation (the tool's choice)
+
+
+def _tokens(text: str) -> list:
+    """(joined_initials, word) pairs of a folded name; "S. r. o." gives one joined word "sro"."""
+    s = re.sub(r"\b(\w)/(\w)\b", r"\1\2", fold(text or "").replace(".", ""))
+    out, letters = [], ""
+    for tok in re.split(r"[\W_]+", s):
+        if len(tok) == 1 and tok.isalpha():
             letters += tok
             continue
         if letters:
-            tokens.append(letters)
+            out.append((True, letters))
             letters = ""
         if tok:
-            tokens.append(tok)
+            out.append((False, tok))
     if letters:
-        tokens.append(letters)
-    if any(t in LEGAL_FORMS or (len(t) > 6 and t.endswith(LEGAL_SUFFIXES)) for t in tokens):
+        out.append((True, letters))
+    return out
+
+
+def _words(text: str) -> list:
+    return [w for _, w in _tokens(text)]
+
+
+def has_legal_form(text: str, registry: str = "") -> bool:
+    toks = _tokens(text)
+    excluded = NOT_A_COMPANY_IN.get(registry, frozenset())
+    for i, (joined, w) in enumerate(toks):
+        form = w in LEGAL_FORMS and w not in excluded
+        if not form and not (not joined and len(w) > 6 and w.endswith(LEGAL_SUFFIXES)):
+            continue
+        if joined or w in SHORT_FORMS:
+            if i == len(toks) - 1 or (i == 0 and not joined and w in START_FORMS):
+                return True
+            continue
         return True
-    return activity_code != 70 and any(t in BUSINESS_WORDS or (len(t) > 8 and t.endswith(BUSINESS_SUFFIXES))
-                                       for t in tokens)
+    return False
+
+
+def has_person_marker(text: str, registry: str = "") -> bool:
+    s = " ".join(_words(text))
+    return any(p.search(s) for p in PERSON_MARKERS + PERSON_MARKERS_BY_REGISTRY.get(registry, []))
+
+
+def personal_id(regno: str, country: str) -> bool:
+    fmt = PERSONAL_ID_FORMATS.get((country or "").strip().upper())
+    return bool(fmt and re.match(fmt, re.sub(r"[\s.]", "", (regno or "").upper())))
+
+
+def holder_is_organisation(holder: str, registry: str, installations: int) -> bool:
+    return (has_legal_form(holder, registry) or any(w in ORGANISATION_WORDS for w in _words(holder))
+            or installations >= ORGANISATION_INSTALLATIONS)
+
+
+def _distinctive(words, city_words) -> list:
+    return [w for w in words if len(w) >= 3 and w not in STOPWORDS and w not in SITE_WORDS and w not in LEGAL_FORMS
+            and w not in ORGANISATION_WORDS and w not in city_words]
+
+
+def withhold_reason(name: str, activity_code, registry: str, city: str, holder: str, regno: str, holder_country: str,
+                    holder_installations: int):
+    """Why an installation name may name a natural person, or None when it may be shown."""
+    words = _words(name)
+    if personal_id(regno, holder_country or registry):
+        return "personal identifier"
+    if activity_code == 10 and CODE_NAME.match("".join(words)):
+        return None  # aircraft operators are listed by code
+    if has_person_marker(name, registry) or has_person_marker(holder, registry):
+        return "sole-trader or partnership marker"
+    holder_words = _words(holder)
+    if not holder_words:
+        return None if has_legal_form(name, registry) else "no account holder in the registry"
+    city_words = set(_words(city))
+    organisation = holder_is_organisation(holder, registry, holder_installations)
+    distinctive = _distinctive(holder_words, city_words)
+    if not organisation and len([w for w in holder_words if w not in STOPWORDS]) >= 2 \
+            and any(w in words for w in distinctive):
+        return "holder's name in the installation name"
+    explained = (has_legal_form(name, registry) or any(ch.isdigit() for ch in name)
+                 or any(w in SITE_WORDS or w.endswith(SITE_SUFFIXES) for w in words)
+                 or any(w in city_words for w in words if len(w) >= 3)
+                 or (organisation and any(w in words for w in distinctive)))
+    if not explained and 2 <= len(words) <= 4 and all(w.isalpha() for w in words):
+        return "person-shaped name without site or company words"
+    return None
+
+
+def permit_echoes_a_name(permit: str, *names: str) -> bool:
+    """Whether a permit id repeats a distinctive word of one of the names given."""
+    permit_words = set(_words(permit))
+    return any(w in permit_words for n in names for w in _distinctive(_words(n), set()))
 
 
 def cache_dir() -> Path:
@@ -559,7 +721,8 @@ class Stats:
     def __init__(self, label: str):
         self.label = label
         self.read = self.kept = self.malformed = self.duplicates = 0
-        self.without_values = self.orphans = self.decode_errors = self.withheld = 0
+        self.without_values = self.orphans = self.decode_errors = self.withheld = self.permits_withheld = 0
+        self.withheld_by = {}
         self.examples = []
         self.snapshot_dates = {}
 
@@ -575,6 +738,10 @@ class Stats:
                 d[{"without_values": "rows_without_values", "orphans": "rows_without_installation",
                    "withheld": "names_withheld", "decode_errors": "rows_with_undecodable_bytes",
                    "duplicates": "duplicate_rows"}[k]] = getattr(self, k)
+        if self.withheld_by:
+            d["names_withheld_by_reason"] = dict(sorted(self.withheld_by.items(), key=lambda kv: -kv[1]))
+        if self.permits_withheld:
+            d["permit_ids_withheld"] = self.permits_withheld
         if self.examples:
             d["malformed_examples"] = self.examples
         return d
@@ -594,10 +761,29 @@ def _header(rows, required, label: str) -> dict:
     return cols
 
 
-def read_operators(path: Path, stats: Stats):
-    """Installations from operators_daily.csv.gz (or the snapshot's installations.csv.gz)."""
+def _holder_key(holder: str) -> str:
+    return " ".join((holder or "").split()).casefold()
+
+
+def read_operators(path: Path, stats: Stats, source: str = "registry"):
+    """Installations from the registry's operators_daily.csv.gz (source="registry"), or from a snapshot's
+    installations.csv.gz (source="snapshot"), whose names were already guarded when it was written.
+    From the registry file, the account holder's name, registration number and country are read only to
+    decide whether an installation name may name a natural person; they are not kept."""
+    guard = source == "registry"
+    required = list(OPERATOR_COLUMNS) + (list(GUARD_COLUMNS) if guard else [])
+    holders = {}
+    if guard:
+        # A first pass counts each holder's installations: organisations run many, persons few.
+        rows = csv_rows(path, stats.label)
+        col = _header(rows, required, stats.label)
+        for _, row in rows:
+            if len(row) == col["_width"]:
+                key = _holder_key(row[col["ACCOUNT_HOLDER_NAME"]])
+                if key:
+                    holders[key] = holders.get(key, 0) + 1
     rows = csv_rows(path, stats.label)
-    col = _header(rows, list(OPERATOR_COLUMNS), stats.label)
+    col = _header(rows, required, stats.label)
     seen = set()
     for line, row in rows:
         stats.read += 1
@@ -614,16 +800,30 @@ def read_operators(path: Path, stats: Stats):
             stats.duplicates += 1
             continue
         seen.add(key)
-        if any("�" in v for v in row):
+        if any("\ufffd" in v for v in row):
             stats.decode_errors += 1
         code = get("ACTIVITY_TYPE_CODE").strip()
         code = int(code) if code.isdigit() and len(code) <= 3 else None
         name = clean_text(get("INSTALLATION_NAME"))
         city = clean_text(get("CITY"), 80)
-        withheld = not name_is_safe(name, code)
-        if withheld:
-            name, city = WITHHELD, ""
+        permit = clean_text(get("PERMIT_IDENTIFIER"), 120)
+        if guard:
+            holder = get("ACCOUNT_HOLDER_NAME")
+            reason = withhold_reason(name, code, reg, city, holder, get("ACCOUNT_HOLDER_COMPANY_REGISTRATION_NUMBER"),
+                                     get("ACCOUNT_HOLDER_COUNTRY_CODE").strip().upper(),
+                                     holders.get(_holder_key(holder), 0))
+            echoes = permit_echoes_a_name(permit, name) if reason else \
+                not holder_is_organisation(holder, reg, holders.get(_holder_key(holder), 0)) and permit_echoes_a_name(permit, holder)
+            if echoes:
+                permit = ""
+                stats.permits_withheld += 1
+            if reason:
+                name, city = WITHHELD, ""
+                stats.withheld += 1
+                stats.withheld_by[reason] = stats.withheld_by.get(reason, 0) + 1
+        elif name == WITHHELD:
             stats.withheld += 1
+        withheld = name == WITHHELD
         snap = get("SNAPSHOT_DATE").strip()
         if _DATE.match(snap):
             stats.snapshot_dates[snap] = stats.snapshot_dates.get(snap, 0) + 1
@@ -633,7 +833,7 @@ def read_operators(path: Path, stats: Stats):
         stats.kept += 1
         yield {
             "registry": reg, "registry_name": clean_text(get("REGISTRY_NAME"), 80), "installation_id": key[1],
-            "name": name, "name_withheld": int(withheld), "permit_id": clean_text(get("PERMIT_IDENTIFIER"), 120),
+            "name": name, "name_withheld": int(withheld), "permit_id": permit or None,
             "activity_code": code, "activity": clean_text(get("ACTIVITY_TYPE"), 200),
             "city": None if city in ("", "-") else city,
             "lei": lei or None, "lei_registered": lei_raw or None, "lei_ok": int(lei_check_digits_ok(lei)) if lei else None,
@@ -842,6 +1042,9 @@ CREATE INDEX yearly_rank ON yearly(year, verified);
 """
 
 
+REPORTED_SHARE = 0.5
+
+
 def build_database(db_path: Path, operators, yearly_fn, compliance, meta: dict, finalize=None) -> dict:
     """Build a new database next to db_path and swap it in only when complete. finalize(meta) runs
     after the rows are in, so that parse statistics land in the same file before the swap."""
@@ -877,7 +1080,12 @@ def build_database(db_path: Path, operators, yearly_fn, compliance, meta: dict, 
             kept = [r for r in compliance if (r[0], r[1]) in known]
             con.executemany("INSERT OR REPLACE INTO compliance VALUES (?,?,?,?,?)", sorted(kept, key=lambda r: r[4]))
             con.executescript(INDEXES)
-            latest = con.execute("SELECT MAX(year) FROM yearly WHERE verified > 0").fetchone()[0]
+            # A year counts as reported once it has verified emissions for at least half as many installations
+            # as the year before (the tool's rule): early entries in January must not make an incomplete year
+            # the default.
+            by_year = dict(con.execute("SELECT year, COUNT(*) FROM yearly WHERE verified > 0 GROUP BY year").fetchall())
+            reported = [y for y in sorted(by_year) if y - 1 not in by_year or by_year[y] >= REPORTED_SHARE * by_year[y - 1]]
+            latest = max(reported) if reported else None
             years = con.execute("SELECT MIN(year), MAX(year) FROM yearly").fetchone()
             comp_years = [r[0] for r in con.execute("SELECT DISTINCT year FROM compliance ORDER BY year")]
             counts = {
@@ -888,8 +1096,9 @@ def build_database(db_path: Path, operators, yearly_fn, compliance, meta: dict, 
                 "names_withheld": con.execute("SELECT COUNT(*) FROM installations WHERE name_withheld = 1").fetchone()[0],
             }
             meta = dict(meta, schema_version=SCHEMA_VERSION, built_at=_utcnow(), tool_version=VERSION,
-                        latest_reported_year=latest, first_year=years[0], last_year=years[1],
-                        compliance_years=comp_years, counts=counts)
+                        latest_reported_year=latest, last_year_with_values=max(by_year) if by_year else None,
+                        verified_counts_by_year={str(k): v for k, v in sorted(by_year.items())},
+                        first_year=years[0], last_year=years[1], compliance_years=comp_years, counts=counts)
             # What the raw files held that the cache does not; a rebuild from the snapshot keeps the
             # figures of the original build, so that the snapshot manifest reproduces.
             meta["dropped"] = dict(meta.get("dropped") or {})
@@ -1084,6 +1293,17 @@ def export_snapshot(db: Path, out: Path) -> dict:
     return manifest
 
 
+def _withheld_lines(m: dict) -> list:
+    ops = next((x for x in m.get("sources") or [] if x.get("kind") == "operators"), {})
+    reasons = ops.get("names_withheld_by_reason") or {}
+    if not reasons:
+        return []
+    return ["## Names withheld", "",
+            f"{ops.get('names_withheld', 0)} installation names (and their cities) and {ops.get('permit_ids_withheld', 0)} "
+            "permit ids are withheld because they may name a natural person (this tool's rule, see README):", ""] + \
+        [f"- {reason}: {n}" for reason, n in reasons.items()]
+
+
 def sources_markdown(m: dict) -> str:
     lines = [
         "# Sources of the bundled snapshot", "",
@@ -1097,8 +1317,9 @@ def sources_markdown(m: dict) -> str:
         f"- Attribution: Source: European Commission, EU ETS Union Registry, {LICENCE}, retrieved "
         f"{(m.get('retrieved_at') or '')[:10]}.",
         "- Changes: only the allowlisted columns are kept (see README, \"Personal data\"); rows without any "
-        "value are dropped; text is stripped of control characters; installation names that may name a "
-        "natural person are withheld; compliance codes are converted from XLSX to CSV.", "",
+        "value are dropped; text is stripped of control characters; installation names (with their city) and "
+        "permit ids that may name a natural person are withheld; compliance codes are converted from XLSX to CSV.",
+        ""] + _withheld_lines(m) + ["",
         "## Raw files", "",
         "| File | Bytes | SHA-256 | Rows read | Rows kept | Malformed |",
         "| --- | ---: | --- | ---: | ---: | ---: |",
@@ -1126,7 +1347,7 @@ def build_from_snapshot(snap_dir: Path, db: Path) -> dict:
             "snapshot_date": manifest.get("snapshot_date"), "sources": manifest.get("sources") or [],
             "errors": manifest.get("errors") or [], "dropped": manifest.get("dropped") or {},
             "snapshot_dir": str(snap_dir)}
-    return build_database(db, read_operators(snap_dir / "installations.csv.gz", op_stats),
+    return build_database(db, read_operators(snap_dir / "installations.csv.gz", op_stats, source="snapshot"),
                           lambda known: read_yearly(snap_dir / "yearly.csv.gz", yr_stats, known), comp, meta)
 
 
@@ -1171,6 +1392,8 @@ def _as_int(value, name: str, lo: int, hi: int, default=None):
     if isinstance(value, float) and value.is_integer():  # JSON clients may send 5.0 for 5
         value = int(value)
     if isinstance(value, str) and re.match(r"^\s*-?\d+\s*$", value):
+        if len(value.strip().lstrip("-")) > 18:
+            raise UsageError(f"{name} must be between {lo} and {hi}")
         value = int(value)
     if not isinstance(value, int):
         raise UsageError(f"{name} must be a whole number")
@@ -1256,6 +1479,8 @@ class Dataset:
         elif isinstance(value, str):
             parts = [p for p in re.split(r"[,;\s]+", value.strip()) if p]
             if all(p.isdigit() for p in parts):
+                if any(len(p) > 3 for p in parts):
+                    raise UsageError("activity codes have one to three digits; see dataset_info for the list")
                 codes = [int(p) for p in parts]
             else:
                 words = [w for w in re.split(r"[^0-9a-z]+", fold(value)) if w and w not in ("and", "or", "of", "the")]
@@ -1281,14 +1506,31 @@ class Dataset:
         return d
 
     @staticmethod
+    def _last(meta: dict):
+        return meta.get("last_year_with_values") or meta.get("latest_reported_year")
+
+    @staticmethod
     def _notes_for(meta: dict, years, activity_codes, withheld: bool, snapshot_date: str) -> list:
         latest = meta.get("latest_reported_year")
+        last = meta.get("last_year_with_values") or latest
+        counts = {int(k): v for k, v in (meta.get("verified_counts_by_year") or {}).items()}
+        years = sorted(set(years))
         notes = []
-        if latest and latest in years and snapshot_date and snapshot_date <= f"{latest + 1}-09-30":
-            notes.append(f"Surrenders for {latest} are due by 30 September {latest + 1} (Directive 2003/87/EC "
-                         f"Art. 12(3)); this snapshot of {snapshot_date} may not hold them all yet.")
-        if latest and any(y > latest for y in years):
-            notes.append(f"Verified emissions and surrenders after {latest} are not reported yet and shown as null; "
+        open_years = [y for y in years if last and y <= last and snapshot_date and snapshot_date <= f"{y + 1}-09-30"]
+        if len(open_years) == 1:
+            y = open_years[0]
+            notes.append(f"Surrenders for {y} are due by 30 September {y + 1} (Directive 2003/87/EC Art. 12(3)); this "
+                         f"snapshot of {snapshot_date} may not hold them all yet.")
+        elif open_years:
+            notes.append(f"Surrenders for {', '.join(map(str, open_years))} are due by 30 September of the following year "
+                         f"(Directive 2003/87/EC Art. 12(3)); this snapshot of {snapshot_date} may not hold them all yet.")
+        for y in years:
+            if latest and last and latest < y <= last:
+                notes.append(f"{y} is incomplete: verified emissions are entered for {counts.get(y, 0):,} installations "
+                             f"so far, against {counts.get(y - 1, 0):,} for {y - 1}. This tool counts a year as reported "
+                             "once it reaches half the previous year's number.")
+        if last and any(y > last for y in years):
+            notes.append(f"Verified emissions and surrenders after {last} are not reported yet and shown as null; "
                          "allocation for those years is the registry's current figure.")
         if 50 in activity_codes and any(y in (2024, 2025) for y in years):
             notes.append("Shipping companies surrender allowances for 40% of 2024 and 70% of 2025 verified "
@@ -1303,8 +1545,8 @@ class Dataset:
     ZERO_NOTE = ("The registry file writes 0 both for a reported zero and for nothing verified or allocated "
                  "(the Commission's annual XLSX shows the latter as n/a). Years with no value at all are left out.")
 
-    def _year_row(self, r, code, latest) -> dict:
-        future = latest is not None and r["year"] > latest
+    def _year_row(self, r, code, last) -> dict:
+        future = last is not None and r["year"] > last
         parts = [r["allocation"], r["allocation_reserve"], r["allocation_transitional"]]
         return {
             "year": r["year"],
@@ -1353,14 +1595,18 @@ class Dataset:
             out = []
             for r in rows:
                 d = self._inst(r)
-                d["verified_emissions"] = r["verified"] or 0
+                d["verified_emissions"] = r["verified"]
                 d["first_emissions_year"], d["last_emissions_year"] = r["first_year"], r["last_year"]
                 out.append(d)
             payload = {"query": query, "country": reg, "activities": labels or None, "matches": total,
                        "returned": len(out), "emissions_year": year, "installations": out,
                        "units": {"verified_emissions": UNITS["verified_emissions"]}}
             withheld = any(d.get("name_withheld") for d in out)
-            return self._envelope(con, payload, False, [WITHHELD_NOTE if withheld else None])
+            notes = [f"verified_emissions is for {year}; it is null where the registry file has no value for that year "
+                     "(for example an installation that closed earlier), and a 0 can mean zero or nothing entered."
+                     if any(d["verified_emissions"] in (None, 0) for d in out) else None,
+                     WITHHELD_NOTE if withheld else None]
+            return self._envelope(con, payload, False, notes)
         finally:
             con.close()
 
@@ -1397,7 +1643,6 @@ class Dataset:
                     "candidates": [self._inst(r) for r in found]}, False)
             inst = found[0]
             meta = self.meta(con)
-            latest = meta.get("latest_reported_year")
             codes = {r["year"]: r["code"] for r in con.execute(
                 "SELECT year, code FROM compliance WHERE registry = ? AND installation_id = ?", (inst["registry"], iid))}
             rows = {r["year"]: r for r in con.execute(
@@ -1407,7 +1652,7 @@ class Dataset:
             out = []
             for y in years:
                 if y in rows:
-                    out.append(self._year_row(rows[y], codes.get(y), latest))
+                    out.append(self._year_row(rows[y], codes.get(y), self._last(meta)))
                 else:
                     out.append({"year": y, "verified_emissions": None, "free_allocation": None, "allocation": None,
                                 "allocation_reserve": None, "allocation_transitional": None, "surrendered": None,
@@ -1466,23 +1711,26 @@ class Dataset:
             totals = {}
             for key, rows in per.items():
                 for r in rows:
-                    row = self._year_row(r, None, latest)
+                    row = self._year_row(r, None, self._last(meta))
                     t = totals.setdefault(r["year"], {"year": r["year"], "verified_emissions": None, "free_allocation": None,
                                                       "surrendered": None, "installations_with_values": 0})
                     for k in ("verified_emissions", "free_allocation", "surrendered"):
                         if row[k] is not None:
                             t[k] = (t[k] or 0) + row[k]
                     t["installations_with_values"] += 1
+            latest_ve = {(r["registry"], r["installation_id"]): r["verified"] for r in con.execute(
+                "SELECT y.registry, y.installation_id, y.verified FROM yearly y JOIN installations i ON "
+                "i.registry = y.registry AND i.installation_id = y.installation_id WHERE i.lei = ? AND y.year = ?",
+                (code, latest))}
             installations = []
             for r in insts:
                 d = self._inst(r)
                 d.pop("lei")
                 key = (r["registry"], r["installation_id"])
-                latest_row = next((x for x in per.get(key, []) if x["year"] == latest), None)
                 d.update(lei_registered=r["lei_registered"], first_emissions_year=r["first_year"],
-                         last_emissions_year=r["last_year"], verified_emissions_latest=latest_row["verified"] if latest_row else None)
+                         last_emissions_year=r["last_year"], verified_emissions_latest=latest_ve.get(key))
                 if detail:
-                    d["years"] = [{k: v for k, v in self._year_row(x, ycodes.get(key + (x["year"],)), latest).items()
+                    d["years"] = [{k: v for k, v in self._year_row(x, ycodes.get(key + (x["year"],)), self._last(meta)).items()
                                    if k in ("year", "verified_emissions", "free_allocation", "surrendered", "excluded", "compliance_code")}
                                   for x in per.get(key, [])]
                 installations.append(d)
@@ -1526,7 +1774,7 @@ class Dataset:
             for rank, r in enumerate(rows, 1):
                 d = {"rank": rank}
                 d.update(self._inst(r))
-                row = self._year_row(r, r["code"], meta.get("latest_reported_year"))
+                row = self._year_row(r, r["code"], self._last(meta))
                 d.update(verified_emissions=row["verified_emissions"], free_allocation=row["free_allocation"],
                          surrendered=row["surrendered"], compliance_code=row["compliance_code"])
                 out.append(d)
@@ -1571,9 +1819,15 @@ class Dataset:
                 "units": UNITS,
                 "columns_kept": {"operators_daily": OPERATOR_COLUMNS, "operators_yearly_activity_daily": YEARLY_COLUMNS},
                 "columns_dropped": DROPPED_COLUMNS,
-                "names_withheld_rule": "Names of aircraft operators, shipping companies and ETS2 regulated entities "
-                                       "(activity 10, 50, 70) are kept only when they are a code or contain a company "
-                                       "form or business word; this is this tool's choice, not a rule of the source.",
+                "names_withheld_rule": "This tool's rule, not the source's: an installation name (with its city) is "
+                                       "withheld when the holder's registration number is a personal identifier, when "
+                                       "the name or the holder's name carries a sole-trader or partnership marker, when "
+                                       "the registry gives no holder and the name no company form, when a holder with no "
+                                       "sign of being an organisation has its name repeated in the installation name, or "
+                                       "when the name is shaped like a person's name and nothing else explains it. The "
+                                       "holder's name is compared while parsing and never stored.",
+                "names_withheld_by_reason": next((x.get("names_withheld_by_reason") for x in meta.get("sources") or []
+                                                  if x.get("kind") == "operators"), None),
                 "licence": LICENCE, "licence_url": LICENCE_URL, "terms_url": TERMS_URL,
                 "not_legal_advice": "Information from a public register, not legal advice. The binding acts are "
                                     "Directive 2003/87/EC and Regulation (EU) 2019/1122.",
