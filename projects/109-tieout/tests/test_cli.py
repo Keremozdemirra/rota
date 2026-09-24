@@ -109,7 +109,6 @@ class Outputs(IsolatedTestCase):
 
     def test_min_digits_and_locale(self):
         rep = tieout.build_report(DECK, [MODEL], min_digits=3)
-        self.assertNotIn("62%", by_written(rep).get("62%", [{}])[0].get("status", "") * 0 + "")
         self.assertEqual(by_written(rep)["62%"][0]["reason"], "fewer than 3 digits (--min-digits)")
         rep = tieout.build_report(REPORT, [MODEL], locale="en")
         self.assertEqual(rep["number_format"], {"locale": "en", "basis": "set with --locale"})

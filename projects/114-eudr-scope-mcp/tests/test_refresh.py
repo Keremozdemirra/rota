@@ -179,7 +179,7 @@ class Unverified(unittest.TestCase):
         # Pretend the consolidated text did not yet include 2025/2650, and that
         # 2025/2650 did not touch Annex I: its Article 38 change is then unapplied.
         def cons(t):
-            return t.replace('title="32025R2650"\n                     >' + chr(0x25BA) + "M2", 'title="x"\n                     >M2')
+            return re.sub(r'(title="32025R2650"\s*>)' + chr(0x25BA) + r"(M2</a>)", r"\1\2", t)
 
         def act(t):
             return re.sub(r"in Annex I, in the table, the line", "in the table, the line", t)
