@@ -284,6 +284,8 @@ def parse_uba(data: bytes) -> tuple[list[dict], dict]:
             pairs.append({"year": year, "g_co2_per_kwh": n})
             year = None
     years = [p["year"] for p in pairs]
+    # 100 to 1500 g/kWh is this tool's plausibility bound for a national power mix, not a published
+    # threshold: a figure outside it means the sentence was misread.
     if not pairs or len(set(years)) != len(years) or not all(100 <= p["g_co2_per_kwh"] <= 1500 for p in pairs):
         raise RefreshError(f"UBA page: could not read year/value pairs reliably (got {pairs})")
     pairs.sort(key=lambda p: p["year"])

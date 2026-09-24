@@ -1,0 +1,166 @@
+{
+ "meta": {
+  "goldenCopy": {
+   "publishDate": "2026-09-24T00:00:00Z"
+  }
+ },
+ "data": {
+  "type": "lei-records",
+  "id": "529900VBK42Y5HHRMD23",
+  "attributes": {
+   "lei": "529900VBK42Y5HHRMD23",
+   "entity": {
+    "legalName": {
+     "name": "BlackRock, Inc.",
+     "language": "en"
+    },
+    "otherNames": [
+     {
+      "name": "BLACKROCK FUNDING, INC.",
+      "language": "en",
+      "type": "PREVIOUS_LEGAL_NAME"
+     }
+    ],
+    "transliteratedOtherNames": [],
+    "legalAddress": {
+     "language": "en",
+     "addressLines": [
+      "c/o CORPORATION SERVICE COMPANY, 251 LITTLE FALLS DRIVE"
+     ],
+     "addressNumber": null,
+     "addressNumberWithinBuilding": null,
+     "mailRouting": null,
+     "city": "WILMINGTON",
+     "region": "US-DE",
+     "country": "US",
+     "postalCode": "19808"
+    },
+    "headquartersAddress": {
+     "language": "en",
+     "addressLines": [
+      "50 HUDSON YARDS"
+     ],
+     "addressNumber": null,
+     "addressNumberWithinBuilding": null,
+     "mailRouting": null,
+     "city": "New York",
+     "region": "US-NY",
+     "country": "US",
+     "postalCode": "10001"
+    },
+    "registeredAt": {
+     "id": "RA000602",
+     "other": null
+    },
+    "registeredAs": "2886049",
+    "jurisdiction": "US-DE",
+    "category": "GENERAL",
+    "legalForm": {
+     "id": "XTIQ",
+     "other": null
+    },
+    "associatedEntity": {
+     "lei": null,
+     "name": null
+    },
+    "status": "ACTIVE",
+    "expiration": {
+     "date": null,
+     "reason": null
+    },
+    "successorEntity": {
+     "lei": null,
+     "name": null
+    },
+    "successorEntities": [],
+    "creationDate": "2024-01-07T23:00:00Z",
+    "subCategory": null,
+    "otherAddresses": [],
+    "eventGroups": [
+     {
+      "groupType": "STANDALONE",
+      "events": [
+       {
+        "validationDocuments": "SUPPORTING_DOCUMENTS",
+        "effectiveDate": "2025-03-23T23:00:00Z",
+        "recordedDate": "2025-03-24T14:52:25Z",
+        "type": "CHANGE_HQ_ADDRESS",
+        "status": "COMPLETED"
+       }
+      ]
+     }
+    ]
+   },
+   "registration": {
+    "initialRegistrationDate": "2024-08-05T11:05:33Z",
+    "lastUpdateDate": "2026-06-22T11:15:05Z",
+    "status": "ISSUED",
+    "nextRenewalDate": "2027-08-05T11:05:33Z",
+    "managingLou": "5299000J2N45DDNE4Y28",
+    "corroborationLevel": "FULLY_CORROBORATED",
+    "validatedAt": {
+     "id": "RA000602",
+     "other": null
+    },
+    "validatedAs": "2886049",
+    "otherValidationAuthorities": []
+   },
+   "bic": null,
+   "mic": null,
+   "ocid": "us_de/2886049",
+   "qcc": null,
+   "gem": null,
+   "spglobal": [
+    "403413"
+   ],
+   "conformityFlag": "CONFORMING"
+  },
+  "relationships": {
+   "managing-lou": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/529900VBK42Y5HHRMD23/managing-lou"
+    }
+   },
+   "lei-issuer": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/529900VBK42Y5HHRMD23/lei-issuer"
+    }
+   },
+   "field-modifications": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/529900VBK42Y5HHRMD23/field-modifications"
+    }
+   },
+   "direct-parent": {
+    "links": {
+     "reporting-exception": "https://api.gleif.org/api/v1/lei-records/529900VBK42Y5HHRMD23/direct-parent-reporting-exception"
+    }
+   },
+   "ultimate-parent": {
+    "links": {
+     "reporting-exception": "https://api.gleif.org/api/v1/lei-records/529900VBK42Y5HHRMD23/ultimate-parent-reporting-exception"
+    }
+   },
+   "direct-children": {
+    "links": {
+     "relationship-records": "https://api.gleif.org/api/v1/lei-records/529900VBK42Y5HHRMD23/direct-child-relationships",
+     "related": "https://api.gleif.org/api/v1/lei-records/529900VBK42Y5HHRMD23/direct-children"
+    }
+   },
+   "ultimate-children": {
+    "links": {
+     "relationship-records": "https://api.gleif.org/api/v1/lei-records/529900VBK42Y5HHRMD23/ultimate-child-relationships",
+     "related": "https://api.gleif.org/api/v1/lei-records/529900VBK42Y5HHRMD23/ultimate-children"
+    }
+   },
+   "isins": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/529900VBK42Y5HHRMD23/isins"
+    }
+   }
+  },
+  "links": {
+   "self": "https://api.gleif.org/api/v1/lei-records/529900VBK42Y5HHRMD23"
+  }
+ }
+}

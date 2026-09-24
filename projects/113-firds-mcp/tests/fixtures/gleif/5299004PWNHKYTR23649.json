@@ -1,0 +1,134 @@
+{
+ "meta": {
+  "goldenCopy": {
+   "publishDate": "2026-09-24T00:00:00Z"
+  }
+ },
+ "data": {
+  "type": "lei-records",
+  "id": "5299004PWNHKYTR23649",
+  "attributes": {
+   "lei": "5299004PWNHKYTR23649",
+   "entity": {
+    "legalName": {
+     "name": "Volkswagen International Finance N.V.",
+     "language": "nl"
+    },
+    "otherNames": [],
+    "transliteratedOtherNames": [],
+    "legalAddress": {
+     "language": "nl",
+     "addressLines": [
+      "Paleisstraat 1"
+     ],
+     "addressNumber": null,
+     "addressNumberWithinBuilding": null,
+     "mailRouting": null,
+     "city": "Amsterdam",
+     "region": "NL-NH",
+     "country": "NL",
+     "postalCode": "1012 RB"
+    },
+    "headquartersAddress": {
+     "language": "nl",
+     "addressLines": [
+      "Paleisstraat 1"
+     ],
+     "addressNumber": null,
+     "addressNumberWithinBuilding": null,
+     "mailRouting": null,
+     "city": "Amsterdam",
+     "region": "NL-NH",
+     "country": "NL",
+     "postalCode": "1012 RB"
+    },
+    "registeredAt": {
+     "id": "RA000463",
+     "other": null
+    },
+    "registeredAs": "33148825",
+    "jurisdiction": "NL",
+    "category": "GENERAL",
+    "legalForm": {
+     "id": "B5PM",
+     "other": null
+    },
+    "associatedEntity": {
+     "lei": null,
+     "name": null
+    },
+    "status": "ACTIVE",
+    "expiration": {
+     "date": null,
+     "reason": null
+    },
+    "successorEntity": {
+     "lei": null,
+     "name": null
+    },
+    "successorEntities": [],
+    "creationDate": "1977-04-14T23:00:00Z",
+    "subCategory": null,
+    "otherAddresses": [],
+    "eventGroups": []
+   },
+   "registration": {
+    "initialRegistrationDate": "2013-12-17T14:39:53Z",
+    "lastUpdateDate": "2026-09-15T09:21:35Z",
+    "status": "ISSUED",
+    "nextRenewalDate": "2026-12-20T23:00:00Z",
+    "managingLou": "5299000J2N45DDNE4Y28",
+    "corroborationLevel": "FULLY_CORROBORATED",
+    "validatedAt": {
+     "id": "RA000463",
+     "other": null
+    },
+    "validatedAs": "33148825",
+    "otherValidationAuthorities": []
+   },
+   "bic": [
+    "VOIFNL21XXX"
+   ],
+   "mic": null,
+   "ocid": "nl/33148825",
+   "qcc": "QNLJ3DHEWH",
+   "gem": null,
+   "spglobal": [
+    "20486896"
+   ],
+   "conformityFlag": "CONFORMING"
+  },
+  "relationships": {
+   "managing-lou": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/5299004PWNHKYTR23649/managing-lou"
+    }
+   },
+   "lei-issuer": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/5299004PWNHKYTR23649/lei-issuer"
+    }
+   },
+   "field-modifications": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/5299004PWNHKYTR23649/field-modifications"
+    }
+   },
+   "direct-parent": {
+    "links": {
+     "relationship-record": "https://api.gleif.org/api/v1/lei-records/5299004PWNHKYTR23649/direct-parent-relationship",
+     "lei-record": "https://api.gleif.org/api/v1/lei-records/5299004PWNHKYTR23649/direct-parent"
+    }
+   },
+   "ultimate-parent": {
+    "links": {
+     "relationship-record": "https://api.gleif.org/api/v1/lei-records/5299004PWNHKYTR23649/ultimate-parent-relationship",
+     "lei-record": "https://api.gleif.org/api/v1/lei-records/5299004PWNHKYTR23649/ultimate-parent"
+    }
+   }
+  },
+  "links": {
+   "self": "https://api.gleif.org/api/v1/lei-records/5299004PWNHKYTR23649"
+  }
+ }
+}

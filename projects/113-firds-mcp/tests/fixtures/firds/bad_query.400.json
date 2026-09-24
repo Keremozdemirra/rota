@@ -1,0 +1,13 @@
+{
+  "responseHeader":{
+    "status":400,
+    "QTime":12,
+    "params":{
+      "q":"isin:(",
+      "wt":"json"}},
+  "error":{
+    "metadata":[
+      "error-class","org.apache.solr.common.SolrException",
+      "root-error-class","org.apache.solr.parser.ParseException"],
+    "msg":"org.apache.solr.search.SyntaxError: Cannot parse 'isin:(': Encountered \"<EOF>\" at line 1, column 6.\r\nWas expecting one of:\r\n    <NOT> ...\r\n    \"+\" ...\r\n    \"-\" ...\r\n    <BAREOPER> ...\r\n    \"(\" ...\r\n    \"*\" ...\r\n    <QUOTED> ...\r\n    <TERM> ...\r\n    <PREFIXTERM> ...\r\n    <WILDTERM> ...\r\n    <REGEXPTERM> ...\r\n    \"[\" ...\r\n    \"{\" ...\r\n    <LPARAMS> ...\r\n    \"filter(\" ...\r\n    <NUMBER> ...\r\n    <TERM> ...\r\n    ",
+    "code":400}}

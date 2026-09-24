@@ -1,0 +1,279 @@
+{
+ "meta": {
+  "goldenCopy": {
+   "publishDate": "2026-09-24T00:00:00Z"
+  },
+  "pagination": {
+   "currentPage": 1,
+   "perPage": 2,
+   "from": 1,
+   "to": 2,
+   "total": 327,
+   "lastPage": 164
+  }
+ },
+ "links": {
+  "first": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/direct-children?page%5Bnumber%5D=1&page%5Bsize%5D=2",
+  "next": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/direct-children?page%5Bnumber%5D=2&page%5Bsize%5D=2",
+  "last": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/direct-children?page%5Bnumber%5D=164&page%5Bsize%5D=2"
+ },
+ "data": [
+  {
+   "type": "lei-records",
+   "id": "9598005PGS3B6FWRJ071",
+   "attributes": {
+    "lei": "9598005PGS3B6FWRJ071",
+    "entity": {
+     "legalName": {
+      "name": "FAIRFIELD INVEST SL",
+      "language": "es"
+     },
+     "otherNames": [],
+     "transliteratedOtherNames": [],
+     "legalAddress": {
+      "language": "es",
+      "addressLines": [
+       "C/ NANCLARES DE OCA 1 b"
+      ],
+      "addressNumber": "1",
+      "addressNumberWithinBuilding": "b",
+      "mailRouting": null,
+      "city": "Madrid",
+      "region": null,
+      "country": "ES",
+      "postalCode": "28022"
+     },
+     "headquartersAddress": {
+      "language": "es",
+      "addressLines": [
+       "C/ NANCLARES DE OCA 1 b"
+      ],
+      "addressNumber": "1",
+      "addressNumberWithinBuilding": "b",
+      "mailRouting": null,
+      "city": "Madrid",
+      "region": null,
+      "country": "ES",
+      "postalCode": "28022"
+     },
+     "registeredAt": {
+      "id": "RA000533",
+      "other": null
+     },
+     "registeredAs": "1000296284890",
+     "jurisdiction": "ES",
+     "category": "GENERAL",
+     "legalForm": {
+      "id": "DP3Q",
+      "other": null
+     },
+     "associatedEntity": {
+      "lei": null,
+      "name": null
+     },
+     "status": "ACTIVE",
+     "expiration": {
+      "date": null,
+      "reason": null
+     },
+     "successorEntity": {
+      "lei": null,
+      "name": null
+     },
+     "successorEntities": [],
+     "creationDate": "2016-03-01T11:00:00Z",
+     "subCategory": null,
+     "otherAddresses": [],
+     "eventGroups": []
+    },
+    "registration": {
+     "initialRegistrationDate": "2026-04-17T06:49:17Z",
+     "lastUpdateDate": "2026-08-15T08:13:26Z",
+     "status": "ISSUED",
+     "nextRenewalDate": "2027-04-17T06:49:17Z",
+     "managingLou": "959800R2X69K6Y6MX775",
+     "corroborationLevel": "FULLY_CORROBORATED",
+     "validatedAt": {
+      "id": "RA000533",
+      "other": null
+     },
+     "validatedAs": "1000296284890",
+     "otherValidationAuthorities": [
+      {
+       "validatedAt": {
+        "id": "RA000535"
+       },
+       "validatedAs": "B87507679"
+      }
+     ]
+    },
+    "bic": null,
+    "mic": null,
+    "ocid": null,
+    "qcc": "QESG9E50KH",
+    "gem": null,
+    "spglobal": [
+     "716175149"
+    ],
+    "conformityFlag": "CONFORMING"
+   },
+   "relationships": {
+    "managing-lou": {
+     "links": {
+      "related": "https://api.gleif.org/api/v1/lei-records/9598005PGS3B6FWRJ071/managing-lou"
+     }
+    },
+    "lei-issuer": {
+     "links": {
+      "related": "https://api.gleif.org/api/v1/lei-records/9598005PGS3B6FWRJ071/lei-issuer"
+     }
+    },
+    "field-modifications": {
+     "links": {
+      "related": "https://api.gleif.org/api/v1/lei-records/9598005PGS3B6FWRJ071/field-modifications"
+     }
+    },
+    "direct-parent": {
+     "links": {
+      "relationship-record": "https://api.gleif.org/api/v1/lei-records/9598005PGS3B6FWRJ071/direct-parent-relationship",
+      "lei-record": "https://api.gleif.org/api/v1/lei-records/9598005PGS3B6FWRJ071/direct-parent"
+     }
+    },
+    "ultimate-parent": {
+     "links": {
+      "relationship-record": "https://api.gleif.org/api/v1/lei-records/9598005PGS3B6FWRJ071/ultimate-parent-relationship",
+      "lei-record": "https://api.gleif.org/api/v1/lei-records/9598005PGS3B6FWRJ071/ultimate-parent"
+     }
+    }
+   },
+   "links": {
+    "self": "https://api.gleif.org/api/v1/lei-records/9598005PGS3B6FWRJ071"
+   }
+  },
+  {
+   "type": "lei-records",
+   "id": "529900BXMRWF4BF5M980",
+   "attributes": {
+    "lei": "529900BXMRWF4BF5M980",
+    "entity": {
+     "legalName": {
+      "name": "GAHL HOLDINGS LLC",
+      "language": "en"
+     },
+     "otherNames": [],
+     "transliteratedOtherNames": [],
+     "legalAddress": {
+      "language": "en",
+      "addressLines": [
+       "c/o THE CORPORATION TRUST COMPANY, CORPORATION TRUST CENTER 1209 ORANGE ST"
+      ],
+      "addressNumber": null,
+      "addressNumberWithinBuilding": null,
+      "mailRouting": null,
+      "city": "Wilmington",
+      "region": "US-DE",
+      "country": "US",
+      "postalCode": "19801"
+     },
+     "headquartersAddress": {
+      "language": "en",
+      "addressLines": [
+       "1 Columbus Circle"
+      ],
+      "addressNumber": null,
+      "addressNumberWithinBuilding": null,
+      "mailRouting": null,
+      "city": "New York",
+      "region": "US-NY",
+      "country": "US",
+      "postalCode": "10019"
+     },
+     "registeredAt": {
+      "id": "RA000602",
+      "other": null
+     },
+     "registeredAs": "10332453",
+     "jurisdiction": "US-DE",
+     "category": "GENERAL",
+     "legalForm": {
+      "id": "HZEH",
+      "other": null
+     },
+     "associatedEntity": {
+      "lei": null,
+      "name": null
+     },
+     "status": "ACTIVE",
+     "expiration": {
+      "date": null,
+      "reason": null
+     },
+     "successorEntity": {
+      "lei": null,
+      "name": null
+     },
+     "successorEntities": [],
+     "creationDate": "2025-09-14T22:00:00Z",
+     "subCategory": null,
+     "otherAddresses": [],
+     "eventGroups": []
+    },
+    "registration": {
+     "initialRegistrationDate": "2025-09-18T14:27:41Z",
+     "lastUpdateDate": "2026-08-17T13:24:44Z",
+     "status": "ISSUED",
+     "nextRenewalDate": "2027-09-18T14:27:41Z",
+     "managingLou": "5299000J2N45DDNE4Y28",
+     "corroborationLevel": "FULLY_CORROBORATED",
+     "validatedAt": {
+      "id": "RA000602",
+      "other": null
+     },
+     "validatedAs": "10332453",
+     "otherValidationAuthorities": []
+    },
+    "bic": null,
+    "mic": null,
+    "ocid": "us_de/10332453",
+    "qcc": null,
+    "gem": null,
+    "spglobal": [
+     "1961174797"
+    ],
+    "conformityFlag": "CONFORMING"
+   },
+   "relationships": {
+    "managing-lou": {
+     "links": {
+      "related": "https://api.gleif.org/api/v1/lei-records/529900BXMRWF4BF5M980/managing-lou"
+     }
+    },
+    "lei-issuer": {
+     "links": {
+      "related": "https://api.gleif.org/api/v1/lei-records/529900BXMRWF4BF5M980/lei-issuer"
+     }
+    },
+    "field-modifications": {
+     "links": {
+      "related": "https://api.gleif.org/api/v1/lei-records/529900BXMRWF4BF5M980/field-modifications"
+     }
+    },
+    "direct-parent": {
+     "links": {
+      "relationship-record": "https://api.gleif.org/api/v1/lei-records/529900BXMRWF4BF5M980/direct-parent-relationship",
+      "lei-record": "https://api.gleif.org/api/v1/lei-records/529900BXMRWF4BF5M980/direct-parent"
+     }
+    },
+    "ultimate-parent": {
+     "links": {
+      "relationship-record": "https://api.gleif.org/api/v1/lei-records/529900BXMRWF4BF5M980/ultimate-parent-relationship",
+      "lei-record": "https://api.gleif.org/api/v1/lei-records/529900BXMRWF4BF5M980/ultimate-parent"
+     }
+    }
+   },
+   "links": {
+    "self": "https://api.gleif.org/api/v1/lei-records/529900BXMRWF4BF5M980"
+   }
+  }
+ ]
+}

@@ -1,0 +1,58 @@
+{
+ "meta": {
+  "goldenCopy": {
+   "publishDate": "2026-09-24T00:00:00Z"
+  }
+ },
+ "data": {
+  "type": "relationship-records",
+  "id": "549300QS4Q1IT6XCA514|LEI|IS_SUBFUND_OF|7|37c91653e647719dc4aa655c271e0b38222b33dbbc0486b3012cf7142f88221b|",
+  "attributes": {
+   "validFrom": "2025-12-02T16:00:00Z",
+   "validTo": null,
+   "relationship": {
+    "startNode": {
+     "id": "549300QS4Q1IT6XCA514",
+     "type": "LEI"
+    },
+    "endNode": {
+     "id": "549300PZLRJB7M8H1057",
+     "type": "LEI"
+    },
+    "type": "IS_SUBFUND_OF",
+    "status": "ACTIVE",
+    "periods": [
+     {
+      "startDate": "2019-07-02T22:00:00Z",
+      "type": "RELATIONSHIP_PERIOD"
+     }
+    ]
+   },
+   "registration": {
+    "initialRegistrationDate": "2023-01-19T10:18:22Z",
+    "lastUpdateDate": "2025-12-02T10:01:26Z",
+    "status": "PUBLISHED",
+    "nextRenewalDate": "2027-01-19T10:18:22Z",
+    "managingLou": "5299000J2N45DDNE4Y28",
+    "corroborationLevel": "FULLY_CORROBORATED",
+    "corroborationDocuments": "SUPPORTING_DOCUMENTS",
+    "corroborationReference": null
+   },
+   "extension": {
+    "deletedAt": null
+   }
+  },
+  "relationships": {
+   "start-node": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/549300QS4Q1IT6XCA514"
+    }
+   },
+   "end-node": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/549300PZLRJB7M8H1057"
+    }
+   }
+  }
+ }
+}

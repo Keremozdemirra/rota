@@ -1,0 +1,178 @@
+{
+ "meta": {
+  "goldenCopy": {
+   "publishDate": "2026-09-24T00:00:00Z"
+  }
+ },
+ "data": {
+  "type": "lei-records",
+  "id": "7LTWFZYICNSX8D621K86",
+  "attributes": {
+   "lei": "7LTWFZYICNSX8D621K86",
+   "entity": {
+    "legalName": {
+     "name": "DEUTSCHE BANK AKTIENGESELLSCHAFT",
+     "language": "de"
+    },
+    "otherNames": [],
+    "transliteratedOtherNames": [],
+    "legalAddress": {
+     "language": "de",
+     "addressLines": [
+      "Taunusanlage 12"
+     ],
+     "addressNumber": null,
+     "addressNumberWithinBuilding": null,
+     "mailRouting": null,
+     "city": "Frankfurt am Main",
+     "region": "DE-HE",
+     "country": "DE",
+     "postalCode": "60325"
+    },
+    "headquartersAddress": {
+     "language": "de",
+     "addressLines": [
+      "Taunusanlage 12"
+     ],
+     "addressNumber": null,
+     "addressNumberWithinBuilding": null,
+     "mailRouting": null,
+     "city": "Frankfurt am Main",
+     "region": "DE-HE",
+     "country": "DE",
+     "postalCode": "60325"
+    },
+    "registeredAt": {
+     "id": "RA000242",
+     "other": null
+    },
+    "registeredAs": "HRB 30000",
+    "jurisdiction": "DE",
+    "category": "GENERAL",
+    "legalForm": {
+     "id": "6QQB",
+     "other": null
+    },
+    "associatedEntity": {
+     "lei": null,
+     "name": null
+    },
+    "status": "ACTIVE",
+    "expiration": {
+     "date": null,
+     "reason": null
+    },
+    "successorEntity": {
+     "lei": null,
+     "name": null
+    },
+    "successorEntities": [],
+    "creationDate": "1952-11-10T23:00:00Z",
+    "subCategory": null,
+    "otherAddresses": [],
+    "eventGroups": [
+     {
+      "groupType": "STANDALONE",
+      "events": [
+       {
+        "validationDocuments": "SUPPORTING_DOCUMENTS",
+        "effectiveDate": "2025-08-05T22:00:00Z",
+        "recordedDate": "2025-09-01T10:30:19Z",
+        "type": "MERGERS_AND_ACQUISITIONS",
+        "status": "COMPLETED"
+       }
+      ]
+     }
+    ]
+   },
+   "registration": {
+    "initialRegistrationDate": "2012-06-06T15:51:15Z",
+    "lastUpdateDate": "2026-04-07T08:05:10Z",
+    "status": "ISSUED",
+    "nextRenewalDate": "2027-06-02T06:47:59Z",
+    "managingLou": "5299000J2N45DDNE4Y28",
+    "corroborationLevel": "FULLY_CORROBORATED",
+    "validatedAt": {
+     "id": "RA000242",
+     "other": null
+    },
+    "validatedAs": "HRB 30000",
+    "otherValidationAuthorities": []
+   },
+   "bic": [
+    "DBSCESMMXXX",
+    "DEUTAEAAXXX",
+    "DEUTATWWXXX"
+   ],
+   "mic": [
+    "DBOX"
+   ],
+   "ocid": "de/M1201_HRB30000",
+   "qcc": "QDEK0YCPBD",
+   "gem": "E100000136992",
+   "spglobal": [
+    "410467"
+   ],
+   "conformityFlag": "CONFORMING"
+  },
+  "relationships": {
+   "managing-lou": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/managing-lou"
+    }
+   },
+   "lei-issuer": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/lei-issuer"
+    }
+   },
+   "field-modifications": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/field-modifications"
+    }
+   },
+   "direct-parent": {
+    "links": {
+     "reporting-exception": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/direct-parent-reporting-exception"
+    }
+   },
+   "ultimate-parent": {
+    "links": {
+     "reporting-exception": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/ultimate-parent-reporting-exception"
+    }
+   },
+   "direct-children": {
+    "links": {
+     "relationship-records": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/direct-child-relationships",
+     "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/direct-children"
+    }
+   },
+   "ultimate-children": {
+    "links": {
+     "relationship-records": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/ultimate-child-relationships",
+     "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/ultimate-children"
+    }
+   },
+   "branches": {
+    "links": {
+     "relationship-records": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/branch-relationships",
+     "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/branches"
+    }
+   },
+   "managed-funds": {
+    "links": {
+     "relationship-records": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/managed-fund-relationships",
+     "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/managed-funds"
+    }
+   },
+   "isins": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86/isins"
+    }
+   }
+  },
+  "links": {
+   "self": "https://api.gleif.org/api/v1/lei-records/7LTWFZYICNSX8D621K86"
+  }
+ }
+}

@@ -1,0 +1,149 @@
+{
+ "meta": {
+  "goldenCopy": {
+   "publishDate": "2026-09-24T00:00:00Z"
+  }
+ },
+ "data": {
+  "type": "lei-records",
+  "id": "529900NNUPAGGOMPXZ31",
+  "attributes": {
+   "lei": "529900NNUPAGGOMPXZ31",
+   "entity": {
+    "legalName": {
+     "name": "VOLKSWAGEN AKTIENGESELLSCHAFT",
+     "language": "de"
+    },
+    "otherNames": [],
+    "transliteratedOtherNames": [],
+    "legalAddress": {
+     "language": "de",
+     "addressLines": [
+      "Berliner Ring 2"
+     ],
+     "addressNumber": null,
+     "addressNumberWithinBuilding": null,
+     "mailRouting": null,
+     "city": "Wolfsburg",
+     "region": "DE-NI",
+     "country": "DE",
+     "postalCode": "38440"
+    },
+    "headquartersAddress": {
+     "language": "de",
+     "addressLines": [
+      "Berliner Ring 2"
+     ],
+     "addressNumber": null,
+     "addressNumberWithinBuilding": null,
+     "mailRouting": null,
+     "city": "Wolfsburg",
+     "region": "DE-NI",
+     "country": "DE",
+     "postalCode": "38440"
+    },
+    "registeredAt": {
+     "id": "RA000221",
+     "other": null
+    },
+    "registeredAs": "HRB 100484",
+    "jurisdiction": "DE",
+    "category": "GENERAL",
+    "legalForm": {
+     "id": "6QQB",
+     "other": null
+    },
+    "associatedEntity": {
+     "lei": null,
+     "name": null
+    },
+    "status": "ACTIVE",
+    "expiration": {
+     "date": null,
+     "reason": null
+    },
+    "successorEntity": {
+     "lei": null,
+     "name": null
+    },
+    "successorEntities": [],
+    "creationDate": "1961-04-26T23:00:00Z",
+    "subCategory": null,
+    "otherAddresses": [],
+    "eventGroups": []
+   },
+   "registration": {
+    "initialRegistrationDate": "2013-11-14T10:04:05Z",
+    "lastUpdateDate": "2025-09-16T10:05:31Z",
+    "status": "ISSUED",
+    "nextRenewalDate": "2026-11-14T10:04:05Z",
+    "managingLou": "5299000J2N45DDNE4Y28",
+    "corroborationLevel": "FULLY_CORROBORATED",
+    "validatedAt": {
+     "id": "RA000221",
+     "other": null
+    },
+    "validatedAs": "HRB 100484",
+    "otherValidationAuthorities": []
+   },
+   "bic": [
+    "VWAGDE22XXX"
+   ],
+   "mic": null,
+   "ocid": "de/P1103_HRB100484",
+   "qcc": null,
+   "gem": "E100000000459",
+   "spglobal": [
+    "377732"
+   ],
+   "conformityFlag": "CONFORMING"
+  },
+  "relationships": {
+   "managing-lou": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/529900NNUPAGGOMPXZ31/managing-lou"
+    }
+   },
+   "lei-issuer": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/529900NNUPAGGOMPXZ31/lei-issuer"
+    }
+   },
+   "field-modifications": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/529900NNUPAGGOMPXZ31/field-modifications"
+    }
+   },
+   "direct-parent": {
+    "links": {
+     "reporting-exception": "https://api.gleif.org/api/v1/lei-records/529900NNUPAGGOMPXZ31/direct-parent-reporting-exception"
+    }
+   },
+   "ultimate-parent": {
+    "links": {
+     "reporting-exception": "https://api.gleif.org/api/v1/lei-records/529900NNUPAGGOMPXZ31/ultimate-parent-reporting-exception"
+    }
+   },
+   "direct-children": {
+    "links": {
+     "relationship-records": "https://api.gleif.org/api/v1/lei-records/529900NNUPAGGOMPXZ31/direct-child-relationships",
+     "related": "https://api.gleif.org/api/v1/lei-records/529900NNUPAGGOMPXZ31/direct-children"
+    }
+   },
+   "ultimate-children": {
+    "links": {
+     "relationship-records": "https://api.gleif.org/api/v1/lei-records/529900NNUPAGGOMPXZ31/ultimate-child-relationships",
+     "related": "https://api.gleif.org/api/v1/lei-records/529900NNUPAGGOMPXZ31/ultimate-children"
+    }
+   },
+   "isins": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/529900NNUPAGGOMPXZ31/isins"
+    }
+   }
+  },
+  "links": {
+   "self": "https://api.gleif.org/api/v1/lei-records/529900NNUPAGGOMPXZ31"
+  }
+ }
+}

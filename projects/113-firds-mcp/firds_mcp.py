@@ -32,6 +32,7 @@ import datetime as _dt
 import email.utils
 import http.client
 import json
+import math
 import os
 import re
 import socket
@@ -260,8 +261,10 @@ def lei_check_digits(first18: str) -> str:
 
 
 def _quote_input(value) -> str:
-    s = clean(str(value), 40)
-    return repr(s)
+    # Echo only what looks like an attempt at a code. Anything else (a URL with a password,
+    # a pasted token) is described, never repeated.
+    s = str(value).strip()
+    return repr(s) if re.fullmatch(r"[A-Za-z0-9]{1,24}", s) else "the input"
 
 
 def check_isin(value) -> str:
@@ -272,7 +275,7 @@ def check_isin(value) -> str:
     if len(s) != 12:
         raise InputError(f"not an ISIN: {_quote_input(value)} has {len(s)} characters; an ISIN has 12")
     if not _ISIN_SHAPE.fullmatch(s):
-        raise InputError(f"not an ISIN: {_quote_input(value)}; an ISIN is two letters, nine letters or digits, "
+        raise InputError(f"not an ISIN: {_quote_input(value)} is not two letters, nine letters or digits, "
                          "and one check digit")
     expected = isin_check_digit(s[:11])
     if int(s[11]) != expected:
@@ -289,7 +292,7 @@ def check_lei(value) -> str:
     if len(s) != 20:
         raise InputError(f"not an LEI: {_quote_input(value)} has {len(s)} characters; an LEI has 20")
     if not _LEI_SHAPE.fullmatch(s):
-        raise InputError(f"not an LEI: {_quote_input(value)}; an LEI is 18 letters or digits followed by two "
+        raise InputError(f"not an LEI: {_quote_input(value)} is not 18 letters or digits followed by two "
                          "check digits")
     if int(_expand(s)) % 97 != 1:
         raise InputError(f"not a valid LEI: {s} ends in {s[18:]}, but the ISO 17442 check digits for {s[:18]} "
@@ -298,7 +301,9 @@ def check_lei(value) -> str:
 
 
 def _check_int(value, name: str, low: int, high: int) -> int:
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or value != int(value):
+    # json.loads accepts NaN and Infinity, and int() of those raises; bool is an int subclass.
+    whole = isinstance(value, int) or (isinstance(value, float) and math.isfinite(value) and value.is_integer())
+    if isinstance(value, bool) or not whole:
         raise InputError(f"{name} must be a whole number from {low} to {high}")
     if not low <= int(value) <= high:
         raise InputError(f"{name} must be from {low} to {high}")
@@ -343,6 +348,12 @@ def plain(value):
 
 def _compact(d: dict) -> dict:
     return {k: v for k, v in d.items() if v not in (None, "", [], {})}
+
+
+def _masked(text) -> str:
+    """An error detail with URL passwords and query strings masked (a proxy URL can carry both)."""
+    s = re.sub(r"(?i)\b([a-z][a-z0-9+.-]*://)[^/\s@]+@", r"\1***@", clean(text, 160))
+    return re.sub(r"\?\S*", "?***", s)
 
 
 # ------------------------------------------------------------------ HTTP
@@ -433,12 +444,13 @@ def _fetch(url: str, source: str, accept: str):
     A 404 payload is None when the body is not a JSON object: GLEIF answers an unknown
     LEI with an HTML page, and a missing parent with a JSON error object.
     """
-    tries_429 = tries_5xx = 0
+    tries_429 = tries_5xx = tries_net = 0
     while True:
         _throttle(source)
         req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": accept,
                                                    "Accept-Encoding": "gzip"})
         headers = None
+        failure = None
         try:
             with _urlopen(req, timeout=TIMEOUT) as resp:
                 status = getattr(resp, "status", None) or resp.getcode()
@@ -457,12 +469,22 @@ def _fetch(url: str, source: str, accept: str):
         except urllib.error.URLError as e:
             if isinstance(e.reason, (socket.timeout, TimeoutError)):
                 raise SourceError(source, "timeout", f"no answer within {TIMEOUT:g} s") from None
-            raise SourceError(source, "network", f"cannot connect ({clean(e.reason, 120)})") from None
+            failure = f"cannot connect ({_masked(e.reason)})"
         except SourceError as e:
             raise SourceError(source, e.kind, e.detail) from None
-        except (http.client.HTTPException, OSError, ValueError) as e:
+        except ValueError:
+            raise SourceError(source, "network", "the configured URL is not valid") from None
+        except (http.client.HTTPException, OSError) as e:
             # IncompleteRead, BadStatusLine, RemoteDisconnected, a reset in mid-answer.
-            raise SourceError(source, "network", f"connection failed ({type(e).__name__})") from None
+            failure = f"connection failed ({type(e).__name__})"
+        if failure:
+            # A reset connection is usually gone a second later; a timeout is not retried,
+            # because the person waiting would wait twice (tool's choice).
+            if tries_net >= 1:
+                raise SourceError(source, "network", failure)
+            tries_net += 1
+            _sleep(1.0)
+            continue
 
         if status == 429:
             if tries_429 >= RETRIES_429:
@@ -575,7 +597,9 @@ _STATE_ORDER = {"not_terminated": 0, "unknown": 1, "terminated": 2, "cancelled":
 
 
 def _most_common(values):
-    counts = collections.Counter(v for v in values if isinstance(v, str) and v.strip())
+    # Venues type names with their own spacing; "N.V.  LS-Notes" and "N.V. LS-Notes" are one name.
+    # Ties go to the value seen first, which is FIRDS's own order.
+    counts = collections.Counter(clean(v) for v in values if isinstance(v, str) and v.strip())
     return counts.most_common(1)[0][0] if counts else None
 
 
@@ -584,6 +608,9 @@ def firds_lookup(isin: str, include_terminated: bool = False) -> dict:
     docs, found, truncated = _firds_docs(isin)
     records = [d for d in docs if d.get("isin") == isin and d.get("type_s", "parent") == "parent"]
     now = _now_utc()
+    if docs and not any(d.get("isin") == isin for d in docs):
+        raise SourceError("ESMA", "schema", f"FIRDS returned {len(docs)} record(s), none for {isin}; the "
+                                            "undocumented endpoint may have changed")
     if not records:
         return {"isin": isin, "found": False,
                 "note": "FIRDS has no current record for this ISIN. FIRDS holds reference data that trading venues "
@@ -926,17 +953,17 @@ def lei_children(lei, limit=20, relation="direct") -> dict:
             break
         page += 1
     children = children[:limit]
-    return _compact({
+    return {
         "lei": code,
         "found": True,
         "relation": relation,
         "total_reported_by_gleif": total,
         "returned": len(children),
-        "truncated": (total is not None and total > len(children)) or None,
+        "truncated": total is not None and total > len(children),
         "children": children,
         "parent_note": PARENT_NOTE,
         "sources": [gleif_source_line(last_payload)],
-    }) | {"children": children}
+    }
 
 
 def isin_to_group(isin) -> dict:
@@ -991,7 +1018,8 @@ def isin_to_group(isin) -> dict:
                 out["parent_note"] = PARENT_NOTE
         except SourceError as e:
             out["gleif_error"] = str(e)
-        sources.append(gleif_source_line(record))
+        if record is not None or "gleif_error" not in out:
+            sources.append(gleif_source_line(record))
     out["sources"] = sources
     out["disclaimer"] = ESMA_DISCLAIMER
     return out
@@ -1145,6 +1173,8 @@ def call_tool(name: str, arguments) -> dict:
         return _tool_error(f"bad arguments: {clean(e, 200)}", "invalid_input")
     except SourceError as e:
         return _tool_error(f"{e.source} could not answer: {e.detail}", e.kind)
+    except Exception as e:  # a payload shape nobody foresaw: report it, keep serving
+        return _tool_error(f"unexpected {type(e).__name__}: {clean(e, 200)}", "internal")
     return {"content": [{"type": "text", "text": json.dumps(result, ensure_ascii=False)}],
             "structuredContent": result, "isError": False}
 
@@ -1178,7 +1208,11 @@ def handle(req) -> None:
 
 
 def serve() -> int:
-    if sys.stdin.isatty():
+    try:
+        interactive = sys.stdin.isatty()
+    except (AttributeError, ValueError):
+        interactive = False
+    if interactive:
         print("firds-mcp: MCP server on stdin/stdout (JSON-RPC, one message per line). "
               "For the command line: firds-mcp --help", file=sys.stderr)
     stream = sys.stdin.buffer
@@ -1211,20 +1245,22 @@ def _entity_line(e: dict) -> str:
 def _linked_lines(title: str, item) -> list:
     if not isinstance(item, dict):
         return []
+    pad = " " * (len(title) - len(title.lstrip()) + 2)
     state = item.get("state")
     if state == "reported":
         entity = item.get("entity") or {}
         lines = [f"{title}: {_entity_line(entity)}" if entity else f"{title}: {item.get('note', '')}"]
         rel = item.get("relationship") or {}
         if rel:
-            lines.append("  " + ", ".join(str(x) for x in (rel.get("type"), rel.get("status"),
-                                                            rel.get("corroboration_level")) if x))
+            lines.append(pad + ", ".join(str(x) for x in (rel.get("type"), rel.get("status"),
+                                                           rel.get("corroboration_level")) if x))
         return lines
     if state == "reporting_exception":
-        line = f"{title}: none reported; reporting exception {item.get('reason')}"
-        lines = [line]
+        lines = [f"{title}: none reported; reporting exception {item.get('reason')}"]
         if item.get("reason_meaning"):
-            lines.append(f"  \"{item['reason_meaning']}\" ({item.get('reason_meaning_source')})")
+            lines.append(f"{pad}\"{item['reason_meaning']}\" ({item.get('reason_meaning_source')})")
+        if item.get("reference"):
+            lines.append(f"{pad}reference: {plain(item['reference'])}")
         return lines
     return [f"{title}: none reported in GLEIF"]
 
@@ -1275,22 +1311,22 @@ def render(command: str, result: dict) -> str:
         lines.append(f"Venues (FIRDS, as of {s.get('as_of')}): {s.get('not_terminated', 0)} not terminated, "
                      f"{s.get('terminated', 0)} terminated, {s.get('cancelled', 0)} cancelled")
         for v in result.get("venues") or []:
-            parts = [f"{v.get('mic', '?'):<5}", f"{v.get('state')}", f"first trade/admission "
-                     f"{v.get('admission_or_first_trade', '-')}"]
+            parts = [f"first trade/admission {v.get('admission_or_first_trade', '-')}"]
             if v.get("termination"):
                 parts.append(f"termination {v['termination']}")
             if v.get("status"):
                 parts.append(f"status {v['status']}")
-            lines.append("  " + ", ".join(parts))
+            lines.append(f"  {str(v.get('mic', '?')):<5} {str(v.get('state')):<14} " + ", ".join(parts))
         if result.get("note"):
             lines.append(result["note"])
     elif command == "group":
         lines += _instrument_lines(result["isin"], result.get("instrument") or {})
         issuer = result.get("issuer") or {}
-        if issuer.get("legal_name") or issuer.get("lei") and issuer.get("category"):
+        if issuer and "note" not in issuer:
             lines.append(f"Issuer (GLEIF): {_entity_line(issuer)}")
         elif issuer:
-            lines.append(f"Issuer (GLEIF): {issuer.get('lei', '')} {issuer.get('note', '')}".rstrip())
+            lines.append(f"Issuer (GLEIF): {issuer.get('lei') or plain(issuer.get('lei_given')) or ''} "
+                         f"{issuer['note']}".strip())
         lines += _linked_lines("Direct parent", result.get("direct_parent"))
         lines += _linked_lines("Ultimate parent", result.get("ultimate_parent"))
         lines += _linked_lines("Fund manager", result.get("fund_manager"))
@@ -1310,9 +1346,11 @@ def render(command: str, result: dict) -> str:
         lines.append(_entity_line(e))
         for key in ("legal_form", "legal_address", "headquarters_address", "registration"):
             if e.get(key):
-                shown = ", ".join(f"{k} {plain(v) if not isinstance(v, list) else '; '.join(map(str, map(plain, v)))}"
-                                  for k, v in e[key].items())
-                lines.append(f"  {key.replace('_', ' ')}: {shown}")
+                parts = []
+                for k, v in e[key].items():
+                    v = "; ".join(str(plain(x)) for x in v) if isinstance(v, list) else plain(v)
+                    parts.append(f"{k.replace('_', ' ')} {v}")
+                lines.append(f"  {key.replace('_', ' ')}: {', '.join(parts)}")
         for key in ("registered_at", "registered_as", "creation_date", "jurisdiction"):
             if e.get(key):
                 lines.append(f"  {key.replace('_', ' ')}: {plain(e[key])}")
@@ -1390,6 +1428,9 @@ def main(argv=None) -> int:
         return 2
     except SourceError as e:
         print(f"firds-mcp: {e.source} could not answer: {e.detail}", file=sys.stderr)
+        return 2
+    except Exception as e:  # a payload shape nobody foresaw: say so instead of a traceback
+        print(f"firds-mcp: unexpected {type(e).__name__}: {clean(e, 200)}", file=sys.stderr)
         return 2
     if hasattr(sys.stdout, "reconfigure"):
         try:

@@ -1,0 +1,9 @@
+{
+ "errors": [
+  {
+   "status": "404",
+   "title": "Not Found",
+   "detail": "Resource lei-records with id 529900ZZZZZZZZZZZZ46 does not exist."
+  }
+ ]
+}

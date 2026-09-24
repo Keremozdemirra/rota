@@ -1,0 +1,156 @@
+{
+ "meta": {
+  "goldenCopy": {
+   "publishDate": "2026-09-24T00:00:00Z"
+  }
+ },
+ "data": {
+  "type": "lei-records",
+  "id": "5493004330BCAPB3GT42",
+  "attributes": {
+   "lei": "5493004330BCAPB3GT42",
+   "entity": {
+    "legalName": {
+     "name": "BLACKROCK ASSET MANAGEMENT IRELAND LIMITED",
+     "language": "en"
+    },
+    "otherNames": [],
+    "transliteratedOtherNames": [],
+    "legalAddress": {
+     "language": "ga",
+     "addressLines": [
+      "3rd Floor, Glencar House, 20 Merrion Road, Dublin 4"
+     ],
+     "addressNumber": null,
+     "addressNumberWithinBuilding": null,
+     "mailRouting": null,
+     "city": "Dublin",
+     "region": "IE-L",
+     "country": "IE",
+     "postalCode": "D04 T9F3"
+    },
+    "headquartersAddress": {
+     "language": "ga",
+     "addressLines": [
+      "3rd Floor, Glencar House, 20 Merrion Road, Dublin 4"
+     ],
+     "addressNumber": null,
+     "addressNumberWithinBuilding": null,
+     "mailRouting": null,
+     "city": "Dublin",
+     "region": "IE-L",
+     "country": "IE",
+     "postalCode": "D04 T9F3"
+    },
+    "registeredAt": {
+     "id": "RA000402",
+     "other": null
+    },
+    "registeredAs": "227552",
+    "jurisdiction": "IE",
+    "category": "GENERAL",
+    "legalForm": {
+     "id": "MNQ7",
+     "other": null
+    },
+    "associatedEntity": {
+     "lei": null,
+     "name": null
+    },
+    "status": "ACTIVE",
+    "expiration": {
+     "date": null,
+     "reason": null
+    },
+    "successorEntity": {
+     "lei": null,
+     "name": null
+    },
+    "successorEntities": [],
+    "creationDate": "1995-01-18T23:00:00Z",
+    "subCategory": null,
+    "otherAddresses": [],
+    "eventGroups": [
+     {
+      "groupType": "STANDALONE",
+      "events": [
+       {
+        "validationDocuments": "SUPPORTING_DOCUMENTS",
+        "effectiveDate": "2025-11-04T23:00:00Z",
+        "recordedDate": "2025-11-05T11:57:29Z",
+        "type": "CHANGE_HQ_ADDRESS",
+        "status": "COMPLETED"
+       }
+      ]
+     }
+    ]
+   },
+   "registration": {
+    "initialRegistrationDate": "2014-02-11T01:40:00Z",
+    "lastUpdateDate": "2025-11-05T11:57:29Z",
+    "status": "ISSUED",
+    "nextRenewalDate": "2026-11-17T14:06:26Z",
+    "managingLou": "5299000J2N45DDNE4Y28",
+    "corroborationLevel": "FULLY_CORROBORATED",
+    "validatedAt": {
+     "id": "RA000402",
+     "other": null
+    },
+    "validatedAs": "227552",
+    "otherValidationAuthorities": []
+   },
+   "bic": null,
+   "mic": null,
+   "ocid": "ie/227552",
+   "qcc": "QIEH38KM15",
+   "gem": null,
+   "spglobal": [
+    "21010260"
+   ],
+   "conformityFlag": "CONFORMING"
+  },
+  "relationships": {
+   "managing-lou": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/5493004330BCAPB3GT42/managing-lou"
+    }
+   },
+   "lei-issuer": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/5493004330BCAPB3GT42/lei-issuer"
+    }
+   },
+   "field-modifications": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/5493004330BCAPB3GT42/field-modifications"
+    }
+   },
+   "direct-parent": {
+    "links": {
+     "relationship-record": "https://api.gleif.org/api/v1/lei-records/5493004330BCAPB3GT42/direct-parent-relationship",
+     "lei-record": "https://api.gleif.org/api/v1/lei-records/5493004330BCAPB3GT42/direct-parent"
+    }
+   },
+   "ultimate-parent": {
+    "links": {
+     "relationship-record": "https://api.gleif.org/api/v1/lei-records/5493004330BCAPB3GT42/ultimate-parent-relationship",
+     "lei-record": "https://api.gleif.org/api/v1/lei-records/5493004330BCAPB3GT42/ultimate-parent"
+    }
+   },
+   "managed-funds": {
+    "links": {
+     "relationship-records": "https://api.gleif.org/api/v1/lei-records/5493004330BCAPB3GT42/managed-fund-relationships",
+     "related": "https://api.gleif.org/api/v1/lei-records/5493004330BCAPB3GT42/managed-funds"
+    }
+   },
+   "isins": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/5493004330BCAPB3GT42/isins"
+    }
+   }
+  },
+  "links": {
+   "self": "https://api.gleif.org/api/v1/lei-records/5493004330BCAPB3GT42"
+  }
+ }
+}

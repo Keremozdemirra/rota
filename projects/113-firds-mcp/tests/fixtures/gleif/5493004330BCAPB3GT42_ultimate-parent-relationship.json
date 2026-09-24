@@ -1,0 +1,63 @@
+{
+ "meta": {
+  "goldenCopy": {
+   "publishDate": "2026-09-24T00:00:00Z"
+  }
+ },
+ "data": {
+  "type": "relationship-records",
+  "id": "5493004330BCAPB3GT42|LEI|IS_ULTIMATELY_CONSOLIDATED_BY|3|14519a15538782341cdcc0c509696afe491b98accbae1be8c06dd5ce00aed96f|",
+  "attributes": {
+   "validFrom": "2025-11-06T00:00:00Z",
+   "validTo": null,
+   "relationship": {
+    "startNode": {
+     "id": "5493004330BCAPB3GT42",
+     "type": "LEI"
+    },
+    "endNode": {
+     "id": "529900VBK42Y5HHRMD23",
+     "type": "LEI"
+    },
+    "type": "IS_ULTIMATELY_CONSOLIDATED_BY",
+    "status": "ACTIVE",
+    "periods": [
+     {
+      "startDate": "2023-12-31T23:00:00Z",
+      "endDate": "2024-09-29T22:00:00Z",
+      "type": "ACCOUNTING_PERIOD"
+     },
+     {
+      "startDate": "2024-09-30T22:00:00Z",
+      "type": "RELATIONSHIP_PERIOD"
+     }
+    ]
+   },
+   "registration": {
+    "initialRegistrationDate": "2024-10-12T10:01:17Z",
+    "lastUpdateDate": "2025-11-05T11:57:29Z",
+    "status": "PUBLISHED",
+    "nextRenewalDate": "2026-11-17T14:06:26Z",
+    "managingLou": "5299000J2N45DDNE4Y28",
+    "corroborationLevel": "FULLY_CORROBORATED",
+    "corroborationDocuments": "ACCOUNTS_FILING",
+    "corroborationReference": null
+   },
+   "extension": {
+    "deletedAt": null
+   }
+  },
+  "relationships": {
+   "start-node": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/5493004330BCAPB3GT42"
+    }
+   },
+   "end-node": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/529900VBK42Y5HHRMD23"
+    }
+   }
+  }
+ }
+}

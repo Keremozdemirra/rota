@@ -1,0 +1,97 @@
+{
+ "responseHeader": {
+  "status": 0,
+  "QTime": 2,
+  "params": {
+   "q": "isin:IE00B4L5Y983",
+   "fl": "isin,type_s,status,latest_received_flag,gnr_full_name,gnr_short_name,gnr_cfi_code,gnr_notional_curr_code,gnr_comm_derivative_flag,lei,upcoming_rca,rca_mic,mic,status_label,mrkt_trdng_start_date,mrkt_trdng_trmination_date,mrkt_issr_trdng_rqst_flag,mrkt_issr_trdng_pprvl_date,mrkt_trdng_rqst_date,valid_from_date,valid_to_date,bnd_nmnl_value_total,bnd_maturity_date,bnd_nmnl_value_curr_code,bnd_nmnl_value_unit,bnd_fixed_rate,bnd_fltng_rt_ndx_isin,bnd_fltng_rt_ndx_code,bnd_fltng_rt_ndx_name,bnd_fltng_rt_ndx_trm_value,bnd_fltng_rt_ndx_trm_unit,bnd_fltng_rate_bs_pnt_sprd,bnd_seniority,drv_expiry_date,drv_price_multiplier,drv_underlng_isin,underlying_isins,drv_underlng_ndx_isin,drv_underlng_lei,underlying_leis,drv_underlng_ndx_code,drv_underlng_ndx_name,drv_underlng_ndx_trm_value,drv_underlng_ndx_trm_unit,drv_option_type,drv_sp_prc_value_amount,drv_sp_prc_value_sign_flag,drv_sp_prc_value_curr_code,drv_sp_prc_percentage,drv_sp_prc_yield,drv_sp_prc_basis_points,drv_sp_noprc_status,drv_sp_noprc_curr_code,drv_option_exercise_style,drv_delivery_type,drvcmd_base_product,drvcmd_sub_product,drvcmd_further_sub_product,drvcmd_transaction_type,drvcmd_final_price_type,drvir_ref_rt_ndx_code,drvir_ref_rt_ndx_name,drvir_ref_rt_ndx_trm_value,drvir_ref_rt_ndx_trm_unti,drvir_notional_curr2_code,drvir_l1_fixed_rate,drvir_l2_fixed_rate,drvir_l2_ir_ndx_code,drvir_l2_ir_ndx_name,drvir_l2_ir_ndx_trm_value,drvir_l2_ir_ndx_trm_unit,drvfx_notional_curr2_code,drvfx_fx_type",
+   "start": "0",
+   "fq": "latest_received_flag:1",
+   "rows": "500",
+   "wt": "json"
+  }
+ },
+ "response": {
+  "numFound": 4,
+  "start": 0,
+  "numFoundExact": true,
+  "docs": [
+   {
+    "type_s": "parent",
+    "isin": "IE00B4L5Y983",
+    "mic": "XETA",
+    "upcoming_rca": "DE",
+    "valid_from_date": "2023-02-07T00:00:00Z",
+    "gnr_full_name": "iShsIII-Core MSCI World U.ETF Registered Shs USD (Acc) o.N.",
+    "gnr_cfi_code": "CEOGES",
+    "gnr_comm_derivative_flag": "No",
+    "gnr_short_name": "ISHS III/SHS CL-ACC USD",
+    "gnr_notional_curr_code": "USD",
+    "lei": "549300QS4Q1IT6XCA514",
+    "mrkt_issr_trdng_rqst_flag": "Yes",
+    "mrkt_issr_trdng_pprvl_date": "2014-08-10T22:00:00Z",
+    "mrkt_trdng_rqst_date": "2014-08-10T22:00:00Z",
+    "mrkt_trdng_start_date": "2014-08-11T05:00:00Z",
+    "drv_sp_prc_value_sign_flag": "No",
+    "latest_received_flag": "1",
+    "rca_mic": "XETA",
+    "status": "UNCH",
+    "status_label": "Unchanged"
+   },
+   {
+    "type_s": "parent",
+    "isin": "IE00B4L5Y983",
+    "mic": "XAMS",
+    "upcoming_rca": "DE",
+    "valid_from_date": "2022-11-15T00:00:00Z",
+    "gnr_full_name": "iShares Core MSCI World UCITS ETF USD (Acc)",
+    "gnr_cfi_code": "CEOGES",
+    "gnr_comm_derivative_flag": "No",
+    "gnr_short_name": "ISHS III/SHS CL-ACC USD",
+    "gnr_notional_curr_code": "USD",
+    "lei": "549300QS4Q1IT6XCA514",
+    "mrkt_issr_trdng_rqst_flag": "Yes",
+    "mrkt_issr_trdng_pprvl_date": "2009-10-12T00:01:00Z",
+    "mrkt_trdng_rqst_date": "2009-10-12T00:01:00Z",
+    "mrkt_trdng_start_date": "2009-10-12T00:01:00Z",
+    "drv_sp_prc_value_sign_flag": "No",
+    "latest_received_flag": "1",
+    "rca_mic": "XETA",
+    "status": "UNCH",
+    "status_label": "Unchanged"
+   },
+   {
+    "type_s": "parent",
+    "isin": "IE00B4L5Y983",
+    "mic": "XLON",
+    "upcoming_rca": "DE",
+    "valid_from_date": "2021-01-03T00:00:00Z",
+    "gnr_full_name": "ISHARES III PLC ISHRS CORE MSCI WORLD ETF USD (ACC)",
+    "gnr_cfi_code": "CEOGES",
+    "gnr_comm_derivative_flag": "No",
+    "gnr_short_name": "ISHS III/SHS CL-ACC USD",
+    "gnr_notional_curr_code": "USD",
+    "lei": "549300QS4Q1IT6XCA514",
+    "mrkt_issr_trdng_rqst_flag": "Yes",
+    "mrkt_issr_trdng_pprvl_date": "2009-09-25T00:00:00Z",
+    "mrkt_trdng_rqst_date": "2009-09-25T00:00:00Z",
+    "mrkt_trdng_start_date": "2009-09-28T00:00:00Z",
+    "mrkt_trdng_trmination_date": "2020-12-31T22:59:59Z",
+    "drv_sp_prc_value_sign_flag": "No",
+    "latest_received_flag": "1",
+    "rca_mic": "XETA",
+    "status": "TERM",
+    "status_label": "Terminated"
+   },
+   {
+    "type_s": "parent",
+    "isin": "IE00B4L5Y983",
+    "mic": "XGRM",
+    "valid_from_date": "2022-04-06T00:00:00Z",
+    "latest_received_flag": "1",
+    "status": "CANC",
+    "status_label": "Cancelled"
+   }
+  ]
+ }
+}

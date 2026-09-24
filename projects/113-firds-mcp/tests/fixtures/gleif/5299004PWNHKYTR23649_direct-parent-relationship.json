@@ -1,0 +1,67 @@
+{
+ "meta": {
+  "goldenCopy": {
+   "publishDate": "2026-09-24T00:00:00Z"
+  }
+ },
+ "data": {
+  "type": "relationship-records",
+  "id": "5299004PWNHKYTR23649|LEI|IS_DIRECTLY_CONSOLIDATED_BY|7|635496a7a83b09ebbe099651f669061546458718f8ea03870e8f78d03ab57155|",
+  "attributes": {
+   "validFrom": "2026-09-15T16:00:00Z",
+   "validTo": null,
+   "relationship": {
+    "startNode": {
+     "id": "5299004PWNHKYTR23649",
+     "type": "LEI"
+    },
+    "endNode": {
+     "id": "529900NNUPAGGOMPXZ31",
+     "type": "LEI"
+    },
+    "type": "IS_DIRECTLY_CONSOLIDATED_BY",
+    "status": "ACTIVE",
+    "periods": [
+     {
+      "startDate": "2023-12-31T23:00:00Z",
+      "endDate": "2024-12-30T23:00:00Z",
+      "type": "ACCOUNTING_PERIOD"
+     },
+     {
+      "startDate": "2017-11-06T23:00:00Z",
+      "type": "RELATIONSHIP_PERIOD"
+     },
+     {
+      "startDate": "2025-03-06T23:00:00Z",
+      "type": "DOCUMENT_FILING_PERIOD"
+     }
+    ]
+   },
+   "registration": {
+    "initialRegistrationDate": "2020-12-16T11:42:10Z",
+    "lastUpdateDate": "2026-09-15T09:21:35Z",
+    "status": "PUBLISHED",
+    "nextRenewalDate": "2026-12-20T23:00:00Z",
+    "managingLou": "5299000J2N45DDNE4Y28",
+    "corroborationLevel": "FULLY_CORROBORATED",
+    "corroborationDocuments": "ACCOUNTS_FILING",
+    "corroborationReference": null
+   },
+   "extension": {
+    "deletedAt": null
+   }
+  },
+  "relationships": {
+   "start-node": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/5299004PWNHKYTR23649"
+    }
+   },
+   "end-node": {
+    "links": {
+     "related": "https://api.gleif.org/api/v1/lei-records/529900NNUPAGGOMPXZ31"
+    }
+   }
+  }
+ }
+}

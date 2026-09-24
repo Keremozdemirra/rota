@@ -74,7 +74,7 @@ def render_scope(r: dict) -> str:
                                                    for x in r["annex_i_lines_below"])))
     out.append(_wrap("Why", r["explanation"]))
     if r.get("annex_ii"):
-        out.append(_wrap("Annex II", f"{r['annex_ii']['status']} ({r['annex_ii']['meaning']})"))
+        out.append(_wrap("Annex II", f"{r['annex_ii']['status']} in Annex II. Article 7(1): \"{r['annex_ii']['meaning']}\""))
     cn = r.get("cn") or {}
     if cn.get("found"):
         out.append(_wrap("CN 2026", f"{cn['cn_code']} {cn['label']}" + (f". {cn['self_explanatory_text']}"

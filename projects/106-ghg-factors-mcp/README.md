@@ -253,6 +253,10 @@ These are the tool's own choices, not rules from a standard or a source:
 
 - **Default year.** `search_factors` uses the newest DESNZ set bundled (2026) unless a
   year is given; `grid_intensity` uses the latest year with a value and says so.
+- **Result size.** `search_factors` returns 10 results by default and at most 50.
+- **Refresh checks.** A UBA figure outside 100 to 1500 g CO2/kWh, a table cell longer
+  than 200 characters, or a flat file whose header names another year stops that
+  source's refresh.
 - **Units.** Spelling variants of one unit are accepted (litre, litres, L; m3, cubic
   metres; tonne, t). Exact decimal steps within one kind are converted and shown:
   Wh, kWh, MWh, GWh; kg, tonnes; litres, cubic metres, million litres. Nothing else is

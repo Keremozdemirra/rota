@@ -1313,10 +1313,11 @@ def render(result, markdown=False, explain=False):
     md = markdown
     cur = result["input"]["reporting_currency"]
     cur_label = cur or "currency not stated"
+    report_currency = f"reporting currency {cur}" if cur else "no currency stated"
     h2 = (lambda t: f"## {t}") if md else (lambda t: t)
     out = []
     head = (f"financed-emissions {result['version']}: {SHORT_SOURCE}. File {result['input']['file']}, "
-            f"{result['input']['rows']} rows, reporting currency {cur_label}.")
+            f"{result['input']['rows']} rows, {report_currency}.")
     out.append(("# Financed emissions\n\n" + head) if md else head)
 
     positions = result["positions"]
@@ -1508,7 +1509,8 @@ def _special(key):
     return {
         "motor_vehicle_loan": "value at origination unknown: attribution assumed at 100% (5.6, p. 91); repaid loan: 0",
         "use_of_proceeds": "emissions = financed emissions of the structure (sum over allocated assets of their "
-                           "attribution factor x emissions, or the issuer's reported figure, 5.7 pp. 101-102); "
+                           "attribution factor x emissions, plus the unallocated amount for an integrated structure, "
+                           "or the issuer's reported figure, 5.7 pp. 101-102); "
                            "outstanding reported = investor outstanding x allocation percentage (5.7 pp. 102-103)",
         "securitization": "attribution = investment attribution factor x tranche attribution factor = investment "
                           "outstanding / deal outstanding (5.8 p. 123, Table 5.8-3 p. 124); emissions = financed "
