@@ -50,6 +50,8 @@ class Lint(Isolated):
 
     def test_top_level_shapes(self):
         self.assertFinds(self.lint(None, text="[1]"), "json-shape", "error")
+        self.assertFinds(self.lint(None, text="null"), "json-shape", "error")
+        self.assertFinds(self.lint(None, text=""), "json-syntax", "error")
         self.assertFinds(self.lint({"PreToolUse": []}), "hooks-key", "error", "at the top level")
         self.assertFinds(self.lint({"description": "x"}), "hooks-key", "error")
         self.assertFinds(self.lint({"hooks": {"PreToolUse": [{"hooks": [dict(CMD)]}]}, "disableAllHooks": True}),

@@ -2140,7 +2140,7 @@ def _path_witnesses(pattern: str) -> list[str]:
 def lint(src: Source) -> list[Finding]:
     f = list(src.problems)
     data = src.data
-    if data is None:
+    if data is None and any(x.rule in ("json-syntax", "file") for x in f):
         return f
     if not isinstance(data, dict):
         f.append(Finding("json-shape", "error", "the top level is not a JSON object", (), 1, 1))
