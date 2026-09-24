@@ -233,11 +233,11 @@ def lei_check_digits_ok(lei: str) -> bool:
 #   - the holder's registration number has a format given only to natural persons, or
 #   - the installation or holder name carries a sole-trader or partnership-of-persons marker, or
 #   - the registry gives no holder and the name carries no company form, or
-#   - nothing shows the holder to be an organisation (a company form, a public-body or country word,
-#     three or more installations) and the installation name repeats a word of the holder's name, or
+#   - nothing shows the holder to be an organisation (a company form, a public-body or country word)
+#     and the installation name repeats a word of the holder's name, or
 #   - the name is shaped like a person's name (two to four words of letters) and nothing explains it
-#     otherwise: no company form, digit, site word, word of its city, or word of an organisation
-#     holder's name.
+#     otherwise: no company form, digit, site word, word of its city, and not only words of an
+#     organisation holder's name.
 # A permit id that repeats such a word is withheld too. When in doubt a name is withheld: the
 # registry code and installation id identify every installation.
 WITHHELD = "[name withheld: possible natural person]"
@@ -259,7 +259,7 @@ ab ag gmbh gesmbh mbh se ltd limited plc llc inc incorporated corp corporation s
 aps asa oy oyj kft zrt nyrt sro spol doo dd ead eood uab sia jsc pjsc ooo oao zao lda ltda sl slu sau sal sae sac dac
 ehf hf pte pvt bhd kk scarl sca sprl bvba cvba eg egen aktiebolag aktieselskab akciova spolocnost spolecnost akcine
 bendrove oo zoo spzoo osauhing anonim sirketi sti ug haftungsbeschrankt amba sam dmcc fze fzco fzc fzllc aie ike epe
-ae as ad ou pt αε επε ικε ανωνυμη κεφαλαιουχικη περιορισμενης еоод оод ад еад""")
+ae as ad ou pt αε επε ικε αβεε αεβε ανωνυμη κεφαλαιουχικη περιορισμενης еоод оод ад еад""")
 # Short forms are also initials or given names ("A. B. Svensson", "Ad"): they count only as the last
 # word, PT and Oy also as the first, where they belong.
 SHORT_FORMS = _folded("ab ag se as ad oy nv bv pt ou ae kk dd sl hf sa αε ад")
@@ -326,7 +326,9 @@ toplana tvornica kotlovnica kotlarna pogon rafinerija katiline katiles katilas k
 katlamaja katlamajad tec ec cnpe mva kva afvalenergiecentrale avfallsforbranning jatteenpolttolaitos glasfabrik
 kartonfabrik zellstoff zellstofffabrik kalkofen kalkbrud kalkbruk
 εργοστασιο σταθμος μοναδα ατμοηλεκτρικος ηλεκτροπαραγωγης διυλιστηριο τσιμεντων κεραμοποιια πλινθοποιια ασβεστοποιια
-θερμοηλεκτρικος ζαχαρεως βιομηχανια εγκατασταση λεβητοστασιο χαρτοποιια""")
+θερμοηλεκτρικος ζαχαρεως βιομηχανια εγκατασταση λεβητοστασιο χαρτοποιια generation szkla szklo""")
+# Site words that are also surnames count only in pairs ("Power Plant") or next to another site word.
+WEAK_SITE_WORDS = _folded("power plant mill steel glass park field block")
 SITE_SUFFIXES = ("kraftwerk", "heizwerk", "werk", "werke", "anlage", "vaerket", "vaerk", "verket", "verk", "bruk", "fabrik",
                  "fabriek", "fabrikk", "centralen", "central", "centrale", "centrala", "voimala", "laitos", "tehdas", "keskus",
                  "hutte", "ownia", "eromu", "station", "verdichter", "katiline", "sjukhus", "sjukhuset", "kraftverk")
@@ -342,7 +344,6 @@ PERSONAL_ID_FORMATS = {
     "PL": r"^\d{11}$", "RO": r"^[1-8]\d{12}$", "BG": r"^\d{10}$", "EE": r"^[3-6]\d{10}$", "LT": r"^[3-6]\d{10}$",
     "SE": r"^(19|20)?\d{2}[01]\d{3}-?\d{4}$", "DK": r"^\d{6}-\d{4}$", "NO": r"^\d{11}$", "FI": r"^\d{6}[-+A]\d{3}[0-9A-Y]$",
     "IS": r"^[0-3]\d{5}-?\d{4}$"}
-ORGANISATION_INSTALLATIONS = 3  # a holder with this many installations is taken to be an organisation (the tool's choice)
 
 
 def _tokens(text: str) -> list:
@@ -392,9 +393,8 @@ def personal_id(regno: str, country: str) -> bool:
     return bool(fmt and re.match(fmt, re.sub(r"[\s.]", "", (regno or "").upper())))
 
 
-def holder_is_organisation(holder: str, registry: str, installations: int) -> bool:
-    return (has_legal_form(holder, registry) or any(w in ORGANISATION_WORDS for w in _words(holder))
-            or installations >= ORGANISATION_INSTALLATIONS)
+def holder_is_organisation(holder: str, registry: str) -> bool:
+    return has_legal_form(holder, registry) or any(w in ORGANISATION_WORDS for w in _words(holder))
 
 
 def _distinctive(words, city_words) -> list:
@@ -402,8 +402,7 @@ def _distinctive(words, city_words) -> list:
             and w not in ORGANISATION_WORDS and w not in city_words]
 
 
-def withhold_reason(name: str, activity_code, registry: str, city: str, holder: str, regno: str, holder_country: str,
-                    holder_installations: int):
+def withhold_reason(name: str, activity_code, registry: str, city: str, holder: str, regno: str, holder_country: str):
     """Why an installation name may name a natural person, or None when it may be shown."""
     words = _words(name)
     if personal_id(regno, holder_country or registry):
@@ -416,15 +415,22 @@ def withhold_reason(name: str, activity_code, registry: str, city: str, holder: 
     if not holder_words:
         return None if has_legal_form(name, registry) else "no account holder in the registry"
     city_words = set(_words(city))
-    organisation = holder_is_organisation(holder, registry, holder_installations)
+    organisation = holder_is_organisation(holder, registry)
     distinctive = _distinctive(holder_words, city_words)
     if not organisation and len([w for w in holder_words if w not in STOPWORDS]) >= 2 \
             and any(w in words for w in distinctive):
         return "holder's name in the installation name"
-    explained = (has_legal_form(name, registry) or any(ch.isdigit() for ch in name)
-                 or any(w in SITE_WORDS or w.endswith(SITE_SUFFIXES) for w in words)
+    # An organisation's name explains an installation name only when every word of it is the
+    # organisation's own (or a site, city or filler word): "Erika Mustermann" is not explained by a
+    # holder "Mustermann GmbH".
+    ignorable = SITE_WORDS | ORGANISATION_WORDS | STOPWORDS | LEGAL_FORMS | city_words
+    site = sum(1 for w in words if w in SITE_WORDS or w.endswith(SITE_SUFFIXES))
+    weak = sum(1 for w in words if w in WEAK_SITE_WORDS)
+    explained = (has_legal_form(name, registry) or any(ch.isdigit() for ch in name) or site or weak >= 2
+                 or (weak and site)
                  or any(w in city_words for w in words if len(w) >= 3)
-                 or (organisation and any(w in words for w in distinctive)))
+                 or (organisation and any(w in words for w in distinctive)
+                     and all(w in holder_words or w in ignorable for w in words)))
     if not explained and 2 <= len(words) <= 4 and all(w.isalpha() for w in words):
         return "person-shaped name without site or company words"
     return None
@@ -761,10 +767,6 @@ def _header(rows, required, label: str) -> dict:
     return cols
 
 
-def _holder_key(holder: str) -> str:
-    return " ".join((holder or "").split()).casefold()
-
-
 def read_operators(path: Path, stats: Stats, source: str = "registry"):
     """Installations from the registry's operators_daily.csv.gz (source="registry"), or from a snapshot's
     installations.csv.gz (source="snapshot"), whose names were already guarded when it was written.
@@ -772,16 +774,6 @@ def read_operators(path: Path, stats: Stats, source: str = "registry"):
     decide whether an installation name may name a natural person; they are not kept."""
     guard = source == "registry"
     required = list(OPERATOR_COLUMNS) + (list(GUARD_COLUMNS) if guard else [])
-    holders = {}
-    if guard:
-        # A first pass counts each holder's installations: organisations run many, persons few.
-        rows = csv_rows(path, stats.label)
-        col = _header(rows, required, stats.label)
-        for _, row in rows:
-            if len(row) == col["_width"]:
-                key = _holder_key(row[col["ACCOUNT_HOLDER_NAME"]])
-                if key:
-                    holders[key] = holders.get(key, 0) + 1
     rows = csv_rows(path, stats.label)
     col = _header(rows, required, stats.label)
     seen = set()
@@ -810,10 +802,9 @@ def read_operators(path: Path, stats: Stats, source: str = "registry"):
         if guard:
             holder = get("ACCOUNT_HOLDER_NAME")
             reason = withhold_reason(name, code, reg, city, holder, get("ACCOUNT_HOLDER_COMPANY_REGISTRATION_NUMBER"),
-                                     get("ACCOUNT_HOLDER_COUNTRY_CODE").strip().upper(),
-                                     holders.get(_holder_key(holder), 0))
+                                     get("ACCOUNT_HOLDER_COUNTRY_CODE").strip().upper())
             echoes = permit_echoes_a_name(permit, name) if reason else \
-                not holder_is_organisation(holder, reg, holders.get(_holder_key(holder), 0)) and permit_echoes_a_name(permit, holder)
+                not holder_is_organisation(holder, reg) and permit_echoes_a_name(permit, holder)
             if echoes:
                 permit = ""
                 stats.permits_withheld += 1
