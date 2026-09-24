@@ -16,6 +16,9 @@ sensitive, ticked in the template) or inconsistent. Every consistency check cite
 the paragraph of Annex I (the standard) or Annex II (the guidance) of Commission
 Recommendation (EU) 2025/1710 that justifies it; the template up to version 1.3.0
 implements that Recommendation. Tolerances are this tool's own choice (see TOLERANCE).
+Every paragraph reference and threshold below (50 employees, para 40; a headcount of
+150, para 42(b); 200 000 hours, Annex II paras 120-121) was checked against the Official
+Journal text (OJ L, 2025/1710, 5.8.2025) on 2026-09-24.
 """
 from __future__ import annotations
 

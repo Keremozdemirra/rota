@@ -170,6 +170,17 @@ it can differ from this check (EFRAG's formulas flag an energy breakdown only wh
 the total). Formulas are never evaluated: the check uses the results the spreadsheet program
 saved, and says so when a file was written by a program that does not calculate.
 
+## Tests
+
+```bash
+python3 -m unittest discover -s tests -t .
+```
+
+Offline: the bundled text, two trimmed CELLAR responses recorded on 2026-09-24, and synthetic
+workbooks generated at test time. Covered: complete, missing and inconsistent templates, wrong
+units, extra sheets, template versions 1.0.x to an unknown 1.4.0, damaged, encrypted and
+oversized files, network failures during `refresh`, and the MCP protocol end to end over stdio.
+
 ## Data: sources, licences, attribution
 
 - **Bundled:** the text of Annex I (and Annex II) of both acts, extracted from the English XHTML

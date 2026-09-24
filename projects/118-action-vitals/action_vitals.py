@@ -1173,8 +1173,6 @@ def gather(targets: list[Path]) -> tuple[list[dict], list[str]]:
         scan = scan_yaml(text)
         entry["issues"] = scan.issues
         entry["uses"] = find_uses(scan)
-        if kind == "action":
-            entry["using"] = scan.value_at(("runs", "using"))
         for u in entry["uses"]:
             ref = parse_ref(u["value"])
             if ref["kind"] in ("local", "self") and ref["pin"] == "local":
@@ -1415,6 +1413,8 @@ def rewrite(files: list[dict], results: list[dict]) -> list[tuple[dict, str, str
             u = uses.get(x["line"])
             if u is None or u["start"] is None:
                 continue
+            if x["line"] == 1 and parts[0].startswith("\ufeff"):
+                u = dict(u, start=u["start"] + 1, end=u["end"] + 1)  # the scanner reads line 1 without its BOM
             parts[x["line"] - 1] = rewrite_line(parts[x["line"] - 1], u, x["suggestion"], x["tag"] or x["ref"])
         new = "".join(p + (breaks[i] if i < len(breaks) else "") for i, p in enumerate(parts))
         if new != f["text"]:
@@ -1680,18 +1680,17 @@ def main(argv: list[str] | None = None, *, net: Net | None = None) -> int:
                   census=a.census, runtime=not a.no_runtime)
     runtime = not a.no_runtime
     results = check(files, net, today, runtime)
+    changes = rewrite(files, results) if a.diff or a.write else []
 
     if a.json:
         print(json.dumps(to_json(results, files, errors, net, today, runtime), indent=1, ensure_ascii=False))
     elif a.markdown:
         sys.stdout.write(render_markdown(results, files, errors, net, today, runtime))
     elif a.diff or a.write:
-        changes = rewrite(files, results)
         sys.stdout.write(unified(changes) or "No tag references to pin.\n")
     else:
         sys.stdout.write(render_text(results, files, errors, net, today, runtime))
     if a.write:
-        changes = rewrite(files, results)
         failed = write_changes(changes)
         for e in failed:
             print(f"action-vitals: {e}", file=sys.stderr)
