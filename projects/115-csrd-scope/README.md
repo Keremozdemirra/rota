@@ -12,8 +12,9 @@ The scope rules changed three times in three years:
 - Directive (EU) 2025/794 ("stop-the-clock", in force 17 April 2025) moved the second and third sets of undertakings to FY2027 and FY2028.
 - Directive (EU) 2026/470 (the Omnibus I content amendment, OJ L 2026/470 of 26.2.2026, in force 18 March 2026) replaced the scope with
   two cumulative tests, net turnover above EUR 450 000 000 and more than 1 000 employees on average, removed listed SMEs,
-  limited the first set to FY2024-FY2026, and lets Member States exempt members of that set that do not exceed both new
-  thresholds for FY2025-FY2026. Member States have until 19 March 2027 to transpose it.
+  limited the first set to FY2024-FY2026, and lets Member States exempt members of that set that do not exceed the new
+  thresholds for FY2025-FY2026. Member States have until 19 March 2027 to transpose its reporting and audit articles
+  (Articles 1 to 3; the due-diligence article by 26 July 2028).
 
 Several answers depend on national law. The Commission's own interpretative Notice (C/2024/6792, FAQ 1-3) says that the
 year that decides the size category, the two-consecutive-years rule and the way employees are averaged follow the national
@@ -28,7 +29,8 @@ csrd-scope gives its answer as a chain of rules, each with the provision it appl
 
 Three **fictional** undertakings. Real output of `csrd-scope 0.1.0` on 2026-09-24.
 
-A German GmbH, not listed, above both new thresholds (`examples/fictional-eu-manufacturer.json`):
+A German GmbH, not listed, not designated a public-interest entity, above both new thresholds
+(`examples/fictional-eu-manufacturer.json`):
 
 ```json
 {
@@ -37,9 +39,20 @@ A German GmbH, not listed, above both new thresholds (`examples/fictional-eu-man
   "eu_undertaking": true,
   "member_state": "DE",
   "legal_form_in_annex_i_or_ii": true,
+  "designated_pie": false,
   "financial_years": [
-    {"year": 2025, "net_turnover_eur": 505000000, "average_employees": 1320, "balance_sheet_total_eur": 410000000},
-    {"year": 2026, "net_turnover_eur": 520000000, "average_employees": 1450, "balance_sheet_total_eur": 430000000}
+    {
+      "year": 2025,
+      "net_turnover_eur": 505000000,
+      "average_employees": 1320,
+      "balance_sheet_total_eur": 410000000
+    },
+    {
+      "year": 2026,
+      "net_turnover_eur": 520000000,
+      "average_employees": 1450,
+      "balance_sheet_total_eur": 430000000
+    }
   ]
 }
 ```
@@ -47,7 +60,7 @@ A German GmbH, not listed, above both new thresholds (`examples/fictional-eu-man
 ```
 $ csrd-scope check --input examples/fictional-eu-manufacturer.json
 Nordhafen Maschinenbau GmbH (fictional)
-In scope; first reporting financial year FY2027 (starts 2027-01-01). By financial year: FY2024-FY2026: no, FY2027-FY2028: yes.
+By financial year: FY2024-FY2026: no; FY2027-FY2028: yes. First reporting financial year: FY2027 (starts 2027-01-01).
 
 Financial year  Starts      In scope  Figures
 FY2024          2024-01-01  no        not supplied
@@ -69,8 +82,7 @@ Rules applied:
     - FY2028: yes - net turnover EUR 520 000 000 (threshold EUR 450 000 000), average employees 1 450 (threshold 1 000): both exceeded (Art. 19a(1); applies from financial years starting on or after 1 January 2027, Art. 5(2) first subparagraph point (b)(i)).
 
 Questions for counsel:
- - Has the Member State designated undertakings of this kind as public-interest entities (Art. 2(1)(d))? If so, the result for the financial years starting in 2024 to 2026 changes.  [AD-2-1]
- - Which national provisions transpose Directive (EU) 2026/470 (deadline 19 March 2027) and Directive (EU) 2025/794 (deadline 31 December 2025) for this undertaking, and from which financial year do they apply?  [OMNI-5-1, STC-3]
+ - Which national provisions transpose Articles 1 to 3 of Directive (EU) 2026/470 (deadline 19 March 2027) and Directive (EU) 2025/794 (deadline 31 December 2025) for this undertaking, and from which financial year do they apply?  [OMNI-5-1, STC-3]
  - Is the average number of employees computed as national law requires (full-time equivalents or headcount, part-time and temporary staff)? Union law does not regulate the calculation.  [NOTICE-FAQ3, OMNI-rec-7]
 Note: Figures for FY2027 to FY2028 repeat the FY2026 figures (assume_latest_figures_continue=true); other figures can give another answer.
 
@@ -80,35 +92,38 @@ National measures notified for Germany (EUR-Lex/CELLAR, as of 2026-09-24):
  - 32026L0470: 0 measure(s), latest notified -
    EUR-Lex (CELLAR) lists the national measures a Member State notified to the Commission. A listed measure does not show that transposition is complete or correct, and an empty list does not show that none exists: check national law.
 
-Legal basis: 02013L0034-20260318, 02022L2464-20260318, 32026L0470, 32025L0794, 32023L2775; checked 2026-09-24. This text is meant purely as a documentation tool and has no legal effect.
-Source: EUR-Lex / CELLAR (Publications Office of the European Union), © European Union, reused under CC BY 4.0 (https://commission.europa.eu/legal-notice_en); legal texts 32013L0034 (consolidated 02013L0034-20260318), 32022L2464 (consolidated 02022L2464-20260318), 32026L0470, 32025L0794, 32023L2775, 32004L0109, 32019R2088, 52024XC06792; retrieved 2026-09-24. Derived: csrd-scope's encoding of the provisions cited, not the text itself.
+Legal basis: 02013L0034-20260318, 02022L2464-20260318, 32026L0470, 32025L0794, 32023L2775; checked 2026-09-24. EUR-Lex, on its consolidated texts: "This text is meant purely as a documentation tool and has no legal effect."
+Source: EUR-Lex / CELLAR (Publications Office of the European Union), © European Union. Reuse: Commission Decision 2011/833/EU, Art. 4; Commission content is licensed CC BY 4.0 (https://commission.europa.eu/legal-notice_en). Legal texts 32013L0034 (consolidated 02013L0034-20260318), 32022L2464 (consolidated 02022L2464-20260318), 32026L0470, 32025L0794, 32023L2775, 32004L0109, 32019R2088, 52024XC06792; retrieved 2026-09-24. Derived: csrd-scope's encoding of the provisions cited, not the text itself.
 Not legal advice. The answer is at EU-directive level; the obligation applies through the national law of the Member State concerned. Not covered: the content of the reports (European Sustainability Reporting Standards, Commission Delegated Regulation (EU) 2023/2772 and later delegated acts under Art. 29b), assurance (Art. 34 Directive 2013/34/EU, Directive 2006/43/EC), due diligence (Directive (EU) 2024/1760, CSDDD), and EU Taxonomy disclosures (Art. 8 Regulation (EU) 2020/852, Delegated Regulation (EU) 2021/2178).
 ```
 
-A listed Dutch NV in the first set, below the new thresholds (excerpt of `csrd-scope check --input examples/fictional-listed-wave1.json`):
+A listed Dutch NV in the first set, below the new thresholds (excerpt of `csrd-scope check --input examples/fictional-listed-wave1.json`).
+FY2027 is open because Directive (EU) 2026/470 need only be in national law by 19 March 2027, after that financial year starts:
 
 ```
 Brightwater Components NV (fictional)
-In scope; first reporting financial year FY2024 (starts 2024-01-01). By financial year: FY2024: yes, FY2025-FY2026: depends, FY2027-FY2028: no.
+By financial year: FY2024: yes; FY2025-FY2027: depends; FY2028: no. First reporting financial year: FY2024 (starts 2024-01-01).
 
 Financial year  Starts      In scope  Figures
 FY2024          2024-01-01  yes       supplied
 FY2025          2025-01-01  depends   supplied
 FY2026          2026-01-01  depends   projected from FY2025 (assume_latest_figures_continue)
-FY2027          2027-01-01  no        projected from FY2025 (assume_latest_figures_continue)
+FY2027          2027-01-01  depends   projected from FY2025 (assume_latest_figures_continue)
 FY2028          2028-01-01  no        projected from FY2025 (assume_latest_figures_continue)
 ...
-    - FY2025: depends - In the 2024-2026 set (public-interest entity: yes; large undertaking (Art. 3(4), two-year rule of Art. 3(10)): yes; average employees 845 > 500: yes), but the Member State may exempt it for FY2025 because it does not exceed both EUR 450 000 000 and 1 000 employees (net turnover EUR 322 000 000, 845 employees): check national law.
-    - FY2027: no - net turnover EUR 322 000 000 (threshold EUR 450 000 000), average employees 845 (threshold 1 000): not both exceeded.
+    - FY2025: depends - In the 2024-2026 set (public-interest entity: yes; large undertaking (Art. 3(4)): yes; average employees 845 > 500: yes); the Member State may exempt it for FY2025 (Art. 5(2) fifth subparagraph): check national law.
+    - FY2027: depends - net turnover EUR 322 000 000 (threshold EUR 450 000 000), average employees 845 (threshold 1 000): not both exceeded. It is a large undertaking (Art. 3(4)) under the text before Directive (EU) 2026/470, which national law may still apply to a financial year starting before the transposition deadline of 19 March 2027.
+    - FY2028: no - net turnover EUR 322 000 000 (threshold EUR 450 000 000), average employees 845 (threshold 1 000): not both exceeded.
 ...
- - Has the Member State used the option to exempt undertakings or issuers that do not exceed EUR 450 000 000 net turnover or 1 000 employees from reporting for the financial years starting in 2025 and 2026?  [CSRD-5-2-derogation, OMNI-rec-31]
+ - Has the Member State used the option to exempt undertakings or issuers from reporting for the financial years starting in 2025 and 2026, and does it reach this one? The text ('do not exceed a net turnover of EUR 450 000 000 or an average number of 1 000 employees') can be read as 'below at least one threshold' (recital 31: those outside the new scope) or as 'below both'.  [CSRD-5-2-derogation, OMNI-rec-31]
+ - Articles 1 to 3 of Directive (EU) 2026/470 must be in national law by 19 March 2027, after this financial year starts. Under the earlier text (Art. 5(2)(b) Directive (EU) 2022/2464 as amended by Directive (EU) 2025/794), large undertakings, parents of large groups and issuers of that size report from financial years starting on or after 1 January 2027. Which text does national law apply to this financial year?  [CSRD2025-5-2-b, CSRD2025-5-2-sub3-b, OMNI-5-1]
 ```
 
 A US group without EU listing, with an EU subsidiary (excerpt of `csrd-scope check --input examples/fictional-non-eu-group.json`):
 
 ```
 Cascade Robotics Inc. (fictional)
-In scope; first reporting financial year FY2028 (starts 2028-01-01). By financial year: FY2024-FY2027: no, FY2028: yes.
+By financial year: FY2024-FY2027: no; FY2028: yes. First reporting financial year: FY2028 (starts 2028-01-01).
 
 Financial year  Starts      In scope  Figures
 FY2024          2024-01-01  no        not supplied
@@ -122,7 +137,8 @@ FY2028          2028-01-01  yes       projected from FY2027 (assume_latest_figur
  - Is any EU subsidiary itself above the Art. 19a(1) or Art. 29a(1) thresholds? An Art. 40a report does not exempt it; until 6 January 2030 one EU subsidiary may report for all of them (Art. 48i). Assess each one separately with eu_undertaking=true.  [NOTICE-FAQ48, AD-48i-1]
 ```
 
-`--json` gives the same answer as one object: `in_scope`, `first_reporting_financial_year`, `by_financial_year`,
+`--json` gives the same answer as one object: `in_scope` (for the latest financial year assessed, named in
+`in_scope_applies_to`), `first_reporting_financial_year` (with where the report is published), `by_financial_year`,
 `rules_applied`, `questions_for_counsel`, `facts_needed`, `national_law`, `legal_basis_version`, `provisions` (the quoted
 text of every provision cited), `what_this_is_not` and `attribution`.
 
@@ -160,7 +176,7 @@ third-country groups: `--non-eu --fy 2027,eu_net_turnover_eur=600000000 --eu-sub
 | `financial_years` | Required. One object per financial year: `year` (the calendar year in which it starts), `net_turnover_eur`, `average_employees`, `balance_sheet_total_eur`; parents add `group_net_turnover_eur`, `group_average_employees`, `group_balance_sheet_total_eur`; third-country undertakings give `eu_net_turnover_eur`, `eu_subsidiaries` and `eu_branches` (lists of `{name, net_turnover_eur}`). Give the year before the first year of interest too: Art. 3(10) compares two years. |
 | `legal_form_in_annex_i_or_ii` | EU undertakings: `true`, `false` or `null`. `csrd-scope sources --member-state XX` lists the forms. |
 | `entity_type` | `other` (default), `credit_institution`, `insurance_undertaking` (any legal form, Art. 1(3)), `aif_or_ucits` (excluded, Art. 1(4)). |
-| `listed_on_eu_regulated_market`, `only_debt_securities_min_denomination_eur_100000`, `designated_pie`, `parent_undertaking`, `financial_holding_undertaking`, `covered_by_parent_consolidated_sustainability_report` | The facts the scope rules turn on. |
+| `listed_on_eu_regulated_market`, `only_debt_securities_min_denomination_eur_100000`, `designated_pie`, `parent_undertaking`, `financial_holding_undertaking`, `covered_by_parent_consolidated_sustainability_report`, `member_state_exemption_2025_2026` | The facts the scope rules turn on. `designated_pie`, the debt-only flag and the Member State's 2025-2026 option default to unknown, which gives "depends" where they matter. |
 | `member_state`, `financial_year_starts_on` (`MM-DD`), `assume_latest_figures_continue` (default `true`: later years repeat the latest figures, and the output says so), `name` | Optional. |
 
 Unknown fields, numbers given as strings, negative or non-finite numbers, and currencies other than EUR are refused with a message.
@@ -169,10 +185,10 @@ Unknown fields, numbers given as strings, negative or non-finite numbers, and cu
 
 | Financial years | Rule | Provisions |
 | --- | --- | --- |
-| starting 2024-2026 | public-interest entity, large undertaking (two of: balance sheet EUR 25 000 000, net turnover EUR 50 000 000, 250 employees; a change counts after two consecutive years) and more than 500 employees; or a PIE parent of a large group with more than 500 employees (consolidated); issuers on the same size tests | Art. 5(2) first and third subpara. point (a) Dir. (EU) 2022/2464; Arts. 2(1), 3(4), 3(7), 3(10) Dir. 2013/34/EU; Del. Dir. (EU) 2023/2775 |
-| starting 2025-2026 | Member States may exempt undertakings or issuers not exceeding EUR 450 000 000 or 1 000 employees: answer "depends" | Art. 5(2) fifth subpara. Dir. (EU) 2022/2464 |
-| starting on or after 1 January 2027 | net turnover > EUR 450 000 000 **and** more than 1 000 employees (individual), or the same on a consolidated basis for parents; credit institutions and insurers in any legal form; AIFs and UCITS excluded | Arts. 1(3), 1(4), 19a(1), 29a(1) Dir. 2013/34/EU; Art. 5(2) point (b) Dir. (EU) 2022/2464 |
-| starting on or after 1 January 2028 | third-country undertaking with EU net turnover > EUR 450 000 000 in each of the last two consecutive years, through an EU subsidiary above EUR 200 000 000 or, without one, an EU branch above EUR 200 000 000 | Art. 40a(1) Dir. 2013/34/EU; Art. 5(2) second subpara. Dir. (EU) 2022/2464 |
+| starting 2024-2026 | public-interest entity, large undertaking (two of: balance sheet EUR 25 000 000, net turnover EUR 50 000 000, 250 employees) and more than 500 employees; or a PIE parent of a large group with more than 500 employees (consolidated); issuers on the same size tests. Where the size category changes between two years, Art. 3(10)'s two-year rule and the year's own figures can differ: "depends" | Art. 5(2) first and third subpara. point (a) Dir. (EU) 2022/2464; Arts. 2(1), 3(4), 3(7), 3(10) Dir. 2013/34/EU; Del. Dir. (EU) 2023/2775 |
+| starting 2025-2026 | Member States may exempt undertakings or issuers that "do not exceed" EUR 450 000 000 or 1 000 employees: "depends" unless `member_state_exemption_2025_2026` is given (the option reads either as "below at least one threshold" or "below both") | Art. 5(2) fifth subpara. Dir. (EU) 2022/2464 |
+| starting on or after 1 January 2027 | net turnover > EUR 450 000 000 **and** more than 1 000 employees (individual), or the same on a consolidated basis for parents; credit institutions and insurers in any legal form; AIFs and UCITS excluded. A financial year starting before 19 March 2027 is "depends" for large undertakings below these tests, because national law may still apply the earlier text | Arts. 1(3), 1(4), 19a(1), 29a(1) Dir. 2013/34/EU; Art. 5(2) point (b) Dir. (EU) 2022/2464, before and after Dir. (EU) 2026/470 |
+| starting on or after 1 January 2028 | third-country undertaking with EU net turnover > EUR 450 000 000 in each of the last two consecutive years (which two years is open where it matters), through an EU subsidiary above EUR 200 000 000, or an EU branch above EUR 200 000 000 where there is no "subsidiary undertaking as referred to in the first subparagraph" (any EU subsidiary, or only one above EUR 200 000 000: open where it matters) | Art. 40a(1) Dir. 2013/34/EU; Art. 5(2) second subpara. Dir. (EU) 2022/2464 |
 | any | subsidiary exemption, financial-holding option, issuers of large-denomination debt only | Arts. 19a(9)-(10), 29a(7a)-(9), 40a(1) last subpara.; Art. 8(1)(b) Dir. 2004/109/EC |
 
 "Depends" means one of: a Member State option or national transposition decides; a provision needs legal judgement
@@ -185,8 +201,8 @@ which they start (FY2027 starts in 2027).
 | Act | CELEX | Version used |
 | --- | --- | --- |
 | Directive 2013/34/EU (Accounting Directive) | 32013L0034 | consolidated 02013L0034-20260318 |
-| Directive (EU) 2022/2464 (CSRD) | 32022L2464 | consolidated 02022L2464-20260318 |
-| Directive (EU) 2026/470 (Omnibus I content amendment), OJ L 2026/470, 26.2.2026 | 32026L0470 | OJ text; in force 18 March 2026; transposition by 19 March 2027 |
+| Directive (EU) 2022/2464 (CSRD) | 32022L2464 | consolidated 02022L2464-20260318; for the FY2027 transition also 02022L2464-20250417 |
+| Directive (EU) 2026/470 (Omnibus I content amendment), OJ L 2026/470, 26.2.2026 | 32026L0470 | OJ text; in force 18 March 2026; Articles 1-3 transposed by 19 March 2027, Article 4 by 26 July 2028 |
 | Directive (EU) 2025/794 (stop-the-clock), OJ L 2025/794, 16.4.2025 | 32025L0794 | OJ text; in force 17 April 2025; transposition by 31 December 2025 |
 | Commission Delegated Directive (EU) 2023/2775 (size criteria) | 32023L2775 | OJ text; financial years from 1 January 2024 |
 | Directive 2004/109/EC (Transparency Directive) | 32004L0109 | consolidated 02004L0109-20240109 |
@@ -207,11 +223,13 @@ measure does not show that transposition is complete or correct, and csrd-scope 
 
 - Source: CELLAR, the Publications Office repository behind EUR-Lex (SPARQL endpoint
   `https://publications.europa.eu/webapi/rdf/sparql` and `https://publications.europa.eu/resource/celex/<CELEX>`).
-- Licence: the Commission's legal notice, https://commission.europa.eu/legal-notice_en: "Unless otherwise indicated (e.g.
-  in individual copyright notices), content owned by the EU on this website is licensed under the Creative Commons
-  Attribution 4.0 International (CC BY 4.0) licence. This means that reuse is allowed, provided appropriate credit is
-  given and changes are indicated." The EUR-Lex legal notice could not be read from the build environment (HTTP 202,
-  empty body, 2026-09-24).
+- Reuse: Commission Decision 2011/833/EU on the reuse of Commission documents, Article 4: "All documents shall be
+  available for reuse: (a) for commercial or non-commercial purposes [...]". The Commission's legal notice,
+  https://commission.europa.eu/legal-notice_en, licenses content owned by the EU on that website under CC BY 4.0:
+  "This means that reuse is allowed, provided appropriate credit is given and changes are indicated." The Publications
+  Office copyright page refers EUR-Lex content to the EUR-Lex notice and asks to be contacted about the conditions of
+  reuse of CELLAR content; the EUR-Lex notice could not be read from the build environment (HTTP 202, empty body,
+  2026-09-24).
 - Every answer carries the attribution line, and says "derived": the rules are csrd-scope's encoding of the provisions.
 - Bundled in `data/`: identifiers, dates, titles, short quotations of the provisions the rules encode, the legal forms
   of Annexes I and II, the EU-27 list (EU Vocabularies country table) and national-measure metadata. No personal data.

@@ -12,7 +12,7 @@ import sys
 import tempfile
 import unittest
 
-from support import DATA, ROOT, Isolated, eu, fixture, fy, non_eu, question_ids, sparql_router, statuses
+from support import DATA, ROOT, Isolated, eu, fy, non_eu, question_ids, sparql_router, statuses
 
 import csrd_scope
 import csrd_scope_cellar as cellar
