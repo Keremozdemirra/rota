@@ -2285,8 +2285,8 @@ def _compare(b: Sheet, a: Sheet, bkey, akey, bcell: Cell, acell: Cell, tr: _Tran
     if bf and af:
         same = tr.identity and bcell.formula == acell.formula
         if not same:
-            bt = _formula_keys(b, bkey, cache)
-            at = _formula_keys(a, akey, cache)
+            bt = _formula_tokens(b, bkey, cache)
+            at = _formula_tokens(a, akey, cache)
             same = canonical(bt, lambda ref: tr.ref(ref, b.index)) == canonical(at, ref_norm_a1)
         if not same:
             return "formula-changed"
