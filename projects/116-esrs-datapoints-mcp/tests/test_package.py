@@ -16,7 +16,7 @@ TEXT_SUFFIXES = {".py", ".md", ".toml", ".json", ".yml", ".in", ".txt", ""}
 def project_files():
     skip = {"__pycache__", ".git", "build", "dist"}
     return [p for p in ROOT.rglob("*") if p.is_file() and not skip & set(p.relative_to(ROOT).parts)
-            and not p.name.endswith(".egg-info")]
+            and not any(part.endswith(".egg-info") for part in p.relative_to(ROOT).parts)]
 
 
 class Packaging(unittest.TestCase):
@@ -72,7 +72,7 @@ class NoEfragContent(unittest.TestCase):
             if p.suffix not in TEXT_SUFFIXES:
                 continue
             text = p.read_text(encoding="utf-8")
-            self.assertIsNone(re.search("[‪-‮⁦-⁩]", text), p)
+            self.assertIsNone(re.search("[\u202a-\u202e\u2066-\u2069]", text), p)
             self.assertIsNone(token.search(text), p)
 
     def test_no_top_level_modules_that_collide(self):
