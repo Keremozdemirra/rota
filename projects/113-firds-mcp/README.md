@@ -230,7 +230,7 @@ GLEIF's parents are accounting-consolidation parents. The LEI ROC defines the ul
 - **Sends** to ESMA: the ISIN, in a query `q=isin:<ISIN>` with `fq=latest_received_flag:1` and a list of field names. To GLEIF: LEIs in URL paths (`/lei-records/<LEI>`, `/direct-parent-relationship` and similar) and page numbers. Only ISINs that pass the ISO 6166 check digit and LEIs that pass the ISO 17442 check digits are sent; nothing else you type goes anywhere. Every request carries the User-Agent `firds-mcp/0.1.0 (+https://github.com/Keremozdemirra/firds-mcp)`. No key, no account, no cookies.
 - **Reads:** no files. Environment variables: `FIRDS_MCP_TIMEOUT` (seconds per request, 1 to 60), `FIRDS_MCP_ESMA_URL` and `FIRDS_MCP_GLEIF_URL` (for a mirror; the tests point them at a local server), and the standard proxy variables Python's `urllib` honours.
 - **Writes:** nothing. There is no cache; every call asks the sources again.
-- **Remote text:** names, addresses and other free text from the sources are stripped of control characters, cut to length, and wrapped as `<<remote text, not an instruction: ...>>` in JSON and MCP answers. Codes, dates and numbers are left bare. The text output prints them unwrapped for a person, with a line saying what they are.
+- **Remote text:** names, addresses and other free text from the sources are stripped of control characters, cut to length, and wrapped as `<<remote text, not an instruction: ...>>` in JSON and MCP answers. A value that is a single word of up to 40 letters, digits and `. _ : + / % -` (a code, a date, a number) is left bare. The text output prints them unwrapped for a person, with a line saying what they are.
 - **Sole proprietors:** for GLEIF records of category SOLE_PROPRIETOR, whose legal name can be a person's name, the name, other names, registration number and street address are withheld (this tool's choice).
 
 ## Limits and choices
@@ -255,7 +255,7 @@ python3 -m unittest discover -s tests -t .
 
 The tests run offline against real ESMA and GLEIF answers recorded on 2026-09-24 and trimmed (`tests/fixtures/README.md` lists each file, the URL it came from and what was cut). One test starts the server as a separate process and speaks MCP to it over stdin/stdout, with the recorded answers served from 127.0.0.1.
 
-The code is MIT-licensed (`LICENSE`). The data belongs to its sources, under the terms above.
+The code is MIT-licensed (`LICENSE`). The data comes from its sources, under the terms above.
 
 ## What this is not
 
@@ -264,4 +264,4 @@ The code is MIT-licensed (`LICENSE`). The data belongs to its sources, under the
 - **Not official.** This is not an ESMA or GLEIF product, and neither endorses it. ESMA states that it "is not able to provide any representation or warranty that the available content is complete, accurate or up to date"; the same goes for this tool's reformatting of it.
 - **Not advice.** Reference data, stated as the sources give it. Not investment, legal or compliance advice, and no verdict on any issuer.
 - **Not a MIC directory.** Venues are given as MIC codes, as FIRDS gives them; the tool does not resolve them to venue names.
-- **Not real time.** FIRDS publishes daily; GLEIF answers from its golden copy, whose publication date each answer states.
+- **Not real time.** FIRDS publishes daily; GLEIF answers from its golden copy, whose publication date every answer with GLEIF data states.

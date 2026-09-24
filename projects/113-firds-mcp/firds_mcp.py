@@ -352,10 +352,14 @@ def _compact(d: dict) -> dict:
     return {k: v for k, v in d.items() if v not in (None, "", [], {})}
 
 
-def _masked(text) -> str:
-    """An error detail with URL passwords and query strings masked (a proxy URL can carry both)."""
-    s = re.sub(r"(?i)\b([a-z][a-z0-9+.-]*://)[^/\s@]+@", r"\1***@", clean(text, 160))
-    return re.sub(r"\?\S*", "?***", s)
+def _masked(text, n: int = 160) -> str:
+    """An error detail with URL passwords and query strings masked (a proxy URL can carry both).
+
+    Masking runs on the whole string before clean() cuts it: a cut can remove the "@" or "?"
+    the masks look for and leave the secret in the part that is kept.
+    """
+    s = re.sub(r"(?i)\b([a-z][a-z0-9+.-]*://)[^/\s@]+@", r"\1***@", str(text))
+    return clean(re.sub(r"\?\S*", "?***", s), n)
 
 
 # ------------------------------------------------------------------ HTTP
@@ -1179,11 +1183,11 @@ def call_tool(name: str, arguments) -> dict:
     except InputError as e:
         return _tool_error(f"{e}. Nothing was sent.", "invalid_input")
     except TypeError as e:
-        return _tool_error(f"bad arguments: {clean(e, 200)}", "invalid_input")
+        return _tool_error(f"bad arguments: {_masked(e, 200)}", "invalid_input")
     except SourceError as e:
         return _tool_error(f"{e.source} could not answer: {e.detail}", e.kind)
     except Exception as e:  # a payload shape nobody foresaw: report it, keep serving
-        return _tool_error(f"unexpected {type(e).__name__}: {clean(e, 200)}", "internal")
+        return _tool_error(f"unexpected {type(e).__name__}: {_masked(e, 200)}", "internal")
     return {"content": [{"type": "text", "text": json.dumps(result, ensure_ascii=False)}],
             "structuredContent": result, "isError": False}
 
@@ -1448,7 +1452,7 @@ def main(argv=None) -> int:
         print(f"firds-mcp: {e.source} could not answer: {e.detail}", file=sys.stderr)
         return 2
     except Exception as e:  # a payload shape nobody foresaw: say so instead of a traceback
-        print(f"firds-mcp: unexpected {type(e).__name__}: {clean(e, 200)}", file=sys.stderr)
+        print(f"firds-mcp: unexpected {type(e).__name__}: {_masked(e, 200)}", file=sys.stderr)
         return 2
     if hasattr(sys.stdout, "reconfigure"):
         try:

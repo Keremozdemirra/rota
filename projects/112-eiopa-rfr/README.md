@@ -280,9 +280,11 @@ were cut.
   and no credentials; EIOPA's files need none.
 - `EIOPA_RFR_OFFLINE=1` or `--offline`: nothing is fetched; `latest` then means
   the newest cached release, and the answer says so.
-- Text from EIOPA's pages and files that reaches the output (file names, column
-  names, curve identifiers) is reduced to letters, digits and plain punctuation
-  and cut to a fixed length.
+- Text from EIOPA's pages and files that reaches the output is reduced to
+  letters, digits and plain punctuation and cut to a fixed length. Curve
+  identifiers must match EIOPA's pattern; column names, file names and texts
+  such as `n/a` that are not among those seen in the releases checked are passed
+  on as `<<remote text, not an instruction: ...>>`.
 
 Choices of this tool, not EIOPA's: the 6-hour reuse of the release list; one
 retry after HTTP 429 or 503, waiting what `Retry-After` asks up to 10 seconds
@@ -297,7 +299,7 @@ pages and 60 seconds for zips per network operation.
 python3 -m unittest discover -s tests -t .
 ```
 
-120 tests, offline, on trimmed copies of real EIOPA files: page parsing with
+127 tests, offline, on trimmed copies of real EIOPA files: page parsing with
 random-id links and the files that are not releases (dual runs, parallel
 calculations, FSR curves, the 2020 extraordinary updates), the older workbook
 layout, network down, DNS failure, timeouts, 404, 429 with `Retry-After`,

@@ -838,15 +838,15 @@ def parse_release(data: bytes, file_label: str, expect: dt.date | None = None) -
         listed = remote(", ".join(clean_text(n, 60) for n in names[:8]), 300) if names else "nothing"
         raise LayoutError(f"{file_label} has no *_Term_Structures.xlsx workbook (it contains {listed})")
     book = books[0]
+    inner = book.rsplit("/", 1)[-1]
+    label = inner if re.fullmatch(r"EIOPA_RFR_\d{8}_Term_Structures\.xlsx", inner, re.I) else remote(inner, 80)
     info = outer.getinfo(book)
     if info.file_size > MAX_ZIP_BYTES:
-        raise LayoutError(f"{file_label}: {clean_text(book)} unpacks to more than {MAX_ZIP_BYTES // 2 ** 20} MB")
+        raise LayoutError(f"{file_label}: {label} unpacks to more than {MAX_ZIP_BYTES // 2 ** 20} MB")
     try:
         xlsx = outer.read(info)
     except (zipfile.BadZipFile, zlib.error, EOFError, OSError, RuntimeError, NotImplementedError):
-        raise LayoutError(f"{file_label} is corrupted: {clean_text(book)} cannot be decompressed") from None
-    inner = book.rsplit("/", 1)[-1]
-    label = inner if re.fullmatch(r"EIOPA_RFR_\d{8}_Term_Structures\.xlsx", inner, re.I) else remote(inner, 80)
+        raise LayoutError(f"{file_label} is corrupted: {label} cannot be decompressed") from None
     wb = _Workbook(xlsx, label)
     curves = {variant: _read_curve_sheet(wb, variant) for variant in SHEETS}
     curve_dates = sorted({col["curve_date"] for v in curves.values() for col in v["columns"]})
@@ -861,7 +861,7 @@ def parse_release(data: bytes, file_label: str, expect: dt.date | None = None) -
         reference = expect.isoformat()
     book_date = re.search(r"(\d{8})_term_structures", book, re.I)
     if book_date and book_date.group(1) != reference.replace("-", ""):
-        warnings.append(f"workbook name {clean_text(book)} does not match reference date {reference}")
+        warnings.append(f"workbook name {label} does not match reference date {reference}")
     menu = _main_menu_date(wb)
     if menu and menu != reference:
         warnings.append(f"Main_Menu sheet shows {menu}, the curves are dated {reference}")

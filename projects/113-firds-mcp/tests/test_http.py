@@ -106,6 +106,16 @@ class ServerAndNetwork(support.OfflineTest):
         self.assertNotIn("key=x", cm.exception.detail)
         self.assertIn("http://***@proxy.corp:3128/?***", cm.exception.detail)
 
+    def test_masking_happens_before_the_cut(self):
+        # A password longer than the kept length: cutting first would drop the "@" and keep the password.
+        secret = "p" * 300
+        err = urllib.error.URLError(f"Tunnel connection failed via http://alice:{secret}@proxy.corp:3128/")
+        self.net.script(RECORD, err, err)
+        with self.assertRaises(fm.SourceError) as cm:
+            fm.lei_record(DB)
+        self.assertNotIn("ppppp", cm.exception.detail)
+        self.assertIn("http://***@proxy.corp:3128/", cm.exception.detail)
+
     def test_timeout_is_not_retried(self):
         self.net.script(RECORD, socket.timeout("timed out"))
         with self.assertRaises(fm.SourceError) as cm:

@@ -107,6 +107,7 @@ R_CODEBLOCK = "code (Markdown code span or block)"
 R_COMMENT = "HTML comment"
 R_MALFORMED = "not a well-formed number"
 R_UNITLABEL = "unit label ('000)"
+R_SECRET = "inside a credential or query string (hidden)"
 
 
 class InputError(Exception):
@@ -119,6 +120,33 @@ _URL_QUERY = re.compile(r"(?i)\b((?:https?|ftp)://[^\s?#]+)\?[^\s#]*")
 _SECRET_FLAG = re.compile(r"(?i)(--(?:api[-_]?key|token|secret|password|passwd|access[-_]?key|auth)[=\s]+)\S+")
 _SECRET_PAIR = re.compile(r"(?i)\b((?:api[-_]?key|token|secret|password|passwd|access[-_]?key)\s*[=:]\s*)\S+")
 _SECRET_ENV = re.compile(r"\b([A-Z][A-Z0-9_]*(?:KEY|TOKEN|SECRET|PASSWORD)[A-Z0-9_]*=)\S+")
+
+
+_HIDE = "\ue000"  # stands in for a hidden character until runs of it are printed as ***
+
+
+def _hide_groups(rx, text: str, group: int) -> str:
+    return rx.sub(lambda m: m.group(0)[:m.start(group) - m.start()] + _HIDE * (m.end(group) - m.start(group))
+                  + m.group(0)[m.end(group) - m.start():], text)
+
+
+_URL_CRED_G = re.compile(r"(?i)\b[a-z][a-z0-9+.-]*://([^/\s@]+)@")
+_URL_QUERY_G = re.compile(r"(?i)\b(?:https?|ftp)://[^\s?#]+\?([^\s#]+)")
+_SECRET_FLAG_G = re.compile(r"(?i)--(?:api[-_]?key|token|secret|password|passwd|access[-_]?key|auth)[=\s]+(\S+)")
+_SECRET_PAIR_G = re.compile(r"(?i)\b(?:api[-_]?key|token|secret|password|passwd|access[-_]?key)\s*[=:]\s*(\S+)")
+_SECRET_ENV_G = re.compile(r"\b[A-Z][A-Z0-9_]*(?:KEY|TOKEN|SECRET|PASSWORD)[A-Z0-9_]*=(\S+)")
+
+
+def hide_secrets(text: str) -> str:
+    """Same length as `text`, secrets replaced by a placeholder, so positions still line up. Runs on the
+    whole segment before anything is cut, so a cut can never split a secret from what marks it."""
+    for rx in (_URL_CRED_G, _URL_QUERY_G, _SECRET_FLAG_G, _SECRET_PAIR_G, _SECRET_ENV_G):
+        text = _hide_groups(rx, text, 1)
+    return text
+
+
+def shown(text: str) -> str:
+    return re.sub(_HIDE + "+", "***", text)
 
 
 def mask(text: str) -> str:
@@ -603,6 +631,7 @@ class Num:
         self.context = ""
         self.written = tok
         self.marker = False
+        self.secret = False
 
     @property
     def scale(self) -> Decimal:
@@ -819,6 +848,7 @@ def _label_units(n: Num, seg: Segment) -> None:
 
 
 def _context(text: str, s: int, e: int) -> str:
+    """`text` must already have its secrets hidden (hide_secrets); the cut happens afterwards."""
     a, b = max(0, s - CONTEXT_CHARS), min(len(text), e + CONTEXT_CHARS)
     if a > 0:
         sp = text.find(" ", a, s)
@@ -828,13 +858,14 @@ def _context(text: str, s: int, e: int) -> str:
         b = sp if sp != -1 else b
     squash = lambda x: re.sub(r"\s+", " ", x)
     left, mid, right = squash(text[a:s]), squash(text[s:e]), squash(text[e:b])
-    return mask(("…" if a > 0 else "") + left.lstrip() + "«" + mid + "»" + right.rstrip() + ("…" if b < len(text) else ""))
+    return shown(("…" if a > 0 else "") + left.lstrip() + "«" + mid + "»" + right.rstrip()
+                 + ("…" if b < len(text) else ""))
 
 
 def _table_context(seg: Segment, ctx: str) -> str:
     row = next((t for k, t in seg.labels if k == "row label" and t), None)
     col = next((t for k, t in seg.labels if k in ("column header", "series") and t), None)
-    head = " · ".join(_short(x, 30) for x in (row, col) if x)
+    head = " · ".join(_short(mask(x), 30) for x in (row, col) if x)
     return f"{head}: {ctx}" if head else ctx
 
 
@@ -859,7 +890,7 @@ def _raw_number(seg: Segment, min_digits: int) -> Num:
         n.status, n.reason = "excluded", f"fewer than {min_digits} digits (--min-digits)"
     else:
         _label_units(n, seg)
-    n.context = mask(_table_context(seg, "«" + n.written + "»"))
+    n.context = _table_context(seg, "«" + n.written + "»")
     return n
 
 
@@ -920,10 +951,13 @@ def scan_segment(seg: Segment, locale: str, min_digits: int = 1) -> list:
         prev = n
     out.extend(nums)
     out.sort(key=lambda x: x.start)
+    hidden = hide_secrets(text)
     for n in out:
-        n.written = text[n.start:n.end]
-        ctx = _context(text, n.start, n.end)
-        n.context = mask(_table_context(seg, ctx)) if seg.table else ctx
+        if _HIDE in hidden[n.tok_start:n.tok_end]:
+            n.secret, n.status, n.reason = True, "excluded", R_SECRET
+        n.written = shown(hidden[n.start:n.end])
+        ctx = _context(hidden, n.start, n.end)
+        n.context = _table_context(seg, ctx) if seg.table else ctx
     return out
 
 
@@ -1745,7 +1779,7 @@ def _unit_for(row_label: str, col_label: str):
 
 def _finish_cells(src: _Source, raw_cells: list, source_units: list) -> None:
     for c, row_label, col_label in raw_cells:
-        c.label = " | ".join(_short(x, 40) for x in (row_label, col_label) if x)
+        c.label = " | ".join(_short(mask(x), 40) for x in (row_label, col_label) if x)
         u = _unit_for(row_label, col_label)
         if u:
             src.cells.append(c.with_unit(u[0], u[1]))
@@ -2311,11 +2345,11 @@ def check_links(links: list, timeout: float = LINK_TIMEOUT, opener=None) -> list
 
 # ------------------------------------------------------------------- report
 def _num_dict(n: Num, many_sources: bool) -> dict:
-    d = {"id": 0, "written": mask(n.written), "where": n.seg.where, "location": n.seg.loc, "context": n.context,
+    d = {"id": 0, "written": n.written, "where": n.seg.where, "location": n.seg.loc, "context": n.context,
          "status": n.status}
     if n.status == "excluded":
         d["reason"] = n.reason
-    if n.mantissa is not None and not n.marker:
+    if n.mantissa is not None and not n.marker and not n.secret:
         value = n.mantissa * n.scale * (-1 if n.negative else 1)
         d["read_as"] = {
             "value": fmt(value).replace(",", ""),

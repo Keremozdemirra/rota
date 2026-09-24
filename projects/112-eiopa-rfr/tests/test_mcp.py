@@ -44,6 +44,13 @@ class Protocol(Isolated):
         self.assertEqual(r["structuredContent"]["no_va"]["rate"], 0.03268)
         self.assertEqual(json.loads(r["content"][0]["text"]), r["structuredContent"])
 
+    def test_null_optional_arguments_mean_the_defaults(self):
+        r = E.handle(rpc("tools/call", name="get_rate", arguments={"currency": "EUR", "maturity_years": 10,
+                                                                   "date": None, "variant": None}))["result"]
+        self.assertFalse(r["isError"], r["content"])
+        self.assertIn("with_va", r["structuredContent"])
+        self.assertEqual(r["structuredContent"]["reference_date"], "2026-08-31")
+
     def test_tool_errors_are_results_not_protocol_errors(self):
         cases = [{"currency": "XYZ", "maturity_years": 10, "date": "2026-08"},   # unknown currency
                  {"currency": "EUR", "maturity_years": 10, "date": "2031-01"},   # month not published

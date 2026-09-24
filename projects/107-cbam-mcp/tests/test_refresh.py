@@ -94,6 +94,18 @@ class Fetch(unittest.TestCase):
             self.assertEqual(calls, 1)
 
 
+class Masking(unittest.TestCase):
+    def test_credentials_and_query_strings_never_reach_messages(self):
+        secret = "s3cr3t" + "x" * 12  # built at runtime: no token-shaped literal in the repository
+        err = FetchError(f"https://user:{secret}@proxy.test/file?token={secret}&a=1: HTTP 404")
+        self.assertNotIn(secret, str(err))
+        self.assertEqual(str(err), "https://***@proxy.test/file?*** HTTP 404")
+        with mock.patch("urllib.request.urlopen", side_effect=urllib.error.URLError(f"http://u:{secret}@p:3128 refused")):
+            with self.assertRaises(FetchError) as cm:
+                refresh.fetch(f"https://x.test/f?key={secret}", sleep=lambda s: None)
+        self.assertNotIn(secret, str(cm.exception))
+
+
 class Run(unittest.TestCase):
     def setUp(self):
         self.tmp = Path(tempfile.mkdtemp(prefix="cbam-mcp-refresh-"))

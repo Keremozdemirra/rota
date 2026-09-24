@@ -36,13 +36,12 @@ $ cbam-mcp compare 7601 10 00 India Türkiye
   Commission says   "An Excel file is made available for information purposes only, while the
                     legally binding values are set out in Commission Implementing Regulation (EU)
                     2025/2621."
-  Data              Commission Excel 'Default values definitive period', version 2 of 2026-08-06
-                    (Default values based on Annex I and II to Implementing Regulation (EU)
-                    2026/1740 adopted on 20 July 2026), file 'DV correcting act_final
-                    update_06.08.xlsx', retrieved 2026-09-24
-  Checked           On 2026-09-24 cbam-mcp compared this file with
-                    http://publications.europa.eu/resource/celex/32026R1740: 12540 of 12540 country
-                    lines and 283 of 283 Annex IV lines identical.
+  Data              Commission Excel 'Default values definitive period', version 2 of 2026-08-06,
+                    retrieved 2026-09-24 (Default values based on Annex I and II to Implementing
+                    Regulation (EU) 2026/1740 adopted on 20 July 2026)
+  Checked           On 2026-09-24 cbam-mcp compared this file with the Official Journal text of
+                    32026R1740: 12540 of 12540 country lines and 283 of 283 Annex IV lines
+                    identical.
   Warning           7601 10 00 is not a CN 2026 code; the table line shown is the one whose code it
                     starts with
   Source: European Commission, DG TAXUD, default values Excel version 2, CC BY 4.0, retrieved 2026-09-24; decimal commas converted to numbers (derived)
@@ -59,9 +58,8 @@ $ cbam-mcp scope 2507 00 80
   Annex I line      ex 2507 00 80 – Other kaolinic clays except non-calcined kaolinic clays
   Goods category    Cement
   Greenhouse gases  Carbon dioxide
-  Why               Annex I lists this as 'ex 2507 00 80 – Other kaolinic clays except non-calcined
-                    kaolinic clays'. 'ex' means only the goods that description covers are in scope,
-                    not every good under 2507 00 80.
+  Why               Annex I lists 2507 00 80 as an 'ex' line: only the goods its text describes
+                    (annex_i_line.text) are in scope, not every good under 2507 00 80.
   Annex II          not listed in Annex II. Article 7(1): "Embedded emissions in goods shall be
                     calculated pursuant to the methods set out in Annex IV. For goods listed in
                     Annex II only direct emissions shall be calculated and taken into account."
@@ -73,8 +71,8 @@ $ cbam-mcp scope 2507 00 80
   Legally binding   no. Binding text: Annex I to Regulation (EU) 2023/956 as published in the
                     Official Journal (OJ L 130, 16.5.2023, p. 52) and amended by Regulation (EU)
                     2025/2083 (OJ L, 2025/2083, 17.10.2025)
-  Data              consolidated text 02023R0956-20251020 of Regulation (EU) 2023/956 (02023R0956 —
-                    EN — 20.10.2025 — 001.001), retrieved 2026-09-24 from CELLAR
+  Data              consolidated text 02023R0956-20251020 of Regulation (EU) 2023/956 (consolidation
+                    date 2025-10-20), retrieved 2026-09-24 from CELLAR
   Source: EUR-Lex/CELLAR, consolidated text 02023R0956-20251020 of Regulation (EU) 2023/956, © European Union, retrieved 2026-09-24; table derived by cbam-mcp
 ```
 
@@ -94,8 +92,7 @@ $ cbam-mcp describe 7308 20 10
   Legally binding   no. Binding text: Annex I to Council Regulation (EEC) No 2658/87 as amended by
                     Commission Implementing Regulation (EU) 2025/1926 (Combined Nomenclature 2026),
                     as published in the Official Journal
-  Data              CN 2026 (EU Vocabularies, http://data.europa.eu/xsp/cn2026/cn2026), bundled
-                    subset, retrieved 2026-09-24
+  Data              CN 2026 (EU Vocabularies, scheme cn2026), bundled subset, retrieved 2026-09-24
   Source: Publications Office of the European Union, EU Vocabularies, Combined Nomenclature 2026, European Commission reuse notice, retrieved 2026-09-24
 ```
 
@@ -170,7 +167,7 @@ Implementing Regulation (EU) 2025/2621 including them existed (the Commission's 
 be available soon"), and this tool only states such rules from consolidated text. Answers say that the
 listed value is increased for the certificate calculation and where; they do not compute it.
 
-Later acts, checked in CELLAR on 2026-09-24 (`data/later_acts.json`, repeated at every refresh): no
+Later acts, checked in CELLAR on 2026-09-24 (`cbam_mcp/data/later_acts.json`, repeated at every refresh): no
 act amending or correcting Implementing Regulation (EU) 2025/2621 is dated after Implementing
 Regulation (EU) 2026/1740 (20 July 2026), and none amending Regulation (EU) 2023/956 after the
 consolidation date. CELLAR lists corrigenda to both acts (2023/956 R(01) to R(04), 2025/2621 R(01)),

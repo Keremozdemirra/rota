@@ -1,5 +1,6 @@
 """End to end on the example files, output formats and exit codes."""
 import json
+import re
 import os
 import subprocess
 import sys
@@ -48,7 +49,7 @@ class Examples(IsolatedTestCase):
                          [("2,105.2", "tied"), ("1,187.4", "tied"), ("920.9", "tied")])
         table = [d for d in self.deck["numbers"] if "table 1" in d["where"] and d["status"] == "tied"]
         self.assertEqual(len(table), 13)
-        hidden = [d for d in self.deck["numbers"] if "(hidden)" in d["where"]]
+        hidden = [d for d in self.deck["numbers"] if "(hidden)" in d["where"] and d["status"] != "excluded"]
         self.assertEqual(hidden[0]["status"], "tied")
         self.assertEqual(got["€13.4bn"][0]["candidates"][0]["source"], "marktdaten.csv")
 
@@ -88,7 +89,8 @@ class Outputs(IsolatedTestCase):
         code, out, _ = run_cli([DECK, MODEL, MARKET, "--explain"])
         report = tieout.build_report(DECK, [MODEL, MARKET])
         excluded = [d for d in report["numbers"] if d["status"] == "excluded"]
-        self.assertEqual(out.count(" excluded "), len(excluded))
+        rows = [line for line in out.splitlines() if re.match(r"\d+\s+excluded\s", line)]
+        self.assertEqual(len(rows), len(excluded))
         for d in excluded:
             self.assertIn(d["reason"], out)
         self.assertIn("tie rule: |v| × 100 or |v| rounds to 62 at whole number", out)
@@ -158,13 +160,17 @@ class ExitCodes(IsolatedTestCase):
 
 class Masking(IsolatedTestCase):
     def test_secrets_in_context_are_masked(self):
-        path = self.text_file("s.md", "Revenue 12.5% per https://alice:hunter2@example.org/r?key=sk-SECRET and "
-                                      "API_KEY=sk-OTHER token: abc123 12.5%\n")
-        code, out, _ = run_cli([path, "--json"])
-        self.assertNotIn("hunter2", out)
-        self.assertNotIn("sk-SECRET", out)
-        self.assertNotIn("sk-OTHER", out)
-        self.assertNotIn("abc123", out)
+        key = "sk-" + "x" * 32
+        other = "ghp_" + "a" * 36
+        pw = "hun" + "ter" + "2025"
+        text = (f"Revenue 12.5% per https://alice:{pw}@example.org/r?key={key} and API_KEY={other} "
+                f"token: abc123 12.5% " + "filler " * 12 + f"then https://bob:{pw}@example.org/x 7.5%\n")
+        path = self.text_file("s.md", text)
+        for args in ([path, "--json"], [path, "--explain"], [path, "--markdown", "--explain"]):
+            code, out, _ = run_cli(args)
+            for secret in (pw, key, other, "abc123", "2025"):
+                self.assertNotIn(secret, out, (args, secret))
+            self.assertIn("https://***@example.org" if "--markdown" not in args else r"https://\*\*\*@example.org", out)
 
 
 if __name__ == "__main__":

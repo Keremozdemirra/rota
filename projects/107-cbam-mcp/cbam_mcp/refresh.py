@@ -55,8 +55,17 @@ MIN_CN_CONCEPTS = 500
 FILES = {"annex": "annex_i.json", "values": "default_values.json", "cn2026": "cn_2026.json", "cn2025": "cn_2025.json"}
 
 
+def mask_url(text) -> str:
+    """URL passwords and query strings masked: a proxy or a pasted link can carry either."""
+    s = re.sub(r"(?i)\b([a-z][a-z0-9+.-]*://)[^/\s@]+@", r"\1***@", str(text))
+    return re.sub(r"\?\S*", "?***", s)
+
+
 class FetchError(RuntimeError):
-    """A download that did not produce a usable body."""
+    """A download that did not produce a usable body. The message is masked whole, before anything shortens it."""
+
+    def __init__(self, message):
+        super().__init__(mask_url(message))
 
 
 class Fetched:
@@ -332,7 +341,7 @@ def refresh_values(data_dir: Path, today: str, fetcher=fetch, check_oj: bool = F
     annex_iv = {code: "|".join(row) for code, row in parsed["annex_iv"].items()}
     meta = {
         "source": "European Commission, DG TAXUD: Default values definitive period (Excel format)",
-        "url": excel_url, "page": EXCEL_PAGE, "filename": filename, "retrieved": today, "sha256": digest,
+        "url": mask_url(excel_url), "page": EXCEL_PAGE, "filename": filename, "retrieved": today, "sha256": digest,
         "bytes": len(got.body), "version": latest.get("version"), "version_date": latest.get("date"),
         "version_note": latest.get("note"), "versions": parsed["versions"], "disclaimer": parsed["disclaimer"],
         "sheets": parsed["sheet_count"], "tables": len(tables), "rows": sum(len(t) for t in tables.values()),
@@ -447,6 +456,8 @@ def render_sources(annex: dict | None, values: dict | None, cn: dict, acts: dict
                 f"- Endpoint: {m['endpoint']} (SPARQL; the queries are in `cbam_mcp/refresh.py`)",
                 f"- Retrieved: {m['retrieved']}; {m['concepts']} concepts ({m['subset']}); SHA-256 of the "
                 f"responses: {', '.join(f'`{h}`' for h in m['sha256_of_responses'])}",
+                "- The endpoint's answers are not byte-stable (row order varies between calls); the file sorts "
+                "concepts by identifier, so a refresh of unchanged data changes only these hashes.",
                 f"- Legally binding text: {m['legal_basis']}",
                 f"- Licence: {legal.LICENCES['cn']['name']}. Terms: {legal.LICENCES['cn']['terms']}. "
                 f"{legal.LICENCES['cn']['quote']}",

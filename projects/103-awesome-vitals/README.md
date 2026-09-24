@@ -231,8 +231,8 @@ Not counted, and tallied on the last line of the report:
   not repositories: any path that starts with a name GitHub reserves (`topics`,
   `orgs`, `sponsors`, `marketplace`, `apps`, `github-copilot`, `mcp` and some 300
   more, from [github-reserved-names](https://github.com/Mottie/github-reserved-names)
-  2.2.0, MIT licence, checked 2026-09-24), plus `models`, `premium-support` and
-  `solutions`. That list says it is not complete; a page it misses would show as
+  2.2.0, MIT licence, checked 2026-09-24), plus `models`, `password_reset`,
+  `premium-support` and `solutions`. That list says it is not complete; a page it misses would show as
   `gone`.
 - A link to one issue, pull request, discussion, commit, comparison or security
   advisory of a repository (`/issues/42`, `/pull/7`, `/commit/1a2b3c4`,
