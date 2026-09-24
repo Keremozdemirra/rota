@@ -1,0 +1,15 @@
+{
+  "name": "vsme-kit",
+  "description": "The vsme-kit plugin: the VSME standard's text and a check of EFRAG's VSME Digital Template.",
+  "owner": {
+    "name": "Kerem Özdemir",
+    "url": "https://github.com/Keremozdemirra"
+  },
+  "plugins": [
+    {
+      "name": "vsme-kit",
+      "source": "./",
+      "description": "Answers questions on the EU voluntary sustainability reporting standard for SMEs (VSME) from the Official Journal text, and checks a filled EFRAG VSME Digital Template for missing and inconsistent disclosures."
+    }
+  ]
+}

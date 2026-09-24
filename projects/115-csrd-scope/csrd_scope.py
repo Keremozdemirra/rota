@@ -453,8 +453,6 @@ def validate(inputs, data: Data) -> dict:
         if not x["parent"] and any(k.startswith("group_") for k in rec):
             errors.append(f"{where}: group figures given but parent_undertaking is not true")
         x["years"][y] = rec
-    if not eu and et == "aif_or_ucits":
-        pass
     if errors:
         raise InputError(errors)
     return x
@@ -810,18 +808,23 @@ class Assessor:
         branches = self.get(prev, "eu_branches")
         qual_subs = [s["name"] for s in (subs or []) if s["net_turnover_eur"] > SUBSIDIARY_OR_BRANCH_EUR]
         qual_br = [b["name"] for b in (branches or []) if b["net_turnover_eur"] > SUBSIDIARY_OR_BRANCH_EUR]
-        if subs is None and branches is None:
-            self.need(f"eu_subsidiaries and eu_branches with their net turnover for FY{prev} (Art. 40a(1) second and fourth subparagraphs)")
+        if qual_subs:
+            vehicle = True                      # a subsidiary above EUR 200m carries it (second subparagraph)
+        elif subs is None:
+            self.need(f"eu_subsidiaries with their net turnover for FY{prev} (Art. 40a(1) second subparagraph); "
+                      "an empty list means none")
             vehicle = None
-        elif qual_subs:
-            vehicle = True
+        elif branches is None:
+            self.need(f"eu_branches with their net turnover for FY{prev} (Art. 40a(1) fourth subparagraph); "
+                      "an empty list means none")
+            vehicle = None
         elif qual_br and not subs:
-            vehicle = True
-        elif qual_br and subs:
-            self.ask("40a-branch")
+            vehicle = True                      # no EU subsidiary at all, branch above EUR 200m
+        elif qual_br:
+            self.ask("40a-branch")              # small EU subsidiaries exist, branch above EUR 200m
             vehicle = None
         else:
-            vehicle = False if (subs is not None and branches is not None) or not (qual_subs or qual_br) else None
+            vehicle = False
         v = AND(cond, vehicle)
         who = (f"EU subsidiaries above {eur(SUBSIDIARY_OR_BRANCH_EUR)} in FY{prev}: {', '.join(qual_subs) or 'none'}; "
                f"EU branches above it: {', '.join(qual_br) or 'none'}")
@@ -1320,7 +1323,7 @@ def main(argv: list[str] | None = None) -> int:
             return 1 if res["status"] == "changed" else 0
         if a.cmd == "refresh":
             out = Path(a.out) if a.out else HERE / "data"
-            if not a.out and not (HERE / "data").is_dir():
+            if not a.out and not ((HERE / "pyproject.toml").is_file() and (HERE / "data" / "legal_basis.json").is_file()):
                 print("refresh: give --out DIR (this is an installed copy, not a source checkout)", file=sys.stderr)
                 return 2
             try:

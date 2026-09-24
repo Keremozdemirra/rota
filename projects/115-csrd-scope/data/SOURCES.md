@@ -21,7 +21,7 @@ CELLAR metadata with this snapshot.
 
 ## Endpoints
 
-- SPARQL: https://publications.europa.eu/webapi/rdf/sparql (queries in `csrd_scope_cellar.py`: `Q_ACTS`, `Q_CONSOLIDATED`, `Q_AMENDING`, `Q_NIM`, `Q_EU_COUNTRIES`)
+- SPARQL: https://publications.europa.eu/webapi/rdf/sparql (queries in `csrd_scope_cellar.py`: `Q_ACTS`, `Q_CONSOLIDATED`, `Q_AMENDING`, `Q_AFTER`, `Q_LANGS`, `Q_NIM`, `Q_EU_COUNTRIES`)
 - Documents: https://publications.europa.eu/resource/celex/<CELEX> with `Accept: application/xhtml+xml` and `Accept-Language: eng`
 
 ## Acts
@@ -85,6 +85,21 @@ Corrigenda that do not correct the English version (ENG) do not change the text 
 | 32022L2464 | corrects | 32022L2464R(08) | 2025-10-08 | BUL CES DEU ELL EST FIN HRV HUN ITA LAV MLT NLD POL POR RON SLK SPA |
 | 32022L2464 | corrects | 32022L2464R(09) | 2026-07-01 | CES |
 | 32026L0470 | corrects | 32026L0470R(01) | 2026-04-22 | LIT |
+
+## Verification notes (2026-09-24, by hand, recorded here because they are not re-derived by refresh)
+
+- 02013L0034-20270130 is dated in the future. A text comparison with 02013L0034-20260318 found no difference
+  except the list of amending acts, which adds Directive (EU) 2025/2 (32025L0002). Its Article 2 replaces
+  Art. 19a(6) of Directive 2013/34/EU from 30 January 2027; Directive (EU) 2026/470 had already deleted that
+  paragraph. The rules use 02013L0034-20260318.
+- 02019R2088-20260702 (after amending Regulation (EU) 2024/3005): Art. 2(12) is identical to the original text 32019R2088.
+- Directive (EU) 2026/470 was published in OJ L 2026/470 on 26.2.2026 and enters into force on the twentieth day
+  following publication (Art. 6), i.e. 18 March 2026, the date of the consolidated versions used.
+- The Commission Notice C/2024/6792 predates Directive (EU) 2026/470; it is cited only for points the
+  amendment did not change (size timing, employee averaging, Article 40a mechanics) and it is not binding.
+- No amending act dated after 2026-03-18 is listed for 32013L0034 or 32022L2464, and no corrigendum since 2024
+  corrects the English version of any act relied on (table above). `verify-sources` repeats this check.
+
 
 ## Documents quoted
 

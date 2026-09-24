@@ -1,0 +1,10 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Keremozdemirra/csrd-scope",
+  "title": "CSRD Scope",
+  "description": "Is an undertaking in scope of the EU CSRD, and from which financial year? With article citations",
+  "repository": {"url": "https://github.com/Keremozdemirra/csrd-scope", "source": "github"},
+  "version": "0.1.0",
+  "packages": [{"registryType": "pypi", "identifier": "csrd-scope", "version": "0.1.0",
+                "runtimeHint": "uvx", "transport": {"type": "stdio"}}]
+}

@@ -1,0 +1,5 @@
+include LICENSE README.md server.json
+recursive-include data *.py *.json *.md
+recursive-include tests *.py *.json *.xhtml
+recursive-include examples *.json
+global-exclude __pycache__ *.py[cod]

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Keremozdemirra/vsme-kit",
+  "title": "VSME kit",
+  "description": "EU SME sustainability standard (VSME): disclosure text and a check of EFRAG's Excel template",
+  "repository": {"url": "https://github.com/Keremozdemirra/vsme-kit", "source": "github"},
+  "version": "0.1.0",
+  "packages": [{"registryType": "pypi", "identifier": "vsme-kit", "version": "0.1.0",
+                "runtimeHint": "uvx", "transport": {"type": "stdio"},
+                "packageArguments": [{"type": "positional", "value": "mcp"}]}]
+}

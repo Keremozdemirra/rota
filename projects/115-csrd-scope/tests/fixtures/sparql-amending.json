@@ -1,0 +1,171 @@
+{
+"head": {
+"link": [],
+"vars": [
+"base",
+"celex",
+"date",
+"title"
+]
+},
+"results": {
+"distinct": false,
+"ordered": true,
+"bindings": [
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32023L2864"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2023-12-13"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Directive (EU) 2023/2864 of the European Parliament and of the Council of 13 December 2023 amending certain Directives as regards the establishment and functioning of the European single access point (Text with EEA relevance)"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32023L2775"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2023-10-17"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Commission Delegated Directive (EU) 2023/2775 of 17 October 2023 amending Directive 2013/34/EU of the European Parliament and of the Council as regards the adjustments of the size criteria for micro, small, medium-sized and large undertakings or groups"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32024L1306"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-04-29"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Directive (EU) 2024/1306 of the European Parliament and of the Council of 29 April 2024 amending Directive 2013/34/EU as regards the time limits for the adoption of sustainability reporting standards for certain sectors and for certain third-country undertakings (Text with EEA relevance)"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32025L0002"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-11-27"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Directive (EU) 2025/2 of the European Parliament and of the Council of 27 November 2024 amending Directive 2009/138/EC as regards proportionality, quality of supervision, reporting, long-term guarantee measures, macro-prudential tools, sustainability risks and group and cross-border supervision, and amending Directives 2002/87/EC and 2013/34/EU (Text with EEA relevance)"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32025L0794"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-04-14"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Directive (EU) 2025/794 of the European Parliament and of the Council of 14 April 2025 amending Directives (EU) 2022/2464 and (EU) 2024/1760 as regards the dates from which Member States are to apply certain corporate sustainability reporting and due diligence requirements (Text with EEA relevance)"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-02-24"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Directive (EU) 2026/470 of the European Parliament and of the Council of 24 February 2026 amending Directives 2006/43/EC, 2013/34/EU, (EU) 2022/2464 and (EU) 2024/1760 as regards certain corporate sustainability reporting requirements and certain corporate sustainability due diligence requirements (Text with EEA relevance)"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-02-24"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Directive (EU) 2026/470 of the European Parliament and of the Council of 24 February 2026 amending Directives 2006/43/EC, 2013/34/EU, (EU) 2022/2464 and (EU) 2024/1760 as regards certain corporate sustainability reporting requirements and certain corporate sustainability due diligence requirements (Text with EEA relevance)"
+}
+}
+]
+}
+}

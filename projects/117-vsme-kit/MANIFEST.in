@@ -1,0 +1,8 @@
+# The tests read the fixtures, the plugin files and the workflows, so the sdist carries them.
+include README.md LICENSE THIRD_PARTY_NOTICES.md server.json vsme-kit.py
+include vsme_kit/data/*.json vsme_kit/data/SOURCES.md
+include .claude-plugin/plugin.json .claude-plugin/marketplace.json
+include skills/vsme-kit/SKILL.md
+include .github/workflows/test.yml .github/workflows/release.yml
+recursive-include tests *.py *.xhtml *.md
+global-exclude *.py[cod]

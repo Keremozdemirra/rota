@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vsme-kit"
+version = "0.1.0"
+description = "The EU voluntary sustainability reporting standard for SMEs (VSME): its text, and a check of a filled EFRAG Digital Template"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["vsme", "sustainability-reporting", "sme", "esg", "csrd", "efrag", "mcp", "mcp-server", "claude-code", "xlsx"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Office/Business :: Financial :: Accounting",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/vsme-kit"
+Issues = "https://github.com/Keremozdemirra/vsme-kit/issues"
+
+[project.scripts]
+vsme-kit = "vsme_kit.cli:main"
+
+[tool.setuptools]
+packages = ["vsme_kit"]
+
+[tool.setuptools.package-data]
+vsme_kit = ["data/*.json", "data/SOURCES.md"]

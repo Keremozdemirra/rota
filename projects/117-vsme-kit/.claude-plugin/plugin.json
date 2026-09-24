@@ -1,0 +1,11 @@
+{
+  "name": "vsme-kit",
+  "displayName": "VSME kit",
+  "version": "0.1.0",
+  "description": "Answers questions on the EU voluntary sustainability reporting standard for SMEs (VSME) from the Official Journal text, and checks a filled EFRAG VSME Digital Template for missing and inconsistent disclosures.",
+  "author": { "name": "Kerem Özdemir", "url": "https://keremozdemir.de" },
+  "homepage": "https://github.com/Keremozdemirra/vsme-kit",
+  "repository": "https://github.com/Keremozdemirra/vsme-kit",
+  "license": "MIT",
+  "keywords": ["vsme", "sustainability-reporting", "sme", "esg", "efrag"]
+}

@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "csrd-scope"
+version = "0.1.0"
+description = "Is an undertaking in scope of the EU CSRD, and from which financial year? Rules with article citations, as a CLI and MCP server."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["csrd", "sustainability-reporting", "esrs", "omnibus", "eu-law", "mcp", "model-context-protocol", "compliance"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Intended Audience :: Legal Industry",
+  "Programming Language :: Python :: 3",
+  "Topic :: Office/Business :: Financial :: Accounting",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/csrd-scope"
+Issues = "https://github.com/Keremozdemirra/csrd-scope/issues"
+
+[project.scripts]
+csrd-scope = "csrd_scope:main"
+csrd-scope-mcp = "csrd_scope_mcp:main"
+
+[tool.setuptools]
+py-modules = ["csrd_scope", "csrd_scope_mcp", "csrd_scope_cellar"]
+# data/ ships inside the wheel as the package csrd_scope_data, so answers work offline
+# after `uvx csrd-scope` or `pip install`.
+packages = ["csrd_scope_data"]
+package-dir = { "csrd_scope_data" = "data" }
+
+[tool.setuptools.package-data]
+csrd_scope_data = ["*.json", "SOURCES.md"]

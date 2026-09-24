@@ -390,7 +390,13 @@ def _check_celex(celex: str) -> str:
 
 # ------------------------------------------------------------------ network
 
+def _short(url: str) -> str:
+    # Error messages name the endpoint, not the whole query string.
+    return url.split("?", 1)[0] + ("?query=..." if "?" in url else "")
+
+
 def _read(url: str, accept: str, extra_headers: dict | None = None) -> tuple[bytes, str]:
+    shown = _short(url)
     headers = {"Accept": accept, "User-Agent": USER_AGENT}
     headers.update(extra_headers or {})
     req = urllib.request.Request(url, headers=headers)
@@ -401,20 +407,20 @@ def _read(url: str, accept: str, extra_headers: dict | None = None) -> tuple[byt
     except urllib.error.HTTPError as e:
         if e.code == 429:
             retry = (e.headers or {}).get("Retry-After") if e.headers is not None else None
-            raise SourceError(f"CELLAR rate limit (HTTP 429){'; retry after ' + str(retry) if retry else ''}: {url}") from None
-        raise SourceError(f"CELLAR answered HTTP {e.code} for {url}") from None
+            raise SourceError(f"CELLAR rate limit (HTTP 429){'; retry after ' + str(retry) if retry else ''}: {shown}") from None
+        raise SourceError(f"CELLAR answered HTTP {e.code} for {shown}") from None
     except urllib.error.URLError as e:
-        raise SourceError(f"CELLAR unreachable ({e.reason}): {url}") from None
+        raise SourceError(f"CELLAR unreachable ({e.reason}): {shown}") from None
     except (socket.timeout, TimeoutError):
-        raise SourceError(f"CELLAR timed out after {TIMEOUT}s: {url}") from None
+        raise SourceError(f"CELLAR timed out after {TIMEOUT}s: {shown}") from None
     except http.client.HTTPException as e:
-        raise SourceError(f"CELLAR connection broke ({type(e).__name__}): {url}") from None
+        raise SourceError(f"CELLAR connection broke ({type(e).__name__}): {shown}") from None
     except OSError as e:
-        raise SourceError(f"CELLAR connection failed ({e}): {url}") from None
+        raise SourceError(f"CELLAR connection failed ({e}): {shown}") from None
     if len(body) > MAX_BYTES:
-        raise SourceError(f"CELLAR response larger than {MAX_BYTES} bytes: {url}")
+        raise SourceError(f"CELLAR response larger than {MAX_BYTES} bytes: {shown}")
     if not body:
-        raise SourceError(f"CELLAR answered with an empty body: {url}")
+        raise SourceError(f"CELLAR answered with an empty body: {shown}")
     return body, final
 
 

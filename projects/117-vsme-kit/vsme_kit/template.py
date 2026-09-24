@@ -620,8 +620,8 @@ def check_b3(t: Template, f: Findings, cond: dict):
         for s2, total_name, kind in ((lb, "TotalGrossLocationBasedScope1AndScope2GHGEmissions", "location-based"),
                                      (mb, "TotalGrossMarketBasedScope1AndScope2GHGEmissions", "market-based")):
             tot = _num(t, total_name + c)
-            if tot is not None and (s1[c] is not None or s2[c] is not None):
-                parts = (s1[c] or 0.0) + (s2[c] or 0.0)
+            if tot is not None and s1[c] is not None and s2[c] is not None:
+                parts = s1[c] + s2[c]
                 if not close(parts, tot):
                     f.add("B3" if not c else "C3", "Scope 1 + 2 total",
                           f"{label[c]}: Scope 1 {fmt(s1[c])} + {kind} Scope 2 {fmt(s2[c])} = {fmt(parts)} tCO2eq, "
@@ -630,8 +630,8 @@ def check_b3(t: Template, f: Findings, cond: dict):
                           + ("; Annex II para 45 (market-based Scope 2)" if kind == "market-based" else ""))
     s3 = _num(t, "GrossScope3GreenhouseGasEmissions_CurrentlyStatedMember")
     all_lb = _num(t, "TotalGrossLocationBasedGHGEmissions_CurrentlyStatedMember")
-    if all_lb is not None and s3 is not None:
-        parts = (s1[""] or 0.0) + (lb[""] or 0.0) + s3
+    if all_lb is not None and None not in (s1[""], lb[""], s3):
+        parts = s1[""] + lb[""] + s3
         if not close(parts, all_lb):
             f.add("B3", "Scope 1 + 2 + 3 total",
                   f"Scope 1 {fmt(s1[''])} + Scope 2 {fmt(lb[''])} + Scope 3 {fmt(s3)} = {fmt(parts)} tCO2eq, "
@@ -719,7 +719,7 @@ def check_social(t: Template, f: Findings):
               f"but the number of employees (B1) is {fmt(employees)}", "Annex I paras 24(e)(v) and 39(a); Annex II para 112")
     genders = [_num(t, n) for n in ("NumberOfMaleEmployees", "NumberOfFemaleEmployees", "NumberOfOtherGenderEmployees",
                                     "NumberOfNonReportedGenderEmployees")]
-    if employees is not None and any(g is not None for g in genders):
+    if employees is not None and genders[0] is not None and genders[1] is not None:
         s = sum(g for g in genders if g is not None)
         if not close(s, employees):
             f.add("B8", "employees by gender", f"male, female, other and not reported add up to {fmt(s)}, "
@@ -860,12 +860,14 @@ def evaluate(t: Template) -> dict:
                     unlocated.add(need[1])
                     need = MAY  # applicability unknown in this version: reported, never called missing
                 else:
-                    need = ALWAYS if value is not False else None
+                    # para 13: an 'if applicable' item that is left out is assumed not to be applicable
+                    need = ALWAYS if value is True else None
             located, present = _present(t, it)
-            if not located:
-                entry["not_located"].append(ref)
-            elif need is None:
+            if need is None:
                 entry["not_applicable"].append(ref)
+            elif not located:
+                if need == ALWAYS:  # an optional datapoint that cannot be found changes nothing
+                    entry["not_located"].append(ref)
             elif present:
                 entry["filled"].append(ref)
             elif need == ALWAYS:
@@ -880,9 +882,9 @@ def evaluate(t: Template) -> dict:
             entry["status"] = "missing"
         elif entry["filled"]:
             entry["status"] = "filled"
-        elif entry["omitted"] and not entry["not_applicable"]:
+        elif entry["omitted"]:
             entry["status"] = "omitted"
-        elif entry["not_applicable"] or entry["omitted"]:
+        elif entry["not_applicable"]:
             entry["status"] = "not applicable"
         else:
             entry["status"] = "not located"
