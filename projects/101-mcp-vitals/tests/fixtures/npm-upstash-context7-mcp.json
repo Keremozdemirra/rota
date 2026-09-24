@@ -1,0 +1,29 @@
+{
+ "name": "@upstash/context7-mcp",
+ "dist-tags": {
+  "latest": "4.1.1"
+ },
+ "time": {
+  "4.1.1": "2026-09-14T14:52:39.435Z"
+ },
+ "versions": {
+  "4.1.1": {
+   "name": "@upstash/context7-mcp",
+   "version": "4.1.1",
+   "license": "MIT",
+   "repository": {
+    "url": "git+https://github.com/upstash/context7.git",
+    "type": "git",
+    "directory": "packages/mcp"
+   },
+   "homepage": "https://github.com/upstash/context7#readme"
+  }
+ },
+ "license": "MIT",
+ "repository": {
+  "url": "git+https://github.com/upstash/context7.git",
+  "type": "git",
+  "directory": "packages/mcp"
+ },
+ "homepage": "https://github.com/upstash/context7#readme"
+}

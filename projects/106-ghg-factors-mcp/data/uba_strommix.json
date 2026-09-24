@@ -1,0 +1,19 @@
+{
+ "country": "DEU",
+ "area": "Germany",
+ "unit": "g CO2/kWh",
+ "values": [
+  {
+   "year": 2023,
+   "g_co2_per_kwh": 379
+  },
+  {
+   "year": 2024,
+   "g_co2_per_kwh": 353
+  },
+  {
+   "year": 2025,
+   "g_co2_per_kwh": 344
+  }
+ ]
+}

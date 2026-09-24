@@ -1,0 +1,75 @@
+{
+ "generated_at": "2026-09-23T09:49:03+00:00",
+ "repositories": [
+  {
+   "full_name": "21st-dev/magic-mcp",
+   "pushed_at": "2026-09-09",
+   "archived": false,
+   "stars": 5919,
+   "open_issues": 5,
+   "license": "ISC",
+   "license_state": "spdx",
+   "status": "active"
+  },
+  {
+   "full_name": "aashari/mcp-server-atlassian-jira",
+   "pushed_at": "2026-03-06",
+   "archived": false,
+   "stars": 77,
+   "open_issues": 25,
+   "license": null,
+   "license_state": "none",
+   "status": "stale"
+  },
+  {
+   "full_name": "datalayer/jupyter-mcp-server",
+   "pushed_at": "2026-09-22",
+   "archived": false,
+   "stars": 1285,
+   "open_issues": 33,
+   "license": "BSD-3-Clause",
+   "license_state": "spdx",
+   "status": "active"
+  },
+  {
+   "full_name": "firecrawl/firecrawl-mcp-server",
+   "pushed_at": "2026-09-23",
+   "archived": false,
+   "stars": 7502,
+   "open_issues": 146,
+   "license": "MIT",
+   "license_state": "spdx",
+   "status": "active"
+  },
+  {
+   "full_name": "github/github-mcp-server",
+   "pushed_at": "2026-09-22",
+   "archived": false,
+   "stars": 33135,
+   "open_issues": 341,
+   "license": "MIT",
+   "license_state": "spdx",
+   "status": "active"
+  },
+  {
+   "full_name": "lharries/whatsapp-mcp",
+   "pushed_at": "2025-07-13",
+   "archived": false,
+   "stars": 6305,
+   "open_issues": 248,
+   "license": "MIT",
+   "license_state": "spdx",
+   "status": "abandoned"
+  },
+  {
+   "full_name": "upstash/context7",
+   "pushed_at": "2026-09-23",
+   "archived": false,
+   "stars": 62349,
+   "open_issues": 65,
+   "license": "MIT",
+   "license_state": "spdx",
+   "status": "active"
+  }
+ ]
+}

@@ -65,6 +65,8 @@ def recorded(github: str = "sandbox") -> dict:
     out = {}
     for f in sorted(FIXTURES.glob("*.json")):
         d = load(f.name)
+        if "url" not in d or "status" not in d:  # a reference answer, not an HTTP exchange
+            continue
         if f.name.startswith("github-") and (github == "sandbox") != (f.name == "github-403-sandbox.json"):
             continue
         out[d["url"]] = (d["status"], d["body"])
@@ -76,14 +78,14 @@ def recorded(github: str = "sandbox") -> dict:
 class FakeNet(pkg_vitals.Net):
     """Answers from recorded fixtures by URL. Anything not recorded is a network failure, and is noted."""
 
-    def __init__(self, extra: dict | None = None, github: str = "sandbox", census: dict | None = None, **kw):
+    def __init__(self, extra: dict | None = None, github: str = "sandbox", census_body: dict | None = None, **kw):
         super().__init__(env={}, **kw)
         self.answers = recorded(github)
         self.answers.update(extra or {})
         self.requested: list[str] = []
         self.missing: list[str] = []
-        if census is not None:
-            self.answers[self.census_url] = (200, census)
+        if census_body is not None:
+            self.answers[self.census_url] = (200, census_body)
 
     def get(self, url, headers=None):
         self.requested.append(url)
@@ -119,19 +121,29 @@ class Server:
             def do_GET(self):  # noqa: N802
                 server.hits.append(self.path)
                 server.headers.append(dict(self.headers))
-                status, body, opts = server.routes.get(self.path, (404, {"error": "Not found"}, {}))
+                # an exact path, else the longest route ending in `*` that prefixes it
+                prefixes = sorted((k for k in server.routes if k.endswith("*") and self.path.startswith(k[:-1])), key=len)
+                default = server.routes[prefixes[-1]] if prefixes else (404, {"error": "Not found"}, {})
+                status, body, opts = server.routes.get(self.path, default)
                 if opts.get("delay"):
                     time.sleep(opts["delay"])
                 if opts.get("drop"):
                     self.close_connection = True
                     return
+                if "raw" in opts:  # bytes on the wire as they are, however broken
+                    self.wfile.write(opts["raw"])
+                    self.close_connection = True
+                    return
                 raw = body if isinstance(body, bytes) else json.dumps(body).encode("utf-8")
                 self.send_response(status)
                 self.send_header("Content-Type", "application/json")
+                if opts.get("location"):
+                    self.send_header("Location", opts["location"])
                 if opts.get("gzip"):
                     raw = gzip.compress(raw)
+                if opts.get("gzip") or opts.get("claims_gzip"):
                     self.send_header("Content-Encoding", "gzip")
-                self.send_header("Content-Length", str(len(raw)))
+                self.send_header("Content-Length", str(opts.get("length", len(raw))))
                 self.end_headers()
                 try:
                     self.wfile.write(raw)
@@ -143,10 +155,12 @@ class Server:
 
         self.httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
         self.httpd.daemon_threads = True
+        self.httpd.block_on_close = False  # a deliberately slow handler must not hold up the next test
         self.base = f"http://127.0.0.1:{self.httpd.server_address[1]}"
 
     def __enter__(self):
-        self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
+        # a short poll interval: shutdown() waits up to one interval, once per test
+        self.thread = threading.Thread(target=self.httpd.serve_forever, kwargs={"poll_interval": 0.02}, daemon=True)
         self.thread.start()
         return self
 
@@ -163,8 +177,11 @@ class Server:
 
 
 def fixture_routes(github: str = "sandbox") -> dict:
-    """Every recorded fixture as a route on the local server."""
+    """Every recorded fixture as a route on the local server. In "sandbox" mode every GitHub API path answers
+    what the recording sandbox answered for all of them: 403."""
     routes = {}
+    if github == "sandbox":
+        routes["/github/*"] = (403, load("github-403-sandbox.json")["body"], {})
     for url, (status, body) in recorded(github).items():
         for public, prefix in BASES.items():
             if url.startswith(public):

@@ -1,0 +1,15 @@
+{
+  "name": "pkg-vitals",
+  "description": "The pkg-vitals plugin: registry facts about an npm or PyPI package before Claude installs it.",
+  "owner": {
+    "name": "Kerem Özdemir",
+    "url": "https://github.com/Keremozdemirra"
+  },
+  "plugins": [
+    {
+      "name": "pkg-vitals",
+      "source": "./",
+      "description": "Asks before Claude installs an npm or PyPI package that is not on the registry, was first published in the last 30 days, is deprecated, yanked or archived, and checks packages on request."
+    }
+  ]
+}

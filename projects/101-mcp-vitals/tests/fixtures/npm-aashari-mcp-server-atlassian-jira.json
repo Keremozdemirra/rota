@@ -1,0 +1,27 @@
+{
+ "name": "@aashari/mcp-server-atlassian-jira",
+ "dist-tags": {
+  "latest": "3.3.0"
+ },
+ "time": {
+  "3.3.0": "2025-12-03T06:43:40.876Z"
+ },
+ "versions": {
+  "3.3.0": {
+   "name": "@aashari/mcp-server-atlassian-jira",
+   "version": "3.3.0",
+   "license": "ISC",
+   "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aashari/mcp-server-atlassian-jira.git"
+   },
+   "homepage": "https://github.com/aashari/mcp-server-atlassian-jira#readme"
+  }
+ },
+ "license": "ISC",
+ "repository": {
+  "type": "git",
+  "url": "git+https://github.com/aashari/mcp-server-atlassian-jira.git"
+ },
+ "homepage": "https://github.com/aashari/mcp-server-atlassian-jira#readme"
+}

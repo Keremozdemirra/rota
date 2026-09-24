@@ -1,0 +1,45 @@
+{
+ "base_path": "/government/publications/greenhouse-gas-reporting-conversion-factors-2026",
+ "description": "These conversion factors enable users to calculate and report greenhouse gas emissions from their UK activities in 2026.",
+ "public_updated_at": "2026-07-31T13:51:53+01:00",
+ "title": "Greenhouse gas reporting: conversion factors 2026",
+ "details": {
+  "attachments": [
+   {
+    "title": "Conversion factors 2026: full set (for all users)",
+    "url": "https://assets.publishing.service.gov.uk/media/6a29392bade52dc0882218a8/ghg-conversion-factors-2026-full-set.xlsx",
+    "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "file_size": 2109334,
+    "filename": "ghg-conversion-factors-2026-full-set.xlsx"
+   },
+   {
+    "title": "Conversion factors 2026: flat file (for automatic processing only) - updated July 2026",
+    "url": "https://assets.publishing.service.gov.uk/media/6a6c9748862aaf18d9c62ac9/ghg-conversion-factors-2026-flat-format-revised.xlsx",
+    "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "file_size": 515426,
+    "filename": "ghg-conversion-factors-2026-flat-format-revised.xlsx"
+   },
+   {
+    "title": "Conversion factors 2026: methodology",
+    "url": "https://assets.publishing.service.gov.uk/media/6a2940543b15d05a7ce3202e/2026-GHG-conversion-factors-methodology-report.pdf",
+    "content_type": "application/pdf",
+    "file_size": 1761487,
+    "filename": "2026-GHG-conversion-factors-methodology-report.pdf"
+   },
+   {
+    "title": "Conversion factors 2026: major changes",
+    "url": "https://assets.publishing.service.gov.uk/media/6a2940653b15d05a7ce3202f/2026-GHG-conversion-factors-major-changes-report.pdf",
+    "content_type": "application/pdf",
+    "file_size": 270986,
+    "filename": "2026-GHG-conversion-factors-major-changes-report.pdf"
+   },
+   {
+    "title": "Conversion factors 2026: statement of voluntary compliance with the Code of Practice for Statistics",
+    "url": "/government/publications/greenhouse-gas-reporting-conversion-factors-2026/conversion-factors-2026-statement-of-voluntary-compliance-with-the-code-of-practice-for-statistics",
+    "content_type": null,
+    "file_size": null,
+    "filename": null
+   }
+  ]
+ }
+}

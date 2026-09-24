@@ -1,8 +1,8 @@
 {
- "url": "https://pypi.org/pypi/PyQt5/json",
+ "url": "https://pypi.org/pypi/pyqt5/json",
  "recorded": "2026-09-24",
  "status": 200,
- "trimmed": "info cut to name, version, licence fields, licence classifiers, project URLs, yanked; urls cut to filename, upload time, yanked; releases and description dropped",
+ "trimmed": "info cut to name, version, licence fields, licence classifiers, project URLs, yanked; urls cut to filename, upload time, yanked; releases and description dropped; URL written in the normalized form pkg-vitals requests (PyPI answers both the same, checked 2026-09-24)",
  "body": {
   "info": {
    "name": "PyQt5",

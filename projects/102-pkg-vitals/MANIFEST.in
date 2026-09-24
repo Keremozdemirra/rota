@@ -1,0 +1,8 @@
+# The sdist carries what the test suite and the plugin need, not only the modules.
+include README.md LICENSE pkg_vitals.py pkg_vitals_hook.py
+recursive-include tests *.py
+recursive-include tests/fixtures *.json
+recursive-include .claude-plugin *.json
+recursive-include hooks *.json
+recursive-include skills *.md
+recursive-include .github *.yml

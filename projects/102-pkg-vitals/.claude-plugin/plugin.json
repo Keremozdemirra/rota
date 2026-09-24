@@ -1,0 +1,11 @@
+{
+  "name": "pkg-vitals",
+  "displayName": "Package Vitals",
+  "version": "0.1.0",
+  "description": "Asks before Claude installs an npm or PyPI package that is not on the registry, was first published in the last 30 days, is deprecated, yanked or archived, and checks packages on request.",
+  "author": { "name": "Kerem Özdemir", "url": "https://keremozdemir.de" },
+  "homepage": "https://github.com/Keremozdemirra/pkg-vitals",
+  "repository": "https://github.com/Keremozdemirra/pkg-vitals",
+  "license": "MIT",
+  "keywords": ["npm", "pypi", "hooks", "supply-chain", "slopsquatting", "package-hallucination", "dependencies"]
+}

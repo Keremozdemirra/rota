@@ -214,9 +214,9 @@ class Shell(Case):
 
     def test_wrappers_and_assignments(self):
         self.assertEqual(names("sudo -E -u root npm i -g x; FOO=1 env -i BAR=2 pip install y; time npm i z; "
-                               "timeout -s KILL 60 npm i q; nice -n 5 uvx w"),
+                               "timeout -s KILL 60 npm i q; nice -n 5 uvx w; echo v | xargs npm i vee; noglob pip install u"),
                          [("npm", "x", None), ("pypi", "y", None), ("npm", "z", None), ("npm", "q", None),
-                          ("pypi", "w", None)])
+                          ("pypi", "w", None), ("npm", "vee", None), ("pypi", "u", None)])
 
     def test_shell_c(self):
         self.assertEqual(names('bash -lc "npm i left-pad && pip install x"'), [("npm", "left-pad", None), ("pypi", "x", None)])

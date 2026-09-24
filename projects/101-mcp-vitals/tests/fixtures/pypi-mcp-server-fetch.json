@@ -1,0 +1,32 @@
+{
+ "info": {
+  "name": "mcp-server-fetch",
+  "version": "2026.8.18",
+  "yanked": false,
+  "yanked_reason": null,
+  "project_urls": {
+   "Issues": "https://github.com/modelcontextprotocol/servers/issues",
+   "Repository": "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch"
+  },
+  "home_page": null,
+  "license_expression": null,
+  "license": "MIT",
+  "classifiers": [
+   "License :: OSI Approved :: MIT License"
+  ]
+ },
+ "urls": [
+  {
+   "filename": "mcp_server_fetch-2026.8.18-py3-none-any.whl",
+   "yanked": false,
+   "yanked_reason": null,
+   "upload_time_iso_8601": "2026-08-18T16:06:16.072453Z"
+  },
+  {
+   "filename": "mcp_server_fetch-2026.8.18.tar.gz",
+   "yanked": false,
+   "yanked_reason": null,
+   "upload_time_iso_8601": "2026-08-18T16:06:17.339100Z"
+  }
+ ]
+}

@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eu-taxonomy-mcp"
+version = "0.1.0"
+description = "EU Taxonomy activities, NACE codes and technical screening criteria for agents (MCP) and the shell, from a dated snapshot of the EU Taxonomy Navigator."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["mcp", "model-context-protocol", "mcp-server", "eu-taxonomy", "sustainable-finance", "nace", "esg", "csrd"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Programming Language :: Python :: 3",
+  "Topic :: Office/Business :: Financial",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/eu-taxonomy-mcp"
+Issues = "https://github.com/Keremozdemirra/eu-taxonomy-mcp/issues"
+Source-data = "https://ec.europa.eu/sustainable-finance-taxonomy/"
+
+[project.scripts]
+eu-taxonomy-mcp = "eu_taxonomy_mcp:main"
+
+[tool.setuptools]
+py-modules = ["eu_taxonomy_mcp", "eu_taxonomy_mcp_refresh"]
+# data/ ships inside the wheel as the package eu_taxonomy_mcp_data, so the bundled
+# snapshot works offline after `uvx eu-taxonomy-mcp` or `pip install`.
+packages = ["eu_taxonomy_mcp_data"]
+package-dir = { "eu_taxonomy_mcp_data" = "data" }
+
+[tool.setuptools.package-data]
+eu_taxonomy_mcp_data = ["taxonomy.json", "SOURCES.md"]

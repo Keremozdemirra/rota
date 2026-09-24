@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pkg-vitals"
+version = "0.1.0"
+description = "Check an npm or PyPI package before a coding agent installs it: does the name exist, is it brand new, deprecated or yanked, is its repository archived?"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["npm", "pypi", "supply-chain", "slopsquatting", "package-hallucination", "claude-code", "ai-agents", "hooks"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Security",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/pkg-vitals"
+Issues = "https://github.com/Keremozdemirra/pkg-vitals/issues"
+
+[project.scripts]
+pkg-vitals = "pkg_vitals:main"
+pkg-vitals-hook = "pkg_vitals_hook:main"
+
+[tool.setuptools]
+py-modules = ["pkg_vitals", "pkg_vitals_hook"]

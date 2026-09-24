@@ -1,0 +1,39 @@
+{
+ "name": "@21st-dev/magic",
+ "dist-tags": {
+  "latest": "0.2.3"
+ },
+ "time": {
+  "0.1.0": "2025-06-09T14:36:49.710Z",
+  "0.2.3": "2026-09-09T20:38:44.325Z"
+ },
+ "versions": {
+  "0.1.0": {
+   "name": "@21st-dev/magic",
+   "version": "0.1.0",
+   "deprecated": "Magic MCP is now the 21st MCP. This version talks to a retired backend and old API keys were reset. Update: npx @21st-dev/cli@latest init, or upgrade to @21st-dev/magic@latest (compatibility proxy). Keys: https://21st.dev/mcp",
+   "license": "ISC",
+   "repository": {
+    "url": "git+https://github.com/21st-dev/magic-mcp.git",
+    "type": "git"
+   },
+   "homepage": "https://21st.dev/magic"
+  },
+  "0.2.3": {
+   "name": "@21st-dev/magic",
+   "version": "0.2.3",
+   "license": "ISC",
+   "repository": {
+    "type": "git",
+    "url": "git+https://github.com/21st-dev/magic-mcp.git"
+   },
+   "homepage": "https://21st.dev/mcp"
+  }
+ },
+ "license": "ISC",
+ "repository": {
+  "type": "git",
+  "url": "git+https://github.com/21st-dev/magic-mcp.git"
+ },
+ "homepage": "https://21st.dev/mcp"
+}

@@ -1,0 +1,25 @@
+{
+ "info": {
+  "name": "jupyter-mcp-server",
+  "version": "0.8.0",
+  "yanked": true,
+  "yanked_reason": null,
+  "project_urls": {
+   "Home": "https://github.com/datalayer/jupyter-mcp-server"
+  },
+  "home_page": null,
+  "license_expression": null,
+  "license": "BSD 3-Clause License\n        \n        Copyright (c) 2025, Datalayer",
+  "classifiers": [
+   "License :: OSI Approved :: BSD License"
+  ]
+ },
+ "urls": [
+  {
+   "filename": "jupyter_mcp_server-0.8.0-py3-none-any.whl",
+   "yanked": true,
+   "yanked_reason": null,
+   "upload_time_iso_8601": "2025-07-02T09:05:51.528682Z"
+  }
+ ]
+}

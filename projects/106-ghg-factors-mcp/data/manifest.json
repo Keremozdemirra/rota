@@ -1,0 +1,67 @@
+{
+ "schema": 1,
+ "sources": {
+  "desnz-2025": {
+   "file": "desnz_2025.csv",
+   "year": 2025,
+   "sheet": "Factors by Category",
+   "version": "1",
+   "status": "Final",
+   "updated": "2025-06-10",
+   "rows": 8740,
+   "rows_with_value": 7029,
+   "non_numeric_values_dropped": 0,
+   "raw_url": "https://assets.publishing.service.gov.uk/media/6846b6ea57f3515d9611f0dd/ghg-conversion-factors-2025-flat-format.xlsx",
+   "raw_sha256": "8bfdb45b81ec4a88e3bdf4584637330f62e6bd09ce1940e654c5d7b7f736de94",
+   "raw_bytes": 505634,
+   "retrieved": "2026-09-24",
+   "page": "https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2025",
+   "content_api": "https://www.gov.uk/api/content/government/publications/greenhouse-gas-reporting-conversion-factors-2025",
+   "attachment_title": "Conversion factors 2025: flat file (for automatic processing only)",
+   "public_updated_at": "2025-06-10T09:30:03+01:00"
+  },
+  "desnz-2026": {
+   "file": "desnz_2026.csv",
+   "year": 2026,
+   "sheet": "Factors by Category",
+   "version": "1.2",
+   "status": "Final",
+   "updated": "2026-07-10",
+   "rows": 8740,
+   "rows_with_value": 7035,
+   "non_numeric_values_dropped": 0,
+   "raw_url": "https://assets.publishing.service.gov.uk/media/6a6c9748862aaf18d9c62ac9/ghg-conversion-factors-2026-flat-format-revised.xlsx",
+   "raw_sha256": "a9a455ab396dae226d510c7be6233748416d490c41a5d20f3dc7a0c45feecd5e",
+   "raw_bytes": 515426,
+   "retrieved": "2026-09-24",
+   "page": "https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2026",
+   "content_api": "https://www.gov.uk/api/content/government/publications/greenhouse-gas-reporting-conversion-factors-2026",
+   "attachment_title": "Conversion factors 2026: flat file (for automatic processing only) - updated July 2026",
+   "public_updated_at": "2026-07-31T13:51:53+01:00"
+  },
+  "ember": {
+   "file": "ember_yearly_intensity.csv",
+   "raw_rows": 104203,
+   "rows": 6305,
+   "areas": 224,
+   "rows_without_intensity": 2,
+   "years": "1985-2025",
+   "raw_url": "https://files.ember-energy.org/public-downloads/generation/outputs/release_generation_yearly_global.csv",
+   "raw_sha256": "ea214963f4a98b26f52aaf541736d4310349a905e64f83e63425bfc3ab6255d7",
+   "raw_bytes": 16084305,
+   "retrieved": "2026-09-24",
+   "last_modified": "Tue, 22 Sep 2026 16:24:55 GMT",
+   "page": "https://ember-energy.org/data/yearly-electricity-data/"
+  },
+  "uba": {
+   "file": "uba_strommix.json",
+   "rows": 3,
+   "years": "2023-2025",
+   "raw_url": "https://www.umweltbundesamt.de/themen/klima-energie/energieversorgung/strom-waermeversorgung-in-zahlen",
+   "raw_sha256": "be1bb859f414dace8aa51800c2c606ddf62a4f80a995314e5feda3dde21d95b3",
+   "raw_bytes": 276866,
+   "retrieved": "2026-09-24"
+  }
+ },
+ "generated_by": "ghg-factors-mcp 0.1.0 refresh"
+}

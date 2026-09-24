@@ -1,0 +1,50 @@
+{
+ "name": "firecrawl-mcp",
+ "dist-tags": {
+  "latest": "3.25.4"
+ },
+ "time": {
+  "1.7.2": "2025-03-21T18:35:23.717Z",
+  "1.7.3": "2025-04-19T09:53:53.374Z",
+  "3.25.4": "2026-09-23T14:55:32.719Z"
+ },
+ "versions": {
+  "1.7.2": {
+   "name": "firecrawl-mcp",
+   "version": "1.7.2",
+   "license": "ISC",
+   "repository": {
+    "url": "git+https://github.com/mendableai/firecrawl-mcp-server.git",
+    "type": "git"
+   },
+   "homepage": "https://github.com/mendableai/firecrawl-mcp-server#readme"
+  },
+  "1.7.3": {
+   "name": "firecrawl-mcp",
+   "version": "1.7.3",
+   "deprecated": "Deprecated – use <=1.7.2 or >= 1.9.0",
+   "license": "MIT",
+   "repository": {
+    "url": "git+https://github.com/mendableai/firecrawl-mcp-server.git",
+    "type": "git"
+   },
+   "homepage": "https://github.com/mendableai/firecrawl-mcp-server#readme"
+  },
+  "3.25.4": {
+   "name": "firecrawl-mcp",
+   "version": "3.25.4",
+   "license": "MIT",
+   "repository": {
+    "url": "git+https://github.com/firecrawl/firecrawl-mcp-server.git",
+    "type": "git"
+   },
+   "homepage": "https://github.com/firecrawl/firecrawl-mcp-server#readme"
+  }
+ },
+ "license": "MIT",
+ "repository": {
+  "url": "git+https://github.com/firecrawl/firecrawl-mcp-server.git",
+  "type": "git"
+ },
+ "homepage": "https://github.com/firecrawl/firecrawl-mcp-server#readme"
+}

@@ -334,10 +334,12 @@ def _strip_wrappers(words: list[str]) -> tuple[dict, list[str]]:
                     k, _, v = words[i].partition("=")
                     env[k] = v
                 i += 2 if words[i] in ("-u", "--unset", "-C", "--chdir") else 1
-        elif base in ("time", "nohup", "command", "exec", "nice", "stdbuf"):
+        elif base in ("time", "nohup", "command", "builtin", "noglob", "exec", "nice", "stdbuf"):
             i += 1
             while i < len(words) and words[i].startswith("-"):
                 i += 2 if words[i] in ("-n", "-a") else 1
+        elif base == "xargs" and i + 1 < len(words) and not words[i + 1].startswith("-"):
+            i += 1  # bare xargs runs its arguments as the command, as Claude Code's own rule matching assumes
         elif base == "timeout":
             i += 1
             while i < len(words) and words[i].startswith("-"):
@@ -1070,8 +1072,8 @@ class Net:
                 lic = _d(d.get("license"))
                 spdx = lic.get("spdx_id") if isinstance(lic.get("spdx_id"), str) else None
                 name = d.get("full_name") if isinstance(d.get("full_name"), str) and GITHUB_SLUG.match(d["full_name"]) else slug
-                return {"source": "GitHub API", "full_name": name, "pushed_at": d.get("pushed_at"),
-                        "archived": d.get("archived") is True, "stars": d.get("stargazers_count"),
+                return {"source": "GitHub API", "full_name": name, "pushed_at": _iso(d.get("pushed_at")),
+                        "archived": d.get("archived") is True, "stars": _int(d.get("stargazers_count")),
                         "license": clean(spdx, 40) if spdx and spdx != "NOASSERTION" else None}
             if code == 404:
                 return {"error": "not found"}
@@ -1089,12 +1091,13 @@ class Net:
                 rows = data.get("repositories") if isinstance(data.get("repositories"), list) else []
                 self.census = {r["full_name"].lower(): r for r in rows
                                if isinstance(r, dict) and isinstance(r.get("full_name"), str)}
-                self.census_date = clean(data.get("generated_at") or "", 10)
+                when = _date(data.get("generated_at"))
+                self.census_date = when.isoformat() if when else "undated"
         r = self.census.get(slug.lower())
         if not r:
             return {"error": "GitHub API unavailable and not in the census"}
-        return {"source": f"agent-vitals census {self.census_date}", "full_name": slug, "pushed_at": r.get("pushed_at"),
-                "archived": r.get("archived") is True, "stars": r.get("stars"),
+        return {"source": f"agent-vitals census {self.census_date}", "full_name": slug, "pushed_at": _iso(r.get("pushed_at")),
+                "archived": r.get("archived") is True, "stars": _int(r.get("stars")),
                 "license": clean(r["license"], 40) if isinstance(r.get("license"), str) else None}
 
 
@@ -1110,6 +1113,15 @@ def _date(iso) -> dt.date | None:
         return dt.date(int(m.group(1)), int(m.group(2)), int(m.group(3))) if m else None
     except ValueError:
         return None
+
+
+def _iso(value) -> str | None:
+    d = _date(value)
+    return d.isoformat() if d else None
+
+
+def _int(value) -> int | None:
+    return value if isinstance(value, int) and not isinstance(value, bool) else None
 
 
 def days_since(iso, today: dt.date) -> int | None:
@@ -1357,9 +1369,9 @@ def check_npm(t: dict, net: Net, today: dt.date) -> dict:
     versions = {k: v for k, v in _d(doc.get("versions")).items() if isinstance(v, dict)}
     times = _d(doc.get("time"))
     if not versions:
-        gone = _d(times.get("unpublished")).get("time")
+        gone = _date(_d(times.get("unpublished")).get("time"))
         if gone:
-            _not_found(r, host, f"every version unpublished on {clean(gone, 10)}")
+            _not_found(r, host, f"every version unpublished on {gone.isoformat()}")
         else:
             r["errors"].append(f"{host}: no versions in the answer")
         return r
@@ -1379,12 +1391,12 @@ def check_npm(t: dict, net: Net, today: dt.date) -> dict:
     vt = _date(times.get(version)) if version else None
     r["version_published"] = vt.isoformat() if vt else None
 
-    # npm keeps a removed malicious package's name with an empty `0.0.x-security`
-    # release described as a "security holding package".
+    # A latest version `0.0.x-security`, described as a "security holding package" and
+    # linked to github.com/npm/security-holder, is npm's placeholder on a name it holds.
     if latest and latest.endswith("-security") and ("security holding" in str(top.get("description") or "").lower()
                                                      or "npm/security-holder" in str(npm_repo(top) or "")):
-        _flag(r, F_PLACEHOLDER, f"npm holds this name with a security placeholder ({_safe_version(latest)}); "
-                                "the package that used the name was removed")
+        _flag(r, F_PLACEHOLDER, f"the latest version is npm's security placeholder ({_safe_version(latest)}, "
+                                "\"security holding package\"): npm holds this name")
     dep = man.get("deprecated")  # the version that would be installed, not only the latest
     if dep:
         r["deprecated"] = remote(dep) if isinstance(dep, str) else "deprecated"
@@ -1469,8 +1481,9 @@ def check_pypi(t: dict, net: Net, today: dt.date) -> dict:
     info = _d(doc.get("info"))
     r["version"] = _safe_version(info.get("version"))
     urls = [u for u in doc.get("urls") or [] if isinstance(u, dict)] if isinstance(doc.get("urls"), list) else []
-    # Installers skip a yanked release unless it is pinned exactly (PEP 592), so only a pin can land on one.
-    # PyPI marks it on the release and on each file; a release whose every file is yanked counts too.
+    # PEP 592: installers must skip a yanked release when a non-yanked one satisfies the request, and it
+    # suggests using a yanked file only for an exact pin (`==` without `.*`, or `===`). So pins are what is
+    # checked. PyPI marks the release and each file; a release whose every file is yanked counts too.
     if pinned and (info.get("yanked") is True or (urls and all(u.get("yanked") is True for u in urls))):
         why = info.get("yanked_reason") or next((u.get("yanked_reason") for u in urls if u.get("yanked_reason")), None)
         r["yanked"] = remote(why) if why else "yanked"
@@ -1637,8 +1650,8 @@ def _notes(results: list[dict]) -> list[str]:
 
 
 def sources_line(report: dict) -> str:
-    used = sorted({"registry.npmjs.org and api.npmjs.org" if r["ecosystem"] == "npm" else "pypi.org"
-                   for r in report["packages"]})
+    hosts = report.get("hosts") or {"npm": "registry.npmjs.org and api.npmjs.org", "pypi": "pypi.org"}
+    used = sorted({hosts[r["ecosystem"]] for r in report["packages"] if r["exists"] is not None})
     if any((r.get("repo") or {}).get("source") == "GitHub API" for r in report["packages"]):
         used.append("the GitHub REST API")
     if any(str((r.get("repo") or {}).get("source", "")).startswith("agent-vitals") for r in report["packages"]):
@@ -1680,8 +1693,9 @@ def render_text(report: dict) -> str:
         lines += ["", f"! marks a serious flag: the hook asks before installing and --strict exits 1. 'new' means first "
                       f"published less than {report['new_days']} days ago, pkg-vitals' own threshold."]
         if report.get("github") != "api" and any(github_slug(r["repository"]) for r in results):
-            lines.append("GitHub API unavailable or rate-limited; repository facts came from the agent-vitals census "
-                         "where it lists the repository (it covers agent tooling). Set GITHUB_TOKEN for live ones.")
+            lines.append("The GitHub API refused or rate-limited the lookups, so repository facts came from the agent-vitals "
+                         "census where it lists the repository (it covers agent tooling). If the limit was the cause, "
+                         "GITHUB_TOKEN raises it.")
         if any(r["ecosystem"] == "pypi" for r in results):
             lines.append("PyPI publishes no download counts through its API, so that column is empty for PyPI.")
         src = sources_line(report)
@@ -1761,15 +1775,15 @@ def main(argv: list[str] | None = None) -> int:
     if extra:
         ap.error(f"unrecognized arguments: {mask(' '.join(extra))} (put an install command after --, "
                  "as in: pkg-vitals -- npm install foo -D)")
-    eco = (a.ecosystem or "").lower()
-    if command is None and eco in INSTALLERS and (eco != "npm" or (a.names and a.names[0] in NPM_INSTALL | NPM_LOCKFILE
-                                                                  | {"exec", "x", "create", "init"})):
-        command, eco = [a.ecosystem] + a.names, ""  # `pkg-vitals npm install foo` means the command line
-    if command is not None and (eco or a.names):
+    eco, names = (a.ecosystem or "").lower(), list(a.names)
+    if command is None and eco in INSTALLERS and (eco != "npm" or (names and names[0] in NPM_INSTALL | NPM_LOCKFILE
+                                                                   | {"exec", "x", "create", "init"})):
+        command, eco, names = [a.ecosystem] + names, "", []  # `pkg-vitals npm install foo` means the command line
+    if command is not None and (eco or names):
         ap.error("give either npm|pypi NAMES or an install command after --, not both")
     if command is None and eco not in ("npm", "pypi"):
         ap.error("say npm or pypi and the package names, or pass an install command after --")
-    if command is None and not a.names:
+    if command is None and not names:
         ap.error(f"no package names given for {eco}")
     if hasattr(sys.stdout, "reconfigure"):  # a console that cannot print a character should not crash the run
         sys.stdout.reconfigure(errors="replace")
@@ -1781,7 +1795,7 @@ def main(argv: list[str] | None = None) -> int:
         parsed = parse_command(text, cwd=cwd)
     else:
         found = _Found(cwd, os.environ)
-        for n in a.names:
+        for n in names:
             found.add(eco, n, eco, "project", at_syntax=True)
         parsed = {"targets": found.targets, "skipped": found.skipped}
     net = None if a.offline else Net(timeout=_env_float("PKG_VITALS_TIMEOUT", 20.0),
@@ -1789,6 +1803,8 @@ def main(argv: list[str] | None = None) -> int:
     results = examine(parsed["targets"], net, today, new_days=a.new_days, downloads="all")
     report = {"checked": today.isoformat(), "tool": f"pkg-vitals {VERSION}", "new_days": a.new_days,
               "offline": a.offline, "github": "offline" if net is None else ("census" if net.github_down else "api"),
+              "hosts": {} if net is None else {"npm": f"{net.host(net.npm_url)} and {net.host(net.downloads_url)}",
+                                               "pypi": net.host(net.pypi_url)},
               "packages": results, "skipped": parsed["skipped"]}
     if a.json:
         report["sources"] = sources_line(report)
@@ -1814,7 +1830,7 @@ def explain(found: list[dict]) -> str:
     """The permission prompt's reason: the facts behind each serious flag, one sentence per package."""
     parts = []
     for r in found[:5]:
-        what = f"{r['ecosystem']} package '{r['name']}'" + (f" {r['version']}" if r["version"] else "")
+        what = f"{'PyPI' if r['ecosystem'] == 'pypi' else 'npm'} package '{r['name']}'" + (f" {r['version']}" if r["version"] else "")
         facts = [n["text"] for n in r["notes"] if n["flag"] in r["serious"]]
         if F_NO_REPO in r["flags"]:
             facts.append("it links no source repository")

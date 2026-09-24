@@ -1,0 +1,222 @@
+Area,ISO 3 code,Year,Area type,Electricity source,Is aggregated source,Generation (TWh),Generation YoY change (TWh),Generation YoY change (%),Share of generation (%),Share of generation YoY change (% points),Capacity (GW),Emissions (MtCO2e),Emissions YoY change (MtCO2e),Emissions YoY change (%),Share of emissions (%),Emissions intensity (gCO2e/kWh),Continent,Ember region,EU member,OECD member,G20 member,G7 member,ASEAN member
+Congo,COG,2024,Country or economy,Solar,False,0.01,0.0,0.0,0.183,-0.004,0.0,0.0,0.0,,0.0,0.0,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Wind,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Hydro,False,1.1,-0.12,-9.836,20.147,-2.614,0.21,0.026,-0.003,-10.345,0.665,23.636,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Bioenergy,False,0.03,0.0,0.0,0.549,-0.011,0.01,0.006,0.0,0.0,0.154,200.0,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Other renewables,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Nuclear,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Coal,False,0.0,0.0,,0.0,0.0,,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Gas,False,4.03,0.22,5.774,73.81,2.728,0.53,3.683,0.201,5.773,94.263,913.896,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Other fossil,False,0.29,0.0,0.0,5.311,-0.099,0.06,0.191,0.0,0.0,4.888,658.621,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Net imports,False,-0.08,-0.03,60.0,-1.465,-0.532,,0.0,0.0,,0.0,0.0,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Wind and solar,True,0.01,0.0,0.0,0.183,-0.004,0.0,0.0,0.0,,0.0,0.0,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,"Hydro, bioenergy and other renewables",True,1.13,-0.12,-9.6,20.696,-2.625,0.22,0.033,-0.002,-5.714,0.845,29.204,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Renewables,True,1.14,-0.12,-9.524,20.879,-2.628,0.22,0.033,-0.003,-8.333,0.845,28.947,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Clean,True,1.14,-0.12,-9.524,20.879,-2.628,0.22,0.033,-0.003,-8.333,0.845,28.947,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Fossil,True,4.32,0.22,5.366,79.121,2.628,0.5900000000000001,3.874,0.201,5.472,99.151,896.759,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Total generation,True,5.46,0.1,1.866,100.0,0.0,0.81,3.907,0.198,5.338,99.996,715.568,Africa,Africa,False,False,False,False,False
+Congo,COG,2024,Country or economy,Demand,True,5.38,0.07,1.318,98.535,-0.532,,,,,,,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Solar,False,2.51,0.31,14.091,15.766,1.691,0.03,0.119,0.014,13.333,27.056,47.41,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Wind,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Hydro,False,13.4,-0.02,-0.149,84.171,-1.69,3.25,0.318,-0.001,-0.313,72.302,23.731,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Bioenergy,False,0.01,0.0,0.0,0.063,-0.001,0.0,0.002,0.0,0.0,0.455,200.0,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Other renewables,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Nuclear,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Coal,False,0.0,0.0,,0.0,0.0,,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Gas,False,0.0,0.0,,0.0,0.0,,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Other fossil,False,0.0,0.0,,0.0,0.0,0.42,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Net imports,False,1.44,0.0,0.0,9.045,-0.168,,0.0,0.0,,0.0,0.0,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Wind and solar,True,2.51,0.31,14.091,15.766,1.691,0.03,0.119,0.014,13.333,27.056,47.41,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,"Hydro, bioenergy and other renewables",True,13.41,-0.02,-0.149,84.234,-1.691,3.25,0.321,0.0,0.0,72.984,23.937,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Renewables,True,15.92,0.29,1.855,100.0,0.0,3.28,0.44,0.014,3.286,100.041,27.638,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Clean,True,15.92,0.29,1.855,100.0,0.0,3.28,0.44,0.014,3.286,100.041,27.638,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Fossil,True,0.0,0.0,,0.0,0.0,0.42,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Total generation,True,15.92,0.29,1.855,100.0,0.0,3.6999999999999997,0.44,0.014,3.286,100.041,27.638,Africa,Africa,False,False,False,False,False
+Congo (DRC),COD,2024,Country or economy,Demand,True,17.36,0.29,1.699,109.045,-0.168,,,,,,,Africa,Africa,False,False,False,False,False
+EU,,2025,Region,Solar,False,366.048,58.788,19.133,13.081,1.995,366.39,17.395,2.794,19.136,2.962,47.521,,,False,False,True,False,False
+EU,,2025,Region,Wind,False,479.506,-9.832,-2.009,17.135,-0.521,243.43,5.941,-0.121,-1.996,1.012,12.39,,,False,False,True,False,False
+EU,,2025,Region,Hydro,False,325.723,-43.957,-11.891,11.64,-1.698,131.69,7.739,-1.045,-11.897,1.318,23.759,,,False,False,True,False,False
+EU,,2025,Region,Bioenergy,False,157.32,0.47,0.3,5.622,-0.037,31.04,34.013,0.102,0.301,5.791,216.203,,,False,False,True,False,False
+EU,,2025,Region,Other renewables,False,7.459,0.779,11.662,0.267,0.026,4.39,0.281,0.03,11.952,0.048,37.673,,,False,False,True,False,False
+EU,,2025,Region,Nuclear,False,652.297,2.747,0.423,23.31,-0.127,95.32,3.147,0.013,0.415,0.536,4.824,,,False,False,True,False,False
+EU,,2025,Region,Coal,False,258.319,-13.511,-4.97,9.231,-0.577,90.14,250.512,-13.744,-5.201,42.653,969.778,,,False,False,True,False,False
+EU,,2025,Region,Gas,False,470.142,38.912,9.023,16.8,1.241,204.24,214.608,17.656,8.965,36.54,456.475,,,False,False,True,False,False
+EU,,2025,Region,Other fossil,False,81.601,-7.509,-8.427,2.916,-0.299,32.89,53.693,-4.941,-8.427,9.142,657.994,,,False,False,True,False,False
+EU,,2025,Region,Net imports,False,-23.98,-11.67,94.801,-0.857,-0.413,,0.0,0.0,,0.0,0.0,,,False,False,True,False,False
+EU,,2025,Region,Wind and solar,True,845.554,48.956,6.146,30.215,1.473,609.8199999999999,23.336,2.673,12.936,3.973,27.598,,,False,False,True,False,False
+EU,,2025,Region,"Hydro, bioenergy and other renewables",True,490.502,-42.708,-8.01,17.528,-1.711,167.11999999999998,42.032,-0.914,-2.128,7.156,85.692,,,False,False,True,False,False
+EU,,2025,Region,Renewables,True,1336.056,6.248,0.47,47.743,-0.238,776.94,65.368,1.759,2.765,11.13,48.926,,,False,False,True,False,False
+EU,,2025,Region,Clean,True,1988.353,8.995,0.454,71.053,-0.365,872.26,68.516,1.773,2.656,11.666,34.459,,,False,False,True,False,False
+EU,,2025,Region,Fossil,True,810.062,17.892,2.259,28.947,0.365,327.27,518.814,-1.028,-0.198,88.334,640.462,,,False,False,True,False,False
+EU,,2025,Region,Total generation,True,2798.415,26.887,0.97,100.0,0.0,1199.53,587.329,0.744,0.127,100.0,209.879,,,False,False,True,False,False
+EU,,2025,Region,Demand,True,2774.435,15.217,0.551,99.143,-0.413,,,,,,,,,False,False,True,False,False
+Germany,DEU,2024,Country or economy,Solar,False,74.13,10.26,16.064,15.073,2.468,91.2,3.523,0.488,16.079,2.108,47.525,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Wind,False,137.429,-3.111,-2.214,27.943,0.208,72.74,1.711,-0.036,-2.061,1.024,12.45,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Hydro,False,23.83,2.59,12.194,4.845,0.653,5.5,0.566,0.061,12.079,0.339,23.752,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Bioenergy,False,51.08,-0.18,-0.351,10.386,0.27,8.88,11.043,-0.039,-0.352,6.606,216.19,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Other renewables,False,0.22,0.03,15.789,0.045,0.008,1.06,0.008,0.001,14.286,0.005,36.364,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Nuclear,False,0.0,-7.22,-100.0,0.0,-1.425,0.0,0.0,-0.035,-100.0,0.0,,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Coal,False,106.33,-18.45,-14.786,21.62,-3.005,32.34,103.078,-17.901,-14.797,61.666,969.416,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Gas,False,78.41,1.75,2.283,15.943,0.814,32.33,33.81,0.754,2.281,20.227,431.195,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Other fossil,False,20.39,-0.57,-2.719,4.146,0.01,4.13,13.417,-0.375,-2.719,8.027,658.019,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Net imports,False,26.27,17.05,184.924,5.341,3.521,,0.0,0.0,,0.0,0.0,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Wind and solar,True,211.559,7.149,3.497,43.016,2.676,163.94,5.233,0.451,9.431,3.131,24.735,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,"Hydro, bioenergy and other renewables",True,75.13,2.44,3.357,15.276,0.931,15.440000000000001,11.618,0.024,0.207,6.95,154.639,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Renewables,True,286.689,9.589,3.46,58.292,3.607,179.38,16.851,0.475,2.901,10.081,58.778,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Clean,True,286.689,2.369,0.833,58.292,2.182,179.38,16.851,0.44,2.681,10.081,58.778,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Fossil,True,205.13,-17.27,-7.765,41.708,-2.182,68.8,150.305,-17.521,-10.44,89.919,732.73,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Total generation,True,491.819,-14.901,-2.941,100.0,0.0,248.18,167.156,-17.081,-9.271,100.0,339.873,Europe,Europe,True,True,True,True,False
+Germany,DEU,2024,Country or economy,Demand,True,518.089,2.149,0.417,105.341,3.521,,,,,,,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Solar,False,89.704,15.574,21.009,18.048,2.975,106.27,4.263,0.74,21.005,2.567,47.523,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Wind,False,132.272,-5.157,-3.752,26.612,-1.331,77.81,1.648,-0.063,-3.682,0.992,12.459,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Hydro,False,18.278,-5.552,-23.298,3.677,-1.168,5.69,0.434,-0.132,-23.322,0.261,23.744,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Bioenergy,False,50.089,-0.991,-1.94,10.078,-0.308,8.98,10.829,-0.214,-1.938,6.521,216.195,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Other renewables,False,0.227,0.007,3.182,0.046,0.001,1.09,0.009,0.001,12.5,0.005,39.648,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Nuclear,False,0.0,0.0,,0.0,0.0,,0.0,0.0,,0.0,,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Coal,False,104.262,-2.068,-1.945,20.977,-0.643,31.97,100.573,-2.505,-2.43,60.561,964.618,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Gas,False,83.498,5.088,6.489,16.799,0.856,32.44,36.004,2.194,6.489,21.68,431.196,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Other fossil,False,18.705,-1.685,-8.264,3.763,-0.383,4.13,12.308,-1.109,-8.266,7.411,658.006,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Net imports,False,19.49,-6.78,-25.809,3.921,-1.42,,0.0,0.0,,0.0,0.0,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Wind and solar,True,221.976,10.417,4.924,44.66,1.644,184.07999999999998,5.91,0.677,12.937,3.559,26.624,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,"Hydro, bioenergy and other renewables",True,68.594,-6.536,-8.7,13.801,-1.475,15.760000000000002,11.272,-0.346,-2.978,6.788,164.329,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Renewables,True,290.57,3.881,1.354,58.461,0.169,199.84,17.182,0.331,1.964,10.346,59.132,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Clean,True,290.57,3.881,1.354,58.461,0.169,,17.182,0.331,1.964,10.346,59.132,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Fossil,True,206.465,1.335,0.651,41.539,-0.169,68.53999999999999,148.885,-1.42,-0.945,89.653,721.115,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Total generation,True,497.035,5.216,1.061,100.0,0.0,,166.068,-1.088,-0.651,100.0,334.117,Europe,Europe,True,True,True,True,False
+Germany,DEU,2025,Country or economy,Demand,True,516.525,-1.564,-0.302,103.921,-1.42,,,,,,,Europe,Europe,True,True,True,True,False
+Lesotho,LSO,2021,Country or economy,Solar,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Wind,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Hydro,False,0.53,0.1,23.256,100.0,0.0,0.07,0.013,0.003,30.0,103.234,24.528,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Bioenergy,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Other renewables,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Nuclear,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Coal,False,0.0,0.0,,0.0,0.0,,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Gas,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Other fossil,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Net imports,False,0.43,-0.01,-2.273,81.132,-21.194,,0.0,0.0,,0.0,0.0,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Wind and solar,True,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,"Hydro, bioenergy and other renewables",True,0.53,0.1,23.256,100.0,0.0,0.07,0.013,0.003,30.0,103.234,24.528,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Renewables,True,0.53,0.1,23.256,100.0,0.0,0.07,0.013,0.003,30.0,103.234,24.528,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Clean,True,0.53,0.1,23.256,100.0,0.0,0.07,0.013,0.003,30.0,103.234,24.528,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Fossil,True,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Total generation,True,0.53,0.1,23.256,100.0,0.0,0.07,0.013,0.003,30.0,103.234,24.528,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2021,Country or economy,Demand,True,0.96,0.09,10.345,181.132,-21.194,,,,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Solar,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Wind,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Hydro,False,0.48,-0.05,-9.434,100.0,0.0,0.07,0.011,-0.002,-15.385,96.451,22.917,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Bioenergy,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Other renewables,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Nuclear,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Coal,False,0.0,0.0,,0.0,0.0,,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Gas,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Other fossil,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Net imports,False,0.43,0.0,0.0,89.583,8.451,,0.0,0.0,,0.0,0.0,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Wind and solar,True,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,"Hydro, bioenergy and other renewables",True,0.48,-0.05,-9.434,100.0,0.0,0.07,0.011,-0.002,-15.385,96.451,22.917,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Renewables,True,0.48,-0.05,-9.434,100.0,0.0,0.07,0.011,-0.002,-15.385,96.451,22.917,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Clean,True,0.48,-0.05,-9.434,100.0,0.0,0.07,0.011,-0.002,-15.385,96.451,22.917,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Fossil,True,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Total generation,True,0.48,-0.05,-9.434,100.0,0.0,0.07,0.011,-0.002,-15.385,96.451,22.917,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2022,Country or economy,Demand,True,0.91,-0.05,-5.208,189.583,8.451,,,,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Solar,False,0.0,0.0,,,,0.03,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Wind,False,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Hydro,False,0.0,-0.48,-100.0,,,0.07,0.0,-0.011,-100.0,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Bioenergy,False,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Other renewables,False,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Nuclear,False,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Coal,False,0.0,0.0,,,,,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Gas,False,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Other fossil,False,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Net imports,False,0.45,0.02,4.651,,,,0.0,0.0,,,0.0,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Wind and solar,True,0.0,0.0,,,,0.03,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,"Hydro, bioenergy and other renewables",True,0.0,-0.48,-100.0,,,0.07,0.0,-0.011,-100.0,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Renewables,True,0.0,-0.48,-100.0,,,0.1,0.0,-0.011,-100.0,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Clean,True,0.0,-0.48,-100.0,,,0.1,0.0,-0.011,-100.0,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Fossil,True,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Total generation,True,0.0,-0.48,-100.0,,,0.1,0.0,-0.011,-100.0,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2023,Country or economy,Demand,True,0.45,-0.46,-50.549,,,,,,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Solar,False,0.0,0.0,,,,0.03,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Wind,False,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Hydro,False,0.0,0.0,,,,0.08,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Bioenergy,False,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Other renewables,False,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Nuclear,False,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Coal,False,0.0,0.0,,,,,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Gas,False,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Other fossil,False,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Net imports,False,0.58,0.13,28.889,,,,0.0,0.0,,,0.0,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Wind and solar,True,0.0,0.0,,,,0.03,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,"Hydro, bioenergy and other renewables",True,0.0,0.0,,,,0.08,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Renewables,True,0.0,0.0,,,,0.11,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Clean,True,0.0,0.0,,,,0.11,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Fossil,True,0.0,0.0,,,,0.0,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Total generation,True,0.0,0.0,,,,0.11,0.0,0.0,,,,Africa,Africa,False,False,False,False,False
+Lesotho,LSO,2024,Country or economy,Demand,True,0.58,0.13,28.889,,,,,,,,,Africa,Africa,False,False,False,False,False
+Poland,POL,2025,Country or economy,Solar,False,19.543,1.883,10.663,11.331,1.069,25.42,0.929,0.09,10.727,0.912,47.536,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Wind,False,23.958,-1.905,-7.366,13.891,-1.138,10.6,0.294,-0.024,-7.547,0.288,12.271,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Hydro,False,1.702,-0.408,-19.336,0.987,-0.239,0.99,0.04,-0.01,-20.0,0.039,23.502,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Bioenergy,False,8.454,0.504,6.34,4.902,0.282,1.02,1.828,0.109,6.341,1.794,216.229,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Other renewables,False,0.232,0.232,,0.135,0.135,0.19,0.009,0.009,,0.009,38.793,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Nuclear,False,0.0,0.0,,0.0,0.0,0.0,0.0,0.0,,0.0,,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Coal,False,87.339,-6.161,-6.589,50.641,-3.69,27.26,84.449,-5.995,-6.628,82.867,966.911,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Gas,False,24.791,4.331,21.168,14.374,2.485,4.93,10.117,1.768,21.176,9.928,408.092,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Other fossil,False,6.448,1.898,41.714,3.739,1.095,0.27,4.243,1.249,41.717,4.164,658.033,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Net imports,False,0.95,-1.02,-51.777,0.551,-0.594,,0.0,0.0,,0.0,0.0,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Wind and solar,True,43.501,-0.022,-0.051,25.223,-0.067,36.02,1.223,0.066,5.704,1.2,28.114,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,"Hydro, bioenergy and other renewables",True,10.389,0.329,3.27,6.024,0.178,2.1999999999999997,1.877,0.108,6.105,1.842,180.672,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Renewables,True,53.89,0.307,0.573,31.246,0.11,38.22,3.1,0.174,5.947,3.042,57.525,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Clean,True,53.89,0.307,0.573,31.246,0.11,38.22,3.1,0.174,5.947,3.042,57.525,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Fossil,True,118.578,0.068,0.057,68.754,-0.11,32.46,98.809,-2.978,-2.926,96.958,833.283,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Total generation,True,172.468,0.375,0.218,100.0,0.0,70.68,101.909,-2.804,-2.678,100.0,590.886,Europe,Europe,True,True,False,False,False
+Poland,POL,2025,Country or economy,Demand,True,173.418,-0.645,-0.371,100.551,-0.594,,,,,,,Europe,Europe,True,True,False,False,False
+Türkiye,TUR,2025,Country or economy,Solar,False,37.25,11.58,45.111,10.527,3.004,25.47,1.788,0.556,45.13,1.062,48.0,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Wind,False,39.42,2.89,7.911,11.14,0.435,14.78,0.353,0.026,7.951,0.21,8.955,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Hydro,False,57.27,-17.3,-23.2,16.184,-5.669,32.29,1.374,-0.416,-23.24,0.816,23.992,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Bioenergy,False,8.48,-0.2,-2.304,2.396,-0.148,1.99,1.95,-0.046,-2.305,1.158,229.953,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Other renewables,False,10.65,0.45,4.412,3.01,0.021,0.01,0.405,0.017,4.381,0.241,38.028,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Nuclear,False,0.0,0.0,,0.0,0.0,,0.0,0.0,,0.0,,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Coal,False,121.4,0.08,0.066,34.307,-1.247,21.02,121.942,-0.126,-0.103,72.43,1004.465,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Gas,False,78.36,15.08,23.831,22.144,3.599,26.94,39.825,7.664,23.83,23.655,508.231,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Other fossil,False,1.03,0.05,5.102,0.291,0.004,0.57,0.721,0.035,5.102,0.428,700.0,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Net imports,False,-2.095,-1.105,111.616,-0.592,-0.302,,0.0,0.0,,0.0,0.0,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Wind and solar,True,76.67,14.47,23.264,21.667,3.439,40.25,2.141,0.582,37.332,1.272,27.925,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,"Hydro, bioenergy and other renewables",True,76.4,-17.05,-18.245,21.59,-5.796,34.29,3.73,-0.444,-10.637,2.216,48.822,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Renewables,True,153.07,-2.58,-1.658,43.257,-2.357,74.53999999999999,5.87,0.137,2.39,3.487,38.348,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Clean,True,153.07,-2.58,-1.658,43.257,-2.357,,5.87,0.137,2.39,3.487,38.348,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Fossil,True,200.79,15.21,8.196,56.743,2.357,48.53,162.488,7.574,4.889,96.513,809.243,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Total generation,True,353.86,12.63,3.701,100.0,0.0,,168.358,7.711,4.8,100.0,475.776,Asia,Europe,False,True,True,False,False
+Türkiye,TUR,2025,Country or economy,Demand,True,351.765,11.525,3.387,99.408,-0.302,,,,,,,Asia,Europe,False,True,True,False,False
+Ukraine,UKR,2022,Country or economy,Solar,False,5.08,-1.42,-21.846,4.556,0.401,8.06,0.241,-0.068,-22.006,0.863,47.441,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Wind,False,1.42,-2.4,-62.827,1.273,-1.169,1.76,0.015,-0.026,-63.415,0.054,10.563,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Hydro,False,11.02,0.58,5.556,9.883,3.21,4.82,0.262,0.014,5.645,0.938,23.775,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Bioenergy,False,0.78,-0.13,-14.286,0.699,0.117,0.27,0.169,-0.028,-14.213,0.605,216.667,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Other renewables,False,0.0,0.0,,0.0,0.0,,0.0,0.0,,0.0,,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Nuclear,False,62.18,-24.03,-27.874,55.762,0.655,13.84,0.343,-0.133,-27.941,1.228,5.516,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Coal,False,23.32,-14.17,-37.797,20.913,-3.051,21.48,22.233,-13.511,-37.799,79.585,953.388,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Gas,False,7.18,-3.14,-30.426,6.439,-0.158,9.26,4.323,-1.891,-30.431,15.475,602.089,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Other fossil,False,0.53,-0.22,-29.333,0.475,-0.004,,0.349,-0.145,-29.352,1.249,658.491,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Net imports,False,0.346,2.386,-116.961,0.31,1.614,,0.0,0.0,,0.0,0.0,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Wind and solar,True,6.5,-3.82,-37.016,5.829,-0.768,9.82,0.257,-0.093,-26.571,0.92,39.538,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,"Hydro, bioenergy and other renewables",True,11.8,0.45,3.965,10.582,3.327,5.09,0.43,-0.015,-3.371,1.539,36.441,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Renewables,True,18.3,-3.37,-15.551,16.411,2.559,14.91,0.687,-0.108,-13.585,2.459,37.541,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Clean,True,80.48,-27.4,-25.399,72.173,3.214,28.750000000000004,1.031,-0.24,-18.883,3.691,12.811,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Fossil,True,31.03,-17.53,-36.1,27.827,-3.214,30.740000000000002,26.905,-15.546,-36.621,96.309,867.064,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Total generation,True,111.51,-44.93,-28.72,100.0,0.0,59.49,27.936,-15.786,-36.105,100.0,250.525,Europe,Europe,False,False,False,False,False
+Ukraine,UKR,2022,Country or economy,Demand,True,111.856,-42.544,-27.554,100.31,1.614,,,,,,,Europe,Europe,False,False,False,False,False
+United Kingdom,GBR,2025,Country or economy,Solar,False,19.399,4.609,31.163,6.612,1.407,21.66,0.922,0.219,31.152,1.44,47.528,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Wind,False,86.164,2.884,3.463,29.369,0.062,33.4,1.111,0.046,4.319,1.735,12.894,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Hydro,False,5.415,-0.345,-5.99,1.846,-0.181,2.19,0.129,-0.008,-5.839,0.201,23.823,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Bioenergy,False,40.932,0.842,2.1,13.952,-0.156,7.01,8.849,0.182,2.1,13.822,216.188,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Other renewables,False,0.0,0.0,,0.0,0.0,,0.0,0.0,,0.0,,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Nuclear,False,36.378,-4.212,-10.377,12.4,-1.884,5.88,0.176,-0.02,-10.204,0.275,4.838,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Coal,False,0.328,-1.572,-82.737,0.112,-0.557,0.0,0.316,-1.511,-82.704,0.494,963.415,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Gas,False,91.984,5.684,6.586,31.353,0.983,38.39,44.11,2.726,6.587,68.898,479.54,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Other fossil,False,12.782,1.332,11.633,4.357,0.328,2.21,8.41,0.876,11.627,13.136,657.957,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Net imports,False,17.925,-4.361,-19.568,6.11,-1.733,,0.0,0.0,,0.0,0.0,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Wind and solar,True,105.563,7.493,7.64,35.981,1.469,55.06,2.033,0.265,14.989,3.175,19.259,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,"Hydro, bioenergy and other renewables",True,46.347,0.497,1.084,15.797,-0.338,9.2,8.978,0.174,1.976,14.023,193.713,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Renewables,True,151.911,7.991,5.552,51.779,1.131,64.25999999999999,11.011,0.438,4.143,17.199,72.483,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Clean,True,188.288,3.778,2.048,64.178,-0.754,70.13999999999999,11.187,0.419,3.891,17.474,59.414,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Fossil,True,105.094,5.444,5.463,35.821,0.753,40.6,52.835,2.09,4.119,82.526,502.74,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Total generation,True,293.383,9.223,3.246,100.0,0.0,110.74000000000001,64.022,2.509,4.079,100.0,218.22,Europe,Europe,False,True,True,True,False
+United Kingdom,GBR,2025,Country or economy,Demand,True,311.308,4.862,1.587,106.11,-1.733,,,,,,,Europe,Europe,False,True,True,True,False
