@@ -55,9 +55,10 @@ MAX_AMOUNT, MAX_EMPLOYEES, MAX_ENTITIES, MAX_NAME = 1e15, 10_000_000, 200, 200
 
 YES, NO, DEPENDS, NA = "yes", "no", "depends", "not applicable"
 
-ATTRIBUTION = ("Source: EUR-Lex / CELLAR (Publications Office of the European Union), © European Union. Reuse: Commission "
-               "Decision 2011/833/EU, Art. 4; Commission content is licensed CC BY 4.0 "
-               "(https://commission.europa.eu/legal-notice_en). Legal texts {celex}; retrieved {checked}. Derived: "
+ATTRIBUTION = ("Source: EUR-Lex / CELLAR (Publications Office of the European Union), © European Union. Reuse: EUR-Lex "
+               "legal notice (https://eur-lex.europa.eu/content/legal-notice/legal-notice.html): Official Journal texts "
+               "may be re-used for commercial or non-commercial purposes (Commission Decision 2011/833/EU, Arts 4 and 6); "
+               "consolidated texts are licensed CC BY 4.0. Legal texts {celex}; retrieved {checked}. Derived: "
                "csrd-scope's encoding of the provisions cited, not the text itself.")
 NOT_COVERED = (
     "Not legal advice. The answer is at EU-directive level; the obligation applies through the national law of "
@@ -1204,10 +1205,18 @@ def sources(member_state: str | None = None, data: Data | None = None) -> dict:
            "acts": {c: {k: a.get(k) for k in ("title", "date_document", "in_force")} for c, a in lb["acts"].items()},
            "consolidated_versions": lb["consolidated_versions"],
            "amendments_corrigenda_since_2024": lb.get("related_since_2024", []),
-           "licence": {"terms": "https://commission.europa.eu/legal-notice_en",
-                       "quote": "content owned by the EU on this website is licensed under the Creative Commons Attribution 4.0 "
-                                "International (CC BY 4.0) licence. This means that reuse is allowed, provided appropriate credit "
-                                "is given and changes are indicated."},
+           "licence": {"terms": "https://eur-lex.europa.eu/content/legal-notice/legal-notice.html",
+                       "official_journal_texts": "Unless otherwise specified, you can re-use the legal documents published in "
+                                                 "EUR-Lex for commercial or non-commercial purposes.",
+                       "consolidated_texts": "The copyright for the editorial content of this website, the summaries of EU "
+                                             "legislation and the consolidated texts, which is owned by the EU, is licensed "
+                                             "under the Creative Commons Attribution 4.0 International licence. This means "
+                                             "that you can re-use the content provided you acknowledge the source and "
+                                             "indicate any changes you have made.",
+                       "reuse_decision": "Commission Decision 2011/833/EU, Article 4: \"All documents shall be available for "
+                                         "reuse: (a) for commercial or non-commercial purposes under the conditions laid "
+                                         "down in Article 6\"; Article 6(2): acknowledge the source, do not distort the "
+                                         "original meaning or message."},
            "endpoint": lb["endpoint"], "attribution": d.attribution()}
     if member_state is not None:
         code = member_state.strip().upper() if isinstance(member_state, str) else ""

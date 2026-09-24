@@ -188,6 +188,21 @@ class LowFindings(Isolated):
     def test_licence_names_the_reuse_decision(self):
         self.assertIn("Decision 2011/833/EU", DATA.attribution())
 
+    def test_licence_basis_is_the_eur_lex_notice(self):
+        # Official Journal texts are reused under the EUR-Lex notice; CC BY 4.0 covers only consolidated texts,
+        # and the commission.europa.eu notice covers that website's own content.
+        att = DATA.attribution()
+        self.assertIn("https://eur-lex.europa.eu/content/legal-notice/legal-notice.html", att)
+        self.assertIn("consolidated texts are licensed CC BY 4.0", att)
+        self.assertNotIn("commission.europa.eu", att)
+        lic = csrd_scope.sources(data=DATA)["licence"]
+        self.assertIn("re-use the legal documents published in EUR-Lex", lic["official_journal_texts"])
+        self.assertIn("the consolidated texts", lic["consolidated_texts"])
+        self.assertIn("Article 6", lic["reuse_decision"])
+        sources_md = (ROOT / "data" / "SOURCES.md").read_text(encoding="utf-8")
+        self.assertNotIn("commission.europa.eu", sources_md)
+        self.assertIn("web.archive.org/web/20260922160312", sources_md)
+
     def test_option_wording_has_both_readings(self):
         self.assertIn("'below both'", csrd_scope.QUESTIONS["derogation"][0])
 

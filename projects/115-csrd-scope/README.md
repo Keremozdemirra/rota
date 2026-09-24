@@ -93,7 +93,7 @@ National measures notified for Germany (EUR-Lex/CELLAR, as of 2026-09-24):
    EUR-Lex (CELLAR) lists the national measures a Member State notified to the Commission. A listed measure does not show that transposition is complete or correct, and an empty list does not show that none exists: check national law.
 
 Legal basis: 02013L0034-20260318, 02022L2464-20260318, 32026L0470, 32025L0794, 32023L2775; checked 2026-09-24. EUR-Lex, on its consolidated texts: "This text is meant purely as a documentation tool and has no legal effect."
-Source: EUR-Lex / CELLAR (Publications Office of the European Union), © European Union. Reuse: Commission Decision 2011/833/EU, Art. 4; Commission content is licensed CC BY 4.0 (https://commission.europa.eu/legal-notice_en). Legal texts 32013L0034 (consolidated 02013L0034-20260318), 32022L2464 (consolidated 02022L2464-20260318), 32026L0470, 32025L0794, 32023L2775, 32004L0109, 32019R2088, 52024XC06792; retrieved 2026-09-24. Derived: csrd-scope's encoding of the provisions cited, not the text itself.
+Source: EUR-Lex / CELLAR (Publications Office of the European Union), © European Union. Reuse: EUR-Lex legal notice (https://eur-lex.europa.eu/content/legal-notice/legal-notice.html): Official Journal texts may be re-used for commercial or non-commercial purposes (Commission Decision 2011/833/EU, Arts 4 and 6); consolidated texts are licensed CC BY 4.0. Legal texts 32013L0034 (consolidated 02013L0034-20260318), 32022L2464 (consolidated 02022L2464-20260318), 32026L0470, 32025L0794, 32023L2775, 32004L0109, 32019R2088, 52024XC06792; retrieved 2026-09-24. Derived: csrd-scope's encoding of the provisions cited, not the text itself.
 Not legal advice. The answer is at EU-directive level; the obligation applies through the national law of the Member State concerned. Not covered: the content of the reports (European Sustainability Reporting Standards, Commission Delegated Regulation (EU) 2023/2772 and later delegated acts under Art. 29b), assurance (Art. 34 Directive 2013/34/EU, Directive 2006/43/EC), due diligence (Directive (EU) 2024/1760, CSDDD), and EU Taxonomy disclosures (Art. 8 Regulation (EU) 2020/852, Delegated Regulation (EU) 2021/2178).
 ```
 
@@ -223,17 +223,20 @@ measure does not show that transposition is complete or correct, and csrd-scope 
 
 - Source: CELLAR, the Publications Office repository behind EUR-Lex (SPARQL endpoint
   `https://publications.europa.eu/webapi/rdf/sparql` and `https://publications.europa.eu/resource/celex/<CELEX>`).
-- Reuse: Commission Decision 2011/833/EU on the reuse of Commission documents, Article 4: "All documents shall be
-  available for reuse: (a) for commercial or non-commercial purposes [...]". The Commission's legal notice,
-  https://commission.europa.eu/legal-notice_en, licenses content owned by the EU on that website under CC BY 4.0:
-  "This means that reuse is allowed, provided appropriate credit is given and changes are indicated." The Publications
-  Office copyright page refers EUR-Lex content to the EUR-Lex notice and asks to be contacted about the conditions of
-  reuse of CELLAR content; the EUR-Lex notice could not be read from the build environment (HTTP 202, empty body,
-  2026-09-24).
+- Reuse of the acts as published in the Official Journal: the EUR-Lex legal notice
+  (https://eur-lex.europa.eu/content/legal-notice/legal-notice.html, read 2026-09-24 from its archived copy of
+  2026-09-22): "Unless otherwise specified, you can re-use the legal documents published in EUR-Lex for commercial or
+  non-commercial purposes." The policy rests on Commission Decision 2011/833/EU, Article 4 ("All documents shall be
+  available for reuse: (a) for commercial or non-commercial purposes under the conditions laid down in Article 6"),
+  whose Article 6(2) conditions are to acknowledge the source and not to distort the original meaning or message.
+- Reuse of the consolidated texts: the same notice licenses "the editorial content of this website, the summaries of
+  EU legislation and the consolidated texts" under CC BY 4.0: "you can re-use the content provided you acknowledge
+  the source and indicate any changes you have made." The quotations and dates are in `data/SOURCES.md`.
 - Every answer carries the attribution line, and says "derived": the rules are csrd-scope's encoding of the provisions.
 - Bundled in `data/`: identifiers, dates, titles, short quotations of the provisions the rules encode, the legal forms
   of Annexes I and II, the EU-27 list (EU Vocabularies country table) and national-measure metadata. No personal data.
-- The code is MIT-licensed; the bundled legal material remains © European Union, CC BY 4.0.
+- The code is MIT-licensed; the bundled legal material remains © European Union, reused under the EUR-Lex legal
+  notice (Official Journal texts) and CC BY 4.0 (consolidated texts).
 
 ## What it reads, what it sends
 
