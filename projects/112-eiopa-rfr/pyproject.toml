@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eiopa-rfr"
+version = "0.1.0"
+description = "EIOPA's monthly Solvency II risk-free interest rate term structures as published, from the command line or as an MCP server."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["eiopa", "solvency-ii", "risk-free-rate", "term-structure", "yield-curve", "insurance", "actuarial", "mcp", "mcp-server", "model-context-protocol"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Programming Language :: Python :: 3",
+  "Topic :: Office/Business :: Financial",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/eiopa-rfr"
+Issues = "https://github.com/Keremozdemirra/eiopa-rfr/issues"
+"Data source" = "https://www.eiopa.europa.eu/tools-and-data/risk-free-interest-rate-term-structures_en"
+
+[project.scripts]
+eiopa-rfr = "eiopa_rfr:main"
+
+[tool.setuptools]
+py-modules = ["eiopa_rfr"]

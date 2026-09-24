@@ -144,6 +144,14 @@ class Messages(unittest.TestCase):
         for part in ("tCO2e", "50 MB", "max_positions", "never converts currencies", "sends nothing"):
             self.assertIn(part, text)
 
+    def test_deeply_nested_json_is_a_parse_error(self):
+        stdin = io.BytesIO(b"[" * 200000 + b"\n" + b'{"jsonrpc":"2.0","id":1,"method":"ping"}\n')
+        stdout = io.BytesIO()
+        mcp.serve(stdin, stdout)
+        lines = [json.loads(x) for x in stdout.getvalue().decode("utf-8").splitlines()]
+        self.assertEqual(lines[0]["error"]["code"], -32700)
+        self.assertEqual(lines[1]["result"], {})
+
     def test_serve_in_process(self):
         stdin = io.BytesIO(b'{"jsonrpc":"2.0","id":1,"method":"ping"}\n\n{"jsonrpc":"2.0","id":2,"method":"x"}\n')
         stdout = io.BytesIO()

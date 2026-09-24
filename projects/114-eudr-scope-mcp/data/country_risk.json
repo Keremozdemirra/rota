@@ -1,0 +1,891 @@
+{
+ "dataset": "Country classification under Article 29 of Regulation (EU) 2023/1115",
+ "retrieved": "2026-09-24",
+ "status": "verified",
+ "status_reasons": [],
+ "act": {
+  "celex": "32025R1093",
+  "title": "Commission Implementing Regulation (EU) 2025/1093 of 22 May 2025 laying down rules for the application of Regulation (EU) 2023/1115 of the European Parliament and of the Council as regards a list of countries that present a low or high risk of producing relevant commodities for which the relevant products do not comply with Article 3, point (a)",
+  "date": "2025-05-22",
+  "published": "2025-05-23",
+  "entry_into_force": "2025-05-26",
+  "eli": "http://data.europa.eu/eli/reg_impl/2025/1093/oj",
+  "source_text": "32025R1093",
+  "url": "https://publications.europa.eu/resource/celex/32025R1093",
+  "related": [],
+  "consolidated_versions": []
+ },
+ "article_1": {
+  "1": "The countries that present a low, or high risk, shall be those listed in the Annex.",
+  "2": "A standard level shall be maintained for all countries not listed in the Annex."
+ },
+ "annex_heading": "List of countries which are considered to present low or high risk according to the assessment based on Article 29 of Regulation (EU) 2023/1115:",
+ "low": [
+  {
+   "annex_name": "Afghanistan",
+   "iso2": "AF",
+   "iso3": "AFG",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Albania",
+   "iso2": "AL",
+   "iso3": "ALB",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Algeria",
+   "iso2": "DZ",
+   "iso3": "DZA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Andorra",
+   "iso2": "AD",
+   "iso3": "AND",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Antigua and Barbuda",
+   "iso2": "AG",
+   "iso3": "ATG",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Armenia",
+   "iso2": "AM",
+   "iso3": "ARM",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Australia",
+   "iso2": "AU",
+   "iso3": "AUS",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Austria",
+   "iso2": "AT",
+   "iso3": "AUT",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Azerbaijan",
+   "iso2": "AZ",
+   "iso3": "AZE",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Bahamas",
+   "iso2": "BS",
+   "iso3": "BHS",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Bahrain",
+   "iso2": "BH",
+   "iso3": "BHR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Bangladesh",
+   "iso2": "BD",
+   "iso3": "BGD",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Barbados",
+   "iso2": "BB",
+   "iso3": "BRB",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Belgium",
+   "iso2": "BE",
+   "iso3": "BEL",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Bhutan",
+   "iso2": "BT",
+   "iso3": "BTN",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Bosnia and Herzegovina",
+   "iso2": "BA",
+   "iso3": "BIH",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Brunei Darussalam",
+   "iso2": "BN",
+   "iso3": "BRN",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Bulgaria",
+   "iso2": "BG",
+   "iso3": "BGR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Burundi",
+   "iso2": "BI",
+   "iso3": "BDI",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Cabo Verde",
+   "iso2": "CV",
+   "iso3": "CPV",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Canada",
+   "iso2": "CA",
+   "iso3": "CAN",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Central African Republic",
+   "iso2": "CF",
+   "iso3": "CAF",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Chile",
+   "iso2": "CL",
+   "iso3": "CHL",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "China",
+   "iso2": "CN",
+   "iso3": "CHN",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Comoros",
+   "iso2": "KM",
+   "iso3": "COM",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Congo",
+   "iso2": "CG",
+   "iso3": "COG",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Costa Rica",
+   "iso2": "CR",
+   "iso3": "CRI",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Croatia",
+   "iso2": "HR",
+   "iso3": "HRV",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Cuba",
+   "iso2": "CU",
+   "iso3": "CUB",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Cyprus",
+   "iso2": "CY",
+   "iso3": "CYP",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Czechia",
+   "iso2": "CZ",
+   "iso3": "CZE",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Denmark",
+   "iso2": "DK",
+   "iso3": "DNK",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Djibouti",
+   "iso2": "DJ",
+   "iso3": "DJI",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Dominica",
+   "iso2": "DM",
+   "iso3": "DMA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Dominican Republic",
+   "iso2": "DO",
+   "iso3": "DOM",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Egypt",
+   "iso2": "EG",
+   "iso3": "EGY",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Estonia",
+   "iso2": "EE",
+   "iso3": "EST",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Eswatini",
+   "iso2": "SZ",
+   "iso3": "SWZ",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Fiji",
+   "iso2": "FJ",
+   "iso3": "FJI",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Finland",
+   "iso2": "FI",
+   "iso3": "FIN",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "France",
+   "iso2": "FR",
+   "iso3": "FRA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Gabon",
+   "iso2": "GA",
+   "iso3": "GAB",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Georgia",
+   "iso2": "GE",
+   "iso3": "GEO",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Germany",
+   "iso2": "DE",
+   "iso3": "DEU",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Ghana",
+   "iso2": "GH",
+   "iso3": "GHA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Greece",
+   "iso2": "GR",
+   "iso3": "GRC",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Grenada",
+   "iso2": "GD",
+   "iso3": "GRD",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Guyana",
+   "iso2": "GY",
+   "iso3": "GUY",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Hungary",
+   "iso2": "HU",
+   "iso3": "HUN",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Iceland",
+   "iso2": "IS",
+   "iso3": "ISL",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "India",
+   "iso2": "IN",
+   "iso3": "IND",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Iran (Islamic Republic of)",
+   "iso2": "IR",
+   "iso3": "IRN",
+   "matched_by": "label, qualifier moved to the front"
+  },
+  {
+   "annex_name": "Iraq",
+   "iso2": "IQ",
+   "iso3": "IRQ",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Ireland",
+   "iso2": "IE",
+   "iso3": "IRL",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Italy",
+   "iso2": "IT",
+   "iso3": "ITA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Jamaica",
+   "iso2": "JM",
+   "iso3": "JAM",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Japan",
+   "iso2": "JP",
+   "iso3": "JPN",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Jordan",
+   "iso2": "JO",
+   "iso3": "JOR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Kazakhstan",
+   "iso2": "KZ",
+   "iso3": "KAZ",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Kenya",
+   "iso2": "KE",
+   "iso3": "KEN",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Kiribati",
+   "iso2": "KI",
+   "iso3": "KIR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Kuwait",
+   "iso2": "KW",
+   "iso3": "KWT",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Kyrgyzstan",
+   "iso2": "KG",
+   "iso3": "KGZ",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Lao People’s Democratic Republic",
+   "iso2": "LA",
+   "iso3": "LAO",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Latvia",
+   "iso2": "LV",
+   "iso3": "LVA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Lebanon",
+   "iso2": "LB",
+   "iso3": "LBN",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Lesotho",
+   "iso2": "LS",
+   "iso3": "LSO",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Libya",
+   "iso2": "LY",
+   "iso3": "LBY",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Liechtenstein",
+   "iso2": "LI",
+   "iso3": "LIE",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Lithuania",
+   "iso2": "LT",
+   "iso3": "LTU",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Luxembourg",
+   "iso2": "LU",
+   "iso3": "LUX",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Madagascar",
+   "iso2": "MG",
+   "iso3": "MDG",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Maldives",
+   "iso2": "MV",
+   "iso3": "MDV",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Mali",
+   "iso2": "ML",
+   "iso3": "MLI",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Malta",
+   "iso2": "MT",
+   "iso3": "MLT",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Marshall Islands",
+   "iso2": "MH",
+   "iso3": "MHL",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Mauritius",
+   "iso2": "MU",
+   "iso3": "MUS",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Micronesia (Federated States of)",
+   "iso2": "FM",
+   "iso3": "FSM",
+   "matched_by": "label, qualifier moved to the front"
+  },
+  {
+   "annex_name": "Monaco",
+   "iso2": "MC",
+   "iso3": "MCO",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Mongolia",
+   "iso2": "MN",
+   "iso3": "MNG",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Montenegro",
+   "iso2": "ME",
+   "iso3": "MNE",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Morocco",
+   "iso2": "MA",
+   "iso3": "MAR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Nauru",
+   "iso2": "NR",
+   "iso3": "NRU",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Nepal",
+   "iso2": "NP",
+   "iso3": "NPL",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Netherlands (Kingdom of the)",
+   "iso2": "NL",
+   "iso3": "NLD",
+   "matched_by": "label, qualifier moved to the front"
+  },
+  {
+   "annex_name": "New Zealand",
+   "iso2": "NZ",
+   "iso3": "NZL",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "North Macedonia",
+   "iso2": "MK",
+   "iso3": "MKD",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Norway",
+   "iso2": "NO",
+   "iso3": "NOR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Oman",
+   "iso2": "OM",
+   "iso3": "OMN",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Palau",
+   "iso2": "PW",
+   "iso3": "PLW",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Palestine",
+   "iso2": "PS",
+   "iso3": "PSE",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Papua New Guinea",
+   "iso2": "PG",
+   "iso3": "PNG",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Philippines",
+   "iso2": "PH",
+   "iso3": "PHL",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Poland",
+   "iso2": "PL",
+   "iso3": "POL",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Portugal",
+   "iso2": "PT",
+   "iso3": "PRT",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Qatar",
+   "iso2": "QA",
+   "iso3": "QAT",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Republic of Korea",
+   "iso2": "KR",
+   "iso3": "KOR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Republic of Moldova",
+   "iso2": "MD",
+   "iso3": "MDA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Romania",
+   "iso2": "RO",
+   "iso3": "ROU",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Rwanda",
+   "iso2": "RW",
+   "iso3": "RWA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Saint Kitts and Nevis",
+   "iso2": "KN",
+   "iso3": "KNA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Saint Lucia",
+   "iso2": "LC",
+   "iso3": "LCA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Saint Vincent and the Grenadines",
+   "iso2": "VC",
+   "iso3": "VCT",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Samoa",
+   "iso2": "WS",
+   "iso3": "WSM",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "San Marino",
+   "iso2": "SM",
+   "iso3": "SMR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "São Tomé and Príncipe",
+   "iso2": "ST",
+   "iso3": "STP",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Saudi Arabia",
+   "iso2": "SA",
+   "iso3": "SAU",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Serbia",
+   "iso2": "RS",
+   "iso3": "SRB",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Seychelles",
+   "iso2": "SC",
+   "iso3": "SYC",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Singapore",
+   "iso2": "SG",
+   "iso3": "SGP",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Slovakia",
+   "iso2": "SK",
+   "iso3": "SVK",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Slovenia",
+   "iso2": "SI",
+   "iso3": "SVN",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Solomon Island",
+   "iso2": "SB",
+   "iso3": "SLB",
+   "matched_by": "fixed mapping (see SOURCES.md)"
+  },
+  {
+   "annex_name": "South Africa",
+   "iso2": "ZA",
+   "iso3": "ZAF",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "South Sudan",
+   "iso2": "SS",
+   "iso3": "SSD",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Spain",
+   "iso2": "ES",
+   "iso3": "ESP",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Sri Lanka",
+   "iso2": "LK",
+   "iso3": "LKA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Suriname",
+   "iso2": "SR",
+   "iso3": "SUR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Sweden",
+   "iso2": "SE",
+   "iso3": "SWE",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Switzerland",
+   "iso2": "CH",
+   "iso3": "CHE",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Syrian Arab Republic",
+   "iso2": "SY",
+   "iso3": "SYR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Tajikistan",
+   "iso2": "TJ",
+   "iso3": "TJK",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Thailand",
+   "iso2": "TH",
+   "iso3": "THA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Timor-Leste",
+   "iso2": "TL",
+   "iso3": "TLS",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Togo",
+   "iso2": "TG",
+   "iso3": "TGO",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Tonga",
+   "iso2": "TO",
+   "iso3": "TON",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Trinidad and Tobago",
+   "iso2": "TT",
+   "iso3": "TTO",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Tunisia",
+   "iso2": "TN",
+   "iso3": "TUN",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Türkiye",
+   "iso2": "TR",
+   "iso3": "TUR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Turkmenistan",
+   "iso2": "TM",
+   "iso3": "TKM",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Tuvalu",
+   "iso2": "TV",
+   "iso3": "TUV",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Ukraine",
+   "iso2": "UA",
+   "iso3": "UKR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "United Arab Emirates",
+   "iso2": "AE",
+   "iso3": "ARE",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "United Kingdom of Great Britain and Northern Ireland",
+   "iso2": "GB",
+   "iso3": "GBR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "United States of America",
+   "iso2": "US",
+   "iso3": "USA",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Uruguay",
+   "iso2": "UY",
+   "iso3": "URY",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Uzbekistan",
+   "iso2": "UZ",
+   "iso3": "UZB",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Vanuatu",
+   "iso2": "VU",
+   "iso3": "VUT",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Vietnam",
+   "iso2": "VN",
+   "iso3": "VNM",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Yemen",
+   "iso2": "YE",
+   "iso3": "YEM",
+   "matched_by": "label"
+  }
+ ],
+ "high": [
+  {
+   "annex_name": "Belarus",
+   "iso2": "BY",
+   "iso3": "BLR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Democratic People’s Republic of Korea",
+   "iso2": "KP",
+   "iso3": "PRK",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Myanmar",
+   "iso2": "MM",
+   "iso3": "MMR",
+   "matched_by": "label"
+  },
+  {
+   "annex_name": "Russian Federation",
+   "iso2": "RU",
+   "iso3": "RUS",
+   "matched_by": "label"
+  }
+ ]
+}

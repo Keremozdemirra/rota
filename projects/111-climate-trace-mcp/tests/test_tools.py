@@ -312,7 +312,7 @@ class OwnersTest(ToolTest):
         self.assertIsNone(res["owners"][0]["lei"])
         self.assertEqual(res["ownership_shares"], "not provided by the API")
         self.assertTrue(any("not an LEI" in n for n in res["notes"]))
-        self.assertTrue(any("4 owner entries" in n for n in res["notes"]))
+        self.assertIn("The API listed 4 owner entries for 1 distinct owner.", res["notes"])
         self.assertEqual(res["attribution"], ATTRIBUTION)
 
     def test_lei_shown_only_when_the_api_returns_a_valid_one(self):

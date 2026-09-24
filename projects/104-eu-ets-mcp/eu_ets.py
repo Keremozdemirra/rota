@@ -1446,8 +1446,8 @@ class Dataset:
             if not insts:
                 counts = meta.get("counts") or {}
                 return self._envelope(con, dict(base, found=False, installations_count=0, message=(
-                    f"No installation in this snapshot lists this LEI. Only {counts.get('installations_with_lei')} of "
-                    f"{counts.get('installations')} installations carry an account-holder LEI, so this is not proof "
+                    f"No installation in this snapshot lists this LEI. Only {counts.get('installations_with_lei') or 0:,} of "
+                    f"{counts.get('installations') or 0:,} installations carry an account-holder LEI, so this is not proof "
                     "that the company holds none; search by installation name or city instead.")), False, [warn])
             where = "i.lei = ?" + (" AND y.year >= ?" if y0 else "") + (" AND y.year <= ?" if y1 else "")
             args = [code] + ([y0] if y0 else []) + ([y1] if y1 else [])
@@ -1641,7 +1641,7 @@ def _render(cmd: str, r: dict) -> str:
                  table(["country", "id", "name", "act", "city", "first", "last", f"verified {r['emissions_year']}"],
                        rows, {1, 3, 5, 6, 7}),
                  "Yearly totals over these installations (derived):",
-                 table(["year", "verified t CO2e", "free allocation", "surrendered", "installations"],
+                 table(["year", "verified t CO2e", "free allocation", "surrendered", "installations with values"],
                        [[str(t["year"]), t["verified_emissions"], t["free_allocation"], t["surrendered"],
                          t["installations_with_values"]] for t in r["yearly_totals"]], {1, 2, 3, 4})]
         for i in r["installations"]:

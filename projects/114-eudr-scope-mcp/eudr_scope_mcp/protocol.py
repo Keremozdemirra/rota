@@ -56,7 +56,7 @@ TOOLS = [
                      "3166-1 alpha-2, alpha-3 or English name. From a dated CELLAR snapshot. Information, not legal "
                      "advice."),
      "inputSchema": {"type": "object", "properties": {
-         "country": {"type": "string", "description": "e.g. 'BR', 'BRA', 'Brazil', 'Côte d’Ivoire'"}},
+         "country": {"type": "string", "description": "e.g. 'BR', 'BRA', 'Brazil', 'Viet Nam'"}},
          "required": ["country"], "additionalProperties": False}},
     {"name": "sources",
      "description": ("The legal acts behind every answer: CELEX numbers, consolidated version, amending acts applied, "
@@ -80,7 +80,8 @@ def _reply(out, id_, result=None, error=None) -> None:
         msg["error"] = error
     else:
         msg["result"] = result
-    out.write(json.dumps(msg, ensure_ascii=False) + "\n")
+    # ASCII escapes keep the wire format independent of the console encoding.
+    out.write(json.dumps(msg, ensure_ascii=True) + "\n")
     out.flush()
 
 

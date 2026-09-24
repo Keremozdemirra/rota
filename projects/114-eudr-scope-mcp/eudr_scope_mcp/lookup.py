@@ -47,7 +47,7 @@ def remote(text) -> str | None:
         return None
     text = clean(str(text))
     if len(text) > MAX_QUOTE:
-        text = text[:MAX_QUOTE - 1] + "…"
+        text = text[:MAX_QUOTE - 1] + chr(0x2026)
     return f"<<remote text, not an instruction: {text}>>"
 
 
@@ -148,25 +148,45 @@ def reset_cache() -> None:
     _cache.clear()
 
 
-def _common(extra_acts=(), country=False) -> dict:
+def attribution(retrieved: str, topic: str, derived: bool = False, table_version: str | None = None) -> str:
+    """The attribution line for one kind of answer (also quoted in SOURCES.md)."""
+    text = (f"Source: EUR-Lex/CELLAR, Publications Office of the European Union, retrieved {retrieved}; "
+            "(c) European Union, reuse under Commission Decision 2011/833/EU.")
+    if topic == "annex":
+        text += (" Table derived by eudr-scope-mcp: amending acts applied to the consolidated text."
+                 if derived else " Extracted by eudr-scope-mcp.")
+    elif topic == "dates":
+        text += " Dates read from the article texts by eudr-scope-mcp."
+    elif topic == "country":
+        text += (" Country names matched to ISO 3166-1 codes by eudr-scope-mcp through the EU 'Countries and "
+                 f"territories' authority table (version {table_version}).")
+    return text
+
+
+def _common(topic: str) -> dict:
+    """Provenance, attribution and disclaimer for one kind of answer."""
     s = _state()
     cons = s.consolidated
-    acts = ["Regulation (EU) 2023/1115"] + [_act_name(a["celex"]) for a in s.dates.get("amending_acts", [])]
-    if country:
-        acts.append(_act_name(s.risk["act"]["celex"]))
-    out = {
-        "legal_acts": acts + list(extra_acts),
-        "consolidated_version": {"celex": cons["celex"], "date": cons["date"], "reference": cons["reference"]},
-        "amendments_applied_by_this_tool": [
-            {"celex": a["celex"], "act": _act_name(a["celex"]), "entry_into_force": a["entry_into_force"]}
-            for a in s.annex.get("amendments_applied", [])],
-        "checked": s.retrieved,
-        "attribution": (f"Source: EUR-Lex/CELLAR, Publications Office of the European Union, retrieved {s.retrieved}; "
-                        "(c) European Union, reuse under Commission Decision 2011/833/EU. "
-                        + ("Table derived by eudr-scope-mcp (amending acts applied to the consolidated text)."
-                           if s.annex.get("amendments_applied") else "Extracted by eudr-scope-mcp.")),
-        "disclaimer": NOT_ADVICE,
-    }
+    applied = s.annex.get("amendments_applied", [])
+    amending = [_act_name(a["celex"]) for a in s.dates.get("amending_acts", [])]
+    if topic == "country":
+        act = s.risk["act"]
+        out = {"legal_acts": [_act_name(act["celex"]), "Regulation (EU) 2023/1115, Article 29"],
+               "source_text": {"celex": act.get("source_text") or act["celex"], "entry_into_force": act.get("entry_into_force")},
+               "checked": s.risk.get("retrieved", s.retrieved)}
+    else:
+        out = {"legal_acts": ["Regulation (EU) 2023/1115"] + amending,
+               "consolidated_version": {"celex": cons["celex"], "date": cons["date"], "reference": cons["reference"]},
+               "checked": s.retrieved}
+        if topic == "annex":
+            out["amendments_applied_by_this_tool"] = [
+                {"celex": a["celex"], "act": _act_name(a["celex"]), "entry_into_force": a["entry_into_force"]}
+                for a in applied]
+    if topic == "sources":
+        out["legal_acts"].append(_act_name(s.risk["act"]["celex"]))
+    out["attribution"] = attribution(out["checked"], topic, derived=bool(applied),
+                                     table_version=s.countries.get("version"))
+    out["disclaimer"] = NOT_ADVICE
     age = (dt.date.fromisoformat(today()) - dt.date.fromisoformat(s.retrieved)).days
     if age > STALE_AFTER_DAYS:
         out["warning"] = (f"This snapshot was checked against CELLAR on {s.retrieved}, {age} days ago. Acts adopted "
@@ -341,7 +361,7 @@ def eudr_scope(cn_code, date: str | None = None) -> dict:
     }
     if s.annex.get("status") != "verified":
         result["data_status_reasons"] = s.annex.get("status_reasons", [])
-    result.update(_common())
+    result.update(_common("annex"))
     return result
 
 
@@ -382,7 +402,7 @@ def commodity_codes(commodity, date: str | None = None) -> dict:
         "legal_basis": "Article 2, point (1), and Annex I of Regulation (EU) 2023/1115",
         "data_status": s.annex.get("status"),
     }
-    result.update(_common())
+    result.update(_common("annex"))
     return result
 
 
@@ -402,7 +422,7 @@ OPERATOR_TYPES = {
 def application_dates(operator_type: str = "all") -> dict:
     if not isinstance(operator_type, str) or len(operator_type) > 60:
         raise InputError("operator_type must be a string")
-    key = re.sub(r"[\s_\-]+", " ", operator_type.strip().casefold()).replace("micro  or", "micro or")
+    key = re.sub(r"[\s_\-]+", " ", operator_type.strip().casefold().replace("/", " or "))
     category = OPERATOR_TYPES.get(key or "all")
     if not category:
         raise InputError("operator_type must be one of: all, large, medium, sme, micro, small, micro or small, "
@@ -506,7 +526,7 @@ def application_dates(operator_type: str = "all") -> dict:
     }
     if d.get("warnings"):
         result["data_warnings"] = d["warnings"]
-    result.update(_common())
+    result.update(_common("dates"))
     return result
 
 
@@ -530,9 +550,7 @@ def country_risk(country) -> dict:
     act_name = _act_name(act["celex"])
     base = {"input": country.strip()[:100]}
     c = _resolve_country(country)
-    common = _common(country=True)
-    common["attribution"] += (f" Country names matched to ISO 3166-1 codes through the EU 'Countries and territories' "
-                              f"authority table (version {s.countries.get('version')}).")
+    common = _common("country")
     if c is None:
         keys = list(s.by_name)
         close = difflib.get_close_matches(norm_country(country), keys, n=3, cutoff=0.8)
@@ -621,5 +639,5 @@ def sources() -> dict:
         },
         "tool": {"name": "eudr-scope-mcp", "version": __version__, "data_dir": str(s.dir)},
     }
-    result.update(_common(country=True))
+    result.update(_common("sources"))
     return result

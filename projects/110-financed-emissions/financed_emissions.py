@@ -561,7 +561,9 @@ def read_rows(text):
     known = set(REQUIRED_COLUMNS) | set(OPTIONAL_COLUMNS)
     unknown = [h for h in header if h and h not in known]
     if unknown:
-        notes.append("ignored columns: " + ", ".join(clean_text(u, 40) for u in unknown))
+        shown = ", ".join(clean_text(u, 40) for u in unknown[:20])
+        more = f" and {len(unknown) - 20} more" if len(unknown) > 20 else ""
+        notes.append(f"ignored columns: {shown}{more}")
     return header, rows, notes, delimiter
 
 
@@ -1327,7 +1329,7 @@ def render(result, markdown=False, explain=False):
     h2 = (lambda t: f"## {t}") if md else (lambda t: t)
     out = []
     head = (f"financed-emissions {result['version']}: {SHORT_SOURCE}. File {result['input']['file']}, "
-            f"{result['input']['rows']} rows, {report_currency}.")
+            f"{result['input']['rows']} row{'' if result['input']['rows'] == 1 else 's'}, {report_currency}.")
     out.append(("# Financed emissions\n\n" + head) if md else head)
 
     positions = result["positions"]

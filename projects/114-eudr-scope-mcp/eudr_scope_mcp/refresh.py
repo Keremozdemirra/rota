@@ -27,6 +27,7 @@ import tempfile
 from pathlib import Path
 
 from . import __version__, annex, cellar, countries, legal, xhtml
+from .lookup import attribution
 
 BASE = "32023R1115"
 COUNTRY_ACT = "32025R1093"
@@ -445,6 +446,7 @@ def write(result: dict, out_dir: Path) -> dict:
             fd, tmp = tempfile.mkstemp(prefix=f".{name}.", dir=out_dir)
             with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as fh:
                 fh.write(text)
+            os.chmod(tmp, 0o644)  # mkstemp creates 0600; the snapshot is meant to be read by anyone
             staged.append((tmp, out_dir / name))
         for tmp, final in staged:
             os.replace(tmp, final)
@@ -516,6 +518,11 @@ def sources_md(result: dict, manifest: dict) -> str:
         "",
     ]
     lines += [f"- {k.replace('_', ' ')}: {v}" for k, v in counts.items()]
+    lines += ["", "## Corrigenda and proposals", ""]
+    for corr in d["corrigenda"]:
+        lines.append(f"- {corr['celex']} ({corr['date']}): {'has an English version' if corr['english'] else 'no English version, so the English text is unaffected'}")
+    for prop in d["pending_proposals"]:
+        lines.append(f"- {prop['celex']} ({prop['date']}), a proposal, not law and not applied: {prop['title']}")
     fixes = [x for x in c["low"] + c["high"] if x["matched_by"].startswith("fixed")]
     moved = [x for x in c["low"] + c["high"] if "qualifier" in x["matched_by"]]
     lines += [
@@ -541,8 +548,10 @@ def sources_md(result: dict, manifest: dict) -> str:
         "  meaning (Article 6(2)).",
         "- Country authority table: same reuse notice (https://data.europa.eu/data/datasets/country).",
         "- Commission web content: CC BY 4.0 (https://commission.europa.eu/legal-notice_en).",
-        "- Attribution used in every answer: 'Source: EUR-Lex/CELLAR, Publications Office of the European",
-        f"  Union, retrieved {result['retrieved']}; (c) European Union. Table derived by eudr-scope-mcp.'",
+        "- Attribution lines carried by the answers:",
+        f"  - scope and commodity answers: {attribution(result['retrieved'], 'annex', bool(a['amendments_applied']))}",
+        f"  - date answers: {attribution(result['retrieved'], 'dates')}",
+        f"  - country answers: {attribution(result['retrieved'], 'country', table_version=result['countries']['version'])}",
         "",
         "Only the texts published in the Official Journal of the European Union are authentic. The consolidated",
         "text says of itself: 'This text is meant purely as a documentation tool and has no legal effect.'",

@@ -260,8 +260,10 @@ class Ref:
 
     def copy(self) -> "Ref":
         new = Ref.__new__(Ref)
-        for slot in Ref.__slots__:
-            setattr(new, slot, getattr(self, slot))
+        new.kind, new.prefix, new.book, new.sheet, new.sheet2 = self.kind, self.prefix, self.book, self.sheet, self.sheet2
+        new.r1, new.c1, new.r2, new.c2 = self.r1, self.c1, self.r2, self.c2
+        new.ra1, new.ca1, new.ra2, new.ca2 = self.ra1, self.ca1, self.ra2, self.ca2
+        new.name, new.spill = self.name, self.spill
         return new
 
     def bounds(self):
@@ -1712,7 +1714,9 @@ def check(wb: Workbook) -> dict:
     tables = []
     for s in wb.sheets:
         for (r, c), cell in s.cells.items():
-            if cell.kind == "e":
+            fi = s.info.get((r, c)) if cell.formula is not None else None
+            if cell.kind == "e" and not (fi is not None and fi.flags & F_REFERR and cell.value == "#REF!"):
+                # A formula containing #REF! is reported once, as ref-error, not again for its cached #REF!.
                 found.append(_finding("error-value", "warning", s.name, r, c, value=cell.value,
                                       formula=("=" + cell.formula) if cell.formula is not None else None))
             if cell.formula is None:
@@ -1721,7 +1725,6 @@ def check(wb: Workbook) -> dict:
                 no_cache += 1
             if cell.ftype == "dataTable":
                 tables.append(where(s.name, r, c))
-            fi = s.info.get((r, c))
             if fi is None:
                 continue
             if fi.flags & F_REFERR:
@@ -2368,10 +2371,7 @@ def _diff_names(before: Workbook, after: Workbook, tr: _Translator, risks: list)
         if norm_b(nm) != norm_a(other):
             item = {"change": "name-changed", "name": nm.name, "scope": scope, "before": "=" + nm.formula,
                     "after": "=" + other.formula}
-            if "#REF!" in other.formula.upper() and "#REF!" not in nm.formula.upper():
-                risks.append({"severity": "error", "code": "name-ref-error", "sheet": None, "cell": None,
-                              "reason": f"defined name {nm.name} now refers to #REF!"})
-            out.append(item)
+            out.append(item)  # a name that now refers to #REF! comes back as a new ref-error-in-name finding
     for key, (nm, scope) in amap.items():
         if key not in bmap:
             out.append({"change": "name-added", "name": nm.name, "scope": scope, "after": "=" + nm.formula})
@@ -2400,10 +2400,9 @@ def _diff_links(before: Workbook, after: Workbook, risks: list) -> list:
     akeys = {_link_key(x): x for x in after.links}
     for key, link in akeys.items():
         if key not in bkeys:
+            # The risk itself is reported once, as the new external-link finding of the after workbook.
             out.append({"change": "link-added", "index": link.index, "kind": link.kind,
                         "target": mask(link.target) if link.target else None, "detail": link.detail})
-            risks.append({"severity": "warning", "code": "link-added", "sheet": None, "cell": None,
-                          "reason": f"external link [{link.index}] added", "target": mask(link.target) if link.target else link.detail})
     for key, link in bkeys.items():
         if key not in akeys:
             out.append({"change": "link-removed", "index": link.index, "kind": link.kind,

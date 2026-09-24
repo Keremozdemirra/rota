@@ -1146,6 +1146,10 @@ def main(argv: list[str] | None = None) -> int:
         late = ", ".join(t for t in target[1:] if t in OWN_FLAGS)
         print(f"mcp-vitals: {late} after the command is read as part of the server's command line; "
               "put mcp-vitals options before it.", file=sys.stderr)
+        # A CI job that wrote `mcp-vitals npx -y pkg --strict` believes it is guarded;
+        # passing with exit 0 would be the silent failure --strict exists to prevent.
+        if "--strict" in target[1:]:
+            return 2
 
     for p in a.config:
         p = p.expanduser()

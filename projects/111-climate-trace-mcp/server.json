@@ -1,0 +1,22 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Keremozdemirra/climate-trace-mcp",
+  "title": "Climate TRACE MCP (unofficial)",
+  "description": "Climate TRACE emission estimates for assets and countries, with owners and each figure's source.",
+  "repository": {
+    "url": "https://github.com/Keremozdemirra/climate-trace-mcp",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "climate-trace-mcp",
+      "version": "0.1.0",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

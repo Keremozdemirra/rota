@@ -24,8 +24,10 @@ and still work.
 from __future__ import annotations
 
 import argparse
+import bisect
 import datetime as dt
 import http.client
+import itertools
 import json
 import os
 import re
@@ -67,36 +69,90 @@ DEFAULT_FAIL_ON = "archived,gone"
 
 # ---------------------------------------------------------------- links
 
-# First path segments that are sections of github.com rather than accounts, so
-# github.com/<one of these>/<x> is never a repository.
-SITE_SECTIONS = frozenset("""
-about account advisories apps blog codespaces collections contact copilot customer-stories dashboard
-education enterprise events explore features git-guides issues join login logout marketplace mobile new
-nonprofit notifications open-source organizations orgs password_reset pricing pulls readme resources search
-security sessions settings signup site solutions sponsors stars team topics trending user-attachments users
-watching
+# Names GitHub keeps for itself, so github.com/<name>/... is one of its own pages and never an
+# account's repository: the list in github-reserved-names 2.2.0 (published 2026-05-28,
+# https://github.com/Mottie/github-reserved-names, checked 2026-09-24). Its README says the list
+# is not complete. None of these names owns a repository in the agent-vitals census of
+# 2026-09-23; `github` and `skills`, which do, are not on it. The list is used under its licence:
+#
+#   The MIT License (MIT)
+#
+#   Copyright (c) Rob Garrison <wowmotty@gmail.com>
+#
+#   Permission is hereby granted, free of charge, to any person obtaining a copy
+#   of this software and associated documentation files (the "Software"), to deal
+#   in the Software without restriction, including without limitation the rights
+#   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#   copies of the Software, and to permit persons to whom the Software is
+#   furnished to do so, subject to the following conditions:
+#
+#   The above copyright notice and this permission notice shall be included in
+#   all copies or substantial portions of the Software.
+#
+#   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#   THE SOFTWARE.
+RESERVED = frozenset("""
+300 302 400 401 402 403 404 405 406 407 408 409 410 411 412 413 414 415 416 417 418 419 420 421 422
+423 424 425 426 427 428 429 430 431 500 501 502 503 504 505 506 507 508 509 510 511 693 694 695 900
+about account admin advisories anonymous any api apps attributes auth billing blob blog bounty
+branches business businesses c cache careers case-studies categories central certification changelog
+chat cla cloud codereview codespaces collection collections comments commit commits companies
+compare contact contributing cookbook copilot coupons customer customer-stories customers dashboard
+dashboard-feed dashboards design develop developer diff discover discussions downloads downtime
+editor editors edu education enterprise enterprises events explore featured features feed files
+fixtures forked garage ghost gist gists git-guides github-copilot graphs groups guide guides help
+help-wanted home hooks hosting hovercards identity images inbox individual info integration
+interfaces introduction invalid-email-address investors issues jobs join journal journals lab labs
+languages launch layouts learn legal library linux listings lists login logos logout mac maintenance
+malware man marketplace mcp mention mentioned mentioning mentions migrating milestones mine mirrors
+mobile navigation network new news newsletter newsroom none nonprofit nonprofits notices
+notifications oauth offer open-source organisations organizations orgs pages partners payments
+personal plans plugins popular popularity posts press preview pricing professional projects pulls
+raw readme recommendations redeem releases render reply repos repositories resources restore revert
+save-net-neutrality saved scraping search security services sessions settings shareholders showcases
+signin signup site site-policy sitemap social-impact socials spam sponsors ssh staff starred stars
+static status statuses storage store stories styleguide subscriptions suggest suggestion suggestions
+support suspended talks teach teacher teachers teaching team teams ten terms timeline topic topics
+tos tour train training translations tree trending undefined updates user-attachments username users
+visualization w watching why-github wiki wikis windows works-with www0 www1 www2 www3 www4 www5 www6
+www7 www8 www9
 """.split())
+# github.com sections that list does not have. This tool's additions; none of them owns a
+# repository in the census either.
+SITE_SECTIONS = RESERVED | {"models", "password_reset", "premium-support", "solutions"}
+# The GitHub MCP Registry shows a server at github.com/mcp/<owner>/<repo>, e.g.
+# github.com/mcp/github/github-mcp-server for github/github-mcp-server: a link to that repository.
+MCP_REGISTRY = "mcp"
 
-# A link into a repository's issues, pull requests, discussions or history cites
-# one conversation or one change inside a list entry's description. The entry
-# is the repository itself, so these are not checked. See the README.
-CONVERSATIONS = frozenset({"issues", "pull", "pulls", "discussions", "commit", "commits", "compare", "security"})
-
-# The lookbehind keeps gist.github.com, api.github.com, user@github.com and URLs
-# nested inside another URL's path out, while still taking markdown targets,
-# autolinks, href values, bare URLs and scheme-less github.com/owner/repo.
+# The lookbehind keeps gist.github.com, api.github.com, user@github.com and URLs nested in
+# another URL's path out, while taking link destinations, autolinks, href values, bare URLs
+# (also inside _emphasis_) and scheme-less github.com/owner/repo. Every repeat is bounded, so a
+# hostile line costs time in proportion to its length.
 GITHUB_LINK = re.compile(
-    r"(?:(?<![\w.@/:-])(?:https?:)?//|(?<![\w.@/:-]))(?:www\.)?github\.com/"
-    r"(?P<owner>[A-Za-z0-9_.-]*)(?:/(?P<repo>[A-Za-z0-9_.-]*))?(?:/(?P<after>[A-Za-z0-9_.-]*))?",
+    r"(?:(?<![A-Za-z0-9.@/:-])(?:https?:)?//|(?<![A-Za-z0-9.@/:-]))(?:www\.)?github\.com/"
+    r"(?P<owner>[A-Za-z0-9_.-]{0,200})(?:/(?P<repo>[A-Za-z0-9_.-]{0,200}))?"
+    r"(?P<rest>(?:/[^\s/?#<>()\[\]{}\"'`|\\^]{0,200}){0,8})",
     re.IGNORECASE,
 )
-IMAGE = re.compile(r"!\[[^\]]*\]\(\s*<?([^)\s>]+)")
-IMG_TAG = re.compile(r"<(?:img|source)\b[^>]*?\b(?:src|srcset)\s*=\s*[\"']?([^\"'\s>]+)", re.IGNORECASE)
-CODE_SPAN = re.compile(r"(`+)(?!`).+?(?<!`)\1(?!`)")
-# Indentation is not limited to three spaces: in lists, fences sit inside
-# nested items, and missing one would check a `git clone` line as an entry.
-FENCE_OPEN = re.compile(r"^\s*(`{3,}|~{3,})(.*)$")
-FENCE_CLOSE = re.compile(r"^\s*(`{3,}|~{3,})\s*$")
+# GFM leaves these out of the end of a bare URL: they end the sentence, not the link.
+BARE_TRAILING = "?!.,:*_~"
+IMAGE = re.compile(r"!\[(?:[^\[\]\n]|\[[^\[\]\n]{0,999}\]){0,999}\]\(\s{0,99}<?([^)\s>]{1,4000})")
+# Any src or srcset value is something embedded (an image, mostly), never a link to follow,
+# in whichever tag and on whichever line of a tag it stands.
+SRC_ATTR = re.compile(r"(?<!\w)(?:src|srcset)\s{0,20}=\s{0,20}(?:\"([^\"]{0,4000})\"|'([^']{0,4000})'|([^\s\"'>]{1,4000}))",
+                      re.IGNORECASE)
+REF_DEF = re.compile(r"\s{0,3}\[(?P<label>[^\[\]\n]{1,999})\]:[ \t]*<?(?P<url>[^\s<>]{1,4000})")
+BACKTICKS = re.compile(r"`+")
+BRACKET = re.compile(r"[\[\]]")
+# Indentation is not limited to three spaces: in lists, fences sit inside nested items.
+FENCE_OPEN = re.compile(r"\s*(`{3,}|~{3,})(.*)")
+FENCE_CLOSE = re.compile(r"\s*(`{3,}|~{3,})\s*")
+LIST_ITEM = re.compile(r"\s*(?:[-+*]|\d{1,9}[.)])(?:\s|$)")
 # Validators, always applied with fullmatch: "$" would also accept a trailing newline.
 OWNER = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]*")
 REPO = re.compile(r"[A-Za-z0-9._-]{1,100}")
@@ -109,80 +165,210 @@ PROFILE, SITE_PAGE, CONVERSATION, IMAGE_LINK = "profile", "site-page", "conversa
 NOT_ENTRIES = {
     PROFILE: ("link to a profile or organisation", "links to profiles or organisations"),
     SITE_PAGE: ("link to a GitHub page that is not a repository", "links to GitHub pages that are not repositories"),
-    CONVERSATION: ("link to an issue, pull request, discussion or commit",
-                   "links to issues, pull requests, discussions or commits"),
+    CONVERSATION: ("link to one issue, pull request, discussion, commit, comparison or advisory",
+                   "links to single issues, pull requests, discussions, commits, comparisons or advisories"),
     IMAGE_LINK: ("image", "images"),
 }
+UNCLOSED_FENCE = "a code fence opened here is never closed; nothing after it was read"
+UNCLOSED_COMMENT = "an HTML comment opened here is never closed; nothing after it was read"
 
 
-def drop_comments(line: str, in_comment: bool) -> tuple[str, bool]:
-    """The part of a line outside HTML comments, and whether a comment is still open after it."""
-    kept, i = [], 0
-    while True:
-        if in_comment:
-            j = line.find("-->", i)
-            if j < 0:
-                return " ".join(kept), True
-            i, in_comment = j + 3, False
-        else:
-            j = line.find("<!--", i)
-            if j < 0:
-                kept.append(line[i:])
-                return " ".join(kept), False
-            kept.append(line[i:j])
-            i, in_comment = j + 4, True
+def one_item(rest: list[str]) -> bool:
+    """Whether the path after owner/repo names one issue, pull request, discussion, commit,
+    comparison or security advisory. Such a link cites that item inside an entry's
+    description; the entry is the repository. Its other pages, the issue list included, count."""
+    first = rest[0].lower() if rest else ""
+    item = rest[1] if len(rest) > 1 else ""
+    if first in ("issues", "pull", "discussions"):
+        return item.isdigit()
+    if first in ("commit", "compare"):
+        return bool(item)
+    return first == "security" and item.lower() == "advisories" and len(rest) > 2 and bool(rest[2])
 
 
-def classify(owner: str, repo: str | None, after: str | None) -> tuple[str | None, str | None]:
+def classify(owner: str, repo: str | None, rest: list[str]) -> tuple[str | None, str | None]:
     """(owner/repo, None) for a link to a repository, (None, reason) for anything else."""
-    if not repo or not repo.strip("."):
-        name = owner.rstrip(".")
-        if not name or name.lower() in SITE_SECTIONS or not OWNER.fullmatch(name):
+    if owner.lower() == MCP_REGISTRY and repo and rest:
+        owner, repo, rest = repo, rest[0], rest[1:]
+    if not repo:
+        if not owner or owner.lower() in SITE_SECTIONS or not OWNER.fullmatch(owner):
             return None, SITE_PAGE
         return None, PROFILE
     if owner.lower() in SITE_SECTIONS or not OWNER.fullmatch(owner):
         return None, SITE_PAGE
-    if after is None:
-        # A bare URL at the end of a sentence carries the full stop with it.
-        repo = repo.rstrip(".")
     if repo.lower().endswith(".git"):
         repo = repo[:-4]
     if not REPO.fullmatch(repo) or repo in (".", ".."):
         return None, SITE_PAGE
-    if after and after.lower() in CONVERSATIONS:
+    if one_item(rest):
         return None, CONVERSATION
     if not REPO_NAME.fullmatch(f"{owner}/{repo}"):
         return None, SITE_PAGE
     return f"{owner}/{repo}", None
 
 
-def scan(text: str) -> tuple[list[tuple[int, str]], list[tuple[int, str, str]]]:
-    """(line, owner/repo) for every repository link; (line, url, reason) for GitHub links that are not entries."""
-    found, skipped = [], []
-    fence: tuple[str, int] | None = None
-    in_comment = False
+def label_key(label: str) -> str:
+    return " ".join(label.split()).casefold()
+
+
+def indent(line: str) -> int:
+    expanded = line.expandtabs(4)
+    return len(expanded) - len(expanded.lstrip(" "))
+
+
+def closing_run(line: str, start: int, run: int) -> int:
+    """Where the next run of exactly `run` backticks starts, or -1."""
+    j = start
+    while True:
+        j = line.find("`" * run, j)
+        if j < 0:
+            return -1
+        k = BACKTICKS.match(line, j).end()
+        if k - j == run:
+            return j
+        j = k
+
+
+def strip_inline(line: str, in_comment: bool) -> tuple[str, bool, bool]:
+    """The line without code spans and HTML comments; whether a comment is open at its end;
+    whether that comment opened on this line. Whichever starts first wins, as in CommonMark:
+    `<!--` inside a code span is code, and a comment ends at the first -->, in backticks or not."""
+    out, i, opened = [], 0, False
+    while i < len(line):
+        if in_comment:
+            j = line.find("-->", i)
+            if j < 0:
+                return "".join(out), True, opened
+            out.append(" ")
+            i, in_comment, opened = j + 3, False, False
+            continue
+        tick, start = line.find("`", i), line.find("<!--", i)
+        if start >= 0 and (tick < 0 or start < tick):
+            out.append(line[i:start] + " ")
+            # <!--> and <!---> are whole comments already
+            for whole in ("<!-->", "<!--->"):
+                if line.startswith(whole, start):
+                    i = start + len(whole)
+                    break
+            else:
+                i, in_comment, opened = start + 4, True, True
+            continue
+        if tick < 0:
+            out.append(line[i:])
+            break
+        run = BACKTICKS.match(line, tick).end() - tick
+        close = closing_run(line, tick + run, run)
+        if close < 0:  # backticks without a partner are text
+            out.append(line[i:tick + run])
+            i = tick + run
+        else:
+            out.append(line[i:tick] + " ")
+            i = close + run
+    return "".join(out), in_comment, opened
+
+
+def visible(text: str, warnings: list | None = None, path: str = "") -> list[tuple[int, str]]:
+    """(line number, text) for what a reader sees as Markdown: no fenced code, HTML comments or
+    code spans. A fence or comment still open at the end of the file goes into `warnings`."""
+    out: list[tuple[int, str]] = []
+    fence: tuple | None = None  # (character, length, indentation, ends with its list item, line)
+    comment_line = 0
+    prev = ""
     # split("\n"), not splitlines(): editors and git count only newlines, and a
     # U+2028 or form feed inside a description must not shift every line after it.
     for n, line in enumerate(text.split("\n"), 1):
         line = line.rstrip("\r")
         if fence:
-            m = FENCE_CLOSE.match(line)
+            m = FENCE_CLOSE.fullmatch(line)
             if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= fence[1]:
                 fence = None
-            continue
-        if not in_comment:
-            m = FENCE_OPEN.match(line)
+                continue
+            # A block inside a list item ends when the item does, closed or not, as on GitHub.
+            if not (fence[3] and line.strip() and indent(line) < fence[2]):
+                continue
+            fence = None
+        if not comment_line:
+            m = FENCE_OPEN.fullmatch(line)
             # three backticks with more backticks after them on the line are inline code, not a fence
             if m and not (m.group(1)[0] == "`" and "`" in m.group(2)):
-                fence = (m.group(1)[0], len(m.group(1)))
+                depth = indent(line)
+                in_item = depth >= 2 and bool(prev) and (bool(LIST_ITEM.match(prev)) or indent(prev) >= 2)
+                fence = (m.group(1)[0], len(m.group(1)), depth, in_item, n)
                 continue
-        line, in_comment = drop_comments(CODE_SPAN.sub(" ", line), in_comment)
-        images = [m.span(1) for m in IMAGE.finditer(line)] + [m.span(1) for m in IMG_TAG.finditer(line)]
+        seen, still_open, opened = strip_inline(line, bool(comment_line))
+        comment_line = n if opened else (comment_line if still_open else 0)
+        if line.strip():
+            prev = line
+        out.append((n, seen))
+    if warnings is not None:
+        if fence:
+            warnings.append({"file": path, "line": fence[4], "message": UNCLOSED_FENCE})
+        if comment_line:
+            warnings.append({"file": path, "line": comment_line, "message": UNCLOSED_COMMENT})
+    return out
+
+
+def image_only_labels(lines: list[tuple[int, str]]) -> set[str]:
+    """Reference labels used as images and never as links: [![CI][badge]][runs] makes `badge`
+    one. Their definitions point at images, so their URLs are not entries."""
+    images, links = set(), set()
+    for _, line in lines:
+        if "[" not in line:
+            continue
+        stack, close_of = [], {}
+        for m in BRACKET.finditer(line):
+            if m.group() == "[":
+                stack.append(m.start())
+            elif stack:
+                close_of[stack.pop()] = m.start()
+        lead = len(line) - len(line.lstrip())
+        consumed = set()
+        for open_ in sorted(close_of):
+            if open_ in consumed:
+                continue
+            close = close_of[open_]
+            nxt = line[close + 1:close + 2]
+            if nxt == "(" or (nxt == ":" and open_ == lead):  # inline link, or a definition
+                continue
+            if nxt == "[" and close + 1 in close_of:  # [text][label], or [label][] for short
+                label = line[close + 2:close_of[close + 1]] or line[open_ + 1:close]
+                consumed.add(close + 1)
+            else:
+                label = line[open_ + 1:close]
+            if 0 < len(label) < 1000:
+                (images if open_ > 0 and line[open_ - 1] == "!" else links).add(label_key(label))
+    return images - links
+
+
+def scan(text: str, warnings: list | None = None, path: str = ""
+         ) -> tuple[list[tuple[int, str]], list[tuple[int, str, str]]]:
+    """(line, owner/repo) for every repository link; (line, url, reason) for GitHub links that are not entries."""
+    found, skipped = [], []
+    lines = visible(text, warnings, path)
+    image_labels = image_only_labels(lines)
+    for n, line in lines:
+        spans = [m.span(1) for m in IMAGE.finditer(line)]
+        spans += [m.span(m.lastindex) for m in SRC_ATTR.finditer(line) if m.lastindex]
+        ref = REF_DEF.match(line)
+        if ref and label_key(ref.group("label")) in image_labels:
+            spans.append(ref.span("url"))
+        spans.sort()
+        starts = [a for a, _ in spans]
+        ends = list(itertools.accumulate((b for _, b in spans), max))
         for m in GITHUB_LINK.finditer(line):
-            if any(a <= m.start() < b for a, b in images):
+            start, end = m.span()
+            k = bisect.bisect_right(starts, start)
+            if k and start < ends[k - 1]:
                 skipped.append((n, m.group(0), IMAGE_LINK))
                 continue
-            name, reason = classify(m.group("owner"), m.group("repo"), m.group("after"))
+            delimited = (line[max(0, start - 3):start].endswith(("](", "](<", "<", '"', "'", "="))
+                         or bool(ref and ref.start("url") == start))
+            if not delimited:
+                while end > start and line[end - 1] in BARE_TRAILING:
+                    end -= 1
+                m = GITHUB_LINK.match(line, start, end) or m
+            rest = [seg for seg in m.group("rest").split("/")[1:]]
+            name, reason = classify(m.group("owner"), m.group("repo"), rest)
             if name:
                 found.append((n, name))
             else:
@@ -200,11 +386,13 @@ def norm(path: str) -> str:
     return p.replace(os.sep, "/")
 
 
-def collect(sources: list[tuple[str, str]], selected: dict | None = None) -> tuple[list[dict], dict[str, int]]:
+def collect(sources: list[tuple[str, str]], selected: dict | None = None,
+            warnings: list | None = None) -> tuple[list[dict], dict[str, int]]:
     """Entries deduplicated by repository (case-insensitive, as GitHub is), every location kept.
 
-    `sources` is [(path as given, text)]; `selected` maps a normalised path (or
-    None for every file) to the line numbers to keep, and limits the entries to them."""
+    `sources` is [(path as given, text)]; `selected` maps a normalised path (or None for
+    every file) to the line numbers to keep, and limits the entries to them. A fence or
+    comment left open goes into `warnings`."""
     repos: dict[str, dict] = {}
     ignored: Counter = Counter()
 
@@ -214,7 +402,7 @@ def collect(sources: list[tuple[str, str]], selected: dict | None = None) -> tup
         return any(n in selected[key] for key in (norm(path), None) if key in selected)
 
     for path, text in sources:
-        found, skipped = scan(text)
+        found, skipped = scan(text, warnings, path)
         for n, _url, reason in skipped:
             if wanted(path, n):
                 ignored[reason] += 1

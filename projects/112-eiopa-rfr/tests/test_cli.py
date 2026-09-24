@@ -67,7 +67,7 @@ class Cli(Isolated):
     def test_curve_and_params(self):
         code, out, _ = self.run_cli("curve", "EUR", "--date", "2026-08", "--variant", "both")
         self.assertEqual(code, 0)
-        self.assertIn("    150  0.03338     0.03338", out)
+        self.assertIn("\n    150  0.03338     0.03364\n", out)  # with VA re-extrapolated, own alpha
         code, out, _ = self.run_cli("params", "all", "--date", "2026-08")
         self.assertEqual(code, 0)
         self.assertIn("CO    Colombia                 10    50    4.2  0.145783      35    n/a", out)

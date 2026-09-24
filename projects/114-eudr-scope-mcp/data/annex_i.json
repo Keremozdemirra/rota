@@ -1,0 +1,3800 @@
+{
+ "dataset": "Annex I to Regulation (EU) 2023/1115: relevant commodities and relevant products",
+ "retrieved": "2026-09-24",
+ "status": "verified",
+ "status_reasons": [],
+ "consolidated": {
+  "celex": "02023R1115-20251226",
+  "date": "2025-12-26",
+  "reference": "02023R1115 — EN — 26.12.2025 — 002.001",
+  "amended_by": [
+   "32024R3234",
+   "32025R2650"
+  ],
+  "url": "https://publications.europa.eu/resource/celex/02023R1115-20251226",
+  "disclaimer": "This text is meant purely as a documentation tool and has no legal effect."
+ },
+ "amendments_applied": [
+  {
+   "celex": "32026R2102",
+   "title": "Commission Delegated Regulation (EU) 2026/2102 of 13 July 2026 amending Regulation (EU) 2023/1115 of the European Parliament and of the Council as regards the list of relevant commodities and relevant products",
+   "published": "2026-09-17",
+   "entry_into_force": "2026-09-18",
+   "operations": 57,
+   "log": [
+    {
+     "point": "(1)",
+     "action": "table note",
+     "detail": "note (1) on Cattle"
+    },
+    {
+     "point": "(2)",
+     "action": "table note",
+     "detail": "note (2) on Oil palm"
+    },
+    {
+     "point": "(3)",
+     "action": "table note",
+     "detail": "note (3) on Rubber"
+    },
+    {
+     "point": "(4)",
+     "action": "table note",
+     "detail": "note (4) on Wood"
+    },
+    {
+     "point": "(5)",
+     "action": "table note",
+     "detail": "note (5) on all relevant products"
+    },
+    {
+     "point": "(6)(a)",
+     "action": "replace",
+     "removed": [
+      "B01"
+     ],
+     "added": [
+      "32026R2102-01"
+     ]
+    },
+    {
+     "point": "(6)(b)",
+     "action": "insert",
+     "after": "B04",
+     "added": [
+      "32026R2102-02"
+     ]
+    },
+    {
+     "point": "(6)(c)",
+     "action": "delete",
+     "removed": [
+      "B08",
+      "B09",
+      "B10"
+     ]
+    },
+    {
+     "point": "(6)(d)",
+     "action": "add note",
+     "removed": [
+      "B12"
+     ],
+     "added": [
+      "32026R2102-03"
+     ]
+    },
+    {
+     "point": "(6)(e)",
+     "action": "insert",
+     "after": "B17",
+     "added": [
+      "32026R2102-04"
+     ]
+    },
+    {
+     "point": "(6)(f)",
+     "action": "replace",
+     "removed": [
+      "B18",
+      "B19",
+      "B20",
+      "B21"
+     ],
+     "added": [
+      "32026R2102-05",
+      "32026R2102-06",
+      "32026R2102-07",
+      "32026R2102-08"
+     ]
+    },
+    {
+     "point": "(6)(g)",
+     "action": "insert",
+     "after": "32026R2102-08",
+     "added": [
+      "32026R2102-09",
+      "32026R2102-10",
+      "32026R2102-11"
+     ]
+    },
+    {
+     "point": "(6)(h)",
+     "action": "replace",
+     "removed": [
+      "B22"
+     ],
+     "added": [
+      "32026R2102-12"
+     ]
+    },
+    {
+     "point": "(6)(i)",
+     "action": "insert",
+     "after": "32026R2102-12",
+     "added": [
+      "32026R2102-13",
+      "32026R2102-14",
+      "32026R2102-15"
+     ]
+    },
+    {
+     "point": "(6)(j)",
+     "action": "replace",
+     "removed": [
+      "B23"
+     ],
+     "added": [
+      "32026R2102-16"
+     ]
+    },
+    {
+     "point": "(6)(k)",
+     "action": "insert",
+     "after": "32026R2102-16",
+     "added": [
+      "32026R2102-17"
+     ]
+    },
+    {
+     "point": "(6)(l)",
+     "action": "replace",
+     "removed": [
+      "B24"
+     ],
+     "added": [
+      "32026R2102-18"
+     ]
+    },
+    {
+     "point": "(6)(m)",
+     "action": "replace",
+     "removed": [
+      "B25"
+     ],
+     "added": [
+      "32026R2102-19"
+     ]
+    },
+    {
+     "point": "(6)(n)",
+     "action": "insert",
+     "after": "32026R2102-19",
+     "added": [
+      "32026R2102-20",
+      "32026R2102-21",
+      "32026R2102-22",
+      "32026R2102-23",
+      "32026R2102-24",
+      "32026R2102-25",
+      "32026R2102-26"
+     ]
+    },
+    {
+     "point": "(6)(o)",
+     "action": "replace",
+     "removed": [
+      "B26"
+     ],
+     "added": [
+      "32026R2102-27"
+     ]
+    },
+    {
+     "point": "(6)(p)",
+     "action": "replace",
+     "removed": [
+      "B27"
+     ],
+     "added": [
+      "32026R2102-28"
+     ]
+    },
+    {
+     "point": "(6)(q)",
+     "action": "replace",
+     "removed": [
+      "B28"
+     ],
+     "added": [
+      "32026R2102-29"
+     ]
+    },
+    {
+     "point": "(6)(r)",
+     "action": "replace",
+     "removed": [
+      "B29"
+     ],
+     "added": [
+      "32026R2102-30"
+     ]
+    },
+    {
+     "point": "(6)(s)",
+     "action": "insert",
+     "after": "32026R2102-30",
+     "added": [
+      "32026R2102-31",
+      "32026R2102-32"
+     ]
+    },
+    {
+     "point": "(6)(t)",
+     "action": "replace",
+     "removed": [
+      "B30"
+     ],
+     "added": [
+      "32026R2102-33"
+     ]
+    },
+    {
+     "point": "(6)(u)",
+     "action": "add note",
+     "removed": [
+      "B34"
+     ],
+     "added": [
+      "32026R2102-34"
+     ]
+    },
+    {
+     "point": "(6)(v)",
+     "action": "delete",
+     "removed": [
+      "B35"
+     ]
+    },
+    {
+     "point": "(6)(w)",
+     "action": "replace",
+     "removed": [
+      "B37"
+     ],
+     "added": [
+      "32026R2102-35"
+     ]
+    },
+    {
+     "point": "(6)(x)",
+     "action": "add note",
+     "removed": [
+      "B39"
+     ],
+     "added": [
+      "32026R2102-36"
+     ]
+    },
+    {
+     "point": "(6)(y)",
+     "action": "delete",
+     "removed": [
+      "B40"
+     ]
+    },
+    {
+     "point": "(6)(z)",
+     "action": "add note",
+     "removed": [
+      "B41"
+     ],
+     "added": [
+      "32026R2102-37"
+     ]
+    },
+    {
+     "point": "(6)(aa)",
+     "action": "replace",
+     "removed": [
+      "B42"
+     ],
+     "added": [
+      "32026R2102-38"
+     ]
+    },
+    {
+     "point": "(6)(bb)",
+     "action": "replace",
+     "removed": [
+      "B46"
+     ],
+     "added": [
+      "32026R2102-39"
+     ]
+    },
+    {
+     "point": "(6)(cc)",
+     "action": "replace",
+     "removed": [
+      "B47"
+     ],
+     "added": [
+      "32026R2102-40"
+     ]
+    },
+    {
+     "point": "(6)(dd)",
+     "action": "replace",
+     "removed": [
+      "B48"
+     ],
+     "added": [
+      "32026R2102-41"
+     ]
+    },
+    {
+     "point": "(6)(ee)",
+     "action": "replace",
+     "removed": [
+      "B49"
+     ],
+     "added": [
+      "32026R2102-42"
+     ]
+    },
+    {
+     "point": "(6)(ff)",
+     "action": "replace",
+     "removed": [
+      "B50"
+     ],
+     "added": [
+      "32026R2102-43"
+     ]
+    },
+    {
+     "point": "(6)(gg)",
+     "action": "replace",
+     "removed": [
+      "B51"
+     ],
+     "added": [
+      "32026R2102-44"
+     ]
+    },
+    {
+     "point": "(6)(hh)",
+     "action": "replace",
+     "removed": [
+      "B52"
+     ],
+     "added": [
+      "32026R2102-45"
+     ]
+    },
+    {
+     "point": "(6)(ii)",
+     "action": "replace",
+     "removed": [
+      "B53"
+     ],
+     "added": [
+      "32026R2102-46"
+     ]
+    },
+    {
+     "point": "(6)(jj)",
+     "action": "replace",
+     "removed": [
+      "B54"
+     ],
+     "added": [
+      "32026R2102-47"
+     ]
+    },
+    {
+     "point": "(6)(kk)",
+     "action": "replace",
+     "removed": [
+      "B55"
+     ],
+     "added": [
+      "32026R2102-48"
+     ]
+    },
+    {
+     "point": "(6)(ll)",
+     "action": "replace",
+     "removed": [
+      "B56"
+     ],
+     "added": [
+      "32026R2102-49"
+     ]
+    },
+    {
+     "point": "(6)(mm)",
+     "action": "replace",
+     "removed": [
+      "B57"
+     ],
+     "added": [
+      "32026R2102-50"
+     ]
+    },
+    {
+     "point": "(6)(nn)",
+     "action": "replace",
+     "removed": [
+      "B58"
+     ],
+     "added": [
+      "32026R2102-51"
+     ]
+    },
+    {
+     "point": "(6)(oo)",
+     "action": "replace",
+     "removed": [
+      "B59"
+     ],
+     "added": [
+      "32026R2102-52"
+     ]
+    },
+    {
+     "point": "(6)(pp)",
+     "action": "replace",
+     "removed": [
+      "B60"
+     ],
+     "added": [
+      "32026R2102-53"
+     ]
+    },
+    {
+     "point": "(6)(qq)",
+     "action": "replace",
+     "removed": [
+      "B61"
+     ],
+     "added": [
+      "32026R2102-54"
+     ]
+    },
+    {
+     "point": "(6)(rr)",
+     "action": "replace",
+     "removed": [
+      "B62"
+     ],
+     "added": [
+      "32026R2102-55"
+     ]
+    },
+    {
+     "point": "(6)(ss)",
+     "action": "replace",
+     "removed": [
+      "B63"
+     ],
+     "added": [
+      "32026R2102-56"
+     ]
+    },
+    {
+     "point": "(6)(tt)",
+     "action": "replace",
+     "removed": [
+      "B64"
+     ],
+     "added": [
+      "32026R2102-57"
+     ]
+    },
+    {
+     "point": "(6)(uu)",
+     "action": "replace",
+     "removed": [
+      "B65"
+     ],
+     "added": [
+      "32026R2102-58"
+     ]
+    },
+    {
+     "point": "(6)(vv)",
+     "action": "replace",
+     "removed": [
+      "B66"
+     ],
+     "added": [
+      "32026R2102-59"
+     ]
+    },
+    {
+     "point": "(6)(ww)",
+     "action": "replace",
+     "removed": [
+      "B67"
+     ],
+     "added": [
+      "32026R2102-60",
+      "32026R2102-61"
+     ]
+    },
+    {
+     "point": "(6)(xx)",
+     "action": "replace",
+     "removed": [
+      "B68"
+     ],
+     "added": [
+      "32026R2102-62",
+      "32026R2102-63",
+      "32026R2102-64",
+      "32026R2102-65",
+      "32026R2102-66",
+      "32026R2102-67"
+     ]
+    },
+    {
+     "point": "(6)(yy)",
+     "action": "replace",
+     "removed": [
+      "B69"
+     ],
+     "added": [
+      "32026R2102-68"
+     ]
+    },
+    {
+     "point": "(6)(zz)",
+     "action": "replace",
+     "removed": [
+      "B70"
+     ],
+     "added": [
+      "32026R2102-69"
+     ]
+    }
+   ]
+  }
+ ],
+ "intro": [
+  "The following table lists goods as classified in the Combined Nomenclature set out in Annex I to Regulation (EEC) No 2658/87 that are referred to in Article 1 of this Regulation.",
+  "Except for by-products of a manufacturing process, where that process involved material that was not waste as defined in Article 3, point (1), of Directive 2008/98/EC, this Regulation does not apply to goods if they are produced entirely from material that has completed its lifecycle and would otherwise have been discarded as waste as defined in Article 3, point (1), of that Directive."
+ ],
+ "table_notes": [
+  {
+   "number": "1",
+   "column": "Relevant commodity",
+   "attached_to": "Cattle",
+   "text": "This Regulation only applies to cattle of the genus Bos and its sub-generas: Bos, Bibos, Novibos, and Poephagus falling under HS subheadings 0102 21 and 0102 29. It does not apply to buffalo (Syncerus genus) or bison (Bison genus) or any other live bovine animals.",
+   "valid_from": "2026-09-18",
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (1)"
+   }
+  },
+  {
+   "number": "2",
+   "column": "Relevant commodity",
+   "attached_to": "Oil palm",
+   "text": "This Regulation applies to oil palm of Elaeis spp. (including Elaeis guineensis). It does not apply to babassu oil from genus Attalea spp. (including Attalea speciosa) and other vegetable oils from other palm tree species.",
+   "valid_from": "2026-09-18",
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (2)"
+   }
+  },
+  {
+   "number": "3",
+   "column": "Relevant commodity",
+   "attached_to": "Rubber",
+   "text": "This Regulation applies to rubber of Hevea brasiliensis. It does not apply to balata, gutta-percha, guayule, chicle and similar natural gums produced with other species and to synthetic rubber products.",
+   "valid_from": "2026-09-18",
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (3)"
+   }
+  },
+  {
+   "number": "4",
+   "column": "Relevant commodity",
+   "attached_to": "Wood",
+   "text": "This Regulation does not apply to bamboo, rattan and other materials of a woody nature and therefore it does also not apply to relevant products listed under the relevant commodity “Wood” to the extent that those products are made of bamboo, rattan and other materials of a woody nature.",
+   "valid_from": "2026-09-18",
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (4)"
+   }
+  },
+  {
+   "number": "5",
+   "column": "Relevant products",
+   "attached_to": null,
+   "text": "This Regulation does not apply to: (a) Samples of products, which are of negligible value and quantity and can be consumed or used only to solicit orders for goods of the type they represent under the condition that the manner of presentation and quantity, for products of the same type or quality, rule out its consumption or use for any purpose other than that of seeking orders; (b) Products which are to undergo examination, analysis or tests to determine their composition, quality or other technical characteristics for purposes of information or industrial or commercial research under the condition that the products to be analysed, examined or tested are either completely used up or destroyed in the course of the examination, analysis or testing, or kept or returned for no other reason and purposes than complying with legal or contractual obligations related to examination, analysis or testing.",
+   "valid_from": "2026-09-18",
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (5)"
+   }
+  }
+ ],
+ "entries": [
+  {
+   "id": "B01",
+   "commodity": "Cattle",
+   "codes": [
+    {
+     "code": "010221",
+     "ex": false
+    },
+    {
+     "code": "010229",
+     "ex": false
+    }
+   ],
+   "label": "0102 21, 0102 29",
+   "description": "Live cattle",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(a)"
+   }
+  },
+  {
+   "id": "32026R2102-01",
+   "commodity": "Cattle",
+   "codes": [
+    {
+     "code": "0102",
+     "ex": true
+    }
+   ],
+   "label": "ex 0102",
+   "description": "Live cattle",
+   "notes": [],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(a)"
+   },
+   "replaces": [
+    "B01"
+   ]
+  },
+  {
+   "id": "B02",
+   "commodity": "Cattle",
+   "codes": [
+    {
+     "code": "0201",
+     "ex": true
+    }
+   ],
+   "label": "ex 0201",
+   "description": "Meat of cattle, fresh or chilled",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B03",
+   "commodity": "Cattle",
+   "codes": [
+    {
+     "code": "0202",
+     "ex": true
+    }
+   ],
+   "label": "ex 0202",
+   "description": "Meat of cattle, frozen",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B04",
+   "commodity": "Cattle",
+   "codes": [
+    {
+     "code": "020610",
+     "ex": true
+    }
+   ],
+   "label": "ex 0206 10",
+   "description": "Edible offal of cattle, fresh or chilled",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "32026R2102-02",
+   "commodity": "Cattle",
+   "codes": [
+    {
+     "code": "02062100",
+     "ex": true
+    }
+   ],
+   "label": "ex 0206 21 00",
+   "description": "Frozen cattle tongues",
+   "notes": [],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(b)"
+   }
+  },
+  {
+   "id": "B05",
+   "commodity": "Cattle",
+   "codes": [
+    {
+     "code": "020622",
+     "ex": true
+    }
+   ],
+   "label": "ex 0206 22",
+   "description": "Edible cattle livers, frozen",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B06",
+   "commodity": "Cattle",
+   "codes": [
+    {
+     "code": "020629",
+     "ex": true
+    }
+   ],
+   "label": "ex 0206 29",
+   "description": "Edible cattle offal (excluding tongues and livers), frozen",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B07",
+   "commodity": "Cattle",
+   "codes": [
+    {
+     "code": "160250",
+     "ex": true
+    }
+   ],
+   "label": "ex 1602 50",
+   "description": "Other prepared or preserved meat, meat offal, blood, of cattle",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B08",
+   "commodity": "Cattle",
+   "codes": [
+    {
+     "code": "4101",
+     "ex": true
+    }
+   ],
+   "label": "ex 4101",
+   "description": "Raw hides and skins of cattle (fresh, or salted, dried, limed, pickled or otherwise preserved, but not tanned, parchment-dressed or further prepared), whether or not dehaired or split",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(c)"
+   }
+  },
+  {
+   "id": "B09",
+   "commodity": "Cattle",
+   "codes": [
+    {
+     "code": "4104",
+     "ex": true
+    }
+   ],
+   "label": "ex 4104",
+   "description": "Tanned or crust hides and skins of cattle, without hair on, whether or not split, but not further prepared",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(c)"
+   }
+  },
+  {
+   "id": "B10",
+   "commodity": "Cattle",
+   "codes": [
+    {
+     "code": "4107",
+     "ex": true
+    }
+   ],
+   "label": "ex 4107",
+   "description": "Leather of cattle, further prepared after tanning or crusting, including parchment-dressed leather, without hair on, whether or not split, other than leather of heading 4114",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(c)"
+   }
+  },
+  {
+   "id": "B11",
+   "commodity": "Cocoa",
+   "codes": [
+    {
+     "code": "1801",
+     "ex": false
+    }
+   ],
+   "label": "1801",
+   "description": "Cocoa beans, whole or broken, raw or roasted",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B12",
+   "commodity": "Cocoa",
+   "codes": [
+    {
+     "code": "1802",
+     "ex": false
+    }
+   ],
+   "label": "1802",
+   "description": "Cocoa shells, husks, skins and other cocoa waste",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(d)"
+   }
+  },
+  {
+   "id": "32026R2102-03",
+   "commodity": "Cocoa",
+   "codes": [
+    {
+     "code": "1802",
+     "ex": false
+    }
+   ],
+   "label": "1802",
+   "description": "Cocoa shells, husks, skins and other cocoa waste",
+   "notes": [
+    "(not including waste as defined in Article 3, point (1), of Directive 2008/98/EC)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(d)"
+   },
+   "replaces": [
+    "B12"
+   ]
+  },
+  {
+   "id": "B13",
+   "commodity": "Cocoa",
+   "codes": [
+    {
+     "code": "1803",
+     "ex": false
+    }
+   ],
+   "label": "1803",
+   "description": "Cocoa paste, whether or not defatted",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B14",
+   "commodity": "Cocoa",
+   "codes": [
+    {
+     "code": "1804",
+     "ex": false
+    }
+   ],
+   "label": "1804",
+   "description": "Cocoa butter, fat and oil",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B15",
+   "commodity": "Cocoa",
+   "codes": [
+    {
+     "code": "1805",
+     "ex": false
+    }
+   ],
+   "label": "1805",
+   "description": "Cocoa powder, not containing added sugar or other sweetening matter",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B16",
+   "commodity": "Cocoa",
+   "codes": [
+    {
+     "code": "1806",
+     "ex": false
+    }
+   ],
+   "label": "1806",
+   "description": "Chocolate and other food preparations containing cocoa",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B17",
+   "commodity": "Coffee",
+   "codes": [
+    {
+     "code": "0901",
+     "ex": false
+    }
+   ],
+   "label": "0901",
+   "description": "Coffee, whether or not roasted or decaffeinated; coffee husks and skins; coffee substitutes containing coffee in any proportion",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "32026R2102-04",
+   "commodity": "Coffee",
+   "codes": [
+    {
+     "code": "21011100",
+     "ex": false
+    }
+   ],
+   "label": "2101 11 00",
+   "description": "Extracts, essences, and concentrates of coffee",
+   "notes": [],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(e)"
+   }
+  },
+  {
+   "id": "B18",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "120710",
+     "ex": false
+    }
+   ],
+   "label": "1207 10",
+   "description": "Palm nuts and kernels",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(f)"
+   }
+  },
+  {
+   "id": "B19",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "1511",
+     "ex": false
+    }
+   ],
+   "label": "1511",
+   "description": "Palm oil and its fractions, whether or not refined, but not chemically modified",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(f)"
+   }
+  },
+  {
+   "id": "B20",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "151321",
+     "ex": false
+    }
+   ],
+   "label": "1513 21",
+   "description": "Crude palm kernel and babassu oil and fractions thereof, whether or not refined, but not chemically modified",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(f)"
+   }
+  },
+  {
+   "id": "B21",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "151329",
+     "ex": false
+    }
+   ],
+   "label": "1513 29",
+   "description": "Palm kernel and babassu oil and their fractions, whether or not refined, but not chemically modified (excluding crude oil)",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(f)"
+   }
+  },
+  {
+   "id": "32026R2102-05",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "12071000",
+     "ex": true
+    }
+   ],
+   "label": "ex 1207 10 00",
+   "description": "Palm nuts and kernels",
+   "notes": [],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(f)"
+   },
+   "replaces": [
+    "B18",
+    "B19",
+    "B20",
+    "B21"
+   ]
+  },
+  {
+   "id": "32026R2102-06",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "1511",
+     "ex": true
+    }
+   ],
+   "label": "ex 1511",
+   "description": "Palm oil and its fractions, whether or not refined, but not chemically modified",
+   "notes": [
+    "(not including waste as defined in Article 3, point (1), of Directive 2008/98/EC)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(f)"
+   },
+   "replaces": [
+    "B18",
+    "B19",
+    "B20",
+    "B21"
+   ]
+  },
+  {
+   "id": "32026R2102-07",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "151321",
+     "ex": true
+    }
+   ],
+   "label": "ex 1513 21",
+   "description": "Crude palm kernel and babassu oil and fractions thereof, whether or not refined, but not chemically modified",
+   "notes": [
+    "(not including waste as defined in Article 3, point (1), of Directive 2008/98/EC)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(f)"
+   },
+   "replaces": [
+    "B18",
+    "B19",
+    "B20",
+    "B21"
+   ]
+  },
+  {
+   "id": "32026R2102-08",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "151329",
+     "ex": true
+    }
+   ],
+   "label": "ex 1513 29",
+   "description": "Palm kernel and babassu oil and their fractions, whether or not refined, other than crude oil, but not chemically modified",
+   "notes": [
+    "(not including waste as defined in Article 3, point (1), of Directive 2008/98/EC)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(f)"
+   },
+   "replaces": [
+    "B18",
+    "B19",
+    "B20",
+    "B21"
+   ]
+  },
+  {
+   "id": "32026R2102-09",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "151620",
+     "ex": true
+    }
+   ],
+   "label": "ex 1516 20",
+   "description": "Palm, palm kernel and babassu oils and their fractions, partly or wholly hydrogenated, inter-esterified, re-esterified or elaidinised, whether or not refined, but not further prepared",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC of the European Parliament and of the Council, Regulation (EC) No 726/2004 of the European parliament and of the Council, or Regulation (EU) 2019/6 of the European Parliament and of the Council)"
+   ],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(g)"
+   }
+  },
+  {
+   "id": "32026R2102-10",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "151800",
+     "ex": true
+    }
+   ],
+   "label": "ex 1518 00",
+   "description": "Palm, palm kernel and babassu oils and their fractions boiled, oxidised, dehydrated, sulphurised, blown, polymerised by heat in vacuum or in inert gas or otherwise chemically modified, excluding those of heading 1516; inedible mixtures or preparations of animal, vegetable or microbial fats or oils or of fractions of different fats or oils of this chapter, that contain or have been made using oil palm",
+   "notes": [
+    "(not including waste as defined in Article 3, point (1), of Directive 2008/98/EC)"
+   ],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(g)"
+   }
+  },
+  {
+   "id": "32026R2102-11",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "152000",
+     "ex": true
+    }
+   ],
+   "label": "ex 1520 00",
+   "description": "Crude glycerol, glycerol waters and lyes that have been produced using oil palm",
+   "notes": [],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(g)"
+   }
+  },
+  {
+   "id": "B22",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "230660",
+     "ex": false
+    }
+   ],
+   "label": "2306 60",
+   "description": "Oilcake and other solid residues of palm nuts or kernels, whether or not ground or in the form of pellets, resulting from the extraction of palm nut or kernel fats or oils",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(h)"
+   }
+  },
+  {
+   "id": "32026R2102-12",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "23066000",
+     "ex": true
+    }
+   ],
+   "label": "ex 2306 60 00",
+   "description": "Oilcake and other solid residues of palm nuts or kernels, whether or not ground or in the form of pellets, resulting from the extraction of palm nut or kernel fats or oils",
+   "notes": [],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(h)"
+   },
+   "replaces": [
+    "B22"
+   ]
+  },
+  {
+   "id": "32026R2102-13",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "290516",
+     "ex": true
+    }
+   ],
+   "label": "ex 2905 16",
+   "description": "Octanol (octyl alcohol) and isomers thereof, that have been synthesized using oil palm",
+   "notes": [],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(i)"
+   }
+  },
+  {
+   "id": "32026R2102-14",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "29051700",
+     "ex": true
+    }
+   ],
+   "label": "ex 2905 17 00",
+   "description": "Dodecan-1-ol (lauryl alcohol), hexadecan-1-ol (cetyl alcohol) and octadecan-1-ol (stearyl alcohol), that have been synthesized using oil palm",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC, Regulation (EC) No 726/2004 or Regulation (EU) 2019/6)"
+   ],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(i)"
+   }
+  },
+  {
+   "id": "32026R2102-15",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "29051900",
+     "ex": true
+    }
+   ],
+   "label": "ex 2905 19 00",
+   "description": "Other saturated monohydric alcohols, not elsewhere specified or included, that have synthesized using oil palm",
+   "notes": [],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(i)"
+   }
+  },
+  {
+   "id": "B23",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "290545",
+     "ex": true
+    }
+   ],
+   "label": "ex 2905 45",
+   "description": "Glycerol, with a purity of 95 % or more (calculated on the weight of the dry product)",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(j)"
+   }
+  },
+  {
+   "id": "32026R2102-16",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "290545",
+     "ex": true
+    }
+   ],
+   "label": "ex 2905 45",
+   "description": "Glycerol, with a purity of 95 % or more (calculated on the weight of the dry product), that has been synthesized using oil palm",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC, Regulation (EC) No 726/2004 or Regulation (EU) 2019/6)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(j)"
+   },
+   "replaces": [
+    "B23"
+   ]
+  },
+  {
+   "id": "32026R2102-17",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "291539",
+     "ex": true
+    }
+   ],
+   "label": "ex 2915 39",
+   "description": "Esters of acetic acid, other than ethyl acetate, vinyl acetate, n-butyl acetate and dinoseb (ISO) acetate, that have been synthesized using oil palm",
+   "notes": [],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(k)"
+   }
+  },
+  {
+   "id": "B24",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "291570",
+     "ex": false
+    }
+   ],
+   "label": "2915 70",
+   "description": "Palmitic acid, stearic acid, their salts and esters",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(l)"
+   }
+  },
+  {
+   "id": "32026R2102-18",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "291570",
+     "ex": true
+    }
+   ],
+   "label": "ex 2915 70",
+   "description": "Palmitic acid, stearic acid, their salts and esters that have been synthesized using oil palm",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC, Regulation (EC) No 726/2004 or Regulation (EU) 2019/6)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(l)"
+   },
+   "replaces": [
+    "B24"
+   ]
+  },
+  {
+   "id": "B25",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "291590",
+     "ex": false
+    }
+   ],
+   "label": "2915 90",
+   "description": "Saturated acyclic monocarboxylic acids, their anhydrides, halides, peroxides and peroxyacids; their halogenated, sulphonated, nitrated or nitrosated derivatives (excluding formic acid, acetic acid, mono-, di- or trichloroacetic acids, propionic acid, butanoic acids, pentanoic acids, palmitic acid, stearic acid, their salts and esters, and acetic anhydride)",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(m)"
+   }
+  },
+  {
+   "id": "32026R2102-19",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "291590",
+     "ex": true
+    }
+   ],
+   "label": "ex 2915 90",
+   "description": "Saturated acyclic monocarboxylic acids, their anhydrides, halides, peroxides and peroxyacids; their halogenated, sulphonated, nitrated or nitrosated derivatives, other than formic acid, its salts and esters, acetic acid and its salts; acetic anhydride, esters of acetic acid, mono-, di- or trichloroacetic acids, their salts and esters, propionic acid, its salts and esters that have been synthesized using oil palm, butanoic acids, pentanoic acids, their salts and esters and palmitic acid, stearic acid, their salts and esters, that have been synthesized using oil palm",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC, Regulation (EC) No 726/2004 or Regulation (EU) 2019/6)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(m)"
+   },
+   "replaces": [
+    "B25"
+   ]
+  },
+  {
+   "id": "32026R2102-20",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "291615",
+     "ex": true
+    }
+   ],
+   "label": "ex 2916 15",
+   "description": "Oleic, linoleic, linolenic acids, their salts and esters that have been synthesized using oil palm",
+   "notes": [],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(n)"
+   }
+  },
+  {
+   "id": "32026R2102-21",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "29161910",
+     "ex": true
+    }
+   ],
+   "label": "ex 2916 19 10",
+   "description": "Undecenoic acids, its salts and esters that have been synthesized using oil palm",
+   "notes": [],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(n)"
+   }
+  },
+  {
+   "id": "32026R2102-22",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "292119",
+     "ex": true
+    }
+   ],
+   "label": "ex 2921 19",
+   "description": "Acyclic monoamines and their derivatives; salts thereof, other than methylamine, di- or trimethylamine and their salts, 2-(N,N-dimethylamino)ethylchloride hydrochloride, 2-(N,N-diethylamino)ethylchloride hydrochloride and 2-(N,N-diisopropylamino)ethylchloride hydrochloride, that have been synthesized using oil palm",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC, Regulation (EC) No 726/2004 or Regulation (EU) 2019/6)"
+   ],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(n)"
+   }
+  },
+  {
+   "id": "32026R2102-23",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "29239000",
+     "ex": true
+    }
+   ],
+   "label": "ex 2923 90 00",
+   "description": "Quaternary ammonium salts and hydroxides, other than choline and its salts, tetraethylammonium perfluorooctane sulphonate and didecyldimethylammonium perfluorooctane sulphonate, that have been synthesized using oil palm",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC, Regulation (EC) No 726/2004 or Regulation (EU) 2019/6)"
+   ],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(n)"
+   }
+  },
+  {
+   "id": "32026R2102-24",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "29241900",
+     "ex": true
+    }
+   ],
+   "label": "ex 2924 19 00",
+   "description": "Acyclic amides, carbamates and their salts, other than meprobamate (INN), fluoroacetamide (ISO), monocrotophos (ISO) and phosphamidon (ISO), that have been synthesized using oil palm",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC, Regulation (EC) No 726/2004 or Regulation (EU) 2019/6)"
+   ],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(n)"
+   }
+  },
+  {
+   "id": "32026R2102-25",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "34011100",
+     "ex": true
+    }
+   ],
+   "label": "ex 3401 11 00",
+   "description": "Soap in the form of bars, cakes, moulded pieces or shapes for toilet use (including medicated products), that contain or have been made using oil palm",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC, Regulation (EC) No 726/2004 or Regulation (EU) 2019/6)"
+   ],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(n)"
+   }
+  },
+  {
+   "id": "32026R2102-26",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "340120",
+     "ex": true
+    }
+   ],
+   "label": "ex 3401 20",
+   "description": "Soap in forms other than bars, cakes, moulded pieces or shapes, that contain or have been made using oil palm",
+   "notes": [],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(n)"
+   }
+  },
+  {
+   "id": "B26",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "382311",
+     "ex": false
+    }
+   ],
+   "label": "3823 11",
+   "description": "Stearic acid, industrial",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(o)"
+   }
+  },
+  {
+   "id": "32026R2102-27",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "38231100",
+     "ex": true
+    }
+   ],
+   "label": "ex 3823 11 00",
+   "description": "Stearic acid, industrial that has been synthesized using oil palm",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC, Regulation (EC) No 726/2004 or Regulation (EU) 2019/6)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(o)"
+   },
+   "replaces": [
+    "B26"
+   ]
+  },
+  {
+   "id": "B27",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "382312",
+     "ex": false
+    }
+   ],
+   "label": "3823 12",
+   "description": "Oleic acid, industrial",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(p)"
+   }
+  },
+  {
+   "id": "32026R2102-28",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "38231200",
+     "ex": true
+    }
+   ],
+   "label": "ex 3823 12 00",
+   "description": "Oleic acid, industrial that has been synthesized using oil palm",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC, Regulation (EC) No 726/2004 or Regulation (EU) 2019/6)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(p)"
+   },
+   "replaces": [
+    "B27"
+   ]
+  },
+  {
+   "id": "B28",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "382319",
+     "ex": false
+    }
+   ],
+   "label": "3823 19",
+   "description": "Industrial monocarboxylic fatty acids; acid oils from refining (excluding stearic acid, oleic acid and tall oil fatty acids)",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(q)"
+   }
+  },
+  {
+   "id": "32026R2102-29",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "382319",
+     "ex": true
+    }
+   ],
+   "label": "ex 3823 19",
+   "description": "Industrial monocarboxylic fatty acids; acid oils from refining other than stearic acid, oleic acid and tall oil fatty acids, that have been synthesized using oil palm",
+   "notes": [
+    "(not including waste as defined in Article 3, point (1), of Directive 2008/98/EC)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(q)"
+   },
+   "replaces": [
+    "B28"
+   ]
+  },
+  {
+   "id": "B29",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "382370",
+     "ex": false
+    }
+   ],
+   "label": "3823 70",
+   "description": "Industrial fatty alcohols",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(r)"
+   }
+  },
+  {
+   "id": "32026R2102-30",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "38237000",
+     "ex": true
+    }
+   ],
+   "label": "ex 3823 70 00",
+   "description": "Industrial fatty alcohols that have been synthesized using oil palm",
+   "notes": [],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(r)"
+   },
+   "replaces": [
+    "B29"
+   ]
+  },
+  {
+   "id": "32026R2102-31",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "382499",
+     "ex": true
+    }
+   ],
+   "label": "ex 3824 99",
+   "description": "Other chemical products and preparations of the chemical or allied industries (including those consisting of mixtures of natural products), not elsewhere specified or included, that contain or have been made using oil palm",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC, Regulation (EC) No 726/2004 or Regulation (EU) 2019/6)"
+   ],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(s)"
+   }
+  },
+  {
+   "id": "32026R2102-32",
+   "commodity": "Oil palm",
+   "codes": [
+    {
+     "code": "390729",
+     "ex": true
+    }
+   ],
+   "label": "ex 3907 29",
+   "description": "Other polyethers in primary forms, other than bis(polyoxyethylene) methylphosphonate, that have been made using oil palm",
+   "notes": [
+    "(not including products to the extent they are used in the manufacturing of medicinal products for human or veterinary use within the scope of Directive 2001/83/EC, Regulation (EC) No 726/2004 or Regulation (EU) 2019/6)"
+   ],
+   "valid_from": "2027-12-30",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(s)"
+   }
+  },
+  {
+   "id": "B30",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4001",
+     "ex": false
+    }
+   ],
+   "label": "4001",
+   "description": "Natural rubber, balata, gutta-percha, guayule, chicle and similar natural gums, in primary forms or in plates, sheets or strip",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(t)"
+   }
+  },
+  {
+   "id": "32026R2102-33",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4001",
+     "ex": true
+    }
+   ],
+   "label": "ex 4001",
+   "description": "Natural rubber, balata, gutta-percha, guayule, chicle and similar natural gums, in primary forms or in plates, sheets or strip",
+   "notes": [],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(t)"
+   },
+   "replaces": [
+    "B30"
+   ]
+  },
+  {
+   "id": "B31",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4005",
+     "ex": true
+    }
+   ],
+   "label": "ex 4005",
+   "description": "Compounded rubber, unvulcanised, in primary forms or in plates, sheets or strip",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B32",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4006",
+     "ex": true
+    }
+   ],
+   "label": "ex 4006",
+   "description": "Unvulcanised rubber in other forms (e.g. rods, tubes and profile shapes) and articles (e.g. discs and rings)",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B33",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4007",
+     "ex": true
+    }
+   ],
+   "label": "ex 4007",
+   "description": "Vulcanised rubber thread and cord",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B34",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4008",
+     "ex": true
+    }
+   ],
+   "label": "ex 4008",
+   "description": "Plates, sheets, strips, rods and profile shapes, of vulcanised rubber other than hard rubber",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(u)"
+   }
+  },
+  {
+   "id": "32026R2102-34",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4008",
+     "ex": true
+    }
+   ],
+   "label": "ex 4008",
+   "description": "Plates, sheets, strips, rods and profile shapes, of vulcanised rubber other than hard rubber",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(u)"
+   },
+   "replaces": [
+    "B34"
+   ]
+  },
+  {
+   "id": "B35",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4010",
+     "ex": true
+    }
+   ],
+   "label": "ex 4010",
+   "description": "Conveyer or transmission belts or belting, of vulcanised rubber",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(v)"
+   }
+  },
+  {
+   "id": "B36",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4011",
+     "ex": true
+    }
+   ],
+   "label": "ex 4011",
+   "description": "New pneumatic tyres, of rubber",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B37",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4012",
+     "ex": true
+    }
+   ],
+   "label": "ex 4012",
+   "description": "Retreaded or used pneumatic tyres of rubber; solid or cushion tyres, tyre treads and tyre flaps, of rubber",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(w)"
+   }
+  },
+  {
+   "id": "32026R2102-35",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "40129030",
+     "ex": true
+    }
+   ],
+   "label": "ex 4012 90 30",
+   "description": "Tyre treads",
+   "notes": [],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(w)"
+   },
+   "replaces": [
+    "B37"
+   ]
+  },
+  {
+   "id": "B38",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4013",
+     "ex": true
+    }
+   ],
+   "label": "ex 4013",
+   "description": "Inner tubes, of rubber",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B39",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4015",
+     "ex": true
+    }
+   ],
+   "label": "ex 4015",
+   "description": "Articles of apparel and clothing accessories (including gloves, mittens and mitts), for all purposes, of vulcanised rubber other than hard rubber",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(x)"
+   }
+  },
+  {
+   "id": "32026R2102-36",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4015",
+     "ex": true
+    }
+   ],
+   "label": "ex 4015",
+   "description": "Articles of apparel and clothing accessories (including gloves, mittens and mitts), for all purposes, of vulcanised rubber other than hard rubber",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(x)"
+   },
+   "replaces": [
+    "B39"
+   ]
+  },
+  {
+   "id": "B40",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4016",
+     "ex": true
+    }
+   ],
+   "label": "ex 4016",
+   "description": "Other articles of vulcanised rubber other than hard rubber, not elsewhere specified in chapter 40",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(y)"
+   }
+  },
+  {
+   "id": "B41",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4017",
+     "ex": true
+    }
+   ],
+   "label": "ex 4017",
+   "description": "Hard rubber (e.g. ebonite) in all forms including waste and scrap; articles of hard rubber",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(z)"
+   }
+  },
+  {
+   "id": "32026R2102-37",
+   "commodity": "Rubber",
+   "codes": [
+    {
+     "code": "4017",
+     "ex": true
+    }
+   ],
+   "label": "ex 4017",
+   "description": "Hard rubber (e.g. ebonite) in all forms including waste and scrap; articles of hard rubber",
+   "notes": [
+    "(not including waste as defined in Article 3, point (1), of Directive 2008/98/EC)",
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(z)"
+   },
+   "replaces": [
+    "B41"
+   ]
+  },
+  {
+   "id": "B42",
+   "commodity": "Soya",
+   "codes": [
+    {
+     "code": "1201",
+     "ex": false
+    }
+   ],
+   "label": "1201",
+   "description": "Soya beans, whether or not broken",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(aa)"
+   }
+  },
+  {
+   "id": "32026R2102-38",
+   "commodity": "Soya",
+   "codes": [
+    {
+     "code": "12019000",
+     "ex": false
+    }
+   ],
+   "label": "1201 90 00",
+   "description": "Soya beans, whether or not broken: other",
+   "notes": [],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(aa)"
+   },
+   "replaces": [
+    "B42"
+   ]
+  },
+  {
+   "id": "B43",
+   "commodity": "Soya",
+   "codes": [
+    {
+     "code": "120810",
+     "ex": false
+    }
+   ],
+   "label": "1208 10",
+   "description": "Soya bean flour and meal",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B44",
+   "commodity": "Soya",
+   "codes": [
+    {
+     "code": "1507",
+     "ex": false
+    }
+   ],
+   "label": "1507",
+   "description": "Soya-bean oil and its fractions, whether or not refined, but not chemically modified",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B45",
+   "commodity": "Soya",
+   "codes": [
+    {
+     "code": "2304",
+     "ex": false
+    }
+   ],
+   "label": "2304",
+   "description": "Oilcake and other solid residues, whether or not ground or in the form of pellets, resulting from the extraction of soya-bean oil",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": null,
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   }
+  },
+  {
+   "id": "B46",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4401",
+     "ex": false
+    }
+   ],
+   "label": "4401",
+   "description": "Fuel wood, in logs, in billets, in twigs, in faggots or in similar forms; wood in chips or particles; sawdust and wood waste and scrap, whether or not agglomerated in logs, briquettes, pellets or similar forms",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(bb)"
+   }
+  },
+  {
+   "id": "32026R2102-39",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4401",
+     "ex": true
+    }
+   ],
+   "label": "ex 4401",
+   "description": "Fuel wood, in logs, in billets, in twigs, in faggots or in similar forms; wood in chips or particles; sawdust and wood waste and scrap, whether or not agglomerated in logs, briquettes, pellets or similar forms",
+   "notes": [
+    "(not including waste as defined in Article 3, point (1), of Directive 2008/98/EC)",
+    "(not including single use packing material and packing containers used exclusively to support, protect or carry another product made available on the market or exported and presented with that product)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(bb)"
+   },
+   "replaces": [
+    "B46"
+   ]
+  },
+  {
+   "id": "B47",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4402",
+     "ex": false
+    }
+   ],
+   "label": "4402",
+   "description": "Wood charcoal (including shell or nut charcoal), whether or not agglomerated",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(cc)"
+   }
+  },
+  {
+   "id": "32026R2102-40",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4402",
+     "ex": true
+    }
+   ],
+   "label": "ex 4402",
+   "description": "Wood charcoal (including shell or nut charcoal), whether or not agglomerated",
+   "notes": [],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(cc)"
+   },
+   "replaces": [
+    "B47"
+   ]
+  },
+  {
+   "id": "B48",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4403",
+     "ex": false
+    }
+   ],
+   "label": "4403",
+   "description": "Wood in the rough, whether or not stripped of bark or sapwood, or roughly squared",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(dd)"
+   }
+  },
+  {
+   "id": "32026R2102-41",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4403",
+     "ex": true
+    }
+   ],
+   "label": "ex 4403",
+   "description": "Wood in the rough, whether or not stripped of bark or sapwood, or roughly squared",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(dd)"
+   },
+   "replaces": [
+    "B48"
+   ]
+  },
+  {
+   "id": "B49",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4404",
+     "ex": false
+    }
+   ],
+   "label": "4404",
+   "description": "Hoopwood; split poles; piles, pickets and stakes of wood, pointed but not sawn lengthwise; wooden sticks, roughly trimmed but not turned, bent or otherwise worked, suitable for the manufacture of walking sticks, umbrellas, tool handles or the like; chipwood and the like",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ee)"
+   }
+  },
+  {
+   "id": "32026R2102-42",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4404",
+     "ex": true
+    }
+   ],
+   "label": "ex 4404",
+   "description": "Hoopwood; split poles; piles, pickets and stakes of wood, pointed but not sawn lengthwise; wooden sticks, roughly trimmed but not turned, bent or otherwise worked, suitable for the manufacture of walking sticks, umbrellas, tool handles or the like; chipwood and the like",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ee)"
+   },
+   "replaces": [
+    "B49"
+   ]
+  },
+  {
+   "id": "B50",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4405",
+     "ex": false
+    }
+   ],
+   "label": "4405",
+   "description": "Wood wool; wood flour",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ff)"
+   }
+  },
+  {
+   "id": "32026R2102-43",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4405",
+     "ex": true
+    }
+   ],
+   "label": "ex 4405",
+   "description": "Wood wool; wood flour",
+   "notes": [
+    "(not including single use packing material and packing containers used exclusively to support, protect or carry another product made available on the market or exported and presented with that product)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ff)"
+   },
+   "replaces": [
+    "B50"
+   ]
+  },
+  {
+   "id": "B51",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4406",
+     "ex": false
+    }
+   ],
+   "label": "4406",
+   "description": "Railway or tramway sleepers (cross-ties) of wood",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(gg)"
+   }
+  },
+  {
+   "id": "32026R2102-44",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4406",
+     "ex": true
+    }
+   ],
+   "label": "ex 4406",
+   "description": "Railway or tramway sleepers (cross-ties) of wood",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(gg)"
+   },
+   "replaces": [
+    "B51"
+   ]
+  },
+  {
+   "id": "B52",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4407",
+     "ex": false
+    }
+   ],
+   "label": "4407",
+   "description": "Wood sawn or chipped lengthwise, sliced or peeled, whether or not planed, sanded or end-jointed, of a thickness exceeding 6 mm",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(hh)"
+   }
+  },
+  {
+   "id": "32026R2102-45",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4407",
+     "ex": true
+    }
+   ],
+   "label": "ex 4407",
+   "description": "Wood sawn or chipped lengthwise, sliced or peeled, whether or not planed, sanded or end-jointed, of a thickness exceeding 6 mm",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(hh)"
+   },
+   "replaces": [
+    "B52"
+   ]
+  },
+  {
+   "id": "B53",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4408",
+     "ex": false
+    }
+   ],
+   "label": "4408",
+   "description": "Sheets for veneering (including those obtained by slicing laminated wood), for plywood or for other similar laminated wood and other wood, sawn lengthwise, sliced or peeled, whether or not planed, sanded, spliced or end-jointed, of a thickness not exceeding 6 mm",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ii)"
+   }
+  },
+  {
+   "id": "32026R2102-46",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4408",
+     "ex": true
+    }
+   ],
+   "label": "ex 4408",
+   "description": "Sheets for veneering (including those obtained by slicing laminated wood), for plywood or for other similar laminated wood and other wood, sawn lengthwise, sliced or peeled, whether or not planed, sanded, spliced or end-jointed, of a thickness not exceeding 6 mm",
+   "notes": [],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ii)"
+   },
+   "replaces": [
+    "B53"
+   ]
+  },
+  {
+   "id": "B54",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4409",
+     "ex": false
+    }
+   ],
+   "label": "4409",
+   "description": "Wood (including strips and friezes for parquet flooring, not assembled) continuously shaped (tongued, grooved, rebated, chamfered, V-jointed, beaded, moulded, rounded or the like) along any of its edges, ends or faces, whether or not planed, sanded or end-jointed",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(jj)"
+   }
+  },
+  {
+   "id": "32026R2102-47",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4409",
+     "ex": true
+    }
+   ],
+   "label": "ex 4409",
+   "description": "Wood (including strips and friezes for parquet flooring, not assembled) continuously shaped (tongued, grooved, rebated, chamfered, V-jointed, beaded, moulded, rounded or the like) along any of its edges, ends or faces, whether or not planed, sanded or end-jointed",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(jj)"
+   },
+   "replaces": [
+    "B54"
+   ]
+  },
+  {
+   "id": "B55",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4410",
+     "ex": false
+    }
+   ],
+   "label": "4410",
+   "description": "Particle board, oriented strand board (OSB) and similar board (for example, waferboard) of wood or other ligneous materials, whether or not agglomerated with resins or other organic binding substances",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(kk)"
+   }
+  },
+  {
+   "id": "32026R2102-48",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4410",
+     "ex": true
+    }
+   ],
+   "label": "ex 4410",
+   "description": "Particle board, oriented strand board (OSB) and similar board (for example, waferboard) of wood or other ligneous materials, whether or not agglomerated with resins or other organic binding substances",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(kk)"
+   },
+   "replaces": [
+    "B55"
+   ]
+  },
+  {
+   "id": "B56",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4411",
+     "ex": false
+    }
+   ],
+   "label": "4411",
+   "description": "Fibreboard of wood or other ligneous materials, whether or not bonded with resins or other organic substances",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ll)"
+   }
+  },
+  {
+   "id": "32026R2102-49",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4411",
+     "ex": true
+    }
+   ],
+   "label": "ex 4411",
+   "description": "Fibreboard of wood or other ligneous materials, whether or not bonded with resins or other organic substances",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ll)"
+   },
+   "replaces": [
+    "B56"
+   ]
+  },
+  {
+   "id": "B57",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4412",
+     "ex": false
+    }
+   ],
+   "label": "4412",
+   "description": "Plywood, veneered panels and similar laminated wood",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(mm)"
+   }
+  },
+  {
+   "id": "32026R2102-50",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4412",
+     "ex": true
+    }
+   ],
+   "label": "ex 4412",
+   "description": "Plywood, veneered panels and similar laminated wood",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(mm)"
+   },
+   "replaces": [
+    "B57"
+   ]
+  },
+  {
+   "id": "B58",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4413",
+     "ex": false
+    }
+   ],
+   "label": "4413",
+   "description": "Densified wood, in blocks, plates, strips or profile shapes",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(nn)"
+   }
+  },
+  {
+   "id": "32026R2102-51",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4413",
+     "ex": true
+    }
+   ],
+   "label": "ex 4413",
+   "description": "Densified wood, in blocks, plates, strips or profile shapes",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(nn)"
+   },
+   "replaces": [
+    "B58"
+   ]
+  },
+  {
+   "id": "B59",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4414",
+     "ex": false
+    }
+   ],
+   "label": "4414",
+   "description": "Wooden frames for paintings, photographs, mirrors or similar objects",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(oo)"
+   }
+  },
+  {
+   "id": "32026R2102-52",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4414",
+     "ex": true
+    }
+   ],
+   "label": "ex 4414",
+   "description": "Wooden frames for paintings, photographs, mirrors or similar objects",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(oo)"
+   },
+   "replaces": [
+    "B59"
+   ]
+  },
+  {
+   "id": "B60",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4415",
+     "ex": false
+    }
+   ],
+   "label": "4415",
+   "description": "Packing cases, boxes, crates, drums and similar packings, of wood; cable-drums of wood; pallets, box pallets and other load boards, of wood; pallet collars of wood",
+   "notes": [
+    "(not including packing material used exclusively as packing material to support, protect or carry another product placed on the market)"
+   ],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(pp)"
+   }
+  },
+  {
+   "id": "32026R2102-53",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4415",
+     "ex": true
+    }
+   ],
+   "label": "ex 4415",
+   "description": "Packing cases, boxes, crates, drums and similar packings, of wood; cable-drums of wood; pallets, box pallets and other load boards, of wood; pallet collars of wood",
+   "notes": [
+    "(not including used products and second-hand products)",
+    "(not including single use packing material and packing containers used exclusively to support, protect or carry another product made available on the market or exported and presented with that product)",
+    "(not including packing material and packing containers clearly suitable for repetitive use used exclusively to support, protect or carry another product made available on the market or exported and presented with that product from the moment they are used for such purpose and onwards)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(pp)"
+   },
+   "replaces": [
+    "B60"
+   ]
+  },
+  {
+   "id": "B61",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4416",
+     "ex": false
+    }
+   ],
+   "label": "4416",
+   "description": "Casks, barrels, vats, tubs and other coopers’ products and parts thereof, of wood, including staves",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(qq)"
+   }
+  },
+  {
+   "id": "32026R2102-54",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4416",
+     "ex": true
+    }
+   ],
+   "label": "ex 4416",
+   "description": "Casks, barrels, vats, tubs and other coopers’ products and parts thereof, of wood, including staves",
+   "notes": [
+    "(not including used products and second-hand products)",
+    "(not including single use packing material and packing containers used exclusively to support, protect or carry another product made available on the market or exported and presented with that product)",
+    "(not including packing material and packing containers clearly suitable for repetitive use used exclusively to support, protect or carry another product made available on the market or exported and presented with that product from the moment they are used for such purpose and onwards)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(qq)"
+   },
+   "replaces": [
+    "B61"
+   ]
+  },
+  {
+   "id": "B62",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4417",
+     "ex": false
+    }
+   ],
+   "label": "4417",
+   "description": "Tools, tool bodies, tool handles, broom or brush bodies and handles, of wood; boot or shoe lasts and trees, of wood",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(rr)"
+   }
+  },
+  {
+   "id": "32026R2102-55",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4417",
+     "ex": true
+    }
+   ],
+   "label": "ex 4417",
+   "description": "Tools, tool bodies, tool handles, broom or brush bodies and handles, of wood; boot or shoe lasts and trees, of wood",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(rr)"
+   },
+   "replaces": [
+    "B62"
+   ]
+  },
+  {
+   "id": "B63",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4418",
+     "ex": false
+    }
+   ],
+   "label": "4418",
+   "description": "Builders’ joinery and carpentry of wood, including cellular wood panels, assembled flooring panels, shingles and shakes",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ss)"
+   }
+  },
+  {
+   "id": "32026R2102-56",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4418",
+     "ex": true
+    }
+   ],
+   "label": "ex 4418",
+   "description": "Builders’ joinery and carpentry of wood, including cellular wood panels, assembled flooring panels, shingles and shakes",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ss)"
+   },
+   "replaces": [
+    "B63"
+   ]
+  },
+  {
+   "id": "B64",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4419",
+     "ex": false
+    }
+   ],
+   "label": "4419",
+   "description": "Tableware and kitchenware, of wood",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(tt)"
+   }
+  },
+  {
+   "id": "32026R2102-57",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4419",
+     "ex": true
+    }
+   ],
+   "label": "ex 4419",
+   "description": "Tableware and kitchenware, of wood",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(tt)"
+   },
+   "replaces": [
+    "B64"
+   ]
+  },
+  {
+   "id": "B65",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4420",
+     "ex": false
+    }
+   ],
+   "label": "4420",
+   "description": "Wood marquetry and inlaid wood; caskets and cases for jewellery or cutlery, and similar articles, of wood; statuettes and other ornaments, of wood; wooden articles of furniture not falling in Chapter 94",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(uu)"
+   }
+  },
+  {
+   "id": "32026R2102-58",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4420",
+     "ex": true
+    }
+   ],
+   "label": "ex 4420",
+   "description": "Wood marquetry and inlaid wood; caskets and cases for jewellery or cutlery, and similar articles, of wood; statuettes and other ornaments, of wood; wooden articles of furniture not falling in Chapter 94",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(uu)"
+   },
+   "replaces": [
+    "B65"
+   ]
+  },
+  {
+   "id": "B66",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4421",
+     "ex": false
+    }
+   ],
+   "label": "4421",
+   "description": "Other articles of wood",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(vv)"
+   }
+  },
+  {
+   "id": "32026R2102-59",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "4421",
+     "ex": true
+    }
+   ],
+   "label": "ex 4421",
+   "description": "Other articles of wood",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(vv)"
+   },
+   "replaces": [
+    "B66"
+   ]
+  },
+  {
+   "id": "B67",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "47",
+     "ex": false
+    },
+    {
+     "code": "48",
+     "ex": false
+    }
+   ],
+   "label": "Chapters 47 and 48",
+   "description": "Pulp and paper of Chapters 47 and 48 of the Combined Nomenclature, with the exception of bamboo-based and recovered (waste and scrap) products",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ww)"
+   }
+  },
+  {
+   "id": "32026R2102-60",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "47",
+     "ex": true
+    }
+   ],
+   "label": "ex 47",
+   "description": "Pulp of wood",
+   "notes": [
+    "(not including used products and second-hand products)",
+    "(not including recovered (waste and scrap) products and products derived from recovered (waste and scrap) products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ww)"
+   },
+   "replaces": [
+    "B67"
+   ]
+  },
+  {
+   "id": "32026R2102-61",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "48",
+     "ex": true
+    }
+   ],
+   "label": "ex 48",
+   "description": "Paper and Paperboard: Articles of paper pulp, of paper or of paperboard",
+   "notes": [
+    "(not including waste as defined in Article 3, point (1), of Directive 2008/98/EC)",
+    "(not including used products and second-hand products)",
+    "(not including recovered (waste and scrap) products and products derived from recovered (waste and scrap) products)",
+    "(not including single use packing material and packing containers used exclusively to support, protect or carry another product made available on the market or exported and presented with that product)",
+    "(not including packing material and packing containers clearly suitable for repetitive use used exclusively to support, protect or carry another product made available on the market or exported and presented with that product from the moment they are used for such purpose and onwards)",
+    "(not including items of correspondence and marketing and information materials exclusively accompanying another product made available on the market or exported, or supplied for marketing or information purposes free of charge)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(ww)"
+   },
+   "replaces": [
+    "B67"
+   ]
+  },
+  {
+   "id": "B68",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "9401",
+     "ex": true
+    }
+   ],
+   "label": "ex 9401",
+   "description": "Seats (other than those of heading 9402), whether or not convertible into beds, and parts thereof, of wood",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(xx)"
+   }
+  },
+  {
+   "id": "32026R2102-62",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "94013100",
+     "ex": true
+    }
+   ],
+   "label": "ex 9401 31 00",
+   "description": "Swivel seats with variable height adjustment, of wood",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(xx)"
+   },
+   "replaces": [
+    "B68"
+   ]
+  },
+  {
+   "id": "32026R2102-63",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "94014100",
+     "ex": true
+    }
+   ],
+   "label": "ex 9401 41 00",
+   "description": "Seats other than garden seats or camping equipment, convertible into beds, of wood",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(xx)"
+   },
+   "replaces": [
+    "B68"
+   ]
+  },
+  {
+   "id": "32026R2102-64",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "94016100",
+     "ex": true
+    }
+   ],
+   "label": "ex 9401 61 00",
+   "description": "Other seats, with wooden frames, upholstered",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(xx)"
+   },
+   "replaces": [
+    "B68"
+   ]
+  },
+  {
+   "id": "32026R2102-65",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "94016900",
+     "ex": true
+    }
+   ],
+   "label": "ex 9401 69 00",
+   "description": "Other seats, with wooden frames, other than upholstered",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(xx)"
+   },
+   "replaces": [
+    "B68"
+   ]
+  },
+  {
+   "id": "32026R2102-66",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "94018000",
+     "ex": true
+    }
+   ],
+   "label": "ex 9401 80 00",
+   "description": "Other seats, of wood",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(xx)"
+   },
+   "replaces": [
+    "B68"
+   ]
+  },
+  {
+   "id": "32026R2102-67",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "94019190",
+     "ex": true
+    }
+   ],
+   "label": "ex 9401 91 90",
+   "description": "Other parts of seats, of wood",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(xx)"
+   },
+   "replaces": [
+    "B68"
+   ]
+  },
+  {
+   "id": "B69",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "940330",
+     "ex": false
+    },
+    {
+     "code": "940340",
+     "ex": false
+    },
+    {
+     "code": "940350",
+     "ex": false
+    },
+    {
+     "code": "940360",
+     "ex": false
+    },
+    {
+     "code": "940391",
+     "ex": false
+    }
+   ],
+   "label": "9403 30, 9403 40, 9403 50, 9403 60 and 9403 91",
+   "description": "Wooden furniture, and parts thereof",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(yy)"
+   }
+  },
+  {
+   "id": "32026R2102-68",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "940330",
+     "ex": true
+    },
+    {
+     "code": "940340",
+     "ex": true
+    },
+    {
+     "code": "940350",
+     "ex": true
+    },
+    {
+     "code": "940360",
+     "ex": true
+    },
+    {
+     "code": "940391",
+     "ex": true
+    }
+   ],
+   "label": "ex 9403 30, ex 9403 40, ex 9403 50, ex 9403 60 and ex 9403 91",
+   "description": "Wooden furniture, and parts thereof",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(yy)"
+   },
+   "replaces": [
+    "B69"
+   ]
+  },
+  {
+   "id": "B70",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "940610",
+     "ex": false
+    }
+   ],
+   "label": "9406 10",
+   "description": "Prefabricated buildings of wood",
+   "notes": [],
+   "valid_from": null,
+   "valid_to": "2026-09-17",
+   "source": {
+    "celex": "02023R1115-20251226",
+    "provision": "Annex I"
+   },
+   "removed_by": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(zz)"
+   }
+  },
+  {
+   "id": "32026R2102-69",
+   "commodity": "Wood",
+   "codes": [
+    {
+     "code": "94061000",
+     "ex": true
+    }
+   ],
+   "label": "ex 9406 10 00",
+   "description": "Prefabricated buildings of wood",
+   "notes": [
+    "(not including used products and second-hand products)"
+   ],
+   "valid_from": "2026-09-18",
+   "valid_to": null,
+   "source": {
+    "celex": "32026R2102",
+    "provision": "Annex, point (6)(zz)"
+   },
+   "replaces": [
+    "B70"
+   ]
+  }
+ ]
+}

@@ -84,7 +84,8 @@ class Server:
         params = req.get("params") if isinstance(req.get("params"), dict) else {}
         if method == "initialize":
             self.reply(id_, {"protocolVersion": PROTOCOL, "capabilities": {"tools": {}},
-                             "serverInfo": {"name": "climate-trace-mcp", "title": "Climate TRACE", "version": __version__},
+                             "serverInfo": {"name": "climate-trace-mcp", "title": "Climate TRACE MCP (unofficial)",
+                                            "version": __version__},
                              "instructions": INSTRUCTIONS})
         elif id_ is None:
             return  # a notification (notifications/initialized and the like): no answer

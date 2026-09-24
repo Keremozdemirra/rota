@@ -1551,7 +1551,7 @@ def _render(command: str, r: dict) -> str:
         lines.append(a)
     if command == "compare":
         lines.append(r["disclaimer"])
-    return "\n".join(lines)
+    return "\n".join(line.rstrip() for line in lines)
 
 
 def cache_info() -> dict:

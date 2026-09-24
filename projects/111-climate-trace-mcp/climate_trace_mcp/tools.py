@@ -606,7 +606,7 @@ class Service:
             notes.append("The API returned no LEI for these owners. climate_trace_owner_id is Climate TRACE's own "
                          "identifier; it is not an LEI (an LEI has 20 characters, ISO 17442).")
         if n_raw > len(owners):
-            notes.append("The API listed %d owner entries; %d remain after removing duplicates." % (n_raw, len(owners)))
+            notes.append("The API listed %d owner entries for %d distinct owner%s." % (n_raw, len(owners), "" if len(owners) == 1 else "s"))
         return {"tool": "owners", "asset_id": aid, "asset_name": clean(data.get("name"), 200) or None,
                 "country": data.get("country") if isinstance(data.get("country"), str) and _A3.match(data.get("country")) else None,
                 "subsector": data.get("subsector") if isinstance(data.get("subsector"), str) and _SLUG.match(data.get("subsector")) else None,

@@ -1,0 +1,3 @@
+include LICENSE README.md server.json
+recursive-include tests *.py *.json *.html *.md
+recursive-include .github *.yml

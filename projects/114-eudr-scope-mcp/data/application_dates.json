@@ -1,0 +1,240 @@
+{
+ "dataset": "Dates of application of Regulation (EU) 2023/1115",
+ "retrieved": "2026-09-24",
+ "status": "verified",
+ "status_reasons": [],
+ "warnings": [],
+ "consolidated": {
+  "celex": "02023R1115-20251226",
+  "date": "2025-12-26",
+  "reference": "02023R1115 — EN — 26.12.2025 — 002.001",
+  "amended_by": [
+   "32024R3234",
+   "32025R2650"
+  ],
+  "url": "https://publications.europa.eu/resource/celex/02023R1115-20251226",
+  "disclaimer": "This text is meant purely as a documentation tool and has no legal effect."
+ },
+ "basic_act": {
+  "celex": "32023R1115",
+  "title": "Regulation (EU) 2023/1115 of the European Parliament and of the Council of 31 May 2023 on the making available on the Union market and the export from the Union of certain commodities and products associated with deforestation and forest degradation and repealing Regulation (EU) No 995/2010 (Text with EEA relevance)",
+  "published": "2023-06-09",
+  "eli": "http://data.europa.eu/eli/reg/2023/1115/oj",
+  "cellar_entry_into_force_dates": [
+   "2023-06-29",
+   "2026-12-30",
+   "2027-06-30"
+  ]
+ },
+ "article_38": {
+  "paragraphs": {
+   "1": "This Regulation shall enter into force on the twentieth day following that of its publication in the Official Journal of the European Union.",
+   "2": "Subject to paragraph 3 of this Article, Articles 3 to 13, Articles 16 to 24 and Articles 26, 31 and 32 shall apply from 30 December 2026.",
+   "3": "Except as regards the products covered by the Annex to Regulation (EU) No 995/2010, for operators, whether natural persons or micro- or small undertakings within the meaning of Article 3(1) or Article 3(2), first subparagraph, respectively, of Directive 2013/34/EU, irrespective of their legal form, who were established as such by 31 December 2024, the Articles referred to in paragraph 2 of this Article shall apply from 30 June 2027."
+  },
+  "entry_into_force": "2023-06-29",
+  "entry_into_force_rule": "enter into force on the twentieth day following that of its publication",
+  "p2_date": "2026-12-30",
+  "p2_articles": "Articles 3 to 13, Articles 16 to 24 and Articles 26, 31 and 32",
+  "p3_date": "2027-06-30",
+  "p3_established_by": "2024-12-31",
+  "p3_excludes_eutr_products": true,
+  "set_by": {
+   "celex": "32025R2650",
+   "provision": "Article 1, point (25)"
+  }
+ },
+ "article_37": {
+  "paragraphs": {
+   "1": "Regulation (EU) No 995/2010 is repealed with effect from 30 December 2026.",
+   "2": "However, Regulation (EU) No 995/2010 shall continue to apply until 31 December 2029 to timber and timber products as defined in Article 2, point (a), of Regulation (EU) No 995/2010 that were produced before 29 June 2023 and placed on the market from 30 December 2026.",
+   "3": "By way of derogation from Article 1(2) of this Regulation, the timber and timber products as defined in Article 2, point (a), of Regulation (EU) No 995/2010 that were produced before 29 June 2023 and placed on the market from 31 December 2029 shall comply with Article 3 of this Regulation."
+  },
+  "p1_repeal_from": "2026-12-30",
+  "p2_until": "2029-12-31",
+  "p2_produced_before": "2023-06-29",
+  "p2_placed_from": "2026-12-30",
+  "p3_produced_before": "2023-06-29",
+  "p3_placed_from": "2029-12-31"
+ },
+ "article_1_2": "Except as provided for in Article 37(3), this Regulation does not apply to relevant products listed in Annex I produced before the date indicated in Article 38(1).",
+ "definitions": {
+  "15": "‘operator’ means any natural or legal person who, in the course of a commercial activity, places relevant products on the market or exports them, excluding downstream operators; ▼M2",
+  "15a": "‘micro or small primary operator’ means an operator who is a natural person or a micro-undertaking or small undertaking, within the meaning of Article 3(1) and Article 3(2), first subparagraph, respectively, of Directive 2013/34/EU of the European Parliament and of the Council, irrespective of its legal form, established in a country classified as low risk in accordance with Article 29 of this Regulation, and who, in the course of a commercial activity, places on the market or exports relevant products that this operator itself has grown, harvested, obtained from or raised on relevant plots of land, or, as regards cattle, on establishments located in that country; this includes operators who exceed the limits of at least two of the three criteria set out in Article 3(1) and (2), first subparagraph, of Directive 2013/34/EU but who can demonstrate that the parts of their balance sheet total, net turnover and average number of employees during the financial year, related to the relevant commodities and the relevant products, do not exceed the limits of at least two of three of those criteria;",
+  "15b": "‘downstream operator’ means any natural or legal person who, in the course of a commercial activity, places on the market or exports relevant products made using relevant products, all of which are covered by a due diligence statement or by a simplified declaration; ▼B",
+  "17": "‘trader’ means any person in the supply chain other than the operator or downstream operator who, in the course of a commercial activity, makes relevant products available on the market; ▼B",
+  "30": "‘micro, small and medium-sized enterprises’ or ‘SMEs’ means micro, small and medium-sized undertakings, irrespective of their legal form, within the meaning of Article 3(1), Article 3(2), first subparagraph, and Article 3(3), respectively, of Directive 2013/34/EU; ▼B"
+ },
+ "history": [
+  {
+   "celex": "32023R1115",
+   "provision": "Article 38 (original text)",
+   "published": "2023-06-09",
+   "p2_date": "2024-12-30",
+   "p3_date": "2025-06-30",
+   "p3_established_by": "2020-12-31"
+  },
+  {
+   "celex": "32024R3234",
+   "provision": "Article 1, point (3)",
+   "published": "2024-12-23",
+   "entry_into_force": "2024-12-26",
+   "p2_date": "2025-12-30",
+   "p3_date": "2026-06-30",
+   "p3_established_by": "2020-12-31"
+  },
+  {
+   "celex": "32025R2650",
+   "provision": "Article 1, point (25)",
+   "published": "2025-12-23",
+   "entry_into_force": "2025-12-26",
+   "p2_date": "2026-12-30",
+   "p3_date": "2027-06-30",
+   "p3_established_by": "2024-12-31"
+  }
+ ],
+ "annex_i_deferred": [
+  {
+   "applies_from": "2027-12-30",
+   "entries": [
+    "ex 0206 21 00",
+    "2101 11 00",
+    "ex 1516 20",
+    "ex 1518 00",
+    "ex 1520 00",
+    "ex 2905 16",
+    "ex 2905 17 00",
+    "ex 2905 19 00",
+    "ex 2915 39",
+    "ex 2916 15",
+    "ex 2916 19 10",
+    "ex 2921 19",
+    "ex 2923 90 00",
+    "ex 2924 19 00",
+    "ex 3401 11 00",
+    "ex 3401 20",
+    "ex 3824 99",
+    "ex 3907 29"
+   ]
+  }
+ ],
+ "unconsolidated_amendments": [
+  {
+   "celex": "32026R2102",
+   "title": "Commission Delegated Regulation (EU) 2026/2102 of 13 July 2026 amending Regulation (EU) 2023/1115 of the European Parliament and of the Council as regards the list of relevant commodities and relevant products",
+   "published": "2026-09-17",
+   "entry_into_force": "2026-09-18",
+   "touches": [
+    "Annex I"
+   ]
+  }
+ ],
+ "amending_acts": [
+  {
+   "celex": "32024R3234",
+   "title": "Regulation (EU) 2024/3234 of the European Parliament and of the Council of 19 December 2024 amending Regulation (EU) 2023/1115 as regards provisions relating to the date of application",
+   "date": "2024-12-19",
+   "published": "2024-12-23",
+   "entry_into_force_text": "2024-12-26",
+   "touches": [
+    "Article 29",
+    "Article 37",
+    "Article 38"
+   ]
+  },
+  {
+   "celex": "32025R2650",
+   "title": "Regulation (EU) 2025/2650 of the European Parliament and of the Council of 19 December 2025 amending Regulation (EU) 2023/1115 as regards certain obligations of operators and traders",
+   "date": "2025-12-19",
+   "published": "2025-12-23",
+   "entry_into_force_text": "2025-12-26",
+   "touches": [
+    "Article 2",
+    "Article 3",
+    "Article 4",
+    "Article 8",
+    "Article 9",
+    "Article 15",
+    "Article 16",
+    "Article 20",
+    "Article 21",
+    "Article 22",
+    "Article 24",
+    "Article 25",
+    "Article 26",
+    "Article 27",
+    "Article 28",
+    "Article 31",
+    "Article 33",
+    "Article 34",
+    "Article 35",
+    "Article 37",
+    "Article 38",
+    "Annex I",
+    "Annex II",
+    "Annex III"
+   ]
+  },
+  {
+   "celex": "32026R2102",
+   "title": "Commission Delegated Regulation (EU) 2026/2102 of 13 July 2026 amending Regulation (EU) 2023/1115 of the European Parliament and of the Council as regards the list of relevant commodities and relevant products",
+   "date": "2026-07-13",
+   "published": "2026-09-17",
+   "entry_into_force_text": "2026-09-18",
+   "touches": [
+    "Annex I"
+   ]
+  }
+ ],
+ "corrigenda": [
+  {
+   "rel": "corrects",
+   "celex": "32023R1115R(01)",
+   "date": "2024-10-01",
+   "entry_into_force": [],
+   "title": null,
+   "english": false
+  },
+  {
+   "rel": "corrects",
+   "celex": "32023R1115R(02)",
+   "date": "2025-02-28",
+   "entry_into_force": [],
+   "title": null,
+   "english": false
+  },
+  {
+   "rel": "corrects",
+   "celex": "32023R1115R(03)",
+   "date": "2025-03-28",
+   "entry_into_force": [],
+   "title": null,
+   "english": false
+  },
+  {
+   "rel": "corrects",
+   "celex": "32023R1115R(04)",
+   "date": "2025-12-22",
+   "entry_into_force": [],
+   "title": null,
+   "english": false
+  },
+  {
+   "rel": "corrects",
+   "celex": "32023R1115R(05)",
+   "date": "2026-07-02",
+   "entry_into_force": [],
+   "title": null,
+   "english": false
+  }
+ ],
+ "pending_proposals": [
+  {
+   "rel": "proposes_to_amend",
+   "celex": "52026PC0661",
+   "date": "2026-09-10",
+   "entry_into_force": [],
+   "title": "Proposal for a COUNCIL REGULATION amending Regulations (EU) No 1380/2013, (EU) No 1308/2013, (EU) 2023/1115 and (EU) 2024/1348 of the European Parliament and of the Council, and Council Regulation (EU) 2023/2720 as regards adaptation of certain requirements and reduction of administrative burden in the Union outermost regions"
+  }
+ ]
+}

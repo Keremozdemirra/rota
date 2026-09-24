@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "climate-trace-mcp"
+version = "0.1.0"
+description = "Climate TRACE emission estimates for assets and countries, over MCP or the command line, with owners and the source and licence of every figure."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["mcp", "model-context-protocol", "mcp-server", "climate-trace", "emissions", "greenhouse-gas", "ghg", "climate", "esg", "claude-code"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/climate-trace-mcp"
+Issues = "https://github.com/Keremozdemirra/climate-trace-mcp/issues"
+"Data source" = "https://climatetrace.org/"
+
+[project.scripts]
+climate-trace-mcp = "climate_trace_mcp.cli:main"
+
+[tool.setuptools]
+packages = ["climate_trace_mcp"]
+
+[tool.setuptools.package-data]
+climate_trace_mcp = ["data/subsectors.json", "data/SOURCES.md"]

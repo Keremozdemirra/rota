@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.DS_Store
+build/
+dist/
+*.egg-info/
+.venv/
+# The tool reads no credentials; this keeps a hand-written .env from ever being committed.
+.env
+.env.*

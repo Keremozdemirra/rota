@@ -244,7 +244,7 @@ def serve(stdin=None, stdout=None):
             continue
         try:
             req = json.loads(line.decode("utf-8"))
-        except (UnicodeDecodeError, ValueError):
+        except (UnicodeDecodeError, ValueError, RecursionError):
             response = {"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": "parse error"}}
         else:
             response = handle(req)

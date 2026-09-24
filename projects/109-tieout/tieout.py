@@ -106,6 +106,7 @@ R_LINK = "part of a link, e-mail address or DOI"
 R_CODEBLOCK = "code (Markdown code span or block)"
 R_COMMENT = "HTML comment"
 R_MALFORMED = "not a well-formed number"
+R_UNITLABEL = "unit label ('000)"
 
 
 class InputError(Exception):
@@ -152,6 +153,22 @@ def fmt(d: Decimal | None) -> str:
     with localcontext() as c:
         c.prec = 60
         return format(d, ",f")
+
+
+def fmt_short(d: Decimal) -> str:
+    """At most six significant digits after the decimal point, for tables: 0.0875794, not 0.087579371225027."""
+    d = d.normalize()
+    if _decimals(d) and len(d.as_tuple().digits) > 6:
+        q = _pow10(d.adjusted() - 5)
+        d = d.quantize(q if q < 1 else Decimal(1))
+    return fmt(d)
+
+
+def fmt_places(d: Decimal, places: int) -> str:
+    """A Decimal with exactly `places` decimals, grouped: 14.0, 4,213.5."""
+    with localcontext() as c:
+        c.prec = 60
+        return format(d.quantize(_pow10(-places)) if places > 0 else d.to_integral_value(), ",f")
 
 
 def _decimals(d: Decimal) -> int:
@@ -718,6 +735,11 @@ def _list_starts(text: str) -> set:
 
 def _glued(n: Num, text: str):
     i = n.tok_start - 1
+    if n.tok == "000":
+        before = text[i] if i >= 0 else ""
+        after = text[n.tok_end:n.tok_end + 1]
+        if before in "'’" or (before == "(" and after == ")") or after == "s":
+            return R_UNITLABEL
     if i >= 0 and not (n.currency and n.start < n.tok_start):
         c = text[i]
         if c.isalpha() or c == "_":
@@ -762,12 +784,12 @@ def _exclusion(n: Num, text: str, spans: list, list_starts: set, page_line: bool
     if g:
         return g
     plain = not (n.scale_word or n.unit or n.currency)
-    if _is_year_token(n) and plain and not n.negative:
+    if _is_year_token(n) and plain and n.sign != "minus sign":
         return R_YEAR
     if prev is not None and _is_year_token(prev) and len(n.tok) == 2 and n.tok.isdigit() and plain \
             and text[prev.tok_end:n.tok_start] in ("/", "-", "–", "—"):
         return R_YEAR
-    if n.tok_start in list_starts and plain and not n.negative:
+    if n.tok_start in list_starts and plain and n.sign != "minus sign":
         return R_LIST
     if page_line:
         return R_PAGE
@@ -1008,7 +1030,7 @@ def _dml_para(p, rels, st: _Para) -> None:
                 st.spans.append((s, st.n, R_DATE))
 
 
-def read_chart(pkg: Package, part: str, where: str, loc: dict) -> list:
+def read_chart(pkg: Package, part: str, where: str, loc: dict, extra_labels=()) -> list:
     """Numbers in a chart part: title and axis titles as text, cached series values as values."""
     root = pkg.xml(part)
     segs = []
@@ -1058,7 +1080,7 @@ def read_chart(pkg: Package, part: str, where: str, loc: dict) -> list:
                     continue
                 idx = int(pt.get("idx")) if (pt.get("idx") or "").isdigit() else 0
                 cat_label = _short(cats.get(idx, f"point {idx + 1}"), 30)
-                labels = [("series", name), ("chart title", title), ("category", cat_label)]
+                labels = [("series", name), ("chart title", title)] + list(extra_labels) + [("category", cat_label)]
                 seg = Segment(v.text, f"{where} ({name or 'series'}, {cat_label})",
                               dict(cloc, series=name, point=cat_label), labels=labels,
                               raw="date" if is_date else "value")
@@ -1144,7 +1166,8 @@ class _Docx:
             elif kind == "chart":
                 self.chart_no += 1
                 try:
-                    self.doc.segments.extend(read_chart(self.pkg, el, f"chart {self.chart_no}", {"near": near}))
+                    self.doc.segments.extend(read_chart(self.pkg, el, f"chart {self.chart_no}", {"near": near},
+                                                        [("caption", self.last_para)] if self.last_para else []))
                 except InputError as e:
                     self.doc.warnings.append(f"chart {self.chart_no} not read: {e}")
             elif kind == "smartart":
@@ -1444,7 +1467,8 @@ class _Pptx:
                         if rel and not rel.external and self.pkg.has(rel.target):
                             self.charts += 1
                             try:
-                                self.doc.segments.extend(read_chart(self.pkg, rel.target, f"{where}, chart", dict(loc)))
+                                self.doc.segments.extend(read_chart(self.pkg, rel.target, f"{where}, chart", dict(loc),
+                                                                    [("slide title", title)] if title else []))
                             except InputError as e:
                                 self.doc.warnings.append(f"{where}: chart not read: {e}")
                     elif gl == "relIds":
@@ -1864,8 +1888,8 @@ def _in_phonetic(si, t) -> bool:
 def _xlsx_row(row_cells, header, sheet, src, raw_cells, hidden):
     nums = [c for c in row_cells if c[2] in ("num", "num_text")]
     texts = [c for c in row_cells if c[2] == "text" and c[3].strip()]
-    year_row = bool(nums) and all(c[3] == c[3].to_integral_value() and YEAR_MIN <= c[3] <= YEAR_MAX for c in nums)
-    for col, rno, kind, val in nums:
+    year_row = len(nums) >= 2 and all(c[3] == c[3].to_integral_value() and YEAR_MIN <= c[3] <= YEAR_MAX for c in nums)
+    for col, rno, kind, val in ([] if year_row else nums):
         left = " · ".join(_short(t[3], 30) for t in texts if t[0] < col)
         cell = Cell(src.name, sheet, f"{_col_letter(col)}{rno}", rno, col, val, from_text=(kind == "num_text"),
                     hidden=hidden)
@@ -1874,7 +1898,7 @@ def _xlsx_row(row_cells, header, sheet, src, raw_cells, hidden):
         header.setdefault(col, val.strip())
     if year_row:
         for col, rno, kind, val in nums:
-            header.setdefault(col, fmt(val))
+            header.setdefault(col, str(int(val)))
 
 
 def read_csv(path: str, source_units: list) -> _Source:
@@ -1930,7 +1954,7 @@ def read_csv(path: str, source_units: list) -> _Source:
         year_row = bool(nums) and all(c[3] == c[3].to_integral_value() and YEAR_MIN <= c[3] <= YEAR_MAX for c in nums)
         if rno == 1 and texts and (not nums or year_row):
             for col, _, kind, val in cells:
-                header[col] = val.strip() if kind == "text" else fmt(val)
+                header[col] = val.strip() if kind == "text" else fmt(val).replace(",", "")
             continue
         for col, _, kind, val in nums:
             left = " · ".join(_short(t[3], 30) for t in texts if t[0] < col)
@@ -2018,7 +2042,7 @@ def _describe(c: Cell, p: Decimal, s_exp: int, t: Decimal, rounded: Decimal, exa
     expr = " ".join(parts)
     if len(parts) > 1:
         expr += f" = {fmt(t)}"
-    return expr if exact else f"{expr}, rounds to {fmt(rounded)}"
+    return expr if exact else f"{expr}, rounds to {fmt_places(rounded, max(0, -rounded.as_tuple().exponent))}"
 
 
 def match_number(n: Num, index: Index) -> None:
@@ -2147,7 +2171,7 @@ def url_problem(url: str):
 
 
 def collect_links(doc: Deliverable) -> list:
-    """URLs and DOIs written in the deliverable, first occurrence first."""
+    """URLs and DOIs written in the deliverable, in document order, each once."""
     out, seen = [], set()
 
     def add(kind, value, where):
@@ -2156,30 +2180,35 @@ def collect_links(doc: Deliverable) -> list:
             seen.add(key)
             out.append({"kind": kind, "target": value, "where": where})
 
-    wheres = {}
+    def add_url(url, where):
+        m = re.match(r"(?i)https?://(?:dx\.)?doi\.org/(10\..+)", url)
+        if m and DOI_RE.fullmatch(urllib.parse.unquote(m.group(1))):
+            add("doi", urllib.parse.unquote(m.group(1)), where)
+        elif re.match(r"(?i)https?://", url):
+            add("url", url, where)
+
+    hyperlinks = {}
+    for url, text in doc.links:
+        hyperlinks.setdefault(text, []).append(url)
     for seg in doc.segments:
         if seg.raw:
             continue
+        found = []
         for m in re.finditer(r"(?i)\b(?:https?://(?:dx\.)?doi\.org/|doi:\s*)?(10\.\d{4,9}/[^\s\"<>]+)", seg.text):
             doi = m.group(1).rstrip(".,;:)]}'\"»")
             if DOI_RE.fullmatch(doi):
-                add("doi", doi, seg.where)
+                found.append((m.start(), "doi", doi))
         for m in re.finditer(r"(?i)\b(?:https?://|www\.)[^\s<>\"'«»]+", seg.text):
             url = _trim_url(m.group())
-            if url.lower().startswith("www."):
-                url = "https://" + url
-            if re.match(r"(?i)https?://(?:dx\.)?doi\.org/10\.", url):
-                continue
-            add("url", url, seg.where)
-        wheres.setdefault(seg.text, seg.where)
-    for url, text in doc.links:
-        if re.match(r"(?i)https?://(?:dx\.)?doi\.org/(10\..+)", url):
-            doi = re.match(r"(?i)https?://(?:dx\.)?doi\.org/(10\..+)", url).group(1)
-            if DOI_RE.fullmatch(urllib.parse.unquote(doi)):
-                add("doi", urllib.parse.unquote(doi), wheres.get(text, "hyperlink"))
-                continue
-        if re.match(r"(?i)https?://", url):
-            add("url", url, wheres.get(text, "hyperlink"))
+            if not re.match(r"(?i)https?://(?:dx\.)?doi\.org/10\.", url):
+                found.append((m.start(), "url", "https://" + url if url.lower().startswith("www.") else url))
+        for _, kind, value in sorted(found):
+            add(kind, value, seg.where)
+        for url in hyperlinks.pop(seg.text, []):
+            add_url(url, seg.where)
+    for urls in hyperlinks.values():
+        for url in urls:
+            add_url(url, "hyperlink")
     return out
 
 
@@ -2226,7 +2255,8 @@ def _reason(e) -> str:
 
 def check_link(link: dict, timeout: float = LINK_TIMEOUT, opener=None) -> dict:
     opener = opener or urllib.request.build_opener(_SafeRedirects())
-    out = {"kind": link["kind"], "target": mask(link["target"]), "where": link["where"],
+    shown = ("doi:" + link["target"]) if link["kind"] == "doi" else link["target"]
+    out = {"kind": link["kind"], "target": mask(shown), "where": link["where"],
            "status": "could not check", "http_status": None, "detail": ""}
     if link["kind"] == "doi":
         doi = link["target"]
@@ -2241,9 +2271,9 @@ def check_link(link: dict, timeout: float = LINK_TIMEOUT, opener=None) -> dict:
         except (ValueError, UnicodeDecodeError, AttributeError):
             rc = None
         if code == 200 and rc in (1, 200):
-            out.update(status="resolves", detail="DOI registered (doi.org)")
+            out.update(status="resolves", detail="DOI registered at doi.org")
         elif code == 404 or rc == 100:
-            out.update(status="does not resolve", detail="DOI not registered (doi.org)")
+            out.update(status="does not resolve", detail="DOI not registered at doi.org")
         else:
             out["detail"] = err or f"doi.org answered HTTP {code}"
         return out
@@ -2289,7 +2319,7 @@ def _num_dict(n: Num, many_sources: bool) -> dict:
         value = n.mantissa * n.scale * (-1 if n.negative else 1)
         d["read_as"] = {
             "value": fmt(value).replace(",", ""),
-            "mantissa": fmt(n.mantissa).replace(",", ""),
+            "mantissa": fmt_places(n.mantissa, n.decimals).replace(",", ""),
             "decimals": n.decimals,
             "scale": fmt(n.scale).replace(",", "") if n.scale_exp else "1",
             "scale_word": n.scale_word, "scale_from": n.scale_from if n.scale_exp else None,
@@ -2348,7 +2378,8 @@ def _rule(n: Num) -> str:
     bound = ""
     if n.qualifier and n.qualifier[0] in ("lower", "upper"):
         bound = f", and {'≥' if n.qualifier[0] == 'lower' else '≤'} {fmt(n.mantissa)}"
-    return f"{' or '.join(exprs)} rounds to {fmt(n.mantissa)} at {step}{bound}"
+    shown = fmt_places(n.mantissa, _decimals(q) if q < 1 else 0)
+    return f"{' or '.join(exprs)} rounds to {shown} at {step}{bound}"
 
 
 def _empty_summary() -> dict:
@@ -2448,17 +2479,18 @@ def _source_text(d: dict) -> str:
     if st == "untied":
         nr = d.get("nearest")
         if nr:
-            return f"no match; nearest {nr['ref']} = {fmt(Decimal(nr['value']))} ({nr['difference_percent']:+.1f}%)"
-        return "no match"
+            return f"nearest {nr['ref']} = {fmt_short(Decimal(nr['value']))} ({nr['difference_percent']:+.1f}%)"
+        return "no source value within ±10%"
     cands = d.get("candidates") or []
     if st == "tied":
         c = cands[0]
-        more = f" +{d['candidate_count'] - 1} same" if d["candidate_count"] > 1 else ""
+        more = f", {d['candidate_count'] - 1} more cell{'s' if d['candidate_count'] > 2 else ''}" \
+            if d["candidate_count"] > 1 else ""
         sign = ", sign differs" if c.get("sign_differs") else ""
-        return f"{c['ref']} = {fmt(Decimal(c['value']))}{more} ({c['how']}{sign})"
+        return f"{c['ref']} = {fmt_short(Decimal(c['value']))} ({c['how']}{sign}){more}"
     vals = []
     for c in cands[:3]:
-        vals.append(f"{c['ref']} = {fmt(Decimal(c['value']))}")
+        vals.append(f"{c['ref']} = {fmt_short(Decimal(c['value']))}")
     return f"{d['candidate_count']} cells: " + "; ".join(vals) + ("; …" if d["candidate_count"] > 3 else "")
 
 
@@ -2492,7 +2524,7 @@ def render_text(report: dict, explain: bool = False) -> str:
         out.append(f"could not read: {e['error']}")
     rows = [d for d in report["numbers"] if explain or d["status"] != "excluded"]
     if rows:
-        widths = (4, 10, 14, 30, 58)
+        widths = (3, 9, 14, 30, 64)
         head = ("#", "status", "number", "where", "source")
         out.append("")
         out.append("  ".join(h.ljust(w) for h, w in zip(head, widths)) + "  context")
@@ -2514,14 +2546,14 @@ def render_text(report: dict, explain: bool = False) -> str:
         out.append("links (--check-links; HEAD, then GET; DOIs through the doi.org handle API):" if report["links"]
                    else "links (--check-links): none found")
         for l in report["links"]:
-            status = l["status"] + (f" ({l['detail']})" if l["detail"] else "")
-            out.append(f"  {_short(status, 52).ljust(52)}  {_short(l['target'], 80)}  [{l['where']}]")
+            out.append(f"  {l['status'].ljust(16)}  {_short(l['detail'], 34).ljust(34)}  {_short(l['target'], 70)}"
+                       f"  [{l['where']}]")
     return "\n".join(out) + "\n"
 
 
 def _explain_lines(d: dict) -> list:
     out = []
-    ra = d.get("read_as")
+    ra = d.get("read_as") if d["status"] != "excluded" else None
     if ra:
         bits = [f"read as {ra['mantissa']}"]
         if ra["scale"] != "1":

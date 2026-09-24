@@ -16,7 +16,7 @@ with or endorsed by PCAF.
 ## Why it exists
 
 The attribution arithmetic is short: outstanding amount over a denominator, times emissions. The rules around it
-are many and spread over 200 pages: negative total equity counts as zero (5.2, p. 57), a vehicle of unknown value
+are many and spread over the standard's 209 pages: negative total equity counts as zero (5.2, p. 57), a vehicle of unknown value
 is attributed at 100% (5.6, p. 91), a sub-sovereign factor is capped at 1 (5.10, p. 154), sovereign exposure in
 USD is divided by PPP-adjusted GDP in international dollars (5.9, p. 144), scope 3 and removals are reported
 separately (6.1, pp. 162, 165), and data quality is weighted by outstanding amount with scope 3 weighted apart

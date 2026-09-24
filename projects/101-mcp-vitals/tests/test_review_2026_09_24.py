@@ -339,6 +339,13 @@ class F7_StrictDoesNotPassSilently(Isolated):
         code, out, err = self.run_main(["--offline", "npx", "-y", "pkg", "--json"])
         self.assertIn("put mcp-vitals options before it", err)
 
+    def test_strict_after_a_command_line_fails_instead_of_passing(self):
+        # A CI job written as `mcp-vitals npx -y pkg --strict` must not go green unchecked.
+        self.serve({})
+        code, _, err = self.run_main(["--offline", "npx", "-y", "pkg", "--strict"])
+        self.assertEqual(code, 2)
+        self.assertIn("put mcp-vitals options before it", err)
+
     def test_strict_exit_codes(self):
         answers = {"https://registry.npmjs.org/pkg": urllib.error.URLError("down")}
         self.serve(answers)

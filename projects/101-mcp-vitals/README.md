@@ -114,7 +114,9 @@ its own options ends up there.
 Exit codes: 0 when nothing is serious (always, without `--strict`). With `--strict`,
 1 when a server is archived, abandoned, deprecated, has no licence file, or its
 repository, package or pinned version is missing; else 2 when a registry, or GitHub
-and the census, could not be reached. 2 also for a bad `--config` path.
+and the census, could not be reached. 2 also for a bad `--config` path, and for
+`--strict` written after a command line (`mcp-vitals npx -y pkg --strict`): options
+go before the command, because everything after it belongs to the server.
 
 ### In CI
 

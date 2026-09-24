@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "firds-mcp"
+version = "0.1.0"
+description = "Who issued an ISIN, the issuer's LEI, its parent companies and where it trades: ESMA FIRDS and GLEIF, as an MCP server and a command-line tool."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["mcp", "mcp-server", "model-context-protocol", "isin", "lei", "gleif", "esma", "firds", "mifir", "reference-data", "claude-code"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Office/Business :: Financial",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/firds-mcp"
+Issues = "https://github.com/Keremozdemirra/firds-mcp/issues"
+
+[project.scripts]
+firds-mcp = "firds_mcp:main"
+
+[tool.setuptools]
+py-modules = ["firds_mcp"]
