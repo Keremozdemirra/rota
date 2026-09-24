@@ -6,7 +6,8 @@
    "celex",
    "date",
    "eif",
-   "title"
+   "title",
+   "adopted"
   ]
  },
  "results": {
@@ -94,86 +95,6 @@
    {
     "rel": {
      "type": "literal",
-     "value": "corrects"
-    },
-    "celex": {
-     "type": "literal",
-     "datatype": "http://www.w3.org/2001/XMLSchema#string",
-     "value": "32023R1115R(01)"
-    },
-    "date": {
-     "type": "literal",
-     "datatype": "http://www.w3.org/2001/XMLSchema#date",
-     "value": "2024-10-01"
-    }
-   },
-   {
-    "rel": {
-     "type": "literal",
-     "value": "corrects"
-    },
-    "celex": {
-     "type": "literal",
-     "datatype": "http://www.w3.org/2001/XMLSchema#string",
-     "value": "32023R1115R(03)"
-    },
-    "date": {
-     "type": "literal",
-     "datatype": "http://www.w3.org/2001/XMLSchema#date",
-     "value": "2025-03-28"
-    }
-   },
-   {
-    "rel": {
-     "type": "literal",
-     "value": "corrects"
-    },
-    "celex": {
-     "type": "literal",
-     "datatype": "http://www.w3.org/2001/XMLSchema#string",
-     "value": "32023R1115R(02)"
-    },
-    "date": {
-     "type": "literal",
-     "datatype": "http://www.w3.org/2001/XMLSchema#date",
-     "value": "2025-02-28"
-    }
-   },
-   {
-    "rel": {
-     "type": "literal",
-     "value": "corrects"
-    },
-    "celex": {
-     "type": "literal",
-     "datatype": "http://www.w3.org/2001/XMLSchema#string",
-     "value": "32023R1115R(04)"
-    },
-    "date": {
-     "type": "literal",
-     "datatype": "http://www.w3.org/2001/XMLSchema#date",
-     "value": "2025-12-22"
-    }
-   },
-   {
-    "rel": {
-     "type": "literal",
-     "value": "corrects"
-    },
-    "celex": {
-     "type": "literal",
-     "datatype": "http://www.w3.org/2001/XMLSchema#string",
-     "value": "32023R1115R(05)"
-    },
-    "date": {
-     "type": "literal",
-     "datatype": "http://www.w3.org/2001/XMLSchema#date",
-     "value": "2026-07-02"
-    }
-   },
-   {
-    "rel": {
-     "type": "literal",
      "value": "proposes_to_amend"
     },
     "celex": {
@@ -190,6 +111,11 @@
      "type": "literal",
      "xml:lang": "en",
      "value": "Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL amending Regulation (EU) 2023/1115 as regards provisions relating to the date of application"
+    },
+    "adopted": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32024R3234"
     }
    },
    {
@@ -211,6 +137,11 @@
      "type": "literal",
      "xml:lang": "en",
      "value": "Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL amending Regulation (EU) 2023/1115 as regards certain obligations of operators and traders"
+    },
+    "adopted": {
+     "type": "literal",
+     "datatype": "http://www.w3.org/2001/XMLSchema#string",
+     "value": "32025R2650"
     }
    },
    {

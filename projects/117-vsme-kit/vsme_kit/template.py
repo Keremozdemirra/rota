@@ -58,12 +58,36 @@ def when(condition):
 
 
 class Item:
-    """One datapoint (or a table of them) of a disclosure."""
+    """One datapoint (or a table of them) of a disclosure.
 
-    def __init__(self, names, label, para, need=ALWAYS, box=None, kind="value", nonneg=False, unit=None):
+    differs_2026: how Delegated Regulation (EU) 2026/1560 treats the datapoint when it does not require
+    it as the 2025 Recommendation does; a gap is then reported as "depends", not "missing".
+    depends_if: (test, question) for a gap that a fact outside the datapoint may explain.
+    """
+
+    def __init__(self, names, label, para, need=ALWAYS, box=None, kind="value", nonneg=False, unit=None,
+                 differs_2026=None, depends_if=None):
         self.names = (names,) if isinstance(names, str) else tuple(names)
         self.label, self.para, self.need, self.box = label, para, need, box
         self.kind, self.nonneg, self.unit = kind, nonneg, unit
+        self.differs_2026, self.depends_if = differs_2026, depends_if
+
+
+class Depends:
+    """A condition this tool cannot settle from the workbook, with the question that would settle it."""
+
+    def __init__(self, question: str):
+        self.question = question
+
+
+def _addresses_given(t) -> bool:
+    return any(not empty(v) for _, v in t.column("AddressOfSite"))
+
+
+GEOLOCATION_QUESTION = (
+    "Para 24(e)(vii) asks for the geolocation of sites. The site addresses are given but no coordinates: the "
+    "template fills them from the address only when its automatic geolocation box is ticked, by asking "
+    "OpenStreetMap from Excel. Are the coordinates provided another way, or should that box be ticked?")
 
 
 # Questions in the template that make a disclosure applicable, found by their label.
@@ -124,7 +148,8 @@ DISCLOSURES = [
         Item("CountryOfPrimaryOperationsAndLocationOfSignificantAssets", "country of primary operations", "24(e)(vi)",
              box=CB + "b1_other_undertakings_information"),
         Item(("AddressOfSite", "CountryOfSite"), "list of sites", "24(e)(vii)", box=CB + "b1_list_of_sites", kind="table"),
-        Item("GPSLocationOfSite", "geolocation (coordinates) of sites", "24(e)(vii)", box=CB + "b1_list_of_sites", kind="table"),
+        Item("GPSLocationOfSite", "geolocation (coordinates) of sites", "24(e)(vii)", box=CB + "b1_list_of_sites", kind="table",
+             depends_if=(_addresses_given, GEOLOCATION_QUESTION)),
         Item("DescriptionOfSustainabilityRelatedCertificationsOrLabels", "description of certifications or labels", "25",
              need=when("certifications"), box=CB + "b1_certifications_or_labels"),
     ]),
@@ -158,7 +183,9 @@ DISCLOSURES = [
     ("B5", "Biodiversity", "33-34", [
         Item(("IdentifierOfSitesInBiodiversitySensitiveAreasTypedAxis", "AreaOfSiteInBiodiversitySensitiveArea"),
              "sites in or near biodiversity sensitive areas, with area", "33", need=when("bsa_sites"),
-             box=CB + "b5_sites_in_biodiversity_sensitive_areas", kind="table"),
+             box=CB + "b5_sites_in_biodiversity_sensitive_areas", kind="table",
+             differs_2026="Under Delegated Regulation (EU) 2026/1560, para 35 asks for the sites and the name of the "
+                          "biodiversity-sensitive area, not their area."),
         Item(("TotalSealedArea", "TotalNatureOrientedAreaOnSite", "TotalNatureOrientedAreaOffSite", "TotalUseOfLand"),
              "land-use metrics", "34", need=MAY, box=CB + "b5_biodiversity_land_use", kind="table", nonneg=True),
     ]),
@@ -190,7 +217,9 @@ DISCLOSURES = [
         Item("NumberOfEmployeesForCountryOfEmploymentContract", "employees by country of the employment contract", "39(c)",
              need=when("several_countries"), box=CB + "b8_country_of_employment", kind="table", nonneg=True),
         Item("EmployeeTurnoverRate", "employee turnover rate", "40", need=when("fifty_or_more"),
-             box=CB + "b8_turnover_rate", nonneg=True),
+             box=CB + "b8_turnover_rate", nonneg=True,
+             differs_2026="Under Delegated Regulation (EU) 2026/1560 the employee turnover rate is disclosure C5, "
+                          "para 58, in the Comprehensive Module, not part of B8."),
     ]),
     ("B9", "Workforce – Health and safety", "41", [
         Item("NumberOfRecordableWorkRelatedAccidentsInTheReportingPeriod", "number of recordable work-related accidents",
@@ -204,13 +233,19 @@ DISCLOSURES = [
         Item("EmployeesReceivePayEqualOrAboveMinimumWageDeterminedByNationalLawOrCollectiveAgreement",
              "pay at or above the applicable minimum wage", "42(a)", box=CB + "b10_remuneration_and_collective_bargaining"),
         Item("PercentageGapInPayBetweenFemaleAndMaleEmployees", "gender pay gap (%)", "42(b)", need=when("pay_gap_required"),
-             box=CB + "b10_remuneration_and_collective_bargaining"),
+             box=CB + "b10_remuneration_and_collective_bargaining",
+             differs_2026="Under Delegated Regulation (EU) 2026/1560, para 42(b), the pay gap is disclosed only if the "
+                          "undertaking is already required by EU law or other national regulations to report it."),
         Item("PercentageOfEmployeesCoveredByCollectiveBargainingAgreements", "employees covered by collective bargaining (%)",
              "42(c)", box=CB + "b10_remuneration_and_collective_bargaining", nonneg=True),
         Item("AverageNumberOfAnnualTrainingHoursPerMaleEmployee", "average training hours, male employees", "42(d)",
-             box=CB + "b10_number_annual_training_hours_per_employee", nonneg=True),
+             box=CB + "b10_number_annual_training_hours_per_employee", nonneg=True,
+             differs_2026="Under Delegated Regulation (EU) 2026/1560, para 42(d) asks for the average number of annual "
+                          "training hours per employee, without a breakdown by gender."),
         Item("AverageNumberOfAnnualTrainingHoursPerFemaleEmployee", "average training hours, female employees", "42(d)",
-             box=CB + "b10_number_annual_training_hours_per_employee", nonneg=True),
+             box=CB + "b10_number_annual_training_hours_per_employee", nonneg=True,
+             differs_2026="Under Delegated Regulation (EU) 2026/1560, para 42(d) asks for the average number of annual "
+                          "training hours per employee, without a breakdown by gender."),
     ]),
     ("B11", "Convictions and fines for corruption and bribery", "43", [
         Item("TotalNumberOfConvictionsForTheViolationOfAntiCorruptionAndAntiBriberyLaws", "number of convictions", "43",
@@ -491,15 +526,60 @@ def _is_no(v) -> bool:
     return v is False or (isinstance(v, str) and v.strip().upper() in ("NO", "FALSE"))
 
 
+def _option(value):
+    """B1 para 24(a): True for Option B, False for Option A; anything else is a question, never a guess."""
+    if empty(value):
+        return Depends("B1 para 24(a) states no module option: does the report follow Option A (Basic Module only) "
+                       "or Option B (Basic Module and Comprehensive Module)?")
+    n = _norm(value)
+    if "option b" in n or "comprehensive module" in n:
+        return True
+    if "option a" in n or "basic module only" in n:
+        return False
+    return Depends(f"B1 para 24(a) states {quote(value, 40)}, which is neither Option A nor Option B: which module "
+                   "option does the report follow?")
+
+
+def _basis(value):
+    if empty(value):
+        return Depends("B1 para 24(c): is the report prepared on an individual or a consolidated basis? Only a "
+                       "consolidated report lists its subsidiaries (para 24(d)).")
+    n = _norm(value)
+    if "consolidated" in n:
+        return True
+    if "individual" in n:
+        return False
+    return Depends(f"B1 para 24(c) states {quote(value, 40)}: is the report individual or consolidated?")
+
+
+def _employee_count_kind(value):
+    n = _norm(value or "")
+    if "headcount" in n:
+        return "headcount"
+    if "full time equivalent" in n or "fte" in n.split():
+        return "full-time equivalents"
+    return None
+
+
+def _threshold(employees, kind, limit, rule):
+    """At least `limit` employees? A headcount answers it; a full-time-equivalent figure only from `limit` upwards."""
+    if employees is None:
+        return Depends(f"B1 gives no number of employees; {rule}. How many employees does the undertaking have?")
+    if employees >= limit:
+        return True  # a headcount is never below the full-time equivalents
+    if kind == "headcount":
+        return False
+    what = kind or "an unspecified unit"
+    return Depends(f"The number of employees is {fmt(employees)} in {what}; {rule}. Is the headcount {limit} or more?")
+
+
 def conditions(t: Template) -> dict:
     """{key: (located, True/False/None)} for every condition an Item can depend on."""
     out = {key: t.question(key) for key in QUESTIONS}
     option = t.get("BasisForPreparation")
-    out["option_b"] = (t.where("BasisForPreparation") is not None,
-                       None if empty(option) else ("option b" in _norm(option) or "comprehensive" in _norm(option)))
+    out["option_b"] = (t.where("BasisForPreparation") is not None, _option(option))
     basis = t.get("BasisForReporting")
-    out["consolidated"] = (t.where("BasisForReporting") is not None,
-                           None if empty(basis) else "consolidated" in _norm(basis))
+    out["consolidated"] = (t.where("BasisForReporting") is not None, _basis(basis))
     # B2's own question sits in the same row as the grid of sustainability issues, left of it.
     target = t.where("SustainabilityIssueAddressedByPracticePolicyAndOrFutureInitiative")
     practices = (False, None)
@@ -518,16 +598,11 @@ def conditions(t: Template) -> dict:
     out["value_chain_incidents_yes"] = (True, _is_yes(t.get(
         "UndertakingIsAwareOfAnyConfirmedIncidentsInvolvingWorkersInTheValueChainAffectedCommunitiesConsumersAndEndUsers")))
     employees = number(t.get("NumberOfEmployees"))
-    out["fifty_or_more"] = (True, None if employees is None else employees >= 50)
-    # 42(b): may be omitted below a headcount of 150. A full-time-equivalent figure of 150 or more
-    # implies a headcount of at least 150; below that the headcount is unknown.
-    kind = _norm(t.get("TypeOfNumberOfEmployees") or "")
-    if employees is None:
-        out["pay_gap_required"] = (True, None)
-    elif "headcount" in kind:
-        out["pay_gap_required"] = (True, employees >= 150)
-    else:
-        out["pay_gap_required"] = (True, True if employees >= 150 else False)
+    kind = _employee_count_kind(t.get("TypeOfNumberOfEmployees"))
+    out["fifty_or_more"] = (True, _threshold(employees, kind, 50, "para 40 asks for the employee turnover rate only if "
+                                             "the undertaking employs 50 or more employees"))
+    out["pay_gap_required"] = (True, _threshold(employees, kind, 150, "para 42(b) allows the pay gap to be omitted when "
+                                                "the headcount is below 150 employees"))
     return out
 
 
@@ -611,10 +686,14 @@ def check_b3(t: Template, f: Findings, cond: dict):
     if total is not None and any(x is not None for x in rows) and cond["energy_breakdown"][1] is not False:
         s = sum(x for x in rows if x is not None)
         if not close(s, total):
+            own = rows[1]
+            extra = (f"; the breakdown includes {fmt(own)} MWh of self-generated electricity, which counts only once, "
+                     "under fuels, when it is generated from a fuel") if own else ""
             f.add("B3", "energy breakdown vs total",
-                  f"the breakdown adds up to {fmt(s)} MWh; total energy consumption is {fmt(total)} MWh",
-                  "Annex I para 29 (total energy consumption with a breakdown); Annex II para 22 (electricity includes "
-                  "heat, steam and cooling; fuels include anything burned)")
+                  f"the breakdown adds up to {fmt(s)} MWh; total energy consumption is {fmt(total)} MWh{extra}",
+                  "Annex I para 29 (total energy consumption with a breakdown); Annex II para 18 (the table), para 20 "
+                  "(energy generated from a fuel and consumed is counted only once, under fuel consumption) and para 22 "
+                  "(electricity includes heat, steam and cooling; fuels include anything burned)")
     s1 = {c: _num(t, "GrossScope1GreenhouseGasEmissions" + c) for c in COLUMNS}
     lb = {c: _num(t, "GrossLocationBasedScope2GreenhouseGasEmissions" + c) for c in COLUMNS}
     mb = {c: _num(t, "GrossMarketBasedScope2GreenhouseGasEmissions" + c) for c in COLUMNS}
@@ -652,7 +731,8 @@ def check_b3(t: Template, f: Findings, cond: dict):
         expected = num / turnover
         if not close(value, expected) and abs(value - expected) > 1e-9:
             f.add("B3", "GHG intensity",
-                  f"{what} intensity is {fmt(value)}; {fmt(num)} tCO2eq / turnover {fmt(turnover)} = {expected:.6g}",
+                  f"{what} intensity is {fmt(value)}; {fmt(num)} tCO2eq / turnover {fmt(turnover)} = {expected:.6g} "
+                  "(Delegated Regulation (EU) 2026/1560 has no GHG intensity datapoint)",
                   "Annex I para 31 (gross GHG emissions divided by turnover, para 24(e)(iv))")
     base, target = _num(t, "GreenhouseGasEmissionReductionTargetBaseYear"), _num(t, "GreenhouseGasEmissionReductionTargetYear")
     if base is not None and target is not None and not base < target:
@@ -805,14 +885,6 @@ def check_governance(t: Template, f: Findings):
                   f"{fmt(women / men)}", "Annex I para 65; Annex II paras 179-180 (female to male members)")
 
 
-def check_period(t: Template, f: Findings):
-    start, end = t.get("template_reporting_period_startdate"), t.get("template_reporting_period_enddate")
-    iso = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-    if isinstance(start, str) and isinstance(end, str) and iso.match(start) and iso.match(end) and end < start:
-        f.add("B1", "reporting period", f"the reporting period ends ({end}) before it starts ({start})",
-              "Annex I para 16 (period consistent with the financial statements)")
-
-
 # ---------------------------------------------------------------- per disclosure
 
 def _present(t: Template, it: Item):
@@ -839,12 +911,12 @@ def evaluate(t: Template) -> dict:
     check_environment(t, f)
     check_social(t, f)
     check_governance(t, f)
-    check_period(t, f)
     option_b = cond["option_b"][1]
     results, unlocated = [], set()
     for code, title, paras, items in DISCLOSURES:
         entry = {"code": code, "title": title, "module": "basic" if code[0] == "B" else "comprehensive",
-                 "paragraphs": paras, "missing": [], "not_located": [], "omitted": [], "not_applicable": [], "filled": []}
+                 "paragraphs": paras, "missing": [], "depends": [], "not_located": [], "omitted": [],
+                 "not_applicable": [], "filled": []}
         if code[0] == "C" and option_b is False:
             entry["status"] = "not applicable"
             entry["reason"] = "Option A (Basic Module only) is selected under B1, para 24(a)(i)"
@@ -856,12 +928,14 @@ def evaluate(t: Template) -> dict:
             if it.box and it.box in omitted:
                 entry["omitted"].append(ref)
                 continue
-            need = it.need
+            need, question = it.need, None
             if isinstance(need, tuple):
                 located, value = cond[need[1]]
                 if not located:
                     unlocated.add(need[1])
                     need = MAY  # applicability unknown in this version: reported, never called missing
+                elif isinstance(value, Depends):
+                    need, question = ALWAYS, value.question
                 else:
                     # para 13: an 'if applicable' item that is left out is assumed not to be applicable
                     need = ALWAYS if value is True else None
@@ -874,25 +948,30 @@ def evaluate(t: Template) -> dict:
             elif present:
                 entry["filled"].append(ref)
             elif need == ALWAYS:
-                entry["missing"].append(ref)
+                if question is None and it.differs_2026:
+                    question = (f"Recommendation (EU) 2025/1710, para {it.para}, which the template follows, asks for "
+                                f"this. {it.differs_2026} Which edition does the report follow?")
+                if question is None and it.depends_if and it.depends_if[0](t):
+                    question = it.depends_if[1]
+                if question is None and code[0] == "C" and isinstance(option_b, Depends):
+                    question = option_b.question
+                if question:
+                    entry["depends"].append({"item": ref, "question": question})
+                else:
+                    entry["missing"].append(ref)
             else:
                 entry["not_applicable"].append(ref)
         found = [x for x in f.items if x["disclosure"] == code]
         entry["findings"] = found
-        if found:
-            entry["status"] = "inconsistent"
-        elif entry["missing"]:
-            entry["status"] = "missing"
-        elif entry["filled"]:
-            entry["status"] = "filled"
-        elif entry["omitted"]:
-            entry["status"] = "omitted"
-        elif entry["not_applicable"]:
-            entry["status"] = "not applicable"
+        for status, key in (("inconsistent", "findings"), ("missing", "missing"), ("depends", "depends"),
+                            ("filled", "filled"), ("omitted", "omitted"), ("not applicable", "not_applicable")):
+            if entry[key]:
+                entry["status"] = status
+                break
         else:
             entry["status"] = "not located"
         results.append(entry)
-    return {"disclosures": results, "option": option_b, "conditions": cond, "questions_not_found": sorted(unlocated)}
+    return {"disclosures": results, "option": option_b, "questions_not_found": sorted(unlocated)}
 
 
 def check(path) -> dict:
@@ -921,16 +1000,34 @@ def check(path) -> dict:
         counts = {}
         for d in ev["disclosures"]:
             counts[d["status"]] = counts.get(d["status"], 0) + 1
+        known = t.version in KNOWN_VERSIONS
+        implements = IMPLEMENTS if known else (
+            "unknown: this version is not one this tool was built against; versions "
+            f"{KNOWN_VERSIONS[0]} to {KNOWN_VERSIONS[-1]} implement {IMPLEMENTS}")
+        option = ev["option"]
         return {
             "file": str(path),
             "template": {"name": "EFRAG VSME Digital Template", "version": t.version,
-                         "known_version": t.version in KNOWN_VERSIONS, "implements": IMPLEMENTS},
-            "option": {True: "B (Basic and Comprehensive Module)", False: "A (Basic Module only)", None: None}[ev["option"]],
+                         "known_version": known, "implements": implements},
+            "edition_note": edition_note(),
+            "option": (option.question if isinstance(option, Depends)
+                       else {True: "B (Basic and Comprehensive Module)", False: "A (Basic Module only)"}[option]),
             "disclosures": ev["disclosures"],
             "summary": counts,
             "template_own_validation": None if empty(own) or not isinstance(own, str) else quote(own, 40),
             "notes": notes,
         }
+
+
+def edition_note() -> str:
+    """Which text the paragraph numbers belong to, and what replaced it, quoted from the 2026 act."""
+    from .standard import load
+    new = load("2026")
+    recital = new["recital_5"].split(". However")[0].replace("(5) ", "", 1).strip()
+    return ("Paragraph numbers are those of Recommendation (EU) 2025/1710, which EFRAG's template up to 1.3.0 "
+            f"implements. {new['act']} ({new['oj']}) entered into force on {new['entry_into_force']}; its recital 5: "
+            f"\"{recital}.\" Datapoints the 2025 text asks for but the 2026 standard does not are reported as "
+            "'depends', with the difference.")
 
 
 def serious(report: dict) -> bool:

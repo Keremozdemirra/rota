@@ -24,7 +24,8 @@ put in on purpose. Real output of `vsme-kit check example.xlsx`, 2026-09-24:
 
 ```
 VSME Digital Template check: synthetic-example.xlsx
-Template version 1.3.0; it implements Commission Recommendation (EU) 2025/1710 of 30 July 2025, Annex I (standard) and Annex II (guidance), OJ L, 2025/1710, 5.8.2025.
+Template version 1.3.0; implements: Commission Recommendation (EU) 2025/1710 of 30 July 2025, Annex I (standard) and Annex II (guidance), OJ L, 2025/1710, 5.8.2025.
+Paragraph numbers are those of Recommendation (EU) 2025/1710, which EFRAG's template up to 1.3.0 implements. Commission Delegated Regulation (EU) 2026/1560 (OJ L, 2026/1560, 21.9.2026) entered into force on 2026-09-24; its recital 5: "From the date of entry into force of this Regulation, Recommendation (EU) 2025/1710 should be considered as no longer producing any legal effects." Datapoints the 2025 text asks for but the 2026 standard does not are reported as 'depends', with the difference.
 Module option (B1, para 24(a)): B (Basic and Comprehensive Module)
 
 code  disclosure                                        status          details
@@ -47,7 +48,7 @@ C9    Gender diversity ratio in the governance body     filled
 2 inconsistent · 1 missing · 15 filled · 2 not applicable
 
 Inconsistencies:
-- B3: the breakdown adds up to 1,250 MWh; total energy consumption is 1,000 MWh. Annex I para 29 (total energy consumption with a breakdown); Annex II para 22 (electricity includes heat, steam and cooling; fuels include anything burned).
+- B3: the breakdown adds up to 1,250 MWh; total energy consumption is 1,000 MWh; the breakdown includes 50 MWh of self-generated electricity, which counts only once, under fuels, when it is generated from a fuel. Annex I para 29 (total energy consumption with a breakdown); Annex II para 18 (the table), para 20 (energy generated from a fuel and consumed is counted only once, under fuel consumption) and para 22 (electricity includes heat, steam and cooling; fuels include anything burned).
 - B3: reporting period: Scope 1 210 + location-based Scope 2 180 = 390 tCO2eq, but the location-based total is 400 tCO2eq. Annex I para 30(a)-(b); Annex II para 27 (Scope 1 + Scope 2 = Total).
 - B10: employees covered by collective bargaining: 125 %. Annex I para 42(c); Annex II paras 137-139 (covered employees / employees x 100, bands up to 100 %).
 - B10: coverage is 125 %; 40 / 48 = 83.33 %. Annex II para 138.
@@ -142,17 +143,28 @@ templates 1.0.0, 1.0.1, 1.1.0, 1.1.1, 1.2.0 and 1.3.0 (downloaded 2026-09-24). A
 read the same way; what cannot be found is listed as "not located", never as missing. Extra
 sheets are ignored.
 
-Per disclosure the result is `filled`, `missing` (with the datapoints), `not applicable` (the
-template's own question answered no or left unanswered, which paragraph 13 treats as "not
-applicable"; or Option A, so no Comprehensive Module), `omitted` (ticked as classified or
-sensitive, paragraph 19) or `inconsistent`. The consistency checks, each citing Recommendation
+Per disclosure the result is `filled`, `missing` (with the datapoints), `depends` (with the
+question that settles it), `not applicable` (the template's own question answered no or left
+unanswered, which paragraph 13 treats as "not applicable"; or Option A, so no Comprehensive
+Module), `omitted` (ticked as classified or sensitive, paragraph 19) or `inconsistent`.
+
+`depends` is used when the answer needs a fact the workbook does not settle, never as a guess:
+the module option is empty or not one of Option A and B; the number of employees is in
+full-time equivalents below a threshold that counts heads (paragraph 40: 50 employees; paragraph
+42(b): a headcount of 150); site addresses are given without coordinates, which the template
+fills only when its automatic geolocation box is ticked; or the 2025 text asks for a datapoint
+that Delegated Regulation (EU) 2026/1560 does not (the turnover rate moved to C5, the pay gap is
+required only where law already requires it, training hours need no gender breakdown, sites in
+biodiversity-sensitive areas need no area). The check's output says which edition its paragraph
+numbers belong to and quotes recital 5 of Regulation 2026/1560. `--strict` fails on `missing`
+and `inconsistent`, not on `depends`. The consistency checks, each citing Recommendation
 (EU) 2025/1710:
 
 | Check | Rests on |
 | --- | --- |
-| Energy: renewable + non-renewable = row total; the breakdown adds up to total energy consumption | Annex I para 29; Annex II paras 18, 22 |
+| Energy: renewable + non-renewable = row total; the breakdown adds up to total energy consumption | Annex I para 29; Annex II paras 18, 20, 22 |
 | Scope 1 + location-based (and market-based) Scope 2 = the total, also for base and target year | Annex I para 30; Annex II paras 27, 45 |
-| GHG intensity = emissions / turnover, recomputed | Annex I para 31 |
+| GHG intensity = emissions / turnover, recomputed (the 2026 text has no intensity datapoint) | Annex I para 31 |
 | Base year before target year | Annex I para 54; Annex II paras 156-157 |
 | Water at high water-stress sites within the total; consumption = withdrawal - discharge | Annex I paras 35-36; Annex II para 87 |
 | Sealed area within total land use; area units hectares or m2 | Annex I paras 33-34 |
@@ -186,18 +198,22 @@ oversized files, network failures during `refresh`, and the MCP protocol end to 
 - **Bundled:** the text of Annex I (and Annex II) of both acts, extracted from the English XHTML
   that CELLAR serves for CELEX 32026R1560 and 32025H1710, retrieved 2026-09-24. Details,
   SHA-256 and counts in [`vsme_kit/data/SOURCES.md`](vsme_kit/data/SOURCES.md).
-  Licence: the Commission's reuse policy. Its legal notice
-  (<https://commission.europa.eu/legal-notice_en>, checked 2026-09-24) says: "Unless otherwise
-  indicated (e.g. in individual copyright notices), content owned by the EU on this website is
-  licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence. This
-  means that reuse is allowed, provided appropriate credit is given and changes are indicated."
-  The policy is Commission Decision 2011/833/EU (<http://data.europa.eu/eli/dec/2011/833/oj>),
-  which covers documents the Publications Office publishes on the Commission's behalf (Article
-  2(1)(a)). Neither act carries an individual copyright notice.
+  These are acts as published in the Official Journal, re-used under the EUR-Lex legal notice
+  (<https://eur-lex.europa.eu/content/legal-notice/legal-notice.html>; archived copy of
+  2026-09-22 at <https://web.archive.org/web/20260922160312/https://eur-lex.europa.eu/content/legal-notice/legal-notice.html>):
+  "Unless otherwise specified, you can re-use the legal documents published in EUR-Lex for
+  commercial or non-commercial purposes." and Commission Decision 2011/833/EU
+  (<http://data.europa.eu/eli/dec/2011/833/oj>), Article 4: "All documents shall be available for
+  reuse: (a) for commercial or non-commercial purposes under the conditions laid down in Article 6".
+  Article 6(2) lets those conditions include acknowledging the source and not distorting the
+  meaning. The EUR-Lex notice grants CC BY 4.0 only to its editorial content, the summaries and the
+  consolidated texts, so these texts are not labelled CC BY. Neither act carries an individual
+  copyright notice.
   Attribution, carried by every answer that quotes the text: `Source: <act>, <OJ reference>,
-  <ELI>; © European Union; reused under the Commission's reuse policy (Decision 2011/833/EU),
-  CC BY 4.0; retrieved 2026-09-24 from CELLAR`, followed by the changes made (whitespace
-  normalised, tables flattened, footnotes and appendices left out, images replaced by a marker).
+  <ELI>; © European Union, https://eur-lex.europa.eu; re-used under the EUR-Lex legal notice and
+  Commission Decision 2011/833/EU (Articles 4 and 6); retrieved 2026-09-24 from CELLAR`, followed
+  by the changes made (whitespace normalised, tables flattened, footnotes and appendices left out
+  while footnote markers stay, images replaced by a marker). Words are not changed.
 - **Not bundled:** anything from EFRAG. EFRAG's VSME Digital Template carries the MIT licence on
   its own "Licence" sheet ("Copyright (c) 2025 EFRAG", in versions 1.0.0 to 1.3.0); `vsme-kit`
   reads the user's copy and ships no part of it except the datapoint names and label phrases it
@@ -238,4 +254,5 @@ oversized files, network failures during `refresh`, and the MCP protocol end to 
 
 ## Licence
 
-MIT. The bundled EU texts remain © European Union, reused under CC BY 4.0 as described above.
+MIT for the code. The bundled texts remain © European Union, re-used under the EUR-Lex legal
+notice and Decision 2011/833/EU as described above.

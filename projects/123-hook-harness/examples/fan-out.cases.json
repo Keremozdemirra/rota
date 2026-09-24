@@ -1,0 +1,10 @@
+{
+  "description": "One Bash call should start at most one handler process. Run against any hooks file that inspects Bash commands, e.g. hook-harness run hooks/hooks.json examples/fan-out.cases.json --dry-run",
+  "cases": [
+    {"name": "an install command", "tool_name": "Bash", "tool_input": {"command": "npm install left-pad"}, "expect": {"max_handlers": 1}},
+    {"name": "a command substitution", "tool_name": "Bash", "tool_input": {"command": "echo \"$(date)\""}, "expect": {"max_handlers": 1}},
+    {"name": "a variable in a compound command", "tool_name": "Bash", "tool_input": {"command": "ls && echo $DIR"}, "expect": {"max_handlers": 1}},
+    {"name": "a here-document", "tool_name": "Bash", "tool_input": {"command": "cat <<EOF > notes.txt\nhello\nEOF"}, "expect": {"max_handlers": 1}},
+    {"name": "a plain command", "tool_name": "Bash", "tool_input": {"command": "git status"}, "expect": {"max_handlers": 1}}
+  ]
+}

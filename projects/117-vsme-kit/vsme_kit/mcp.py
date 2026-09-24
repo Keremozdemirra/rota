@@ -38,11 +38,13 @@ TOOLS = [
          "required": ["code"]}},
     {"name": "check_template",
      "description": "Checks a filled EFRAG VSME Digital Template (local .xlsx, versions 1.0.0-1.3.0) and reports each "
-                    "disclosure B1-C9 as filled, missing, not applicable, omitted (classified or sensitive) or "
-                    "inconsistent, listing missing datapoints and arithmetic or unit inconsistencies (totals, Scope 1+2, "
-                    "intensity, percentages over 100 %, negative quantities), each with the paragraph of Recommendation "
-                    "(EU) 2025/1710 it rests on. Percentages in the template are fractions (0.25 = 25 %). Reads the file "
-                    "only; returns no free text from it except short marked quotes. Not assurance.",
+                    "disclosure B1-C9 as filled, missing, depends (with the question that settles it), not applicable, "
+                    "omitted (classified or sensitive) or inconsistent, listing missing datapoints and arithmetic or unit "
+                    "inconsistencies (totals, Scope 1+2, intensity, percentages over 100 %, negative quantities). "
+                    "Paragraphs cited are those of Recommendation (EU) 2025/1710, which the template implements; since "
+                    "2026-09-24 Delegated Regulation (EU) 2026/1560 applies instead (its recital 5), and datapoints only the "
+                    "2025 text requires are reported as 'depends'. Percentages in the template are fractions (0.25 = 25 %). "
+                    "Reads the file only; returns no free text from it except short marked quotes. Not assurance.",
      "inputSchema": {"type": "object", "properties": {
          "path": {"type": "string", "description": "path of the .xlsx file on this machine"}}, "required": ["path"]}},
     {"name": "editions",
@@ -94,6 +96,8 @@ def handle(req) -> None:
         return
     method, id_ = req.get("method"), req.get("id")
     params = req.get("params") if isinstance(req.get("params"), dict) else {}
+    if "id" not in req:  # a notification: JSON-RPC 2.0 sends no response to it, whatever the method
+        return
     if method == "initialize":
         reply(id_, {"protocolVersion": PROTOCOL, "capabilities": {"tools": {}},
                     "serverInfo": {"name": "vsme-kit", "version": VERSION,

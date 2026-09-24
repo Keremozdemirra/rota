@@ -222,6 +222,17 @@
    {
     "c": {
      "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/MAC"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Macao Special Administrative Region of the People’s Republic of China"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
      "value": "http://publications.europa.eu/resource/authority/country/YUG"
     },
     "alt": {
@@ -354,12 +365,45 @@
    {
     "c": {
      "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/GGY"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Bailiwick of Guernsey"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
      "value": "http://publications.europa.eu/resource/authority/country/XIC"
     },
     "alt": {
      "type": "literal",
      "xml:lang": "en",
      "value": "Autonomous Community of the Canary Islands"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/CRQ"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Sark Island"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/CRQ"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Isle of Sark"
     }
    },
    {
@@ -596,6 +640,39 @@
    {
     "c": {
      "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/MAC"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Macau"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/MAC"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Macao"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/MAC"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Macanese"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
      "value": "http://publications.europa.eu/resource/authority/country/IRN"
     },
     "alt": {
@@ -745,6 +822,17 @@
      "type": "literal",
      "xml:lang": "en",
      "value": "North Korean"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/GGY"
+    },
+    "alt": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Guernsey"
     }
    },
    {

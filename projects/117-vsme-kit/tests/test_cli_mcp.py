@@ -66,6 +66,8 @@ class McpStdio(Isolated):
             {"jsonrpc": "2.0", "id": 7, "method": "resources/list"},
             {"jsonrpc": "2.0", "id": 8, "method": "tools/call", "params": {"name": "check_template", "arguments": {"path": str(self.tmp / "missing.xlsx")}}},
             {"jsonrpc": "2.0", "id": 9, "method": "tools/call", "params": {"name": "vsme_disclosures", "arguments": {"bogus": 1}}},
+            # review item 6: a notification (no id) gets no response, even for tools/call
+            {"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "editions", "arguments": {}}},
         ]
         stdin = "\n".join(json.dumps(r) for r in requests) + "\nnot json\n"
         env = dict(os.environ, PYTHONPATH=str(ROOT), HOME=str(self.tmp))
@@ -91,10 +93,12 @@ class McpStdio(Isolated):
         self.assertTrue(by_id[9]["result"]["isError"])
         self.assertEqual(replies[-1]["error"]["code"], -32700)
         self.assertNotIn(None, [r.get("jsonrpc") for r in replies])
+        self.assertEqual([r.get("id") for r in replies], [1, 2, 3, 4, 5, 6, 7, 8, 9, None])  # None: the parse error only
 
     def test_tool_descriptions_state_returns_units_and_limits(self):
         text = " ".join(t["description"] for t in mcp.TOOLS)
-        for needed in ("MWh", "tCO2eq", "fractions (0.25 = 25 %)", "1.0.0-1.3.0", "not reproduced", "Not assurance"):
+        for needed in ("MWh", "tCO2eq", "fractions (0.25 = 25 %)", "1.0.0-1.3.0", "not reproduced", "Not assurance",
+                       "Delegated Regulation (EU) 2026/1560", "depends"):
             self.assertIn(needed, text)
 
 

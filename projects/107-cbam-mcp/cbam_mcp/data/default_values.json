@@ -40,6 +40,7 @@
    "RULE_NOT_LISTED": true,
    "RULE_NO_VALUE": true,
    "NO_ROUTE": true,
+   "HS_GROUP_ROUTE": true,
    "DIRECT_INDIRECT_FOR_INFORMATION": true
   },
   "checked": "2026-09-24",
@@ -54,6 +55,45 @@
    "https://taxation-customs.ec.europa.eu/document/download/1c05d211-80cb-4aaa-8ef0-e08005a95d7e_en?filename=DV%20correcting%20act_final%20update_06.08.xlsx"
   ],
   "this_file_listed": true
+ },
+ "consolidated": {
+  "celex": "02025R2621-20260101",
+  "consolidation_date": "2026-01-01",
+  "reference": "02025R2621 — EN — 01.01.2026 — 001.001",
+  "url": "http://publications.europa.eu/resource/celex/02025R2621-20260101",
+  "retrieved": "2026-09-24",
+  "sha256": "efeb70d41fbe83d9a466fa35214445b4860cb68fe2bc589e844f2cd838c6ca17",
+  "bytes": 12396218,
+  "amendments": {
+   "M1": "32026R1740"
+  },
+  "disclaimer": "This text is meant purely as a documentation tool and has no legal effect. The Union's institutions do not assume any liability for its contents. The authentic versions of the relevant acts, including their preambles, are those published in the Official Journal of the European Union and available in EUR-Lex. Those official texts are directly accessible through the links embedded in this document",
+  "markup": {
+   "annex_i": [
+    "For the calculation of the number of CBAM certificates, the default values of the column ‘total emissions’ shall be selected and increased as follows:",
+    "For goods in the cement, iron and steel, aluminium and hydrogen sectors, the mark-up shall be 10 % for the year 2026, 20 % for the year 2027 and 30 % for the year 2028 and onwards.",
+    "For goods in the fertiliser sector, the mark-up shall be 1 % for the year 2026 and onwards."
+   ],
+   "annex_iv": [
+    "The ‘highest default values’ in this Annex shall be increased by the mark-ups laid down in the introductory part of Annex I."
+   ]
+  },
+  "notes": [],
+  "check": {
+   "tables_compared": 122,
+   "rows_compared": 12540,
+   "rows_identical": 12540,
+   "annex_iv_compared": 283,
+   "annex_iv_identical": 283,
+   "tables_only_in_official_journal": [],
+   "differences": [],
+   "quotes_found": {
+    "RULE_NOT_LISTED": true,
+    "RULE_NO_VALUE": true,
+    "NO_ROUTE": true,
+    "HS_GROUP_ROUTE": true
+   }
+  }
  }
 },
 "other_table": "Other Countries and Territories",

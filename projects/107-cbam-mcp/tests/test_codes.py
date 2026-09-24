@@ -27,6 +27,7 @@ class CnCodes(unittest.TestCase):
         self.assertIn("prefix", warnings[0])
 
     def test_ex_prefix_is_ignored_and_said(self):
+        self.assertEqual(normalize_cn("ex2507 00 80")[0], "25070080")  # review: no space after "ex"
         digits, warnings = normalize_cn("ex 2507 00 80")
         self.assertEqual(digits, "25070080")
         self.assertIn("'ex'", warnings[0])
@@ -61,6 +62,15 @@ class Countries(unittest.TestCase):
                      "North Korea (Democratic People's Republic of Korea)"}
         for typed, name in cases.items():
             self.assertEqual(resolve_country(typed, self.TABLES)[0], name, typed)
+
+    def test_sourced_and_tool_aliases(self):
+        tables = self.TABLES + ["China", "United States", "United Kingdom"]
+        extra = {"Czechia": {"iso": "CZ", "kind": "eu"}}
+        for typed, name in {"PRC": "China", "People’s Republic of China": "China",
+                            "S. Korea": "Korea, Republic of (South Korea)", "ROK": "Korea, Republic of (South Korea)",
+                            "USA": "United States", "UK": "United Kingdom", "Republic of Türkiye": "Türkiye",
+                            "Czech Republic": "Czechia"}.items():
+            self.assertEqual(resolve_country(typed, tables, extra)[0], name, typed)
 
     def test_extra_names_from_the_regulation(self):
         extra = {"Norway": {"iso": "NO", "kind": "annex_iii"}, "Germany": {"iso": "DE", "kind": "eu"}}

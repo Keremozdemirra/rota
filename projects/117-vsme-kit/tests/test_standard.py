@@ -23,8 +23,25 @@ class Lookups(unittest.TestCase):
         self.assertEqual((b3["title"], b3["paragraphs"], b3["in_value_chain_cap"]),
                          ("Energy and greenhouse gas emissions", ["32", "33"], True))
         self.assertFalse(res["disclosures"][1]["in_value_chain_cap"])  # B2
-        self.assertIn("CC BY 4.0", res["attribution"])
         self.assertIn("retrieved 2026-09-24", res["attribution"])
+
+    def test_licence_basis_is_the_eur_lex_notice_not_cc_by(self):
+        # review 2026-09-24, item 1: OJ texts are re-used under the EUR-Lex notice and Decision 2011/833/EU
+        for edition in standard.EDITIONS:
+            snap = standard.load(edition)
+            line = standard.attribution(snap)
+            self.assertNotIn("CC BY", line)
+            self.assertIn("EUR-Lex legal notice and Commission Decision 2011/833/EU (Articles 4 and 6)", line)
+            self.assertEqual(snap["licence"]["terms"], "https://eur-lex.europa.eu/content/legal-notice/legal-notice.html")
+            self.assertNotIn("licence", snap["licence"])
+            self.assertIn("re-use the legal documents published in EUR-Lex", snap["licence"]["quote"])
+            self.assertIn("All documents shall be available for reuse", snap["licence"]["policy_quote"])
+
+    def test_changes_line_mentions_the_footnote_markers(self):
+        # review item 7: "(2)" and similar markers stay while the footnotes are left out
+        self.assertIn("footnote markers", standard.load("2025")["changes"])
+        para13 = next(p for p in standard.load("2025")["annex_i"] if p["n"] == "13")
+        self.assertIn("(2)", para13["text"])
 
     def test_comprehensive_module_2025(self):
         res = standard.disclosures("comprehensive", "2025")

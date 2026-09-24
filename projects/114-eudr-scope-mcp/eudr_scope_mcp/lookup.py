@@ -115,6 +115,8 @@ class Snapshot:
         for level in ("low", "high"):
             for item in self.risk.get(level, []):
                 self.listed[item["iso3"]] = (level, item["annex_name"])
+                if item["iso3"] in self.by_iso:  # the Annex's own spelling, e.g. "Solomon Island"
+                    self.by_name[norm_country(item["annex_name"])] = self.by_iso[item["iso3"]]
 
 
 def _short_title(title: str) -> str:
@@ -148,16 +150,18 @@ def reset_cache() -> None:
 
 def attribution(retrieved: str, topic: str, derived: bool = False, table_version: str | None = None) -> str:
     """The attribution line for one kind of answer (also quoted in SOURCES.md)."""
-    text = (f"Source: EUR-Lex/CELLAR, Publications Office of the European Union, retrieved {retrieved}; "
-            "(c) European Union, reuse under Commission Decision 2011/833/EU.")
+    where = f"from EUR-Lex/CELLAR, Publications Office of the European Union, retrieved {retrieved}; (c) European Union"
+    if topic == "country":
+        return (f"Source: Commission Implementing Regulation (EU) 2025/1093 as published in the Official Journal, {where}; "
+                "reuse under the EUR-Lex legal notice and Commission Decision 2011/833/EU. ISO codes from the EU "
+                f"'Countries and territories' authority table (version {table_version}), matched by eudr-scope-mcp.")
+    text = (f"Source: consolidated text of Regulation (EU) 2023/1115 (CC BY 4.0) and the amending acts as published "
+            f"in the Official Journal, {where}.")
     if topic == "annex":
-        text += (" Table derived by eudr-scope-mcp: amending acts applied to the consolidated text."
+        text += (" Changes: Annex I derived by eudr-scope-mcp, amending acts applied to the consolidated text."
                  if derived else " Extracted by eudr-scope-mcp.")
     elif topic == "dates":
         text += " Dates read from the article texts by eudr-scope-mcp."
-    elif topic == "country":
-        text += (" Country names matched to ISO 3166-1 codes by eudr-scope-mcp through the EU 'Countries and "
-                 f"territories' authority table (version {table_version}).")
     return text
 
 
@@ -307,6 +311,19 @@ def _table_notes(commodities, day: str) -> list:
     return out
 
 
+def _partial(e: dict, inside: list) -> bool:
+    """An 'ex' code, or an entry with its own exclusions, covers only part of the goods under the code."""
+    return (all(c["ex"] for c in inside) or bool(e["notes"])
+            or "with the exception of" in e["description"])
+
+
+def _horizon(day: str) -> str:
+    checked = _state().retrieved
+    if day > checked:
+        return f" (Checked on {checked}; acts adopted after that date are not reflected in an answer for {day}.)"
+    return ""
+
+
 def eudr_scope(cn_code, date: str | None = None) -> dict:
     digits, notes = normalize_cn(cn_code)
     day = _check_date(date)
@@ -331,36 +348,44 @@ def eudr_scope(cn_code, date: str | None = None) -> dict:
     level = CATEGORY_LEVEL[len(digits)]
     commodities = sorted({e["commodity"] for e, _ in containing} | {e["commodity"] for e in below})
     if containing:
-        full = [e for e, inside in containing if any(not c["ex"] for c in inside)]
-        status = "relevant_product" if full else "partly_ex"
-        e = (full or [x for x, _ in containing])[0]
+        full = [e for e, inside in containing if not _partial(e, inside)]
+        e, inside = next(((x, i) for x, i in containing if x in full), containing[0])
         if full:
-            answer = (f"CN {shown} falls under Annex I entry '{e['label']}' ({e['commodity']}) on {day}: goods under "
-                      "this code are relevant products within the meaning of Article 2, point (2), of Regulation (EU) "
-                      "2023/1115.")
+            status = "relevant_product"
+            answer = (f"Yes: CN {shown} falls under Annex I entry '{e['label']}' ({e['commodity']}) on {day}; goods "
+                      "under this code are relevant products within the meaning of Article 2, point (2), of Regulation "
+                      "(EU) 2023/1115 (general exclusions such as samples are in table_notes).")
         else:
-            answer = (f"CN {shown} falls under the 'ex' entry '{e['label']}' ({e['commodity']}) on {day}: only goods "
-                      "under this code that match the entry's description are relevant products; others under the "
-                      "same code are not.")
-        if any(n for n in e["notes"]):
-            answer += " The entry has exclusions ('not including ...'), listed in the notes."
+            status = "partly_ex"
+            kind = "the 'ex' entry" if all(c["ex"] for c in inside) else "the entry"
+            answer = (f"Depends: CN {shown} falls under {kind} '{e['label']}' ({e['commodity']}) on {day}, which covers "
+                      "only part of the goods under this code. Question to settle: do the goods match the entry's "
+                      "description and fall outside each exclusion quoted in its notes or text? Only then are they "
+                      "relevant products.")
     elif below:
         status = "heading_with_listed_codes"
         labels = ", ".join(e["label"] for e in below[:12]) + (" ..." if len(below) > 12 else "")
-        answer = (f"CN {shown} ({level}) is not listed as a whole on {day}; Annex I lists {len(below)} "
-                  f"entr{'y' if len(below) == 1 else 'ies'} under it: {labels}. Look up the code of the goods.")
+        answer = (f"Depends on the sub-code: CN {shown} ({level}) is not listed as a whole on {day}; Annex I lists "
+                  f"{len(below)} entr{'y' if len(below) == 1 else 'ies'} under it: {labels}. Look up the code of the goods.")
     else:
         status = "not_listed"
-        answer = (f"CN {shown} is not listed in Annex I on {day}: goods under this code are not relevant products "
-                  "under Regulation (EU) 2023/1115.")
+        answer = (f"No: CN {shown} is not listed in Annex I on {day}, so goods under this code are not relevant "
+                  "products under Regulation (EU) 2023/1115. This tool does not check that the code exists in the "
+                  "Combined Nomenclature.")
     if later:
         answer += " Later: " + "; ".join(f"'{e['label']}' applies from {e['valid_from']}" for e in later[:6]) + "."
     if earlier and not containing:
         answer += " Earlier: " + "; ".join(f"'{e['label']}' until {e['valid_to']}" for e in earlier[:6]) + "."
+    answer += _horizon(day)
+    table_status = status
+    if s.annex.get("status") != "verified":
+        status = "unverified"
+        answer = ("unverified: " + "; ".join(s.annex.get("status_reasons", [])[:3])
+                  + ". What the table last verified says (may be outdated): " + answer)
     notes.append("The answer depends on the CN classification of the goods, which this tool does not check.")
     result = {
         "input": str(cn_code)[:40], "cn_code": digits, "cn_code_display": shown, "level": level, "date": day,
-        "status": status, "answer": answer,
+        "status": status, "answer": answer, "table_status": table_status,
         "commodities": commodities,
         "matches": [_view(e, "the code falls under this entry") for e, _ in containing],
         "listed_under_this_code": [_view(e, "entry under this code") for e in below],
@@ -404,12 +429,16 @@ def commodity_codes(commodity, date: str | None = None) -> dict:
     live = [e for e in mine if _live(e, day)]
     later = [e for e in mine if e["valid_from"] and e["valid_from"] > day]
     removed = [e for e in mine if e["valid_to"] and e["valid_to"] < day]
+    answer = (f"On {day}, Annex I lists {len(live)} entr{'y' if len(live) == 1 else 'ies'} under {name}"
+              + (f"; {len(later)} more apply later" if later else "")
+              + (f"; {len(removed)} earlier entr{'y was' if len(removed) == 1 else 'ies were'} replaced or removed"
+                 if removed else "") + "." + _horizon(day))
+    if s.annex.get("status") != "verified":
+        answer = ("unverified: " + "; ".join(s.annex.get("status_reasons", [])[:3])
+                  + ". What the table last verified says (may be outdated): " + answer)
     result = {
-        "commodity": name, "date": day,
-        "answer": (f"On {day}, Annex I lists {len(live)} entr{'y' if len(live) == 1 else 'ies'} under {name}"
-                   + (f"; {len(later)} more apply later" if later else "")
-                   + (f"; {len(removed)} earlier entr{'y was' if len(removed) == 1 else 'ies were'} replaced or removed"
-                      if removed else "") + "."),
+        "commodity": name, "date": day, "status": s.annex.get("status"),
+        "answer": answer,
         "entries": [_view(e) for e in live],
         "applies_later": [_view(e) for e in later],
         "replaced_or_removed": [_view(e) for e in removed],
@@ -502,13 +531,25 @@ def application_dates(operator_type: str = "all") -> dict:
         rows = [row("2", general), row("3", micro)]
 
     first = rows[0]
-    if verified:
-        answer = f"From {first['applies_from']} ({first['provision']}) for {first['who']}"
-        if len(rows) > 1:
-            answer += f"; from {rows[1]['applies_from']} ({rows[1]['provision']}) for {rows[1]['who']}"
-        answer += f". The obligations concerned are {a38['p2_articles']}."
+    if verified and category in ("large", "medium"):
+        answer = f"From {first['applies_from']} ({first['provision']}) for {first['who']}."
+    elif verified and category in ("downstream", "trader"):
+        answer = (f"From {first['applies_from']} ({first['provision']}) for {first['who']} that are not natural persons "
+                  f"or micro- or small undertakings. Depends for micro or small ones: {a38['p3_date']} if Article "
+                  "38(3) extends to them. Question for counsel: does Article 38(3), worded for 'operators', cover "
+                  f"{first['who']} that are natural persons or micro- or small undertakings?")
+    elif verified:
+        p3 = next(r for r in rows if r["provision"] == "Article 38(3)")
+        p2 = next(r for r in rows if r["provision"] == "Article 38(2)")
+        answer = (f"Depends on two facts for natural persons and micro- or small undertakings: were they established "
+                  f"as such by {a38['p3_established_by']}, and are the products outside the Annex to Regulation (EU) "
+                  f"No 995/2010? If both, from {p3['applies_from']} (Article 38(3)); otherwise from "
+                  f"{p2['applies_from']} (Article 38(2))"
+                  + (f", which also applies to {p2['who']}" if category in ("sme", "operator", "all") else "") + ".")
     else:
         answer = "unverified: " + "; ".join(d.get("status_reasons", [])[:3])
+    if verified:
+        answer += f" The obligations concerned are {a38['p2_articles']}."
     related = [
         {"date": a38["entry_into_force"], "provision": "Article 38(1) and Article 1(2)",
          "what": "entry into force; relevant products produced before this date are outside the Regulation, "
@@ -546,6 +587,25 @@ def application_dates(operator_type: str = "all") -> dict:
 
 
 # ------------------------------------------------------------ countries
+
+def _readings(c: dict, s: "Snapshot", depth: int = 0) -> set:
+    """Risk levels the Annex can be read to give an entry of the authority table.
+
+    Listed: its level. A country not listed: standard (Article 1(2)). A
+    territory (scheme 'Territories' or recorded under another country):
+    standard, or the level of the country it is recorded under, or unknown when
+    the table names none. This rule is the tool's reading, documented in README.
+    """
+    listed = s.listed.get(c["iso3"])
+    if listed:
+        return {listed[0]}
+    if not c.get("territory") and not c.get("part_of"):
+        return {"standard"}
+    parent = s.by_iso.get(c.get("part_of") or "")
+    if parent is None or depth > 5:
+        return {"standard", "unknown"}
+    return {"standard"} | _readings(parent, s, depth + 1)
+
 
 def _resolve_country(text: str):
     s = _state()
@@ -593,21 +653,28 @@ def country_risk(country) -> dict:
                                f"'{'Low' if level == 'low' else 'High'} risk countries' in the Annex to {act_name}.",
                      "listed_in_annex_as": annex_name,
                      "basis": {"provision": f"Article 1(1) and Annex of {act_name}", "text": remote(art1.get("1"))}})
-    elif c.get("part_of") and c["part_of"] in s.by_iso:
-        parent = s.by_iso[c["part_of"]]
-        plevel = s.listed.get(parent["iso3"], ("standard", None))[0]
-        base.update({"risk": None, "status": "not_determined",
-                     "answer": f"{c['name']} is not named in the Annex to {act_name}. The EU authority table records it "
-                               f"under {parent['name']}, which is {plevel} risk. Whether that classification covers "
-                               f"{c['name']}, or Article 1(2) (standard risk for countries not listed) applies, is not "
-                               "stated in the act; this tool does not decide it.",
-                     "part_of": {"name": parent["name"], "iso3": parent["iso3"], "risk": plevel},
-                     "basis": {"provision": f"Article 1(2) of {act_name}", "text": remote(art1.get("2"))}})
     else:
-        base.update({"risk": "standard", "status": "not_listed",
-                     "answer": f"{c['name']} is not listed in the Annex to {act_name}, so it has the standard level of "
-                               "risk (Article 1(2)).",
-                     "basis": {"provision": f"Article 1(2) of {act_name}", "text": remote(art1.get("2"))}})
+        readings = _readings(c, s)
+        parent = s.by_iso.get(c.get("part_of") or "")
+        if readings == {"standard"}:
+            base.update({"risk": "standard", "status": "not_listed",
+                         "answer": f"{c['name']} is not listed in the Annex to {act_name}, so it has the standard level "
+                                   "of risk (Article 1(2))." + (f" It is recorded under {parent['name']}, which is not "
+                                                                "listed either, so both readings give standard."
+                                                                if parent else ""),
+                         "basis": {"provision": f"Article 1(2) of {act_name}", "text": remote(art1.get("2"))}})
+        else:
+            under = (f"the EU authority table records it under {parent['name']} "
+                     f"({'/'.join(sorted(readings - {'standard'}))} risk)" if parent
+                     else "the EU authority table lists it as a territory without naming the country it belongs to")
+            base.update({"risk": None, "status": "not_determined",
+                         "answer": f"Depends: {c['name']} is not named in the Annex to {act_name}, and {under}. "
+                                   "Article 1(2) gives standard risk to countries not listed. Question for counsel: "
+                                   f"does the classification of the country {c['name']} belongs to cover it, or is it "
+                                   "a country not listed?",
+                         "readings": sorted(readings),
+                         "part_of": {"name": parent["name"], "iso3": parent["iso3"]} if parent else None,
+                         "basis": {"provision": f"Article 1(2) of {act_name}", "text": remote(art1.get("2"))}})
     base["act"] = {"celex": act["celex"], "name": act_name, "entry_into_force": act.get("entry_into_force"),
                    "amended": bool(act.get("related"))}
     base["legal_basis"] = f"Article 29 of Regulation (EU) 2023/1115; {act_name}"
@@ -640,19 +707,24 @@ def sources() -> dict:
         "acts": acts,
         "consolidated_version": s.consolidated | {"disclaimer": remote(s.consolidated.get("disclaimer"))},
         "corrigenda": [{"celex": c["celex"], "date": c["date"], "english": c.get("english")} for c in d.get("corrigenda", [])],
-        "pending_proposals": [{"celex": p["celex"], "date": p["date"], "title": remote(p["title"])}
-                              for p in d.get("pending_proposals", [])],
+        "proposals": [{"celex": p["celex"], "date": p["date"], "adopted_as": p.get("adopted_as"),
+                       "title": remote(p["title"])} for p in d.get("proposals", d.get("pending_proposals", []))],
         "documents": s.manifest.get("documents", []),
         "status": {"annex_i": s.annex.get("status"), "application_dates": d.get("status"),
                    "country_risk": s.risk.get("status")},
         "country_codes": {"table": s.countries.get("authority_table"), "version": s.countries.get("version")},
         "licence": {
-            "cellar": "European Commission reuse notice, Commission Decision 2011/833/EU "
-                      "(http://data.europa.eu/eli/dec/2011/833/oj), as given on "
-                      "https://data.europa.eu/data/datasets/sparql-cellar-of-the-publications-office",
-            "commission_web_content": "CC BY 4.0, https://commission.europa.eu/legal-notice_en",
+            "consolidated_text": "CC BY 4.0 (EUR-Lex legal notice, consolidated texts); Annex I here is derived",
+            "official_journal_acts": "EUR-Lex legal notice: 'Unless otherwise specified, you can re-use the legal "
+                                     "documents published in EUR-Lex for commercial or non-commercial purposes.'",
+            "commission_acts": "also Commission Decision 2011/833/EU, Articles 4 and 6(2) (acknowledge the source, "
+                               "do not distort the meaning)",
+            "cellar_metadata_and_country_table": "Commission reuse notice, Decision 2011/833/EU "
+                                                 "(data.europa.eu dataset records)",
+            "legal_notice": "https://eur-lex.europa.eu/content/legal-notice/legal-notice.html (see data/SOURCES.md "
+                            "for where and when it was read)",
         },
-        "tool": {"name": "eudr-scope-mcp", "version": __version__, "data_dir": str(s.dir)},
+        "tool": {"name": "eudr-scope-mcp", "version": __version__},
     }
     result.update(_common("sources"))
     return result

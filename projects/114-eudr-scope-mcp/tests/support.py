@@ -4,7 +4,7 @@ The fixtures are real responses from publications.europa.eu recorded on
 2026-09-24, trimmed: the consolidated text keeps its header, Articles 1, 2
 (seven definitions), 37, 38 and the whole of Annex I; the delegated act keeps
 16 of its 57 amendment points; the country act keeps 12 of its 144 names; the
-country authority table keeps 24 entries.
+country authority table keeps 27 entries.
 """
 from __future__ import annotations
 
@@ -39,8 +39,8 @@ def sparql_key(query: str) -> str:
         return "nal_alt"
     if "ISO_3166_1_ALPHA_2" in query:
         return "nal"
-    if "expression_uses_language ?lang" in query:
-        return "languages_corrigenda"
+    if "resource_legal_corrects_resource_legal ?t" in query:
+        return "corrigenda_" + celex.group(1)
     if "act_consolidated_consolidates_resource_legal" in query:
         return "consolidated_" + celex.group(1)
     if "resource_legal_amends_resource_legal" in query:

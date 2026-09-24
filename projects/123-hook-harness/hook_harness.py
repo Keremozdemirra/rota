@@ -2634,8 +2634,14 @@ def render_run_text(rep: dict, verbose: bool = False) -> str:
                 out.append(f"      {'ok  ' if ch['ok'] else 'FAIL'} {ch['check']}: expected {ch['expected']}, got "
                            f"{ch['actual']}")
         if detail:
-            for h in c["handlers"]:
-                out.append(f"      {'runs' if h['runs'] else 'skip'} {h['handler']} (line {h['line']}): {h['why']}")
+            for runs in (True, False):
+                hs = [h for h in c["handlers"] if h["runs"] == runs]
+                limit = len(hs) if verbose else 8
+                for h in hs[:limit]:
+                    out.append(f"      {'runs' if h['runs'] else 'skip'} {h['handler']} (line {h['line']}): {h['why']}")
+                if len(hs) > limit:
+                    out.append(f"      ... and {len(hs) - limit} more handler(s) that {'run' if runs else 'do not run'}"
+                               " (--verbose or --json lists them)")
             for run in c["runs"]:
                 out.append(f"      {run['handler']}: {run['outcome']}; exit {run['exit_code']}, {run['duration']:.2f} s, "
                            f"stdout {run['stdout_kind']}")

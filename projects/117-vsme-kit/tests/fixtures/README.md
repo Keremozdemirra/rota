@@ -5,7 +5,8 @@
 (EU) 2026/1560, retrieved 2026-09-24), trimmed for size: most numbered paragraphs of the annexes,
 the appendices of Annex I and most recitals and articles were removed, and embedded images were
 replaced by an empty `data:` URI. Structure, markup and the remaining text are unchanged.
-© European Union, CC BY 4.0 (Commission reuse policy, Decision 2011/833/EU).
+© European Union, https://eur-lex.europa.eu; re-used under the EUR-Lex legal notice and Commission
+Decision 2011/833/EU (Articles 4 and 6).
 
 There are no workbook fixtures on disk: `tests/xlsxgen.py` generates synthetic VSME-like
 workbooks at test time, with invented values.

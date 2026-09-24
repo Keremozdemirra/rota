@@ -7,7 +7,8 @@
    "a3",
    "pref",
    "status",
-   "broader"
+   "broader",
+   "territory"
   ]
  },
  "results": {
@@ -201,6 +202,37 @@
    {
     "c": {
      "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/CRQ"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "CQ"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "CRQ"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Sark"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    },
+    "broader": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/GGY"
+    },
+    "territory": {
+     "type": "literal",
+     "value": "http://publications.europa.eu/resource/authority/country/0003"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
      "value": "http://publications.europa.eu/resource/authority/country/DEU"
     },
     "a2": {
@@ -288,6 +320,33 @@
     "broader": {
      "type": "uri",
      "value": "http://publications.europa.eu/resource/authority/country/FRA"
+    },
+    "territory": {
+     "type": "literal",
+     "value": "http://publications.europa.eu/resource/authority/country/0003"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/GGY"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "GG"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "GGY"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Guernsey"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
     }
    },
    {
@@ -311,6 +370,10 @@
     "status": {
      "type": "uri",
      "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    },
+    "territory": {
+     "type": "literal",
+     "value": "http://publications.europa.eu/resource/authority/country/0003"
     }
    },
    {
@@ -334,6 +397,10 @@
     "broader": {
      "type": "uri",
      "value": "http://publications.europa.eu/resource/authority/country/ESP"
+    },
+    "territory": {
+     "type": "literal",
+     "value": "http://publications.europa.eu/resource/authority/country/0003"
     }
    },
    {
@@ -403,6 +470,33 @@
     "status": {
      "type": "uri",
      "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    }
+   },
+   {
+    "c": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/country/MAC"
+    },
+    "a2": {
+     "type": "literal",
+     "value": "MO"
+    },
+    "a3": {
+     "type": "literal",
+     "value": "MAC"
+    },
+    "pref": {
+     "type": "literal",
+     "xml:lang": "en",
+     "value": "Macao"
+    },
+    "status": {
+     "type": "uri",
+     "value": "http://publications.europa.eu/resource/authority/concept-status/CURRENT"
+    },
+    "territory": {
+     "type": "literal",
+     "value": "http://publications.europa.eu/resource/authority/country/0003"
     }
    },
    {

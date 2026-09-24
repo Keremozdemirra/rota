@@ -1,0 +1,9 @@
+# The sdist carries what the test suite reads, plus the examples and the cross-check tool.
+include README.md LICENSE hook_harness.py
+recursive-include tests *.py *.json
+recursive-include tests/fixtures *.json
+recursive-include examples *.json
+recursive-include examples/mcp-vitals-project .mcp.json
+recursive-include tools *.py
+recursive-include .github *.yml
+global-exclude *.py[cod]

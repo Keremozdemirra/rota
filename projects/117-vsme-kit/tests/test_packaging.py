@@ -85,7 +85,15 @@ class Packaging(unittest.TestCase):
             snap = json.loads(read(f"vsme_kit/data/standard-{edition}.json"))
             self.assertIn(snap["source"]["sha256"], sources)
             self.assertIn(snap["celex"], sources)
-            self.assertEqual(snap["licence"]["terms"], "https://commission.europa.eu/legal-notice_en")
+            self.assertEqual(snap["licence"]["terms"], "https://eur-lex.europa.eu/content/legal-notice/legal-notice.html")
+        for needed in ("Unless otherwise specified, you can re-use the legal documents published in EUR-Lex for commercial "
+                       "or non-commercial purposes.", "All documents shall be available for reuse",
+                       "the editorial content of this website, the summaries of EU legislation and the consolidated texts",
+                       "web.archive.org/web/20260922160312"):
+            self.assertIn(needed, " ".join(sources.split()))
+        for rel in ("README.md", "THIRD_PARTY_NOTICES.md", "tests/fixtures/README.md"):
+            text = " ".join(read(rel).split())
+            self.assertNotRegex(text, r"(Official Journal|OJ|bundled|EU texts?)[^.]{0,80}CC BY 4\.0", rel)
 
     def test_no_token_shaped_literals(self):
         pattern = re.compile("|".join([r"sk-ant-[A-Za-z0-9_-]{20}", r"sk-[A-Za-z0-9]{32}", r"ghp_[A-Za-z0-9]{36}",

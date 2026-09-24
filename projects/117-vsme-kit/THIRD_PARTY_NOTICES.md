@@ -38,6 +38,9 @@ solutions built on these materials mention EFRAG; this file and the README do.
 
 ## Official Journal texts
 
-`vsme_kit/data/*.json` and `tests/fixtures/*.xhtml`: © European Union, from the Official Journal
-via CELLAR, reused under the Commission's reuse policy (Decision 2011/833/EU), CC BY 4.0. Changes
-are described in `vsme_kit/data/SOURCES.md` and `tests/fixtures/README.md`.
+`vsme_kit/data/*.json` and `tests/fixtures/*.xhtml`: © European Union, https://eur-lex.europa.eu,
+acts as published in the Official Journal, read via CELLAR. Re-used under the EUR-Lex legal notice
+("Unless otherwise specified, you can re-use the legal documents published in EUR-Lex for commercial
+or non-commercial purposes.") and Commission Decision 2011/833/EU, Articles 4 and 6: the source is
+acknowledged and the meaning is not changed. Changes are described in `vsme_kit/data/SOURCES.md` and
+`tests/fixtures/README.md`.

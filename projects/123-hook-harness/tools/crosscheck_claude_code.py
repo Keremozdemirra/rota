@@ -236,7 +236,7 @@ def _mock(plan: list, log: list):
 
 
 def run_claude(work: Path, plan: list, settings: dict, plugin_dir: Path | None, claude: str,
-               project: Path) -> list:
+               project: Path, mode: str = "dontAsk") -> list:
     """Send PLAN through Claude Code; return the recorder rows."""
     home = work / "home"
     home.mkdir(exist_ok=True)
@@ -252,7 +252,7 @@ def run_claude(work: Path, plan: list, settings: dict, plugin_dir: Path | None, 
            # read only by the local stand-in above; not a credential
            "ANTHROPIC_API_KEY": "placeholder-for-local-stand-in", "DISABLE_TELEMETRY": "1",
            "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1", "DISABLE_AUTOUPDATER": "1", "IS_SANDBOX": "1"}
-    argv = [claude, "-p", "go", "--settings", str(work / "settings.json"), "--permission-mode", "dontAsk",
+    argv = [claude, "-p", "go", "--settings", str(work / "settings.json"), "--permission-mode", mode,
             "--output-format", "stream-json", "--verbose"]
     if plugin_dir:
         argv += ["--plugin-dir", str(plugin_dir)]
@@ -381,8 +381,20 @@ def hooks(hooks_path: Path, cases_path: Path, claude: str, keep: Path | None) ->
             index.append(None)  # the tool would really run
             continue
         inp = dict(case.get("tool_input") or {})
-        if tool == "Edit":
+        fp = inp.get("file_path")
+        if tool in FILE_TOOLS and isinstance(fp, str) and (fp.startswith(("~", "\\")) or ":" in fp[:3] or (
+                os.path.isabs(fp) and not os.path.abspath(fp).startswith(str(proj) + os.sep))):
+            index.append(None)  # only paths inside the temporary project are replayed
+            continue
+        target = proj / inp["file_path"] if tool in ("Write", "Edit") and isinstance(inp.get("file_path"), str) else None
+        if target is not None and not target.is_absolute():
+            target = proj / target
+        if tool in ("Edit", "Write") and target is not None and target.exists():
             plan.append({"name": "Read", "input": {"file_path": inp.get("file_path")}})
+        if tool == "Edit" and target is not None:
+            # the replayed edit must succeed for PostToolUse to fire, so the file first holds old_string
+            plan.append({"name": "Write", "input": {"file_path": inp.get("file_path"),
+                                                    "content": str(inp.get("old_string", ""))}})
         index.append(len(plan))
         plan.append({"name": tool, "input": inp})
     settings = {"hooks": {}, "permissions": {"allow": [f"Edit(/{proj}/**)", f"Read(/{proj}/**)"]}}
@@ -397,10 +409,17 @@ def hooks(hooks_path: Path, cases_path: Path, claude: str, keep: Path | None) ->
     else:
         settings["hooks"] = data["hooks"]
     settings["hooks"].setdefault("PreToolUse", []).append(_deny_all(work, except_files=True))
-    rows = run_claude(work, plan, settings, plugin_dir, claude, proj)
-    runs = {}
+    settings["hooks"].setdefault("PreToolUse", []).append({"matcher": "Write|Edit|Read",
+                                                          "hooks": [_recorder(work, "__pre__")]})
+    settings["hooks"].setdefault("PostToolUse", []).append({"matcher": "*", "hooks": [_recorder(work, "__post__")]})
+    # .mcp.json and other protected paths need bypassPermissions to be written; the catch-all PreToolUse handler
+    # still denies every other tool, and file cases outside the temporary project were skipped above.
+    rows = run_claude(work, plan, settings, plugin_dir, claude, proj, mode="bypassPermissions")
+    runs, reached = {}, set()
     for row in rows:
-        if row["id"] != "__deny__":
+        if row["id"] in ("__deny__", "__pre__", "__post__"):
+            reached.add((row["tool_use_id"], row["event"]))
+        else:
             runs.setdefault((row["tool_use_id"], row["event"]), []).append(row["id"])
     opts = hh.Options(dry_run=True, project_dir=proj)
     predicted = hh.run_suite(src, suite, opts)
@@ -409,7 +428,12 @@ def hooks(hooks_path: Path, cases_path: Path, claude: str, keep: Path | None) ->
     print(f"{hooks_path} against {version}:")
     for case, pos, pred in zip(suite.cases, index, predicted):
         if pos is None:
-            print(f"  skipped  {case['name']} (only PreToolUse calls and PostToolUse file calls are sent)")
+            print(f"  skipped  {case['name']} (sent are PreToolUse calls, and PostToolUse file calls inside the "
+                  "temporary project)")
+            continue
+        if (f"toolu_{pos:05d}", case["event"]) not in reached:
+            print(f"  not counted  {case['name']}: the {case['event']} hooks never fired for this call (Claude Code "
+                  "rejected it, or the tool failed; the PowerShell tool, for one, is not enabled on every machine)")
             continue
         observed = len(runs.get((f"toolu_{pos:05d}", case["event"]), []))
         total += 1

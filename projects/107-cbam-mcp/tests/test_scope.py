@@ -91,6 +91,21 @@ class Scope(unittest.TestCase):
         self.assertEqual(heading["status"], "partially_in_scope")
         self.assertEqual([x["cn_code"] for x in heading["subcodes"]["in_scope"]], ["2804 10 00"])
 
+    def test_prefix_wider_than_the_bundled_cn_is_not_fully_in_scope(self):
+        # Review finding 3: only 2716 of chapter 27 (and 2601 of 26) is bundled; that must not read as "all covered".
+        for code in ("27", "26", "260"):
+            r = lookup.cbam_scope(code)
+            self.assertEqual(r["status"], "partially_in_scope", code)
+            self.assertFalse(r["subcodes"]["complete"], code)
+            self.assertIn("bundled CN chapters", r["subcodes"]["note"])
+        self.assertEqual(lookup.cbam_scope("2716")["status"], "in_scope")
+        self.assertEqual(lookup.cbam_scope("84")["status"], "not_in_scope")
+
+    def test_depends_on_names_the_missing_fact(self):
+        self.assertIn("'ex' line", lookup.cbam_scope("2507 00 80")["depends_on"])
+        self.assertIn("8 digits", lookup.cbam_scope("7202")["depends_on"])
+        self.assertNotIn("depends_on", lookup.cbam_scope("7208 51 20"))
+
     def test_annex_ii_absent_for_goods_with_indirect_emissions(self):
         r = lookup.cbam_scope("2601 12 00")
         self.assertEqual((r["status"], r["annex_ii"]["status"]), ("in_scope", "not listed"))

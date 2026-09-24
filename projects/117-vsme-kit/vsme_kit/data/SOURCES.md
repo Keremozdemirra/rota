@@ -22,36 +22,46 @@ effects". The Recommendation was published on 5 August 2025.
 
 ## Licence
 
-Commission legal notice, https://commission.europa.eu/legal-notice_en, checked 2026-09-24:
-"The Commission's reuse policy is implemented by the Commission Decision of 12 December 2011 on
-the reuse of Commission documents. Unless otherwise indicated (e.g. in individual copyright
-notices), content owned by the EU on this website is licensed under the Creative Commons
-Attribution 4.0 International (CC BY 4.0) licence. This means that reuse is allowed, provided
-appropriate credit is given and changes are indicated."
+These are acts as published in the Official Journal. They are re-used under the EUR-Lex legal
+notice and Commission Decision 2011/833/EU, not under CC BY 4.0.
 
-Commission Decision 2011/833/EU (read from CELLAR, CELEX 32011D0833, 2026-09-24) applies to
-"public documents produced by the Commission ... which have been published by the Commission or
-by the Publications Office on its behalf" (Article 2(1)(a)); documents are available for reuse
-"for commercial or non-commercial purposes" (Article 4); conditions may include acknowledging
-the source and not distorting the meaning (Article 6(2)). Neither act's English XHTML carries an
-individual copyright notice (no "©" or "copyright" in either text).
+EUR-Lex legal notice, https://eur-lex.europa.eu/content/legal-notice/legal-notice.html (archived
+copy https://web.archive.org/web/20260922160312/https://eur-lex.europa.eu/content/legal-notice/legal-notice.html):
+"Unless otherwise specified, you can re-use the legal documents published in EUR-Lex for commercial
+or non-commercial purposes." The same notice grants CC BY 4.0 only to "the editorial content of
+this website, the summaries of EU legislation and the consolidated texts". Wording as recorded in
+the build standards of this project on 2026-09-24 from the archived copy; neither the live page
+(an AWS WAF JavaScript challenge, HTTP 202) nor the archive (connection reset, HTTP 429) could be
+read from this environment on 2026-09-24.
 
-Not verified from here: EUR-Lex's own legal notice
-(https://eur-lex.europa.eu/content/legal-notice/legal-notice.html) answered with an AWS WAF
-JavaScript challenge (HTTP 202) to every request from this environment on 2026-09-24. The
-Publications Office's copyright notice (https://op.europa.eu/en/web/about-us/legal-notices/publications-office-of-the-european-union-copyright)
-refers to it for EUR-Lex content and asks questions about reusing CELLAR content to be sent to
-op-copyright@publications.europa.eu.
+Commission Decision 2011/833/EU on the reuse of Commission documents, http://data.europa.eu/eli/dec/2011/833/oj,
+read from CELLAR (CELEX 32011D0833) on 2026-09-24. Article 2(1)(a): it applies to public documents
+produced by the Commission "which have been published by the Commission or by the Publications
+Office on its behalf through publications, websites or dissemination tools". Article 4: "All
+documents shall be available for reuse: (a) for commercial or non-commercial purposes under the
+conditions laid down in Article 6". Article 6(2): those conditions may include "the obligation for
+the reuser to acknowledge the source of the documents", "the obligation not to distort the original
+meaning or message of the documents" and "the non-liability of the Commission for any consequence
+stemming from the reuse".
+
+Neither act's English XHTML carries an individual copyright notice (no "©" or "copyright" in
+either text). The Commission's own legal notice (https://commission.europa.eu/legal-notice_en)
+covers the content of that website only and is not the basis for these texts. The Publications
+Office's copyright notice
+(https://op.europa.eu/en/web/about-us/legal-notices/publications-office-of-the-european-union-copyright,
+read 2026-09-24) refers to the EUR-Lex notice for EUR-Lex content.
 
 ## Attribution and changes
 
 Every answer that quotes the text carries:
-`Source: <act>, <OJ reference>, <ELI>; © European Union; reused under the Commission's reuse
-policy (Decision 2011/833/EU), CC BY 4.0; retrieved 2026-09-24 from CELLAR.` and the changes:
-text extracted from the English XHTML; whitespace normalised; tables flattened (cells joined
-by " | "); footnotes, the appendices of Annex I and the table of contents left out; formulas
-and figures, which the Official Journal shows as images, replaced by
-"[image in the Official Journal, not reproduced]". Words are not changed.
+`Source: <act>, <OJ reference>, <ELI>; © European Union, https://eur-lex.europa.eu; re-used under
+the EUR-Lex legal notice and Commission Decision 2011/833/EU (Articles 4 and 6); retrieved
+2026-09-24 from CELLAR.` and the changes: text extracted from the English XHTML; whitespace
+normalised; tables flattened (cells joined by " | "); footnotes, the appendices of Annex I and the
+table of contents left out, while footnote markers such as "(5)" stay in the text; formulas and
+figures, which the Official Journal shows as images, replaced by
+"[image in the Official Journal, not reproduced]". Words are not changed, so the meaning is not
+distorted (Article 6(2)(b)).
 
 No personal data: the acts name no natural persons other than the signatory, and the snapshot
 keeps only the annexes, Article 4 and recital 5.

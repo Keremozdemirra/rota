@@ -35,9 +35,20 @@ class DefaultValue(unittest.TestCase):
         self.assertIn("2026/1740", r["legally_binding_source"])
         self.assertEqual(r["legal_status_of_data"]["quote"], legal.EXCEL_NOTICE["quote"])
         self.assertIn("version 2 of 2026-08-06", r["data_version"])
-        self.assertIn("CC BY 4.0", r["attribution"])
+        # Point 16: the Excel is a Commission document (Decision 2011/833/EU), not labelled CC BY 4.0.
+        self.assertIn("Decision 2011/833/EU", r["attribution"])
+        self.assertNotIn("CC BY", r["attribution"])
         self.assertIn("identical", r["checked_against_official_journal"])
-        self.assertIn(legal.MARKUP_POINTER, r["notes"])
+        self.assertIn(legal.MARKUP_NOTE, r["notes"])
+        self.assertIn({"production_route_at_hs_level": legal.HS_GROUP_ROUTE}, r["notes"])
+
+    def test_markup_rule_is_quoted_from_the_consolidated_text(self):
+        rule = lookup.default_value("7601", "India")["markup_rule"]
+        self.assertIn("the mark-up shall be 10 % for the year 2026", rule["quote"][1])
+        self.assertIn("fertiliser sector, the mark-up shall be 1 %", rule["quote"][2])
+        self.assertIn("consolidated text 02025R2621-20260101", rule["source"])
+        self.assertIn("consolidation date 2026-01-01", rule["source"])
+        self.assertIn("increased by the mark-ups", rule["annex_iv"][0])
 
     def test_dash_uses_other_countries_with_the_rule(self):
         line = lookup.default_value("2523 21 00", "Türkiye")["lines"][0]
@@ -50,11 +61,21 @@ class DefaultValue(unittest.TestCase):
         self.assertEqual(line["values_from_table"], "Other Countries and Territories")
         self.assertIn("has no line 7601", line["fallback"]["reason"])
 
-    def test_country_missing_in_the_excel(self):
-        r = lookup.default_value("7601", "Kosovo")
-        line = r["lines"][0]
-        self.assertEqual((line["values_from_table"], line["fallback"]["rule"]), ("Other Countries and Territories", legal.RULE_NOT_LISTED))
-        self.assertIn("not a country name in the tables", r["warnings"][0])
+    def test_country_missing_in_the_excel_is_an_error_not_a_fallback(self):
+        # Review finding 2: an unrecognised name must never get the "Other" row's value.
+        for name in ("Kosovo", "Atlantis", "XK"):
+            with self.assertRaises(InputError) as cm:
+                lookup.default_value("7601", name)
+            self.assertIn("ask for country 'Other countries and territories'", str(cm.exception))
+
+    def test_other_only_when_asked_for(self):
+        line = lookup.default_value("7601", "Other countries and territories")["lines"][0]
+        self.assertEqual((line["values_from_table"], line.get("fallback"), line["total"]),
+                         ("Other Countries and Territories", None, 2.203))
+
+    def test_eu_member_under_another_name(self):
+        r = lookup.default_value("7208 51 20", "Czech Republic")
+        self.assertEqual((r["status"], r["country"], r["lines"]), ("not_a_third_country", "Czechia", []))
 
     def test_typo_is_an_error_with_a_suggestion(self):
         with self.assertRaises(InputError) as cm:
@@ -70,7 +91,7 @@ class DefaultValue(unittest.TestCase):
         self.assertIn("point 1 of Annex III", r["explanation"])
 
     def test_electricity_is_not_in_the_excel(self):
-        r = lookup.default_value("2716 00 00", "Serbia")
+        r = lookup.default_value("2716 00 00", "India")
         self.assertEqual((r["status"], r["lines"]), ("not_in_this_data", []))
         self.assertEqual(r["rule"], legal.ELECTRICITY)
         self.assertIn("CC BY NC SA", r["licence_of_annex_iii"]["quote"])
@@ -98,7 +119,18 @@ class DefaultValue(unittest.TestCase):
 
     def test_out_of_scope_code_has_no_line(self):
         r = lookup.default_value("7317 00", "India")
-        self.assertEqual((r["status"], r["scope_status"]), ("no_line", "not_in_scope"))
+        self.assertEqual((r["status"], r["scope_status"], r["lines"]), ("not_in_scope", "not_in_scope", []))
+
+    def test_excluded_code_does_not_borrow_its_heading(self):
+        # Review finding 4: 3105 60 00 is excepted in Annex I; the 3105 heading row must not answer for it.
+        r = lookup.default_value("3105 60 00", "India")
+        self.assertEqual((r["status"], r["lines"]), ("not_in_scope", []))
+        self.assertEqual(lookup.compare_origins("3105 60 00", ["India"])["status"], "not_in_scope")
+
+    def test_code_under_a_see_below_heading_without_its_own_line(self):
+        r = lookup.default_value("7206 50", "India")
+        self.assertEqual((r["status"], r["lines"]), ("no_line", []))
+        self.assertIn("7206 10 00, 7206 90 00", r["explanation"])
 
 
 class Compare(unittest.TestCase):
@@ -111,18 +143,32 @@ class Compare(unittest.TestCase):
 
     def test_india_versus_turkiye(self):
         r = lookup.compare_origins("7601 10 00", ["India", "TR", "Kosovo", "Norway"])
+        self.assertIn("Kosovo", r["countries_not_recognised"][0])
         line = r["lines"][0]
         rows = {c["country"]: c for c in line["by_country"]}
         self.assertEqual((rows["India"]["total"], rows["Türkiye"]["total"]), (1.87, 1.7))
-        self.assertEqual(rows["Kosovo"]["values_from_table"], "Other Countries and Territories")
+        self.assertNotIn("Kosovo", rows)
         self.assertEqual(rows["Norway"]["status"], "origin_outside_cbam")
         self.assertEqual(line["other_countries_and_territories"]["total"], 2.203)
         self.assertIs(r["legally_binding"], False)
 
     def test_bad_countries(self):
-        r = lookup.compare_origins("7601", "India, Indai")
+        r = lookup.compare_origins("7601", ["India", "Indai"])
         self.assertEqual(len(r["lines"][0]["by_country"]), 1)
         self.assertIn("India", r["countries_not_recognised"][0])
+
+    def test_names_with_commas_are_not_split(self):
+        # Review finding 6: "Congo, Democratic Republic of" is one table, not "Congo" plus a remainder.
+        r = lookup.compare_origins("2523 29 00", ["Congo, Democratic Republic of", "Congo"])
+        totals = [(c["country"], c["total"]) for c in r["lines"][0]["by_country"]]
+        self.assertEqual(totals, [("Congo, Democratic Republic of", 1.25), ("Congo", 0.93)])
+        one = lookup.compare_origins("2523 29 00", "Congo, Democratic Republic of")
+        self.assertEqual(one["lines"][0]["by_country"][0]["total"], 1.25)
+
+    def test_ex_warning_in_both_value_tools(self):
+        # Review finding 5.
+        self.assertIn("'ex' line", lookup.compare_origins("2507 00 80", ["India"])["warnings"][-1])
+        self.assertIn("'ex' line", lookup.default_value("2507 00 80", "India")["warnings"][-1])
         for bad in ([], None, ["India"] * 31, 5):
             with self.assertRaises(InputError):
                 lookup.compare_origins("7601", bad)

@@ -26,9 +26,10 @@ X = "{%s}" % XH
 SML = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 
 # Lines of the default-value tables kept in the fixtures.
-KEEP_LINES = {"2507008080", "2523100010", "2523100090", "25232100", "28041000", "7206", "72061000", "72069000",
-              "7208", "7601", "761090", "76109010", "76109090", "26011200"}
-KEEP_TABLES = {"India", "Türkiye", "Albania", "Other Countries and Territories", "Other countries and territories"}
+KEEP_LINES = {"2507008080", "2523100010", "2523100090", "25232100", "25232900", "28041000", "3105", "31051000",
+              "7206", "72061000", "72069000", "7208", "7601", "761090", "76109010", "76109090", "26011200"}
+KEEP_TABLES = {"India", "Türkiye", "Albania", "Congo", "Congo, Democratic Republic of",
+               "Other Countries and Territories", "Other countries and territories"}
 # CN notations (prefixes) kept, with all their ancestors.
 KEEP_CN = ("2507", "2523", "2716", "2804", "310510", "310560", "7202", "720410", "720851", "730820", "7317",
            "760110", "260112")
@@ -177,18 +178,26 @@ def xlsx(raw: Path):
     print(path.name, path.stat().st_size)
 
 
-def oj(raw: Path):
+def oj(raw: Path, out_name: str, consolidated: bool = False):
+    """The default-value act, trimmed: the quoted rules, the kept tables and, for a consolidated text,
+    its reference line, disclaimer, amendment marker and the mark-up paragraphs."""
     root = ET.parse(raw).getroot()
     html = ET.Element(X + "html")
     body = ET.SubElement(html, X + "body")
+    if consolidated:
+        for p in root.iter(X + "p"):
+            if p.get("class") in ("reference", "disclaimer"):
+                body.append(p)
+        marker = next(a for a in root.iter(X + "a") if "".join(a.itertext()).strip().startswith("\u25baM1"))
+        ET.SubElement(body, X + "p").append(marker)
     quotes = ("Where a country or territory is not explicitly listed", "Where a country or territory is explicitly listed",
-              "If no production route is indicated for a CN code", "The default values for direct emissions and indirect")
+              "If no production route is indicated for a CN code", "The default values for direct emissions and indirect",
+              "If a production route is indicated for a group", "For the calculation of the number of CBAM certificates",
+              "the mark-up shall be", "shall be increased by the mark-ups laid down")
     for p in root.iter(X + "p"):
         t = text(p)
-        found = [q for q in quotes if q in t]
-        if found and len(t) < 1200:
+        if any(q in t for q in quotes) and len(t) < 1200:
             body.append(p)
-            quotes = tuple(q for q in quotes if q not in found)
     current = None
     for table in root.iter(X + "table"):
         keep_rows = []
@@ -215,7 +224,7 @@ def oj(raw: Path):
             tb = ET.SubElement(new, X + "tbody")
             for tr in keep_rows:
                 tb.append(tr)
-    write_xhtml(html, HERE / "oj_1740_trimmed.xhtml")
+    write_xhtml(html, HERE / out_name)
 
 
 def cn(full: Path, parents: Path, year: int):
@@ -257,9 +266,10 @@ if __name__ == "__main__":
     raw = Path(sys.argv[1])
     consolidated(raw / "consolidated.xhtml")
     xlsx(raw / "default_values.xlsx")
-    oj(raw / "oj_1740.xhtml")
+    oj(raw / "oj_1740.xhtml", "oj_1740_trimmed.xhtml")
+    oj(raw / "consolidated_2621.xhtml", "consolidated_2621_trimmed.xhtml", consolidated=True)
     for y in (2026, 2025):
         cn(raw / f"sparql_cn{y}_full.json", raw / f"sparql_cn{y}_parents.json", y)
-    for name in ("sparql_consolidated.json", "sparql_later_acts.json"):
+    for name in ("sparql_consolidated.json", "sparql_consolidated_2621.json", "sparql_later_acts.json"):
         (HERE / name).write_bytes((raw / name).read_bytes())
     page(raw / "commission_page.html")

@@ -126,6 +126,75 @@ class Inconsistent(Isolated):
         self.assertIn("revenue above turnover", checks(r, "C8"))
 
 
+class ReviewFixes(Isolated):
+    """Regression tests for the adversarial review of 2026-09-24."""
+
+    def test_editions_are_explained_and_2026_differences_are_depends(self):
+        # item 2: 60 employees, no turnover rate. Under 2025 para 40 it is required; under 2026/1560 it is C5 para 58.
+        path = self.book(overrides={"NumberOfEmployees": 60, "NumberOfPermanentContractEmployees": 56,
+                                    "NumberOfMaleEmployees": 42, "EmployeeTurnoverRate": None,
+                                    "PercentageOfEmployeesCoveredByCollectiveBargainingAgreements": 40 / 60})
+        r = template.check(path)
+        b8 = r["disclosures"][7]
+        self.assertEqual(b8["status"], "depends")
+        self.assertEqual(b8["missing"], [])
+        self.assertIn("C5, para 58", b8["depends"][0]["question"])
+        self.assertIn("Delegated Regulation (EU) 2026/1560", r["edition_note"])
+        self.assertIn("no longer producing any legal effects", r["edition_note"])
+        code, out, _ = self.run_cli(["check", path, "--strict"])
+        self.assertEqual(code, 0)
+        self.assertIn("2026/1560", out)
+        self.assertIn("Depends, questions to settle:", out)
+
+    def test_coordinates_left_to_the_templates_geolocation_are_depends(self):
+        # item 3: address given, coordinates empty (EFRAG fills them only when its geolocation box is ticked)
+        r = template.check(self.book(overrides={"sites": [("1 Placeholder Street", "Country A", None)]}))
+        b1 = r["disclosures"][0]
+        self.assertEqual(b1["status"], "depends")
+        self.assertIn("automatic geolocation box", b1["depends"][0]["question"])
+        self.assertFalse(template.serious(r))
+        r = template.check(self.book(overrides={"sites": []}))
+        self.assertIn("list of sites (para 24(e)(vii))", r["disclosures"][0]["missing"])
+
+    def test_unknown_version_does_not_claim_what_it_implements(self):
+        # item 4
+        r = template.check(self.book(version="2.0.0"))
+        self.assertTrue(r["template"]["implements"].startswith("unknown"))
+
+    def test_full_time_equivalents_below_150_make_the_pay_gap_depend(self):
+        # item 5 and point 17: FTE 120 does not settle a headcount of 150
+        r = template.check(self.book(overrides={"TypeOfNumberOfEmployees": "Full-time equivalent (FTE)",
+                                                "NumberOfEmployees": 120,
+                                                "PercentageGapInPayBetweenFemaleAndMaleEmployees": None}))
+        pay = [x for x in r["disclosures"][9]["depends"] if "pay gap" in x["item"]]
+        self.assertEqual(len(pay), 1)
+        self.assertIn("Is the headcount 150 or more?", pay[0]["question"])
+
+    def test_module_option_empty_or_unrecognised_is_a_question(self):
+        # item 5 and point 18: no guess at Option A or B
+        r = template.check(self.book(overrides={"BasisForPreparation": None, "DescriptionOfMainBusinessRelationships": None}))
+        c1 = r["disclosures"][11]
+        self.assertEqual(c1["status"], "depends")
+        self.assertEqual(c1["missing"], [])
+        self.assertIn("Option A", r["option"])
+        r = template.check(self.book(overrides={"BasisForPreparation": "Option C (something else)"}))
+        self.assertIn("neither Option A nor Option B", r["option"])
+        self.assertNotEqual(r["disclosures"][11]["status"], "not applicable")
+
+    def test_energy_finding_cites_the_self_generation_rule(self):
+        # item 8
+        r = template.check(self.book(overrides={"TotalEnergyConsumption": 1000}))
+        f = next(x for d in r["disclosures"] for x in d["findings"] if x["check"] == "energy breakdown vs total")
+        self.assertIn("para 20", f["cite"])
+        self.assertIn("self-generated electricity", f["message"])
+
+    def test_no_check_without_a_paragraph_behind_it(self):
+        # item 8: the reporting-period order is not a VSME rule, so it is not checked
+        r = template.check(self.book(overrides={"template_reporting_period_startdate": "2025-12-31",
+                                                "template_reporting_period_enddate": "2025-01-01"}))
+        self.assertEqual(checks(r), [])
+
+
 class Units(Isolated):
     def test_a_number_typed_with_its_unit_is_text(self):
         r = template.check(self.book(overrides={"TotalEnergyConsumption": "1250 kWh"}))

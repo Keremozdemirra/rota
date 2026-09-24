@@ -42,10 +42,34 @@ class Cli(unittest.TestCase):
         code, out, _ = run("value", "2804", "10", "00", "Other", "countries")
         self.assertEqual(code, 0)
         self.assertIn("from Other Countries and Territories", out)
-        code, out, _ = run("compare", "7601", "10", "00", "India", "Türkiye,Kosovo")
+        # Review finding 6: one argument is one country, commas included.
+        code, out, _ = run("compare", "2523", "29", "00", "Congo, Democratic Republic of", "Congo", "--json")
         self.assertEqual(code, 0)
-        self.assertIn("Türkiye", out)
-        self.assertIn("1.700", out)
+        rows = json.loads(out)["lines"][0]["by_country"]
+        self.assertEqual([(r["country"], r["total"]) for r in rows], [("Congo, Democratic Republic of", 1.25), ("Congo", 0.93)])
+
+    def test_corrupted_data_exits_2_without_traceback(self):
+        import tempfile
+        from cbam_test_support import shared_data_dir
+        d = Path(tempfile.mkdtemp())
+        for f in shared_data_dir().iterdir():
+            (d / f.name).write_bytes(f.read_bytes())
+        broken = json.loads((d / "default_values.json").read_text(encoding="utf-8"))
+        broken["lines"] = [["7601"]]  # a row too short: parses as JSON, not as this tool's table
+        (d / "default_values.json").write_text(json.dumps(broken), encoding="utf-8")
+        (d / "annex_i.json").write_text(json.dumps({"meta": {}, "annex_i": "not a list"}), encoding="utf-8")
+        with DataEnv(d):
+            for argv in (("value", "7601", "India"), ("scope", "7208")):
+                code, out, err = run(*argv)
+                self.assertEqual(code, 2, argv)
+                self.assertNotIn("Traceback", err)
+
+    def test_sources_labels_and_no_local_path(self):
+        code, out, _ = run("sources")
+        self.assertEqual(code, 0)
+        self.assertNotIn("Acts on 3", out)
+        self.assertIn("Data directory: CBAM_MCP_DATA_DIR", out)
+        self.assertNotIn(str(Path.cwd()), out)
 
     def test_describe_and_sources(self):
         self.assertIn("Electrical energy", run("describe", "2716", "00", "00")[1])

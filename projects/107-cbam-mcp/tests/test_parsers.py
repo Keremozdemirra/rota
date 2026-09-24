@@ -72,6 +72,17 @@ class Regulation(unittest.TestCase):
                 parsers.parse_regulation_xhtml(raw)
             self.assertIn(expected, str(cm.exception))
 
+    def test_deep_nesting_is_a_parse_error_not_a_crash(self):
+        # Review: a RecursionError used to escape from refresh.
+        deep = (b'<html xmlns="http://www.w3.org/1999/xhtml"><body><div id="anx_I">' + b"<div>" * 3000 + b"x"
+                + b"</div>" * 3000 + b'</div><div id="anx_II"/></body></html>')
+        with self.assertRaises(ParseError):
+            parsers.parse_regulation_xhtml(deep)
+        cell = (b'<html xmlns="http://www.w3.org/1999/xhtml"><body><table><tr><td colspan="6">India</td></tr>'
+                b"<tr><td>" + b"<span>" * 3000 + b"7601" + b"</span>" * 3000 + b"</td></tr></table></body></html>")
+        with self.assertRaises(ParseError):
+            parsers.parse_oj_default_values(cell)
+
     def test_layout_change_is_caught_by_the_floor(self):
         raw = fixture("consolidated_trimmed.xhtml").replace(b'id="anx_I"', b'id="anx_I_old"', 1)
         with self.assertRaises(ParseError):

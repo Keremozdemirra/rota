@@ -8,8 +8,9 @@
   eudr-scope-mcp sources               legal acts, versions, hashes, licence
   eudr-scope-mcp refresh --out data    rebuild the snapshot from CELLAR
 
-Exit codes: 0 answered; 2 could not answer (bad input, missing snapshot,
-refresh failed).
+Exit codes: lookups 0 answered, 2 could not answer (bad input, missing
+snapshot); refresh 0 written and verified, 1 written with parts marked
+unverified, 2 failed and nothing written.
 """
 from __future__ import annotations
 

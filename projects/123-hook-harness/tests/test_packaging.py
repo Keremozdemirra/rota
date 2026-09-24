@@ -39,8 +39,7 @@ class Packaging(unittest.TestCase):
         self.assertIn(CHECKOUT, readme)
         self.assertIn(SETUP_PYTHON, readme)
         self.assertIn(f"hook-harness=={hh.VERSION}", readme)
-        self.assertTrue(readme.rstrip().splitlines()[-1] or True)
-        self.assertIn("## What this is not", readme)
+        self.assertEqual(re.findall(r"^## .*", readme, re.M)[-1], "## What this is not")
 
     def test_manifest_carries_what_the_tests_need(self):
         text = self.read("MANIFEST.in")

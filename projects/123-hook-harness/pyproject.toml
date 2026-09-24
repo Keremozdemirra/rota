@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hook-harness"
+version = "0.1.0"
+description = "Test and lint Claude Code hooks in CI: which handlers a tool call starts, what they print, whether they decide what you expect."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["claude-code", "hooks", "testing", "lint", "ci", "ai-agents", "plugins"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: Testing",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/hook-harness"
+Issues = "https://github.com/Keremozdemirra/hook-harness/issues"
+
+[project.scripts]
+hook-harness = "hook_harness:main"
+
+[tool.setuptools]
+py-modules = ["hook_harness"]

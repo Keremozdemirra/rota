@@ -1,8 +1,10 @@
 """The snapshot that ships in the wheel, and the packaging files around it."""
 import json
+import os
 import re
 import sys
 import unittest
+from unittest import mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -58,7 +60,33 @@ class Snapshot(unittest.TestCase):
                 self.assertIn(h, text)
 
 
+    def test_review_findings_on_the_real_snapshot(self):
+        with mock.patch.dict(os.environ, {"CBAM_MCP_DATA_DIR": str(DATA)}):
+            # Finding 2: aliases reach the right table; never the "Other" row.
+            prc = lookup.default_value("7208 51 20", "PRC")["lines"][0]
+            self.assertEqual((prc["values_from_table"], prc["total"]), ("China", 3.187))
+            kor = lookup.default_value("7208 51 20", "S. Korea")["lines"][0]
+            self.assertEqual(kor["total"], 2.118)
+            # Finding 3: chapter 27 is not fully covered.
+            self.assertEqual(lookup.cbam_scope("27")["status"], "partially_in_scope")
+            # Finding 1: the mark-up rule comes from the consolidated text, with its version.
+            rule = lookup.default_value("7601", "India")["markup_rule"]
+            self.assertIn("02025R2621-20260101", rule["source"])
+        cons = self.s.values["meta"]["consolidated"]
+        self.assertEqual((cons["amendments"], cons["check"]["rows_identical"]), ({"M1": "32026R1740"}, 12540))
+
+
 class Packaging(unittest.TestCase):
+    def test_readme_facts_and_section_order(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertEqual(re.findall(r"^## (.+)$", readme, re.M)[-1], "What this is not")
+        self.assertNotIn("no consolidated text of", readme)
+        self.assertIn("02025R2621-20260101", readme)
+        self.assertIn("An OJ text, not CC BY", readme)
+        sources = (DATA / "SOURCES.md").read_text(encoding="utf-8")
+        self.assertIn("CC BY 4.0 (EUR-Lex legal notice: consolidated texts)", sources)
+        self.assertIn("Commission document, re-usable under Commission Decision 2011/833/EU", sources)
+
     def test_versions_and_registry_name_agree(self):
         server = json.loads((ROOT / "server.json").read_text(encoding="utf-8"))
         pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")

@@ -39,9 +39,9 @@ def load(edition: str) -> dict:
 
 
 def attribution(snap: dict) -> str:
-    return (f"Source: {snap['act']}, {snap['oj']}, {snap['eli']}; © European Union; reused under the Commission's reuse "
-            f"policy (Decision 2011/833/EU), CC BY 4.0; retrieved {snap['source']['retrieved']} from CELLAR. "
-            f"Changes: {snap['changes']}")
+    return (f"Source: {snap['act']}, {snap['oj']}, {snap['eli']}; © European Union, https://eur-lex.europa.eu; "
+            f"re-used under the EUR-Lex legal notice and Commission Decision 2011/833/EU (Articles 4 and 6); "
+            f"retrieved {snap['source']['retrieved']} from CELLAR. Changes: {snap['changes']}")
 
 
 def status() -> dict:

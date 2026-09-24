@@ -76,8 +76,11 @@ def build_countries(rows: list, alt_rows: list) -> list:
             continue  # e.g. "EU" (no alpha-3) is not a country
         code = r["c"].rsplit("/", 1)[-1]
         parent = (r.get("broader") or "").rsplit("/", 1)[-1] or None
+        known = by_uri.get(r["c"], {})
         by_uri[r["c"]] = {"iso2": a2, "iso3": a3, "name": tidy(r["pref"])[:80], "authority_code": code,
-                          "part_of": parent, "aliases": []}
+                          "part_of": parent or known.get("part_of"),
+                          # member of the table's "Territories" scheme (.../country/0003)
+                          "territory": bool(r.get("territory")) or known.get("territory", False), "aliases": []}
     for r in alt_rows:
         entry = by_uri.get(r.get("c"))
         alt = tidy(r.get("alt") or "").replace("*", "").strip()

@@ -39,13 +39,15 @@ class FakeFetcher:
         if url == refresh.SPARQL_ENDPOINT:
             query = urllib.parse.parse_qs((data or b"").decode()).get("query", [""])[0]
             if "act_consolidated_consolidates" in query:
-                return "sparql_consolidated"
+                return "sparql_consolidated_2621" if "32025R2621" in query else "sparql_consolidated"
             if "GROUP_CONCAT" in query:
                 return "sparql_later_acts"
             year = "2026" if "cn2026/cn2026" in query else "2025"
             return f"sparql_cn{year}_parents" if "VALUES ?id" in query else f"sparql_cn{year}"
         if url.endswith("02023R0956-20251020"):
             return "consolidated"
+        if url.endswith("02025R2621-20260101"):
+            return "consolidated_2621"
         if url == refresh.EXCEL_URL:
             return "excel"
         if url == refresh.EXCEL_PAGE:
@@ -54,7 +56,8 @@ class FakeFetcher:
             return "oj"
         return "unknown"
 
-    FILES = {"sparql_consolidated": "sparql_consolidated.json", "sparql_later_acts": "sparql_later_acts.json",
+    FILES = {"sparql_consolidated": "sparql_consolidated.json", "sparql_consolidated_2621": "sparql_consolidated_2621.json",
+             "consolidated_2621": "consolidated_2621_trimmed.xhtml", "sparql_later_acts": "sparql_later_acts.json",
              "sparql_cn2026": "sparql_cn2026_trimmed.json", "sparql_cn2025": "sparql_cn2025_trimmed.json",
              "sparql_cn2026_parents": "sparql_cn2026_parents.json", "sparql_cn2025_parents": "sparql_cn2025_parents.json",
              "consolidated": "consolidated_trimmed.xhtml", "excel": "default_values_trimmed.xlsx",

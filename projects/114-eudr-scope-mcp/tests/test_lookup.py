@@ -86,6 +86,24 @@ class Scope(Base):
         self.assertEqual(lookup.eudr_scope("4703 11 00")["status"], "partly_ex")  # ex 47
         self.assertEqual(len(lookup.eudr_scope("9403")["listed_under_this_code"]), 1)
 
+    def test_chapter_entry_with_an_exception_is_partial(self):
+        # Review 2026-09-24: "Pulp and paper of Chapters 47 and 48 ..., with the exception of ... recovered
+        # (waste and scrap) products" was answered as a plain relevant product for 4707 (recovered paper).
+        r = lookup.eudr_scope("4707 10 00", "2026-09-01")
+        self.assertEqual(r["status"], "partly_ex")
+        self.assertTrue(r["answer"].startswith("Depends"))
+
+    def test_answers_are_definite_only_when_nothing_is_missing(self):
+        self.assertTrue(lookup.eudr_scope("1801 00 00")["answer"].startswith("Yes"))
+        self.assertTrue(lookup.eudr_scope("8471 30 00")["answer"].startswith("No"))
+        self.assertTrue(lookup.eudr_scope("1802 00 00")["answer"].startswith("Depends"))  # "not including waste"
+        self.assertTrue(lookup.eudr_scope("1513")["answer"].startswith("Depends on the sub-code"))
+
+    def test_date_after_the_snapshot_says_so(self):
+        r = lookup.eudr_scope("2101 11 00", "2028-01-01")
+        self.assertIn("acts adopted after that date are not reflected", r["answer"])
+        self.assertNotIn("not reflected", lookup.eudr_scope("1801")["answer"])
+
     def test_taric_code(self):
         r = lookup.eudr_scope("0901 11 00 00")
         self.assertEqual((r["cn_code"], r["status"]), ("09011100", "relevant_product"))
@@ -124,6 +142,11 @@ class Dates(Base):
                 self.assertEqual([d["applies_from"] for d in r["dates"]], ["2027-06-30", "2026-12-30"])
                 self.assertIn("established as such by 2024-12-31", r["dates"][0]["conditions"])
 
+    def test_depends_where_a_fact_is_missing(self):
+        self.assertTrue(lookup.application_dates("micro")["answer"].startswith("Depends on two facts"))
+        self.assertTrue(lookup.application_dates("large")["answer"].startswith("From 2026-12-30"))
+        self.assertIn("Question for counsel", lookup.application_dates("trader")["answer"])
+
     def test_sme_trader_and_history(self):
         self.assertEqual(len(lookup.application_dates("SME")["dates"]), 2)
         trader = lookup.application_dates("trader")
@@ -131,6 +154,7 @@ class Dates(Base):
         self.assertIn("does not decide", trader["dates"][0]["note"])
         hist = lookup.application_dates()["history"]
         self.assertEqual([h["article_38_2"] for h in hist], ["2024-12-30", "2025-12-30", "2026-12-30"])
+        self.assertEqual([p["celex"] for p in lookup.application_dates()["pending_proposals"]], ["52026PC0661"])
 
     def test_unknown_operator_type(self):
         with self.assertRaises(lookup.InputError):
@@ -164,7 +188,23 @@ class Countries(Base):
     def test_territory_is_not_decided(self):
         r = lookup.country_risk("French Guiana")
         self.assertEqual((r["status"], r["risk"]), ("not_determined", None))
-        self.assertEqual(r["part_of"]["risk"], "low")
+        self.assertEqual((r["part_of"]["iso3"], r["readings"]), ("FRA", ["low", "standard"]))
+        self.assertTrue(r["answer"].startswith("Depends"))
+
+    def test_territories_follow_one_rule(self):
+        # Review 2026-09-24: Hong Kong and Macao were a definite 'standard', French Guiana not.
+        for q in ("HK", "Hong Kong", "MAC"):
+            with self.subTest(q=q):
+                r = lookup.country_risk(q)
+                self.assertEqual((r["status"], r["risk"]), ("not_determined", None))
+                self.assertIn("unknown", r["readings"])
+        sark = lookup.country_risk("Sark")  # under Guernsey, which is not listed: both readings are standard
+        self.assertEqual((sark["risk"], sark["status"]), ("standard", "not_listed"))
+        self.assertIn("both readings", sark["answer"])
+
+    def test_annex_spelling_is_accepted(self):
+        r = lookup.country_risk("Solomon Island")
+        self.assertEqual((r["risk"], r["country"]["iso3"]), ("low", "SLB"))
 
     def test_unknown_country(self):
         r = lookup.country_risk("Atlantis")
@@ -191,6 +231,10 @@ class Sources(Base):
         self.assertEqual(celexes, ["32023R1115", "32024R3234", "32025R2650", "32026R2102", "32025R1093"])
         self.assertEqual(r["status"], {"annex_i": "verified", "application_dates": "verified", "country_risk": "verified"})
         self.assertEqual(len(r["documents"]), 6)
+        self.assertNotIn("data_dir", r["tool"])  # no local paths in answers
+        self.assertEqual([(p["celex"], p["adopted_as"]) for p in r["proposals"]],
+                         [("52024PC0452", "32024R3234"), ("52025PC0652", "32025R2650"), ("52026PC0661", None)])
+        self.assertNotIn("commission.europa.eu", json.dumps(r["licence"]))
 
 
 class Staleness(Base):

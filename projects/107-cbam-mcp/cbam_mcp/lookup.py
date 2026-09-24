@@ -133,7 +133,7 @@ def _scope_version(s: Store) -> str:
 def _scope_attribution(s: Store) -> str:
     m = s.annex["meta"]
     return (f"Source: EUR-Lex/CELLAR, consolidated text {known(m['celex'], CELEX)} of Regulation (EU) 2023/956, "
-            f"© European Union, retrieved {_date(m['retrieved'])}; table derived by cbam-mcp")
+            f"© European Union, CC BY 4.0, retrieved {_date(m['retrieved'])}; table derived by cbam-mcp")
 
 
 def _values_version(s: Store) -> str:
@@ -145,7 +145,8 @@ def _values_version(s: Store) -> str:
 def _values_attribution(s: Store) -> str:
     m = s.values["meta"]
     return (f"Source: European Commission, DG TAXUD, default values Excel version {known(m.get('version'), VERSION)}, "
-            f"CC BY 4.0, retrieved {_date(m['retrieved'])}; decimal commas converted to numbers (derived)")
+            f"re-used under Commission Decision 2011/833/EU, retrieved {_date(m['retrieved'])}; decimal commas "
+            f"converted to numbers (derived)")
 
 
 def _cn_version(s: Store, year: int) -> str:
@@ -715,7 +716,7 @@ def sources() -> dict:
         "reference": remote(a.get("reference")), "retrieved": _date(a["retrieved"]), "sha256": a["sha256"],
         "rows": {"annex_i": a["annex_i_lines"], "annex_ii": a["annex_ii_lines"]},
         "legally_binding": False, "legal_status": remote(a.get("disclaimer")),
-        "legally_binding_source": legal.SCOPE_BINDING_SOURCE, "licence": legal.LICENCES["eurlex"],
+        "legally_binding_source": legal.SCOPE_BINDING_SOURCE, "licence": legal.LICENCES["eurlex_consolidated"],
         "attribution": _scope_attribution(s)})
     v = s.values["meta"]
     check = v.get("oj_check")
@@ -734,12 +735,12 @@ def sources() -> dict:
         "consolidated_text": (v.get("consolidated") or None) and {
             "celex": known(v["consolidated"].get("celex"), CELEX), "url": known(v["consolidated"].get("url"), URL),
             "reference": remote(v["consolidated"].get("reference")), "retrieved": _date(v["consolidated"].get("retrieved")),
-            "sha256": v["consolidated"].get("sha256"),
+            "sha256": v["consolidated"].get("sha256"), "licence": legal.LICENCES["eurlex_consolidated"],
             **{k: int(v["consolidated"]["check"][k]) for k in ("rows_compared", "rows_identical", "annex_iv_compared",
                                                                "annex_iv_identical")}},
         "not_included": "Annexes II and III to Implementing Regulation (EU) 2025/2621 (indirect-emission factors, "
                         "electricity); the Excel does not contain them",
-        "licence": legal.LICENCES["commission"], "attribution": _values_attribution(s)})
+        "licence": legal.LICENCES["commission_excel"], "attribution": _values_attribution(s)})
     for year in (2026, 2025):
         m = s.cn(year)["meta"]
         out["datasets"].append({

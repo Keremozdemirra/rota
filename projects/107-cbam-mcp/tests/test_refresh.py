@@ -131,7 +131,16 @@ class Run(unittest.TestCase):
         for digest in (annex["meta"]["sha256"], m["sha256"]):
             self.assertIn(digest, sources)
         self.assertIn("Dated after 32026R1740 (2026-07-20): none", sources)
-        self.assertIn("CC BY 4.0", sources)
+        cons = m["consolidated"]
+        self.assertEqual((cons["celex"], cons["amendments"]), ("02025R2621-20260101", {"M1": "32026R1740"}))
+        self.assertIn("the mark-up shall be 10 %", cons["markup"]["annex_i"][1])
+        self.assertEqual(cons["check"]["rows_identical"], cons["check"]["rows_compared"])
+        # Point 16: each dataset with its own licence basis.
+        self.assertIn("CC BY 4.0 (EUR-Lex legal notice: consolidated texts)", sources)
+        self.assertIn("Commission document, re-usable under Commission Decision 2011/833/EU", sources)
+        self.assertIn("Unless otherwise specified, you can re-use the legal documents published in EUR-Lex", sources)
+        self.assertIn("COM_REUSE", sources)
+        self.assertIn("web.archive.org", sources)
         self.assertEqual([p for p in self.tmp.iterdir() if p.suffix == ".tmp"], [])
 
     def test_failed_source_keeps_its_previous_file(self):
@@ -153,6 +162,15 @@ class Run(unittest.TestCase):
         after = self.files()
         for name in ("default_values.json", "annex_i.json", "cn_2026.json", "cn_2025.json"):
             self.assertEqual(before[name], after[name], name)
+
+    def test_consolidated_default_value_act_is_required(self):
+        self.assertEqual(build(self.tmp), 0)
+        before = self.files()
+        for fetcher in (FakeFetcher(fail={"consolidated_2621": FetchError("CELLAR: HTTP 503")}),
+                        FakeFetcher(override={"consolidated_2621": fixture("consolidated_2621_trimmed.xhtml")
+                                              .replace(b"the mark-up shall be", b"the increase is")})):
+            self.assertEqual(build(self.tmp, fetcher), 2)
+            self.assertEqual(before["default_values.json"], self.files()["default_values.json"])
 
     def test_consolidation_lookup_failure_uses_pinned_text(self):
         fetcher = FakeFetcher(fail={"sparql_consolidated": FetchError("SPARQL: HTTP 500")})

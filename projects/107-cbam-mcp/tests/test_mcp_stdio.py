@@ -52,7 +52,8 @@ class Handle(unittest.TestCase):
     def test_tool_errors_are_results(self):
         cases = [("cbam_scope", {"cn_code": "72O8"}, "digits"),
                  ("default_value", {"cn_code": "7601"}, "bad arguments"),
-                 ("default_value", {"cn_code": "7601", "country": "Indai"}, "did you mean"),
+                 ("default_value", {"cn_code": "7601", "country": "Indai"}, "Did you mean: India"),
+                 ("default_value", {"cn_code": "7601", "country": "Kosovo"}, "is not a name in the default-value tables"),
                  ("cn_describe", {"cn_code": "2716", "year": 1999}, "2025 or 2026"),
                  ("cbam_scope", {"cn_code": "7208", "colour": "red"}, "bad arguments")]
         for name, args, expected in cases:

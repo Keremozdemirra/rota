@@ -10,6 +10,7 @@
    "name": "Andorra",
    "authority_code": "AND",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Andorran",
     "Principality of Andorra"
@@ -21,6 +22,7 @@
    "name": "United Arab Emirates",
    "authority_code": "ARE",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Emirati"
    ]
@@ -31,6 +33,7 @@
    "name": "Afghanistan",
    "authority_code": "AFG",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Afghan",
     "Islamic Republic of Afghanistan"
@@ -42,6 +45,7 @@
    "name": "Antigua and Barbuda",
    "authority_code": "ATG",
    "part_of": null,
+   "territory": false,
    "aliases": []
   },
   {
@@ -50,6 +54,7 @@
    "name": "Anguilla",
    "authority_code": "AIA",
    "part_of": "GBR",
+   "territory": true,
    "aliases": [
     "Anguillan"
    ]
@@ -60,6 +65,7 @@
    "name": "Albania",
    "authority_code": "ALB",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Albanian",
     "Republic of Albania"
@@ -71,6 +77,7 @@
    "name": "Armenia",
    "authority_code": "ARM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Armenian",
     "Republic of Armenia"
@@ -82,6 +89,7 @@
    "name": "Angola",
    "authority_code": "AGO",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Angolan",
     "Republic of Angola"
@@ -93,6 +101,7 @@
    "name": "Antarctica",
    "authority_code": "ATA",
    "part_of": null,
+   "territory": true,
    "aliases": [
     "Antarctic"
    ]
@@ -103,6 +112,7 @@
    "name": "Argentina",
    "authority_code": "ARG",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Argentine",
     "Argentine Republic"
@@ -114,6 +124,7 @@
    "name": "American Samoa",
    "authority_code": "ASM",
    "part_of": "USA",
+   "territory": true,
    "aliases": [
     "American Samoan",
     "Territory of American Samoa"
@@ -125,6 +136,7 @@
    "name": "Austria",
    "authority_code": "AUT",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Austrian",
     "Republic of Austria"
@@ -136,6 +148,7 @@
    "name": "Australia",
    "authority_code": "AUS",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Australian",
     "Commonwealth of Australia"
@@ -147,6 +160,7 @@
    "name": "Aruba",
    "authority_code": "ABW",
    "part_of": "NLD",
+   "territory": true,
    "aliases": [
     "Aruban"
    ]
@@ -157,6 +171,7 @@
    "name": "Åland Islands",
    "authority_code": "ALA",
    "part_of": "FIN",
+   "territory": true,
    "aliases": []
   },
   {
@@ -165,6 +180,7 @@
    "name": "Azerbaijan",
    "authority_code": "AZE",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Azerbaijani",
     "Republic of Azerbaijan"
@@ -176,6 +192,7 @@
    "name": "Bosnia and Herzegovina",
    "authority_code": "BIH",
    "part_of": null,
+   "territory": false,
    "aliases": []
   },
   {
@@ -184,6 +201,7 @@
    "name": "Barbados",
    "authority_code": "BRB",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Barbadian"
    ]
@@ -194,6 +212,7 @@
    "name": "Bangladesh",
    "authority_code": "BGD",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Bangladeshi",
     "People’s Republic of Bangladesh"
@@ -205,6 +224,7 @@
    "name": "Belgium",
    "authority_code": "BEL",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Belgian",
     "Kingdom of Belgium"
@@ -216,6 +236,7 @@
    "name": "Burkina Faso",
    "authority_code": "BFA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Burkinabe"
    ]
@@ -226,6 +247,7 @@
    "name": "Bulgaria",
    "authority_code": "BGR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Bulgarian",
     "People’s Republic of Bulgaria",
@@ -238,6 +260,7 @@
    "name": "Bahrain",
    "authority_code": "BHR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Bahraini",
     "Kingdom of Bahrain"
@@ -249,6 +272,7 @@
    "name": "Burundi",
    "authority_code": "BDI",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Burundian",
     "Republic of Burundi"
@@ -260,6 +284,7 @@
    "name": "Benin",
    "authority_code": "BEN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Beninese",
     "Republic of Benin"
@@ -271,6 +296,7 @@
    "name": "Saint Barthélemy",
    "authority_code": "BLM",
    "part_of": "FRA",
+   "territory": true,
    "aliases": [
     "Collectivity of Saint Barthélemy",
     "St. Barth’s",
@@ -283,6 +309,7 @@
    "name": "Bermuda",
    "authority_code": "BMU",
    "part_of": "GBR",
+   "territory": true,
    "aliases": [
     "Bermudian"
    ]
@@ -293,6 +320,7 @@
    "name": "Brunei",
    "authority_code": "BRN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Brunei Darussalam",
     "Bruneian"
@@ -304,6 +332,7 @@
    "name": "Bolivia",
    "authority_code": "BOL",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Bolivian",
     "Plurinational State of Bolivia"
@@ -315,6 +344,7 @@
    "name": "Bonaire, Sint Eustatius and Saba",
    "authority_code": "BES",
    "part_of": "NLD",
+   "territory": true,
    "aliases": []
   },
   {
@@ -323,6 +353,7 @@
    "name": "Brazil",
    "authority_code": "BRA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Brazilian",
     "Federative Republic of Brazil"
@@ -334,6 +365,7 @@
    "name": "Bahamas",
    "authority_code": "BHS",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Bahamian",
     "Commonwealth of the Bahamas"
@@ -345,6 +377,7 @@
    "name": "Bhutan",
    "authority_code": "BTN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Bhutanese",
     "Kingdom of Bhutan"
@@ -356,6 +389,7 @@
    "name": "Bouvet Island",
    "authority_code": "BVT",
    "part_of": "NOR",
+   "territory": true,
    "aliases": []
   },
   {
@@ -364,6 +398,7 @@
    "name": "Botswana",
    "authority_code": "BWA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Botswanan",
     "Republic of Botswana"
@@ -375,6 +410,7 @@
    "name": "Belarus",
    "authority_code": "BLR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Belarusian",
     "Republic of Belarus"
@@ -386,6 +422,7 @@
    "name": "Belize",
    "authority_code": "BLZ",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Belizean"
    ]
@@ -396,6 +433,7 @@
    "name": "Canada",
    "authority_code": "CAN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Canadian"
    ]
@@ -406,6 +444,7 @@
    "name": "Cocos (Keeling) Islands",
    "authority_code": "CCK",
    "part_of": "AUS",
+   "territory": true,
    "aliases": [
     "Cocos Keeling Islands",
     "Territory of Cocos (Keeling) Islands"
@@ -417,6 +456,7 @@
    "name": "Democratic Republic of the Congo",
    "authority_code": "COD",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Congo-Kinshasa"
    ]
@@ -427,6 +467,7 @@
    "name": "Central African Republic",
    "authority_code": "CAF",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Central African"
    ]
@@ -437,6 +478,7 @@
    "name": "Congo",
    "authority_code": "COG",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Congo-Brazzaville",
     "Congolese",
@@ -449,6 +491,7 @@
    "name": "Switzerland",
    "authority_code": "CHE",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Swiss",
     "Swiss Confederation"
@@ -460,6 +503,7 @@
    "name": "Côte d’Ivoire",
    "authority_code": "CIV",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Ivorian",
     "Republic of Côte d’Ivoire"
@@ -471,6 +515,7 @@
    "name": "Cook Islands",
    "authority_code": "COK",
    "part_of": "NZL",
+   "territory": true,
    "aliases": []
   },
   {
@@ -479,6 +524,7 @@
    "name": "Chile",
    "authority_code": "CHL",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Chilean",
     "Republic of Chile"
@@ -490,6 +536,7 @@
    "name": "Cameroon",
    "authority_code": "CMR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Cameroonian",
     "Republic of Cameroon"
@@ -501,6 +548,7 @@
    "name": "China",
    "authority_code": "CHN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Chinese",
     "People’s Republic of China"
@@ -512,6 +560,7 @@
    "name": "Colombia",
    "authority_code": "COL",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Colombian",
     "Republic of Colombia"
@@ -523,6 +572,7 @@
    "name": "Clipperton",
    "authority_code": "CPT",
    "part_of": "FRA",
+   "territory": true,
    "aliases": [
     "Clipperton Island"
    ]
@@ -533,6 +583,7 @@
    "name": "Sark",
    "authority_code": "CRQ",
    "part_of": "GGY",
+   "territory": true,
    "aliases": [
     "Isle of Sark",
     "Sark Island"
@@ -544,6 +595,7 @@
    "name": "Costa Rica",
    "authority_code": "CRI",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Costa Rican",
     "Republic of Costa Rica"
@@ -555,6 +607,7 @@
    "name": "Cuba",
    "authority_code": "CUB",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Cuban",
     "Republic of Cuba"
@@ -566,6 +619,7 @@
    "name": "Cabo Verde",
    "authority_code": "CPV",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Cabo Verdean",
     "Republic of Cabo Verde"
@@ -577,6 +631,7 @@
    "name": "Curaçao",
    "authority_code": "CUW",
    "part_of": "NLD",
+   "territory": true,
    "aliases": []
   },
   {
@@ -585,6 +640,7 @@
    "name": "Christmas Island",
    "authority_code": "CXR",
    "part_of": "AUS",
+   "territory": true,
    "aliases": [
     "Christmas Island Territory"
    ]
@@ -595,6 +651,7 @@
    "name": "Cyprus",
    "authority_code": "CYP",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Cypriot",
     "Republic of Cyprus"
@@ -606,6 +663,7 @@
    "name": "Czechia",
    "authority_code": "CZE",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Czech",
     "Czech Republic"
@@ -617,6 +675,7 @@
    "name": "Germany",
    "authority_code": "DEU",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "FRG",
     "Federal Republic of Germany",
@@ -630,6 +689,7 @@
    "name": "Djibouti",
    "authority_code": "DJI",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Djibouti"
    ]
@@ -640,6 +700,7 @@
    "name": "Denmark",
    "authority_code": "DNK",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Danish",
     "Kingdom of Denmark"
@@ -651,6 +712,7 @@
    "name": "Dominica",
    "authority_code": "DMA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Commonwealth of Dominica"
    ]
@@ -661,6 +723,7 @@
    "name": "Dominican Republic",
    "authority_code": "DOM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Dominican"
    ]
@@ -671,6 +734,7 @@
    "name": "Algeria",
    "authority_code": "DZA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Algerian",
     "People’s Democratic Republic of Algeria"
@@ -682,6 +746,7 @@
    "name": "Ecuador",
    "authority_code": "ECU",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Ecuadorian",
     "Republic of Ecuador"
@@ -693,6 +758,7 @@
    "name": "Estonia",
    "authority_code": "EST",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Estonian",
     "Republic of Estonia"
@@ -704,6 +770,7 @@
    "name": "Egypt",
    "authority_code": "EGY",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Arab Republic of Egypt",
     "Egyptian"
@@ -715,6 +782,7 @@
    "name": "Western Sahara",
    "authority_code": "ESH",
    "part_of": null,
+   "territory": true,
    "aliases": [
     "Sahrawi"
    ]
@@ -725,6 +793,7 @@
    "name": "Eritrea",
    "authority_code": "ERI",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Eritrean",
     "State of Eritrea"
@@ -736,6 +805,7 @@
    "name": "Spain",
    "authority_code": "ESP",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kingdom of Spain",
     "Spanish",
@@ -748,6 +818,7 @@
    "name": "Ethiopia",
    "authority_code": "ETH",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Ethiopian",
     "Federal Democratic Republic of Ethiopia",
@@ -760,6 +831,7 @@
    "name": "Finland",
    "authority_code": "FIN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Finnish",
     "Republic of Finland"
@@ -771,6 +843,7 @@
    "name": "Fiji",
    "authority_code": "FJI",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Fijian",
     "Republic of Fiji"
@@ -782,6 +855,7 @@
    "name": "Falkland Islands",
    "authority_code": "FLK",
    "part_of": "GBR",
+   "territory": true,
    "aliases": []
   },
   {
@@ -790,6 +864,7 @@
    "name": "Micronesia",
    "authority_code": "FSM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Federated States of Micronesia"
    ]
@@ -800,6 +875,7 @@
    "name": "Faroes",
    "authority_code": "FRO",
    "part_of": "DNK",
+   "territory": true,
    "aliases": [
     "Faroe Islands",
     "Faroese"
@@ -811,6 +887,7 @@
    "name": "France",
    "authority_code": "FRA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "French",
     "French Republic"
@@ -822,6 +899,7 @@
    "name": "Gabon",
    "authority_code": "GAB",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Gabonese",
     "Gabonese Republic"
@@ -833,6 +911,7 @@
    "name": "United Kingdom",
    "authority_code": "GBR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "British",
     "UK",
@@ -845,6 +924,7 @@
    "name": "Grenada",
    "authority_code": "GRD",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Grenadian"
    ]
@@ -855,6 +935,7 @@
    "name": "Georgia",
    "authority_code": "GEO",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Georgian"
    ]
@@ -865,6 +946,7 @@
    "name": "French Guiana",
    "authority_code": "GUF",
    "part_of": "FRA",
+   "territory": true,
    "aliases": [
     "Guianese"
    ]
@@ -875,6 +957,7 @@
    "name": "Guernsey",
    "authority_code": "GGY",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Bailiwick of Guernsey"
    ]
@@ -885,6 +968,7 @@
    "name": "Ghana",
    "authority_code": "GHA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Ghanaian",
     "Republic of Ghana"
@@ -896,6 +980,7 @@
    "name": "Gibraltar",
    "authority_code": "GIB",
    "part_of": "GBR",
+   "territory": true,
    "aliases": [
     "Gibraltarian"
    ]
@@ -906,6 +991,7 @@
    "name": "Greenland",
    "authority_code": "GRL",
    "part_of": "DNK",
+   "territory": true,
    "aliases": [
     "Greenlandic"
    ]
@@ -916,6 +1002,7 @@
    "name": "The Gambia",
    "authority_code": "GMB",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Gambia",
     "Gambian",
@@ -928,6 +1015,7 @@
    "name": "Guinea",
    "authority_code": "GIN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Guinean",
     "Republic of Guinea"
@@ -939,6 +1027,7 @@
    "name": "Guadeloupe",
    "authority_code": "GLP",
    "part_of": "FRA",
+   "territory": true,
    "aliases": [
     "Guadeloupean"
    ]
@@ -949,6 +1038,7 @@
    "name": "Equatorial Guinea",
    "authority_code": "GNQ",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Equatorial Guinea"
    ]
@@ -959,6 +1049,7 @@
    "name": "Greece",
    "authority_code": "GRC",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Greek",
     "Hellenic Republic",
@@ -971,6 +1062,7 @@
    "name": "South Georgia and the South Sandwich Islands",
    "authority_code": "SGS",
    "part_of": "GBR",
+   "territory": true,
    "aliases": [
     "SGSSI"
    ]
@@ -981,6 +1073,7 @@
    "name": "Guatemala",
    "authority_code": "GTM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Guatemalan",
     "Republic of Guatemala"
@@ -992,6 +1085,7 @@
    "name": "Guam",
    "authority_code": "GUM",
    "part_of": "USA",
+   "territory": true,
    "aliases": [
     "Guamanian",
     "Territory of Guam"
@@ -1003,6 +1097,7 @@
    "name": "Guinea-Bissau",
    "authority_code": "GNB",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Guinea-Bissau"
    ]
@@ -1013,6 +1108,7 @@
    "name": "Guyana",
    "authority_code": "GUY",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Cooperative Republic of Guyana",
     "Guyanese"
@@ -1024,6 +1120,7 @@
    "name": "Hong Kong",
    "authority_code": "HKG",
    "part_of": null,
+   "territory": true,
    "aliases": [
     "Hong Kong Chinese",
     "Hong Kong SAR",
@@ -1037,6 +1134,7 @@
    "name": "Heard Island and McDonald Islands",
    "authority_code": "HMD",
    "part_of": "AUS",
+   "territory": true,
    "aliases": [
     "HIMI",
     "Territory of Heard Island and McDonald Islands"
@@ -1048,6 +1146,7 @@
    "name": "Honduras",
    "authority_code": "HND",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Honduran",
     "Republic of Honduras"
@@ -1059,6 +1158,7 @@
    "name": "Croatia",
    "authority_code": "HRV",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Croatian",
     "Republic of Croatia"
@@ -1070,6 +1170,7 @@
    "name": "Haiti",
    "authority_code": "HTI",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Haitian",
     "Republic of Haiti"
@@ -1081,6 +1182,7 @@
    "name": "Hungary",
    "authority_code": "HUN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Hungarian",
     "People’s Republic of Hungary",
@@ -1093,6 +1195,7 @@
    "name": "Indonesia",
    "authority_code": "IDN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Indonesian",
     "Republic of Indonesia"
@@ -1104,6 +1207,7 @@
    "name": "Ireland",
    "authority_code": "IRL",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Irish"
    ]
@@ -1114,6 +1218,7 @@
    "name": "Israel",
    "authority_code": "ISR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Israeli",
     "State of Israel"
@@ -1125,6 +1230,7 @@
    "name": "Isle of Man",
    "authority_code": "IMN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Manx"
    ]
@@ -1135,6 +1241,7 @@
    "name": "India",
    "authority_code": "IND",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Indian",
     "Republic of India"
@@ -1146,6 +1253,7 @@
    "name": "British Indian Ocean Territory",
    "authority_code": "IOT",
    "part_of": "GBR",
+   "territory": true,
    "aliases": [
     "BIOT"
    ]
@@ -1156,6 +1264,7 @@
    "name": "Iraq",
    "authority_code": "IRQ",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Iraqi",
     "Republic of Iraq"
@@ -1167,6 +1276,7 @@
    "name": "Iran",
    "authority_code": "IRN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Iranian",
     "Islamic Republic of Iran"
@@ -1178,6 +1288,7 @@
    "name": "Iceland",
    "authority_code": "ISL",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Icelandic"
    ]
@@ -1188,6 +1299,7 @@
    "name": "Italy",
    "authority_code": "ITA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Italian",
     "Italian Republic"
@@ -1199,6 +1311,7 @@
    "name": "Jersey",
    "authority_code": "JEY",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Bailiwick of Jersey"
    ]
@@ -1209,6 +1322,7 @@
    "name": "Jamaica",
    "authority_code": "JAM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Jamaican"
    ]
@@ -1219,6 +1333,7 @@
    "name": "Jordan",
    "authority_code": "JOR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Hashemite Kingdom of Jordan",
     "Jordanian"
@@ -1230,6 +1345,7 @@
    "name": "Japan",
    "authority_code": "JPN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Japanese"
    ]
@@ -1240,6 +1356,7 @@
    "name": "Kenya",
    "authority_code": "KEN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kenyan",
     "Republic of Kenya"
@@ -1251,6 +1368,7 @@
    "name": "Kyrgyzstan",
    "authority_code": "KGZ",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kyrgyz",
     "Kyrgyz Republic"
@@ -1262,6 +1380,7 @@
    "name": "Cambodia",
    "authority_code": "KHM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Cambodian",
     "Kingdom of Cambodia"
@@ -1273,6 +1392,7 @@
    "name": "Kiribati",
    "authority_code": "KIR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kiribatian",
     "Republic of Kiribati"
@@ -1284,6 +1404,7 @@
    "name": "Comoros",
    "authority_code": "COM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Comorian",
     "Union of the Comoros"
@@ -1295,6 +1416,7 @@
    "name": "Saint Kitts and Nevis",
    "authority_code": "KNA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Federation of Saint Kitts and Nevis"
    ]
@@ -1305,6 +1427,7 @@
    "name": "North Korea",
    "authority_code": "PRK",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "DPRK",
     "Democratic People’s Republic of Korea",
@@ -1317,6 +1440,7 @@
    "name": "South Korea",
    "authority_code": "KOR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "ROK",
     "Republic of Korea",
@@ -1329,6 +1453,7 @@
    "name": "Kuwait",
    "authority_code": "KWT",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kuwaiti",
     "State of Kuwait"
@@ -1340,6 +1465,7 @@
    "name": "Cayman Islands",
    "authority_code": "CYM",
    "part_of": "GBR",
+   "territory": true,
    "aliases": [
     "Caymanian"
    ]
@@ -1350,6 +1476,7 @@
    "name": "Kazakhstan",
    "authority_code": "KAZ",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kazakhstani",
     "Republic of Kazakhstan"
@@ -1361,6 +1488,7 @@
    "name": "Laos",
    "authority_code": "LAO",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Lao",
     "Lao People’s Democratic Republic",
@@ -1373,6 +1501,7 @@
    "name": "Lebanon",
    "authority_code": "LBN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Lebanese",
     "Lebanese Republic"
@@ -1384,6 +1513,7 @@
    "name": "Saint Lucia",
    "authority_code": "LCA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Saint Lucian",
     "Sainte Lucie"
@@ -1395,6 +1525,7 @@
    "name": "Liechtenstein",
    "authority_code": "LIE",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Principality of Liechtenstein"
    ]
@@ -1405,6 +1536,7 @@
    "name": "Sri Lanka",
    "authority_code": "LKA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Democratic Socialist Republic of Sri Lanka",
     "Sri Lankan"
@@ -1416,6 +1548,7 @@
    "name": "Liberia",
    "authority_code": "LBR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Liberian",
     "Republic of Liberia"
@@ -1427,6 +1560,7 @@
    "name": "Lesotho",
    "authority_code": "LSO",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kingdom of Lesotho"
    ]
@@ -1437,6 +1571,7 @@
    "name": "Lithuania",
    "authority_code": "LTU",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Lithuanian",
     "Republic of Lithuania"
@@ -1448,6 +1583,7 @@
    "name": "Luxembourg",
    "authority_code": "LUX",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Grand Duchy of Luxembourg",
     "Luxembourgish"
@@ -1459,6 +1595,7 @@
    "name": "Latvia",
    "authority_code": "LVA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Latvian",
     "Republic of Latvia"
@@ -1470,6 +1607,7 @@
    "name": "Libya",
    "authority_code": "LBY",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Great Socialist People’s Libyan Arab Jamahiriya",
     "Libyan",
@@ -1483,6 +1621,7 @@
    "name": "Morocco",
    "authority_code": "MAR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kingdom of Morocco",
     "Moroccan"
@@ -1494,6 +1633,7 @@
    "name": "Monaco",
    "authority_code": "MCO",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Monegasque",
     "Principality of Monaco"
@@ -1505,6 +1645,7 @@
    "name": "Moldova",
    "authority_code": "MDA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Moldovan",
     "Republic of Moldova"
@@ -1516,6 +1657,7 @@
    "name": "Montenegro",
    "authority_code": "MNE",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Montenegrin"
    ]
@@ -1526,6 +1668,7 @@
    "name": "Saint Martin",
    "authority_code": "MAF",
    "part_of": "FRA",
+   "territory": true,
    "aliases": [
     "Collectivity of Saint Martin"
    ]
@@ -1536,6 +1679,7 @@
    "name": "Madagascar",
    "authority_code": "MDG",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Malagasy",
     "Republic of Madagascar"
@@ -1547,6 +1691,7 @@
    "name": "Marshall Islands",
    "authority_code": "MHL",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Marshallese",
     "Republic of the Marshall Islands"
@@ -1558,6 +1703,7 @@
    "name": "North Macedonia",
    "authority_code": "MKD",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Former Yugoslav Republic of Macedonia",
     "Macedonian",
@@ -1571,6 +1717,7 @@
    "name": "Mali",
    "authority_code": "MLI",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Malian",
     "Republic of Mali"
@@ -1582,6 +1729,7 @@
    "name": "Myanmar/Burma",
    "authority_code": "MMR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Burma",
     "Burma/Myanmar",
@@ -1595,6 +1743,7 @@
    "name": "Mongolia",
    "authority_code": "MNG",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Mongolian"
    ]
@@ -1605,6 +1754,7 @@
    "name": "Macao",
    "authority_code": "MAC",
    "part_of": null,
+   "territory": true,
    "aliases": [
     "Macanese",
     "Macao Special Administrative Region of the People’s Republic of China",
@@ -1617,6 +1767,7 @@
    "name": "Northern Mariana Islands",
    "authority_code": "MNP",
    "part_of": "USA",
+   "territory": true,
    "aliases": [
     "Commonwealth of the Northern Mariana Islands"
    ]
@@ -1627,6 +1778,7 @@
    "name": "Martinique",
    "authority_code": "MTQ",
    "part_of": "FRA",
+   "territory": true,
    "aliases": [
     "Martinican"
    ]
@@ -1637,6 +1789,7 @@
    "name": "Mauritania",
    "authority_code": "MRT",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Islamic Republic of Mauritania",
     "Mauritanian"
@@ -1648,6 +1801,7 @@
    "name": "Montserrat",
    "authority_code": "MSR",
    "part_of": "GBR",
+   "territory": true,
    "aliases": [
     "Emerald Isle of the Caribbean",
     "Montserratian"
@@ -1659,6 +1813,7 @@
    "name": "Malta",
    "authority_code": "MLT",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Maltese",
     "Republic of Malta",
@@ -1671,6 +1826,7 @@
    "name": "Mauritius",
    "authority_code": "MUS",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Mauritian",
     "Republic of Mauritius"
@@ -1682,6 +1838,7 @@
    "name": "Maldives",
    "authority_code": "MDV",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Maldivian",
     "Republic of Maldives"
@@ -1693,6 +1850,7 @@
    "name": "Malawi",
    "authority_code": "MWI",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Malawian",
     "Republic of Malawi"
@@ -1704,6 +1862,7 @@
    "name": "Mexico",
    "authority_code": "MEX",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Mexican",
     "United Mexican States"
@@ -1715,6 +1874,7 @@
    "name": "Malaysia",
    "authority_code": "MYS",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Malaysian"
    ]
@@ -1725,6 +1885,7 @@
    "name": "Mozambique",
    "authority_code": "MOZ",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Mozambican",
     "Republic of Mozambique"
@@ -1736,6 +1897,7 @@
    "name": "Namibia",
    "authority_code": "NAM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Namibian",
     "Republic of Namibia"
@@ -1747,6 +1909,7 @@
    "name": "New Caledonia",
    "authority_code": "NCL",
    "part_of": "FRA",
+   "territory": true,
    "aliases": [
     "New Caledonian",
     "Territory of New Caledonia and Dependencies"
@@ -1758,6 +1921,7 @@
    "name": "Niger",
    "authority_code": "NER",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Nigerien",
     "Republic of Niger"
@@ -1769,6 +1933,7 @@
    "name": "Norfolk Island",
    "authority_code": "NFK",
    "part_of": "AUS",
+   "territory": true,
    "aliases": [
     "Territory of Norfolk Island"
    ]
@@ -1779,6 +1944,7 @@
    "name": "Nigeria",
    "authority_code": "NGA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Federal Republic of Nigeria",
     "Nigerian"
@@ -1790,6 +1956,7 @@
    "name": "Nicaragua",
    "authority_code": "NIC",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Nicaraguan",
     "Republic of Nicaragua"
@@ -1801,6 +1968,7 @@
    "name": "Netherlands",
    "authority_code": "NLD",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Dutch",
     "Kingdom of the Netherlands"
@@ -1812,6 +1980,7 @@
    "name": "Norway",
    "authority_code": "NOR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kingdom of Norway",
     "Norwegian"
@@ -1823,6 +1992,7 @@
    "name": "Nepal",
    "authority_code": "NPL",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Federal Democratic Republic of Nepal",
     "Kingdom of Nepal",
@@ -1835,6 +2005,7 @@
    "name": "Nauru",
    "authority_code": "NRU",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Nauruan",
     "Pleasant Island",
@@ -1847,6 +2018,7 @@
    "name": "Niue",
    "authority_code": "NIU",
    "part_of": "NZL",
+   "territory": true,
    "aliases": [
     "Niuean",
     "Rock of Polynesia"
@@ -1858,6 +2030,7 @@
    "name": "New Zealand",
    "authority_code": "NZL",
    "part_of": null,
+   "territory": false,
    "aliases": []
   },
   {
@@ -1866,6 +2039,7 @@
    "name": "Oman",
    "authority_code": "OMN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Magan",
     "Omani",
@@ -1878,6 +2052,7 @@
    "name": "Panama",
    "authority_code": "PAN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Panamanian",
     "Republic of Panama"
@@ -1889,6 +2064,7 @@
    "name": "Peru",
    "authority_code": "PER",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Peruvian",
     "Republic of Peru"
@@ -1900,6 +2076,7 @@
    "name": "French Polynesia",
    "authority_code": "PYF",
    "part_of": "FRA",
+   "territory": true,
    "aliases": [
     "Polynesian"
    ]
@@ -1910,6 +2087,7 @@
    "name": "Papua New Guinea",
    "authority_code": "PNG",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Independent State of Papua New Guinea"
    ]
@@ -1920,6 +2098,7 @@
    "name": "Philippines",
    "authority_code": "PHL",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Philippine",
     "Republic of the Philippines"
@@ -1931,6 +2110,7 @@
    "name": "Pakistan",
    "authority_code": "PAK",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Islamic Republic of Pakistan",
     "Pakistani"
@@ -1942,6 +2122,7 @@
    "name": "Poland",
    "authority_code": "POL",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "People’s Republic of Poland",
     "Polish",
@@ -1954,6 +2135,7 @@
    "name": "Saint Pierre and Miquelon",
    "authority_code": "SPM",
    "part_of": "FRA",
+   "territory": true,
    "aliases": [
     "Territorial Collectivity of Saint Pierre and Miquelon"
    ]
@@ -1964,6 +2146,7 @@
    "name": "Pitcairn Islands",
    "authority_code": "PCN",
    "part_of": "GBR",
+   "territory": true,
    "aliases": [
     "Pitcairn, Henderson, Ducie and Oeno Islands",
     "Pitcairner"
@@ -1975,6 +2158,7 @@
    "name": "Puerto Rico",
    "authority_code": "PRI",
    "part_of": "USA",
+   "territory": true,
    "aliases": [
     "Commonwealth of Puerto Rico",
     "Puerto Rican"
@@ -1986,6 +2170,7 @@
    "name": "Palestine*",
    "authority_code": "PSE",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Palestine",
     "Palestinian"
@@ -1997,6 +2182,7 @@
    "name": "Portugal",
    "authority_code": "PRT",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Portuguese",
     "Portuguese Republic"
@@ -2008,6 +2194,7 @@
    "name": "Palau",
    "authority_code": "PLW",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Palauan",
     "Republic of Palau"
@@ -2019,6 +2206,7 @@
    "name": "Paraguay",
    "authority_code": "PRY",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Paraguayan",
     "Republic of Paraguay"
@@ -2030,6 +2218,7 @@
    "name": "Qatar",
    "authority_code": "QAT",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Qatari",
     "State of Qatar"
@@ -2041,6 +2230,7 @@
    "name": "Réunion",
    "authority_code": "REU",
    "part_of": "FRA",
+   "territory": true,
    "aliases": [
     "Reunionese",
     "Île Bourbon"
@@ -2052,6 +2242,7 @@
    "name": "Romania",
    "authority_code": "ROU",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Romanian",
     "Romanian People’s Republic",
@@ -2064,6 +2255,7 @@
    "name": "Serbia",
    "authority_code": "SRB",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Serbia",
     "Serbian"
@@ -2075,6 +2267,7 @@
    "name": "Russia",
    "authority_code": "RUS",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Russian",
     "Russian Federation"
@@ -2086,6 +2279,7 @@
    "name": "Rwanda",
    "authority_code": "RWA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Rwanda",
     "Rwandan",
@@ -2098,6 +2292,7 @@
    "name": "Saudi Arabia",
    "authority_code": "SAU",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "KSA",
     "Kingdom of Saudi Arabia",
@@ -2110,6 +2305,7 @@
    "name": "Solomon Islands",
    "authority_code": "SLB",
    "part_of": null,
+   "territory": false,
    "aliases": []
   },
   {
@@ -2118,6 +2314,7 @@
    "name": "Seychelles",
    "authority_code": "SYC",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Seychelles"
    ]
@@ -2128,6 +2325,7 @@
    "name": "Sudan",
    "authority_code": "SDN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of the Sudan",
     "Sudanese"
@@ -2139,6 +2337,7 @@
    "name": "Sweden",
    "authority_code": "SWE",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kingdom of Sweden",
     "Swedish"
@@ -2150,6 +2349,7 @@
    "name": "Singapore",
    "authority_code": "SGP",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Singapore",
     "Singaporean"
@@ -2161,6 +2361,7 @@
    "name": "Saint Helena, Ascension and Tristan da Cunha",
    "authority_code": "SHN",
    "part_of": "GBR",
+   "territory": true,
    "aliases": [
     "Saint Helena",
     "Saint Helena and Dependencies"
@@ -2172,6 +2373,7 @@
    "name": "Slovenia",
    "authority_code": "SVN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Slovenia",
     "Slovenian"
@@ -2183,6 +2385,7 @@
    "name": "Svalbard and Jan Mayen",
    "authority_code": "SJM",
    "part_of": "NOR",
+   "territory": true,
    "aliases": []
   },
   {
@@ -2191,6 +2394,7 @@
    "name": "Slovakia",
    "authority_code": "SVK",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Slovak",
     "Slovak Republic",
@@ -2203,6 +2407,7 @@
    "name": "Sierra Leone",
    "authority_code": "SLE",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Sierra Leone",
     "Sierra Leonean"
@@ -2214,6 +2419,7 @@
    "name": "San Marino",
    "authority_code": "SMR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of San Marino"
    ]
@@ -2224,6 +2430,7 @@
    "name": "Senegal",
    "authority_code": "SEN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Senegal",
     "Senegalese"
@@ -2235,6 +2442,7 @@
    "name": "Somalia",
    "authority_code": "SOM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Federal Republic of Somalia",
     "Somali",
@@ -2248,6 +2456,7 @@
    "name": "Suriname",
    "authority_code": "SUR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Suriname",
     "Surinamese"
@@ -2259,6 +2468,7 @@
    "name": "South Sudan",
    "authority_code": "SSD",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of South Sudan",
     "South Sudanese"
@@ -2270,6 +2480,7 @@
    "name": "São Tomé and Príncipe",
    "authority_code": "STP",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Democratic Republic of São Tomé and Príncipe"
    ]
@@ -2280,6 +2491,7 @@
    "name": "El Salvador",
    "authority_code": "SLV",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of El Salvador",
     "Salvadoran",
@@ -2292,6 +2504,7 @@
    "name": "Sint Maarten",
    "authority_code": "SXM",
    "part_of": "NLD",
+   "territory": true,
    "aliases": []
   },
   {
@@ -2300,6 +2513,7 @@
    "name": "Syria",
    "authority_code": "SYR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Syrian",
     "Syrian Arab Republic"
@@ -2311,6 +2525,7 @@
    "name": "Eswatini",
    "authority_code": "SWZ",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kingdom of Eswatini",
     "Kingdom of Swaziland",
@@ -2325,6 +2540,7 @@
    "name": "Turks and Caicos Islands",
    "authority_code": "TCA",
    "part_of": "GBR",
+   "territory": true,
    "aliases": []
   },
   {
@@ -2333,6 +2549,7 @@
    "name": "Chad",
    "authority_code": "TCD",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Chadian",
     "Republic of Chad"
@@ -2344,6 +2561,7 @@
    "name": "French Southern and Antarctic Lands",
    "authority_code": "ATF",
    "part_of": "FRA",
+   "territory": true,
    "aliases": []
   },
   {
@@ -2352,6 +2570,7 @@
    "name": "Togo",
    "authority_code": "TGO",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Siam",
     "Togolese",
@@ -2364,6 +2583,7 @@
    "name": "Thailand",
    "authority_code": "THA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kingdom of Thailand",
     "Thai"
@@ -2375,6 +2595,7 @@
    "name": "Tajikistan",
    "authority_code": "TJK",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Tajikistan",
     "Tajik"
@@ -2386,6 +2607,7 @@
    "name": "Tokelau",
    "authority_code": "TKL",
    "part_of": "NZL",
+   "territory": true,
    "aliases": [
     "Tokelauan"
    ]
@@ -2396,6 +2618,7 @@
    "name": "Timor-Leste",
    "authority_code": "TLS",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Democratic Republic of Timor-Leste",
     "East Timor",
@@ -2408,6 +2631,7 @@
    "name": "Turkmenistan",
    "authority_code": "TKM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Turkmen",
     "Turkmenia"
@@ -2419,6 +2643,7 @@
    "name": "Tunisia",
    "authority_code": "TUN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Tunisia",
     "Tunisian"
@@ -2430,6 +2655,7 @@
    "name": "Tonga",
    "authority_code": "TON",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Kingdom of Tonga",
     "Tongan"
@@ -2441,6 +2667,7 @@
    "name": "Türkiye",
    "authority_code": "TUR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Turkey",
     "Republic of Türkiye",
@@ -2454,6 +2681,7 @@
    "name": "Trinidad and Tobago",
    "authority_code": "TTO",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Trinidad and Tobago"
    ]
@@ -2464,6 +2692,7 @@
    "name": "Tuvalu",
    "authority_code": "TUV",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Ellice Islands",
     "Tuvaluan"
@@ -2475,6 +2704,7 @@
    "name": "Taiwan",
    "authority_code": "TWN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Formosa",
     "Taiwanese"
@@ -2486,6 +2716,7 @@
    "name": "Tanzania",
    "authority_code": "TZA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Tanzanian",
     "United Republic of Tanzania"
@@ -2497,6 +2728,7 @@
    "name": "Ukraine",
    "authority_code": "UKR",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Ukrainian"
    ]
@@ -2507,6 +2739,7 @@
    "name": "Uganda",
    "authority_code": "UGA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Uganda",
     "Ugandan"
@@ -2518,6 +2751,7 @@
    "name": "United States Minor Outlying Islands",
    "authority_code": "UMI",
    "part_of": "USA",
+   "territory": true,
    "aliases": [
     "US Minor Outlying Islands"
    ]
@@ -2528,6 +2762,7 @@
    "name": "United States",
    "authority_code": "USA",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "American",
     "US",
@@ -2541,6 +2776,7 @@
    "name": "Uruguay",
    "authority_code": "URY",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Eastern Republic of Uruguay",
     "Uruguayan"
@@ -2552,6 +2788,7 @@
    "name": "Uzbekistan",
    "authority_code": "UZB",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Uzbekistan",
     "Uzbek"
@@ -2563,6 +2800,7 @@
    "name": "Holy See",
    "authority_code": "VAT",
    "part_of": null,
+   "territory": false,
    "aliases": []
   },
   {
@@ -2571,6 +2809,7 @@
    "name": "Saint Vincent and the Grenadines",
    "authority_code": "VCT",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Vincentian"
    ]
@@ -2581,6 +2820,7 @@
    "name": "Venezuela",
    "authority_code": "VEN",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Bolivarian Republic of Venezuela",
     "Venezuelan"
@@ -2592,6 +2832,7 @@
    "name": "British Virgin Islands",
    "authority_code": "VGB",
    "part_of": "GBR",
+   "territory": true,
    "aliases": []
   },
   {
@@ -2600,6 +2841,7 @@
    "name": "US Virgin Islands",
    "authority_code": "VIR",
    "part_of": "USA",
+   "territory": true,
    "aliases": [
     "Virgin Islands of the United States"
    ]
@@ -2610,6 +2852,7 @@
    "name": "Viet Nam",
    "authority_code": "VNM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Vietnam",
     "Socialist Republic of Viet Nam",
@@ -2624,6 +2867,7 @@
    "name": "Vanuatu",
    "authority_code": "VUT",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Vanuatu",
     "Vanuatuan"
@@ -2635,6 +2879,7 @@
    "name": "Wallis and Futuna",
    "authority_code": "WLF",
    "part_of": "FRA",
+   "territory": true,
    "aliases": [
     "Territory of the Wallis and Futuna Islands"
    ]
@@ -2645,6 +2890,7 @@
    "name": "Samoa",
    "authority_code": "WSM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Independent State of Samoa",
     "Samoan"
@@ -2656,6 +2902,7 @@
    "name": "Yemen",
    "authority_code": "YEM",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Democratic Yemen",
     "People’s Democratic Republic of Yemen",
@@ -2671,6 +2918,7 @@
    "name": "Mayotte",
    "authority_code": "MYT",
    "part_of": "FRA",
+   "territory": true,
    "aliases": [
     "Departmental Collectivity of Mayotte",
     "Mahoran"
@@ -2682,6 +2930,7 @@
    "name": "South Africa",
    "authority_code": "ZAF",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of South Africa",
     "South African"
@@ -2693,6 +2942,7 @@
    "name": "Zambia",
    "authority_code": "ZMB",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Zambia",
     "Zambian"
@@ -2704,6 +2954,7 @@
    "name": "Zimbabwe",
    "authority_code": "ZWE",
    "part_of": null,
+   "territory": false,
    "aliases": [
     "Republic of Zimbabwe",
     "Zimbabwean"

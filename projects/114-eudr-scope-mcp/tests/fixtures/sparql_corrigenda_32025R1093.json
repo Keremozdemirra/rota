@@ -2,12 +2,10 @@
  "head": {
   "link": [],
   "vars": [
-   "rel",
+   "target",
    "celex",
    "date",
-   "eif",
-   "title",
-   "adopted"
+   "lang"
   ]
  },
  "results": {

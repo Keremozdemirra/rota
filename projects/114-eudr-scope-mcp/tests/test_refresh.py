@@ -202,6 +202,73 @@ class Unverified(unittest.TestCase):
         self.assertEqual((c["low"], c["high"]), ([], []))
 
 
+class ReviewRegressions(unittest.TestCase):
+    """Findings of the review of 2026-09-24, one test each."""
+
+    def test_deferral_inside_a_consolidated_entry_is_kept(self):
+        # A later consolidation carries "(This provision shall apply from ...)" inside the entry.
+        def cons(t):
+            return t.replace('Chocolate and other food preparations containing cocoa</p>',
+                             'Chocolate and other food preparations containing cocoa</p>\n'
+                             '<p class="tbl-norm">(This provision shall apply from 30 December 2027)</p>')
+        result = build(support.FakeCellar(edits={"doc:02023R1115-20251226": cons}))
+        entry = next(e for e in result["annex_i"]["entries"] if e["label"] == "1806")
+        self.assertEqual(entry["valid_from"], "2027-12-30")
+        self.assertNotIn("applies_from", entry)
+        with tempfile.TemporaryDirectory() as tmp:
+            refresh.write(result, Path(tmp))
+            with support.SnapshotEnv(Path(tmp)):
+                from eudr_scope_mcp import lookup
+                r = lookup.eudr_scope("1806 10 10")
+        self.assertEqual(r["status"], "not_listed")
+        self.assertEqual(r["applies_later"][0]["valid_from"], "2027-12-30")
+
+    def test_unidentified_amendment_makes_annex_answers_unverified(self):
+        def act(t):
+            return re.sub(r"Annex I to Regulation \(EU\)\s+2023/1115 is amended in accordance with",
+                          "The list in the first annex to Regulation (EU) 2023/1115 is changed in line with", t)
+        fake = support.FakeCellar(edits={"doc:32026R2102": act})
+        with tempfile.TemporaryDirectory() as tmp:
+            with support.Patched(fake):
+                code = refresh.run(tmp, today=support.TODAY, log=lambda m: None)
+            self.assertEqual(code, 1)  # written, but not verified
+            with support.SnapshotEnv(Path(tmp)):
+                from eudr_scope_mcp import lookup
+                r = lookup.eudr_scope("4101 20 10")
+                c = lookup.commodity_codes("cattle")
+        self.assertEqual(r["status"], "unverified")
+        self.assertTrue(r["answer"].startswith("unverified: 32026R2102"))
+        self.assertEqual(r["table_status"], "partly_ex")
+        self.assertTrue(c["answer"].startswith("unverified"))
+
+    def test_english_corrigendum_of_an_applied_act(self):
+        corr = support.load("sparql_corrigenda_32023R1115.json")
+        corr["results"]["bindings"].append({
+            "target": {"type": "literal", "value": "32026R2102"},
+            "celex": {"type": "literal", "value": "32026R2102R(01)"},
+            "date": {"type": "literal", "value": "2026-09-20"},
+            "lang": {"type": "uri", "value": "http://publications.europa.eu/resource/authority/language/ENG"}})
+        result = build(support.FakeCellar({"sparql:corrigenda_32023R1115": json.dumps(corr).encode()}))
+        self.assertEqual(result["annex_i"]["status"], "unverified")
+        self.assertIn("32026R2102R(01)", " ".join(result["annex_i"]["status_reasons"]))
+        listed = {c["celex"]: c for c in result["application_dates"]["corrigenda"]}
+        self.assertEqual(listed["32025R2650R(02)"]["corrects"], "32025R2650")
+        self.assertFalse(listed["32025R2650R(02)"]["english"])
+
+    def test_pending_proposals_come_from_adoption_links(self):
+        d = build()["application_dates"]
+        self.assertEqual([p["celex"] for p in d["pending_proposals"]], ["52026PC0661"])
+
+    def test_licence_basis_per_dataset(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            refresh.write(build(), Path(tmp))
+            text = (Path(tmp) / "SOURCES.md").read_text(encoding="utf-8")
+        self.assertIn("Unless otherwise specified, you can re-use the legal documents", text)
+        self.assertIn("web.archive.org/web/20260922160312", text)
+        self.assertIn("All documents shall be available for reuse", text)
+        self.assertNotIn("commission.europa.eu/legal-notice", text)
+
+
 class CommandLine(unittest.TestCase):
     def test_refresh_dry_run_writes_nothing(self):
         with tempfile.TemporaryDirectory() as tmp, support.Patched(support.FakeCellar()):

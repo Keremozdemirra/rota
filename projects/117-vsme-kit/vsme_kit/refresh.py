@@ -36,17 +36,26 @@ ACTS = {
              "short": "Commission Recommendation (EU) 2025/1710",
              "standard": "voluntary sustainability reporting standard for SMEs (VSME), Annex I"},
 }
+# Official Journal texts are re-used under the EUR-Lex legal notice and Decision 2011/833/EU,
+# not under CC BY 4.0, which EUR-Lex grants only to its editorial content, the summaries and
+# the consolidated texts.
 LICENCE = {
-    "terms": "https://commission.europa.eu/legal-notice_en",
-    "quote": ("Unless otherwise indicated (e.g. in individual copyright notices), content owned by the EU on this "
-              "website is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence. This "
-              "means that reuse is allowed, provided appropriate credit is given and changes are indicated."),
+    "terms": "https://eur-lex.europa.eu/content/legal-notice/legal-notice.html",
+    "terms_archived": "https://web.archive.org/web/20260922160312/https://eur-lex.europa.eu/content/legal-notice/legal-notice.html",
+    "quote": "Unless otherwise specified, you can re-use the legal documents published in EUR-Lex for commercial or "
+             "non-commercial purposes.",
     "policy": "Commission Decision 2011/833/EU on the reuse of Commission documents, http://data.europa.eu/eli/dec/2011/833/oj",
-    "licence": "CC BY 4.0, https://creativecommons.org/licenses/by/4.0/",
+    "policy_quote": ("Article 4: \"All documents shall be available for reuse: (a) for commercial or non-commercial "
+                     "purposes under the conditions laid down in Article 6\"; Article 6(2): conditions may include "
+                     "\"the obligation for the reuser to acknowledge the source of the documents\" and \"the obligation "
+                     "not to distort the original meaning or message of the documents\"."),
+    "not_cc_by": "CC BY 4.0 covers only \"the editorial content of this website, the summaries of EU legislation and "
+                 "the consolidated texts\" (EUR-Lex legal notice); these are acts as published in the Official Journal.",
     "checked": "2026-09-24",
 }
 CHANGES = ("Text extracted from the English XHTML of the Official Journal: whitespace normalised, table layout "
-           "flattened (cells joined by ' | '), footnotes and appendices left out, images replaced by a marker.")
+           "flattened (cells joined by ' | '), footnotes, appendices and the table of contents left out while footnote "
+           "markers such as '(5)' stay in the text, images replaced by a marker.")
 ORDINALS = {"first": 1, "second": 2, "third": 3, "fifth": 5, "tenth": 10, "twentieth": 20}
 MONTHS = {m: i for i, m in enumerate(("january", "february", "march", "april", "may", "june", "july", "august",
                                       "september", "october", "november", "december"), 1)}

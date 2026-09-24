@@ -189,46 +189,57 @@ CN_DATASET = {
 
 # --------------------------------------------------------------- licences
 
-# Licence basis (standards point 16). The EUR-Lex legal notice answers HTTP 202 with an
-# empty body to curl from the build sandbox; it was read on 2026-09-24 through the
-# WebFetch tool, and Decision 2011/833/EU from CELLAR (celex 32011D0833) the same day.
-LICENCES = {
-    "eurlex": {
-        "name": "CC BY 4.0 (EUR-Lex legal notice: consolidated texts); EU legal documents re-usable "
-                "(EUR-Lex legal notice; Commission Decision 2011/833/EU, Article 4)",
-        "terms": "https://eur-lex.europa.eu/content/legal-notice/legal-notice.html",
-        "quote": "The copyright for the editorial content of this website, the summaries of EU legislation and the "
-                 "consolidated texts, which is owned by the EU, is licensed under the Creative Commons Attribution "
-                 "4.0 International licence.",
-        "quote_2": "Unless otherwise specified, you can re-use the legal documents published in EUR-Lex for "
-                   "commercial or non-commercial purposes.",
-        "read": "2026-09-24 through the WebFetch tool (curl from here got HTTP 202 with an empty body)",
-    },
-    "decision_2011_833": {
-        "name": "Commission Decision 2011/833/EU on the reuse of Commission documents, Article 4",
-        "terms": "http://data.europa.eu/eli/dec/2011/833/oj",
-        "quote": "All documents shall be available for reuse: (a) for commercial or non-commercial purposes under "
+# Licence basis (standards point 16). EUR-Lex legal notice:
+# https://eur-lex.europa.eu/content/legal-notice/legal-notice.html (archived copy:
+# https://web.archive.org/web/20260922160312/https://eur-lex.europa.eu/content/legal-notice/legal-notice.html).
+# It answers HTTP 202 with an empty body to curl from the build sandbox; it was read on
+# 2026-09-24 through the WebFetch tool. Decision 2011/833/EU was read from CELLAR the same day.
+_EURLEX = "https://eur-lex.europa.eu/content/legal-notice/legal-notice.html"
+_EURLEX_READ = ("2026-09-24 through the WebFetch tool (curl from here got HTTP 202 with an empty body); archived "
+                "copy https://web.archive.org/web/20260922160312/" + _EURLEX)
+_DECISION = {
+    "article_4": "All documents shall be available for reuse: (a) for commercial or non-commercial purposes under "
                  "the conditions laid down in Article 6; (b) without charge, subject to the provisions laid down in "
                  "Article 9; and (c) without the need to make an individual application, unless otherwise provided "
                  "in Article 7.",
-        "read": "2026-09-24 from CELLAR, celex 32011D0833",
+    "article_6_2": "Those conditions, which shall not unnecessarily restrict possibilities for reuse, may include "
+                   "the following: (a) the obligation for the reuser to acknowledge the source of the documents; "
+                   "(b) the obligation not to distort the original meaning or message of the documents; (c) the "
+                   "non-liability of the Commission for any consequence stemming from the reuse.",
+}
+LICENCES = {
+    # Consolidated texts (02023R0956-..., 02025R2621-...): CC BY 4.0.
+    "eurlex_consolidated": {
+        "name": "CC BY 4.0 (EUR-Lex legal notice: consolidated texts)",
+        "terms": _EURLEX, "read": _EURLEX_READ,
+        "quote": "The copyright for the editorial content of this website, the summaries of EU legislation and the "
+                 "consolidated texts, which is owned by the EU, is licensed under the Creative Commons Attribution "
+                 "4.0 International licence.",
+        "quote_2": "This means that you can re-use the content provided you acknowledge the source and indicate any "
+                   "changes you have made.",
     },
-    "commission": {
-        "name": "CC BY 4.0 (the Commission legal notice that the CBAM page links as its legal notice); "
-                "Commission Decision 2011/833/EU, Article 4",
-        "terms": "https://commission.europa.eu/legal-notice_en",
-        "quote": "Unless otherwise indicated (e.g. in individual copyright notices), content owned by the EU on "
-                 "this website is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) "
-                 "licence. This means that reuse is allowed, provided appropriate credit is given and changes "
-                 "are indicated.",
-        "read": "2026-09-24; the footer of taxation-customs.ec.europa.eu links this page as its legal notice",
+    # Official Journal texts as published (e.g. 32026R1740): not CC BY; re-use as legal documents.
+    "eurlex_oj": {
+        "name": "EU legal documents re-usable for commercial or non-commercial purposes (EUR-Lex legal notice; "
+                "Commission Decision 2011/833/EU, Articles 4 and 6(2))",
+        "terms": _EURLEX, "read": _EURLEX_READ,
+        "quote": "Unless otherwise specified, you can re-use the legal documents published in EUR-Lex for commercial "
+                 "or non-commercial purposes.",
+        "quote_2": "Decision 2011/833/EU, Article 4: " + _DECISION["article_4"],
+    },
+    # The Commission's Excel: a Commission document.
+    "commission_excel": {
+        "name": "Commission document, re-usable under Commission Decision 2011/833/EU, Articles 4 and 6(2)",
+        "terms": "http://data.europa.eu/eli/dec/2011/833/oj", "read": "2026-09-24 from CELLAR, celex 32011D0833",
+        "quote": "Article 4: " + _DECISION["article_4"],
+        "quote_2": "Article 6(2): " + _DECISION["article_6_2"],
     },
     "cn": {
-        "name": "European Commission reuse notice (Commission Decision 2011/833/EU)",
+        "name": "European Commission reuse notice (COM_REUSE, Commission Decision 2011/833/EU)",
         "terms": "http://data.europa.eu/eli/dec/2011/833/oj",
+        "read": "2026-09-24 from the data.europa.eu dataset metadata",
         "quote": "Licence of both distributions of the datasets combined-nomenclature-2025 and "
                  "combined-nomenclature-2026 on data.europa.eu: 'European Commission reuse notice'.",
-        "read": "2026-09-24 from the data.europa.eu dataset metadata",
     },
 }
 

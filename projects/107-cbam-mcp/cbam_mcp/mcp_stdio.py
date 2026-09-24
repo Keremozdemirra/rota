@@ -41,13 +41,15 @@ TOOLS = [
          "CBAM default values for goods under a CN code from one country of origin, from the Commission's Excel of "
          "definitive-period default values (the binding values are in Annex I to Implementing Regulation (EU) "
          "2025/2621 as replaced by Implementing Regulation (EU) 2026/1740). Returns per matching table line: "
-         "direct, indirect and total embedded emissions in tCO2e per tonne of good as listed (before the increase "
-         "Annex I sets for the certificate calculation, which this tool does not apply), the production-route "
-         "letter and its meaning, the 'Other countries and territories' values where Annex I says to use them "
-         "(country not listed, no line, or '–'), and the Annex IV value for precursors whose country of "
-         "production is unknown. EU Member States and the Annex III origins (e.g. Norway, Switzerland) get an "
-         "explanation instead of values. No values for electricity (2716) and no indirect-emission factors: those "
-         "are Annexes II and III of Implementing Regulation (EU) 2025/2621, not in the Excel. Not legally binding."),
+         "direct, indirect and total embedded emissions in tCO2e per tonne of good as listed, before the mark-up "
+         "(markup_rule quotes the rule from the consolidated text; this tool does not apply it), the "
+         "production-route letter and its meaning, the 'Other countries and territories' values where Annex I says "
+         "to use them for a listed country (no line, or '\u2013'), and the Annex IV value for precursors whose "
+         "country of production is unknown. A country name the tool does not recognise is an error, never a "
+         "fallback; for a third country the tables do not list, ask for country 'Other countries and "
+         "territories'. EU Member States and Annex III origins (e.g. Norway, Switzerland) get an explanation "
+         "instead of values; a code outside CBAM scope gets no value. No values for electricity (2716) and no "
+         "indirect-emission factors: those are Annexes II and III, not in the Excel. Not legally binding."),
      "inputSchema": {"type": "object", "properties": {
          "cn_code": _CN,
          "country": {"type": "string", "description": "country of origin: name as in the tables ('Türkiye', "
@@ -94,7 +96,7 @@ HANDLERS = {"cbam_scope": lookup.cbam_scope, "default_value": lookup.default_val
 INSTRUCTIONS = (
     "EU CBAM lookups from dated snapshots of the official sources. Every answer states the legally binding act, "
     "the data version and that the data is not legally binding. Default values are in tCO2e per tonne of good, "
-    "as listed, before the increase Annex I sets for the certificate calculation. Information only, not legal advice.")
+    "as listed, before the mark-up (quoted, not applied). Information only, not legal advice.")
 
 
 def _error_result(text: str) -> dict:

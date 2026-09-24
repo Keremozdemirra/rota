@@ -19,6 +19,7 @@ previous snapshot untouched.
 from __future__ import annotations
 
 import datetime as dt
+import email.utils
 import hashlib
 import json
 import os
@@ -127,6 +128,13 @@ MIN_COUNTRIES = 200
 
 class RefreshError(RuntimeError):
     pass
+
+
+def _http_date(value) -> str | None:
+    try:
+        return email.utils.parsedate_to_datetime(value).date().isoformat()
+    except (TypeError, ValueError, IndexError):
+        return None
 
 
 def _date(value: str) -> str:
@@ -335,13 +343,29 @@ def build(today: str | None = None, log=lambda msg: None) -> dict:
         status = "unverified"
         reasons.append("the last act that replaced Article 38 does not state the dates in the consolidated text")
 
-    corrigenda = [r for r in rel if r["rel"] == "corrects"]
-    english = english_versions([c["celex"] for c in corrigenda])
-    for c in corrigenda:
-        c["english"] = c["celex"] in english
+    # Corrigenda of every act this snapshot rests on. Only English ones change
+    # the text read here; one the consolidated text may not include, or one of
+    # an act applied by this tool, means the result can no longer be vouched for.
+    log("SPARQL: corrigenda of 2023/1115 and of every amending act")
+    corr = corrigenda([BASE] + [a["celex"] for a in amending])
+    cons_doc = next(d for d in documents if d["role"] == "consolidated text")
+    cons_seen = _http_date(cons_doc.get("last_modified")) or cons_date
+    applied_celex = {a["celex"] for a in applied}
+    for c in corr:
+        if not c["english"]:
+            continue
+        if c["corrects"] in applied_celex:
+            annex_status = "unverified"
+            annex_reasons.append(f"{c['celex']} corrects {c['corrects']} in English; this tool applies "
+                                 f"{c['corrects']} and does not apply corrigenda")
+        elif (c["date"] or "9999") > cons_seen:
+            status = annex_status = "unverified"
+            reasons.append(f"{c['celex']} corrects {c['corrects']} in English after the consolidated text "
+                           f"was last updated ({cons_seen})")
+            annex_reasons.append(reasons[-1])
+    # A proposal is pending until CELLAR records an act that adopts it.
     proposals = [r for r in rel if r["rel"] == "proposes_to_amend"]
-    latest_act = max((a["date"] or "" for a in amending), default="")
-    pending = [p for p in proposals if (p["date"] or "") > latest_act]
+    pending = [p for p in proposals if not p.get("adopted_as")]
 
     log("SPARQL + XHTML: Implementing Regulation (EU) 2025/1093 (country list)")
     cmeta = work_meta(COUNTRY_ACT)
@@ -351,12 +375,9 @@ def build(today: str | None = None, log=lambda msg: None) -> dict:
     if cmeta["in_force"] is not True:
         c_status, c_reasons = "unverified", [f"{COUNTRY_ACT} is not recorded as in force"]
     changes = [r for r in crel if r["rel"] in ("amends", "repeals")]
-    c_corr = [r for r in crel if r["rel"] == "corrects"]
-    c_english = english_versions([c["celex"] for c in c_corr])
-    for c in c_corr:
-        c["english"] = c["celex"] in c_english
+    c_corr = [c for c in corrigenda([COUNTRY_ACT]) if c["english"]]
     source_celex = COUNTRY_ACT
-    if changes or any(c["english"] for c in c_corr):
+    if changes or c_corr:
         if cversions and cversions[0][1] >= max((r["date"] or "") for r in changes + c_corr):
             source_celex = cversions[0][0]
         else:
@@ -424,11 +445,12 @@ def build(today: str | None = None, log=lambda msg: None) -> dict:
             "unconsolidated_amendments": unconsolidated,
             "amending_acts": [{k: a.get(k) for k in ("celex", "title", "date", "published", "entry_into_force_text",
                                                      "touches")} for a in amending],
-            "corrigenda": corrigenda, "pending_proposals": pending,
+            "corrigenda": corr, "proposals": proposals, "pending_proposals": pending,
         },
         "country_risk": {
             "dataset": "Country classification under Article 29 of Regulation (EU) 2023/1115",
             "retrieved": today, "status": c_status, "status_reasons": c_reasons,
+            "corrigenda_in_english": c_corr,
             "act": {"celex": COUNTRY_ACT, "title": cmeta["title"], "date": cmeta["date"], "published": pub_c,
                     "entry_into_force": eif_c, "eli": cmeta["eli"], "source_text": source_celex,
                     "url": cellar.resource_url(source_celex), "related": crel,
@@ -544,9 +566,11 @@ def sources_md(result: dict, manifest: dict) -> str:
     lines += [f"- {k.replace('_', ' ')}: {v}" for k, v in counts.items()]
     lines += ["", "## Corrigenda and proposals", ""]
     for corr in d["corrigenda"]:
-        lines.append(f"- {corr['celex']} ({corr['date']}): {'has an English version' if corr['english'] else 'no English version, so the English text is unaffected'}")
-    for prop in d["pending_proposals"]:
-        lines.append(f"- {prop['celex']} ({prop['date']}), a proposal, not law and not applied: {prop['title']}")
+        lines.append(f"- {corr['celex']} ({corr['date']}) corrects {corr['corrects']}: "
+                     + ("has an English version" if corr["english"] else "no English version, so the English text is unaffected"))
+    for prop in d["proposals"]:
+        lines.append(f"- {prop['celex']} ({prop['date']}): " + (f"adopted as {prop['adopted_as']}" if prop["adopted_as"]
+                     else "pending (no adopting act in CELLAR), not law and not applied") + f": {prop['title']}")
     fixes = [x for x in c["low"] + c["high"] if x["matched_by"].startswith("fixed")]
     moved = [x for x in c["low"] + c["high"] if "qualifier" in x["matched_by"]]
     lines += [
@@ -564,18 +588,35 @@ def sources_md(result: dict, manifest: dict) -> str:
         "",
         "## Licence and attribution",
         "",
-        "- Legal texts and metadata: CELLAR, Publications Office of the European Union. The dataset record",
-        "  https://data.europa.eu/data/datasets/sparql-cellar-of-the-publications-office gives its licence as",
-        "  the European Commission reuse notice, Commission Decision 2011/833/EU",
-        "  (http://data.europa.eu/eli/dec/2011/833/oj), which allows reuse for commercial or non-commercial",
-        "  purposes; its conditions may include acknowledging the source and not distorting the original",
-        "  meaning (Article 6(2)).",
-        "- Country authority table: same reuse notice (https://data.europa.eu/data/datasets/country).",
-        "- Commission web content: CC BY 4.0 (https://commission.europa.eu/legal-notice_en).",
-        "- Attribution lines carried by the answers:",
-        f"  - scope and commodity answers: {attribution(result['retrieved'], 'annex', bool(a['amendments_applied']))}",
-        f"  - date answers: {attribution(result['retrieved'], 'dates')}",
-        f"  - country answers: {attribution(result['retrieved'], 'country', table_version=result['countries']['version'])}",
+        "EUR-Lex legal notice, https://eur-lex.europa.eu/content/legal-notice/legal-notice.html. From this sandbox",
+        "eur-lex.europa.eu answered HTTP 202 with an empty body and web.archive.org reset the connection on",
+        "2026-09-24, so the sentences below are quoted from the archived copy of 2026-09-22",
+        "(https://web.archive.org/web/20260922160312/https://eur-lex.europa.eu/content/legal-notice/legal-notice.html)",
+        "as given in this project's build notes, not re-read by this tool:",
+        "",
+        "- 'Unless otherwise specified, you can re-use the legal documents published in EUR-Lex for commercial or",
+        "  non-commercial purposes.'",
+        "- Creative Commons Attribution 4.0 covers 'the editorial content of this website, the summaries of EU",
+        "  legislation and the consolidated texts'.",
+        "",
+        "Commission Decision 2011/833/EU on the reuse of Commission documents (http://data.europa.eu/eli/dec/2011/833/oj),",
+        "read from CELLAR on 2026-09-24: Article 4, 'All documents shall be available for reuse: (a) for commercial or",
+        "non-commercial purposes under the conditions laid down in Article 6'; Article 6(2) conditions may include",
+        "'(a) the obligation for the reuser to acknowledge the source of the documents; (b) the obligation not to",
+        "distort the original meaning or message of the documents'.",
+        "",
+        "| Data | Basis |",
+        "| --- | --- |",
+        f"| Consolidated text {cons['celex']} (Annex I base, Articles 1, 2, 37, 38) | CC BY 4.0 (EUR-Lex legal notice, consolidated texts); changes indicated: Annex I is derived |",
+        "| Regulations (EU) 2023/1115, 2024/3234, 2025/2650 as published in the OJ (European Parliament and Council) | EUR-Lex legal notice, re-use of legal documents published in EUR-Lex |",
+        f"| Commission acts as published in the OJ ({', '.join(x['celex'] for x in a['amendments_applied'])}, {c['act']['celex']}) | EUR-Lex legal notice, plus Decision 2011/833/EU Articles 4 and 6(2) |",
+        "| CELLAR metadata (SPARQL) and the 'Countries and territories' authority table | Commission reuse notice, Decision 2011/833/EU, per https://data.europa.eu/data/datasets/sparql-cellar-of-the-publications-office and https://data.europa.eu/data/datasets/country |",
+        "",
+        "Attribution lines carried by the answers:",
+        "",
+        f"- scope and commodity answers: {attribution(result['retrieved'], 'annex', bool(a['amendments_applied']))}",
+        f"- date answers: {attribution(result['retrieved'], 'dates')}",
+        f"- country answers: {attribution(result['retrieved'], 'country', table_version=result['countries']['version'])}",
         "",
         "Only the texts published in the Official Journal of the European Union are authentic. The consolidated",
         "text says of itself: 'This text is meant purely as a documentation tool and has no legal effect.'",
@@ -596,9 +637,11 @@ def run(out_dir: str, today: str | None = None, dry_run: bool = False, log=print
     for key in ("annex_i", "application_dates", "country_risk"):
         part = result[key]
         log(f"  {key}: {part['status']}" + ("" if not part["status_reasons"] else " - " + "; ".join(part["status_reasons"])))
+    unverified = any(result[k]["status"] != "verified" for k in ("annex_i", "application_dates", "country_risk"))
     if dry_run:
         log("dry run: nothing written")
-        return 0
+        return 1 if unverified else 0
     manifest = write(result, Path(out_dir))
     log(f"wrote {len(manifest['files']) + 2} files to {out_dir}")
-    return 0
+    # 1: written, but some answers will say "unverified" until the texts are reviewed.
+    return 1 if unverified else 0

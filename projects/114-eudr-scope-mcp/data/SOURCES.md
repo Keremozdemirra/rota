@@ -44,12 +44,16 @@ Country names are matched to ISO 3166-1 codes through the EU authority table htt
 
 ## Corrigenda and proposals
 
-- 32023R1115R(01) (2024-10-01): no English version, so the English text is unaffected
-- 32023R1115R(02) (2025-02-28): no English version, so the English text is unaffected
-- 32023R1115R(03) (2025-03-28): no English version, so the English text is unaffected
-- 32023R1115R(04) (2025-12-22): no English version, so the English text is unaffected
-- 32023R1115R(05) (2026-07-02): no English version, so the English text is unaffected
-- 52026PC0661 (2026-09-10), a proposal, not law and not applied: Proposal for a COUNCIL REGULATION amending Regulations (EU) No 1380/2013, (EU) No 1308/2013, (EU) 2023/1115 and (EU) 2024/1348 of the European Parliament and of the Council, and Council Regulation (EU) 2023/2720 as regards adaptation of certain requirements and reduction of administrative burden in the Union outermost regions
+- 32023R1115R(01) (2024-10-01) corrects 32023R1115: no English version, so the English text is unaffected
+- 32023R1115R(02) (2025-02-28) corrects 32023R1115: no English version, so the English text is unaffected
+- 32023R1115R(03) (2025-03-28) corrects 32023R1115: no English version, so the English text is unaffected
+- 32023R1115R(04) (2025-12-22) corrects 32023R1115: no English version, so the English text is unaffected
+- 32025R2650R(01) (2026-02-12) corrects 32025R2650: no English version, so the English text is unaffected
+- 32025R2650R(02) (2026-05-18) corrects 32025R2650: no English version, so the English text is unaffected
+- 32023R1115R(05) (2026-07-02) corrects 32023R1115: no English version, so the English text is unaffected
+- 52024PC0452 (2024-10-02): adopted as 32024R3234: Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL amending Regulation (EU) 2023/1115 as regards provisions relating to the date of application
+- 52025PC0652 (2025-10-21): adopted as 32025R2650: Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL amending Regulation (EU) 2023/1115 as regards certain obligations of operators and traders
+- 52026PC0661 (2026-09-10): pending (no adopting act in CELLAR), not law and not applied: Proposal for a COUNCIL REGULATION amending Regulations (EU) No 1380/2013, (EU) No 1308/2013, (EU) 2023/1115 and (EU) 2024/1348 of the European Parliament and of the Council, and Council Regulation (EU) 2023/2720 as regards adaptation of certain requirements and reduction of administrative burden in the Union outermost regions
 
 ## Choices made by this tool
 
@@ -62,18 +66,35 @@ Country names are matched to ISO 3166-1 codes through the EU authority table htt
 
 ## Licence and attribution
 
-- Legal texts and metadata: CELLAR, Publications Office of the European Union. The dataset record
-  https://data.europa.eu/data/datasets/sparql-cellar-of-the-publications-office gives its licence as
-  the European Commission reuse notice, Commission Decision 2011/833/EU
-  (http://data.europa.eu/eli/dec/2011/833/oj), which allows reuse for commercial or non-commercial
-  purposes; its conditions may include acknowledging the source and not distorting the original
-  meaning (Article 6(2)).
-- Country authority table: same reuse notice (https://data.europa.eu/data/datasets/country).
-- Commission web content: CC BY 4.0 (https://commission.europa.eu/legal-notice_en).
-- Attribution lines carried by the answers:
-  - scope and commodity answers: Source: EUR-Lex/CELLAR, Publications Office of the European Union, retrieved 2026-09-24; (c) European Union, reuse under Commission Decision 2011/833/EU. Table derived by eudr-scope-mcp: amending acts applied to the consolidated text.
-  - date answers: Source: EUR-Lex/CELLAR, Publications Office of the European Union, retrieved 2026-09-24; (c) European Union, reuse under Commission Decision 2011/833/EU. Dates read from the article texts by eudr-scope-mcp.
-  - country answers: Source: EUR-Lex/CELLAR, Publications Office of the European Union, retrieved 2026-09-24; (c) European Union, reuse under Commission Decision 2011/833/EU. Country names matched to ISO 3166-1 codes by eudr-scope-mcp through the EU 'Countries and territories' authority table (version 20260617-0).
+EUR-Lex legal notice, https://eur-lex.europa.eu/content/legal-notice/legal-notice.html. From this sandbox
+eur-lex.europa.eu answered HTTP 202 with an empty body and web.archive.org reset the connection on
+2026-09-24, so the sentences below are quoted from the archived copy of 2026-09-22
+(https://web.archive.org/web/20260922160312/https://eur-lex.europa.eu/content/legal-notice/legal-notice.html)
+as given in this project's build notes, not re-read by this tool:
+
+- 'Unless otherwise specified, you can re-use the legal documents published in EUR-Lex for commercial or
+  non-commercial purposes.'
+- Creative Commons Attribution 4.0 covers 'the editorial content of this website, the summaries of EU
+  legislation and the consolidated texts'.
+
+Commission Decision 2011/833/EU on the reuse of Commission documents (http://data.europa.eu/eli/dec/2011/833/oj),
+read from CELLAR on 2026-09-24: Article 4, 'All documents shall be available for reuse: (a) for commercial or
+non-commercial purposes under the conditions laid down in Article 6'; Article 6(2) conditions may include
+'(a) the obligation for the reuser to acknowledge the source of the documents; (b) the obligation not to
+distort the original meaning or message of the documents'.
+
+| Data | Basis |
+| --- | --- |
+| Consolidated text 02023R1115-20251226 (Annex I base, Articles 1, 2, 37, 38) | CC BY 4.0 (EUR-Lex legal notice, consolidated texts); changes indicated: Annex I is derived |
+| Regulations (EU) 2023/1115, 2024/3234, 2025/2650 as published in the OJ (European Parliament and Council) | EUR-Lex legal notice, re-use of legal documents published in EUR-Lex |
+| Commission acts as published in the OJ (32026R2102, 32025R1093) | EUR-Lex legal notice, plus Decision 2011/833/EU Articles 4 and 6(2) |
+| CELLAR metadata (SPARQL) and the 'Countries and territories' authority table | Commission reuse notice, Decision 2011/833/EU, per https://data.europa.eu/data/datasets/sparql-cellar-of-the-publications-office and https://data.europa.eu/data/datasets/country |
+
+Attribution lines carried by the answers:
+
+- scope and commodity answers: Source: consolidated text of Regulation (EU) 2023/1115 (CC BY 4.0) and the amending acts as published in the Official Journal, from EUR-Lex/CELLAR, Publications Office of the European Union, retrieved 2026-09-24; (c) European Union. Changes: Annex I derived by eudr-scope-mcp, amending acts applied to the consolidated text.
+- date answers: Source: consolidated text of Regulation (EU) 2023/1115 (CC BY 4.0) and the amending acts as published in the Official Journal, from EUR-Lex/CELLAR, Publications Office of the European Union, retrieved 2026-09-24; (c) European Union. Dates read from the article texts by eudr-scope-mcp.
+- country answers: Source: Commission Implementing Regulation (EU) 2025/1093 as published in the Official Journal, from EUR-Lex/CELLAR, Publications Office of the European Union, retrieved 2026-09-24; (c) European Union; reuse under the EUR-Lex legal notice and Commission Decision 2011/833/EU. ISO codes from the EU 'Countries and territories' authority table (version 20260617-0), matched by eudr-scope-mcp.
 
 Only the texts published in the Official Journal of the European Union are authentic. The consolidated
 text says of itself: 'This text is meant purely as a documentation tool and has no legal effect.'

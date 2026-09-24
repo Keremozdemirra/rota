@@ -473,7 +473,7 @@ def render_sources(annex: dict | None, values: dict | None, cn: dict, acts: dict
                 f"{len((annex.get('annex_iii_point_1') or {}).get('territories', []))} Annex III territories",
                 f"- Amended by: {', '.join(f'{k} = {v}' for k, v in m.get('amendments', {}).items()) or 'none'}",
                 f"- Legal status: the consolidated text says: \"{m.get('disclaimer') or ''}\"",
-                *_licence("eurlex"), *_licence("decision_2011_833"),
+                *_licence("eurlex_consolidated"),
                 "- Attribution: © European Union, https://eur-lex.europa.eu. Changes: table extracted from the "
                 "XHTML (codes, descriptions, gases, exceptions); amendment markers kept as `amended_by`.", ""]
         for n in m.get("notes") or []:
@@ -491,7 +491,7 @@ def render_sources(annex: dict | None, values: dict | None, cn: dict, acts: dict
                 f"{m['annex_iv_rows']} Annex IV lines",
                 f"- Legal status: \"{legal.EXCEL_NOTICE['quote']}\" ({legal.EXCEL_NOTICE['source']}). The file "
                 f"itself says: \"{m.get('disclaimer')}\"",
-                *_licence("commission"), *_licence("decision_2011_833"),
+                *_licence("commission_excel"),
                 "- Attribution: Source: European Commission, DG TAXUD. Changes: values kept as published "
                 "(decimal comma); answers convert them to numbers (derived).", ""]
         cons = m.get("consolidated")
@@ -509,10 +509,11 @@ def render_sources(annex: dict | None, values: dict | None, cn: dict, acts: dict
                     f"{c['annex_iv_compared']} Annex IV lines identical; quoted rules found: "
                     f"{', '.join(k for k, v in c['quotes_found'].items() if v) or 'none'}.",
                     *(f"  - Note: {n}" for n in cons.get("notes") or []),
-                    *_licence("eurlex"), ""]
+                    *_licence("eurlex_consolidated"), ""]
         check = m.get("oj_check")
         if check:
-            out += [f"- Checked against the Official Journal on {check['checked']}: {check['url']} "
+            out += [f"- Checked against the Official Journal on {check['checked']} (licence of that text: "
+                    f"{legal.LICENCES['eurlex_oj']['name']}; \"{legal.LICENCES['eurlex_oj']['quote']}\"): {check['url']} "
                     f"(SHA-256 `{check['sha256']}`): {check['rows_identical']} of {check['rows_compared']} country "
                     f"lines in {check['tables_compared']} tables and {check['annex_iv_identical']} of "
                     f"{check['annex_iv_compared']} Annex IV lines identical; quoted rules found: "

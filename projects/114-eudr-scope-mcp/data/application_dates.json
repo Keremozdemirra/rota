@@ -188,44 +188,72 @@
  ],
  "corrigenda": [
   {
-   "rel": "corrects",
    "celex": "32023R1115R(01)",
+   "corrects": "32023R1115",
    "date": "2024-10-01",
-   "entry_into_force": [],
-   "title": null,
    "english": false
   },
   {
-   "rel": "corrects",
    "celex": "32023R1115R(02)",
+   "corrects": "32023R1115",
    "date": "2025-02-28",
-   "entry_into_force": [],
-   "title": null,
    "english": false
   },
   {
-   "rel": "corrects",
    "celex": "32023R1115R(03)",
+   "corrects": "32023R1115",
    "date": "2025-03-28",
-   "entry_into_force": [],
-   "title": null,
    "english": false
   },
   {
-   "rel": "corrects",
    "celex": "32023R1115R(04)",
+   "corrects": "32023R1115",
    "date": "2025-12-22",
-   "entry_into_force": [],
-   "title": null,
    "english": false
   },
   {
-   "rel": "corrects",
-   "celex": "32023R1115R(05)",
-   "date": "2026-07-02",
-   "entry_into_force": [],
-   "title": null,
+   "celex": "32025R2650R(01)",
+   "corrects": "32025R2650",
+   "date": "2026-02-12",
    "english": false
+  },
+  {
+   "celex": "32025R2650R(02)",
+   "corrects": "32025R2650",
+   "date": "2026-05-18",
+   "english": false
+  },
+  {
+   "celex": "32023R1115R(05)",
+   "corrects": "32023R1115",
+   "date": "2026-07-02",
+   "english": false
+  }
+ ],
+ "proposals": [
+  {
+   "rel": "proposes_to_amend",
+   "celex": "52024PC0452",
+   "date": "2024-10-02",
+   "entry_into_force": [],
+   "title": "Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL amending Regulation (EU) 2023/1115 as regards provisions relating to the date of application",
+   "adopted_as": "32024R3234"
+  },
+  {
+   "rel": "proposes_to_amend",
+   "celex": "52025PC0652",
+   "date": "2025-10-21",
+   "entry_into_force": [],
+   "title": "Proposal for a REGULATION OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL amending Regulation (EU) 2023/1115 as regards certain obligations of operators and traders",
+   "adopted_as": "32025R2650"
+  },
+  {
+   "rel": "proposes_to_amend",
+   "celex": "52026PC0661",
+   "date": "2026-09-10",
+   "entry_into_force": [],
+   "title": "Proposal for a COUNCIL REGULATION amending Regulations (EU) No 1380/2013, (EU) No 1308/2013, (EU) 2023/1115 and (EU) 2024/1348 of the European Parliament and of the Council, and Council Regulation (EU) 2023/2720 as regards adaptation of certain requirements and reduction of administrative burden in the Union outermost regions",
+   "adopted_as": null
   }
  ],
  "pending_proposals": [
@@ -234,7 +262,8 @@
    "celex": "52026PC0661",
    "date": "2026-09-10",
    "entry_into_force": [],
-   "title": "Proposal for a COUNCIL REGULATION amending Regulations (EU) No 1380/2013, (EU) No 1308/2013, (EU) 2023/1115 and (EU) 2024/1348 of the European Parliament and of the Council, and Council Regulation (EU) 2023/2720 as regards adaptation of certain requirements and reduction of administrative burden in the Union outermost regions"
+   "title": "Proposal for a COUNCIL REGULATION amending Regulations (EU) No 1380/2013, (EU) No 1308/2013, (EU) 2023/1115 and (EU) 2024/1348 of the European Parliament and of the Council, and Council Regulation (EU) 2023/2720 as regards adaptation of certain requirements and reduction of administrative burden in the Union outermost regions",
+   "adopted_as": null
   }
  ]
 }

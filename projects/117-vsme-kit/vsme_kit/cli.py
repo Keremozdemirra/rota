@@ -8,7 +8,7 @@ import sys
 from . import VERSION, standard, template
 from .xlsx import WorkbookError
 
-STATUS_ORDER = ("inconsistent", "missing", "filled", "omitted", "not applicable", "not located")
+STATUS_ORDER = ("inconsistent", "missing", "depends", "filled", "omitted", "not applicable", "not located")
 EXIT_OK, EXIT_FINDINGS, EXIT_CANNOT = 0, 1, 2
 
 
@@ -84,6 +84,8 @@ def _detail(d: dict) -> str:
         bits.append(f"{len(d['findings'])} inconsistency(ies)")
     if d["missing"]:
         bits.append("missing: " + "; ".join(d["missing"]))
+    if d.get("depends"):
+        bits.append("depends: " + "; ".join(x["item"] for x in d["depends"]))
     if d["omitted"]:
         bits.append("omitted as classified or sensitive: " + "; ".join(d["omitted"]))
     if d["not_located"]:
@@ -94,11 +96,13 @@ def _detail(d: dict) -> str:
 def render_check(rep: dict, fmt: str) -> str:
     t = rep["template"]
     head = (f"VSME Digital Template check: {rep['file']}\n"
-            f"Template version {t['version'] or 'unknown'}; it implements {t['implements']}.\n"
-            f"Module option (B1, para 24(a)): {rep['option'] or 'not given'}")
+            f"Template version {t['version'] or 'unknown'}; implements: {t['implements']}.\n"
+            f"{rep['edition_note']}\n"
+            f"Module option (B1, para 24(a)): {rep['option']}")
     rows = [(d["code"], d["title"][:48], d["status"], _detail(d)) for d in rep["disclosures"]]
     counts = " · ".join(f"{rep['summary'][s]} {s}" for s in STATUS_ORDER if rep["summary"].get(s))
     findings = [f"- {x['disclosure']}: {x['message']}. {x['cite']}." for d in rep["disclosures"] for x in d["findings"]]
+    questions = [f"- {d['code']}, {x['item']}: {x['question']}" for d in rep["disclosures"] for x in d.get("depends", [])]
     tail = []
     if rep["template_own_validation"]:
         tail.append(f"The template's own validation status, as saved in the file: {rep['template_own_validation']}")
@@ -109,10 +113,14 @@ def render_check(rep: dict, fmt: str) -> str:
         out = [head.replace("\n", "  \n"), _md_table(["code", "disclosure", "status", "details"], rows), f"**{counts}**"]
         if findings:
             out.append("**Inconsistencies**\n\n" + "\n".join(findings))
+        if questions:
+            out.append("**Depends: questions to settle**\n\n" + "\n".join(questions))
         return "\n\n".join(out + ["_" + x + "_" for x in tail])
     out = [head, _table(["code", "disclosure", "status", "details"], rows), counts]
     if findings:
         out.append("Inconsistencies:\n" + "\n".join(findings))
+    if questions:
+        out.append("Depends, questions to settle:\n" + "\n".join(questions))
     return "\n\n".join(out + tail)
 
 
@@ -138,7 +146,8 @@ def _parser():
     c = sub.add_parser("check", parents=[fmt], help="check a filled VSME Digital Template (xlsx)")
     c.add_argument("path")
     c.add_argument("--strict", action="store_true",
-                   help="exit 1 when a disclosure is missing or inconsistent (2 when the file cannot be checked)")
+                   help="exit 1 when a disclosure is missing or inconsistent ('depends' does not fail; "
+                        "2 when the file cannot be checked)")
     sub.add_parser("editions", parents=[fmt], help="which edition of the standard is which, with dates")
     sub.add_parser("mcp", help="run the MCP server on stdin/stdout")
     r = sub.add_parser("refresh", help="rebuild the bundled text from the Official Journal (network)")
