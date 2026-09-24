@@ -566,7 +566,7 @@ def scan_aws(ctx: Context) -> Section:
         if latest:
             detail += f" (latest until {latest.astimezone(dt.timezone.utc):%Y-%m-%d %H:%M} UTC)"
         sec.add("medium" if valid else "info", "SSO and role cache", detail + "; contents not read",
-                where=ctx.show(aws), reach=f"AWS: {valid} cached SSO or role session(s) still valid" if valid else "")
+                where=ctx.show(aws), reach=f"AWS: {_count(valid, 'cached SSO or role session')} still valid" if valid else "")
     return sec
 
 
@@ -1315,7 +1315,7 @@ def scan_git(ctx: Context) -> Section:
                     ctx.add_token(urllib.parse.unquote(pw), ctx.show(p), strict_github=False)
         for host, (n, with_pw) in sorted(hosts.items()):
             if with_pw:
-                sec.add("high", host, f"{_count(with_pw, 'stored password or token')}", where=ctx.show(p),
+                sec.add("high", host, f"{_count(with_pw, 'stored credential')}", where=ctx.show(p),
                         reach=f"Git: push and pull as you on {host}; credentials stored in {ctx.show(p)}")
             else:
                 sec.add("info", host, f"{_count(n, 'entry', 'entries')} without a password", where=ctx.show(p))

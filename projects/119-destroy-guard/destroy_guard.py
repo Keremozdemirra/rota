@@ -878,7 +878,7 @@ def _kubectl(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
             if p is None:
                 problem = problem or "a manifest path comes from a shell expression or an unknown directory."
                 break
-            entries.append({"path": os.path.realpath(p), "sha256": fingerprint(p)})
+            entries.append({"path": os.path.realpath(p), "sha256": fingerprint(p, manifests_only=f != kust)})
         target = dict(base, namespace=ns_id, files=entries, kustomize=bool(kust),
                       recursive=_has(flags, "-R", "--recursive"))
         shown = ", ".join(e.get("path") or e.get("url", "") for e in entries)
@@ -931,8 +931,12 @@ def _kubectl(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
     return [_op(ctx, tool, label, "deletes " + ", ".join(shown) + where, targets, problem, plan=plan)]
 
 
-def fingerprint(path) -> str:
-    """SHA-256 over a manifest file, or over every file under a directory (names and contents), bounded."""
+def fingerprint(path, manifests_only: bool = False) -> str:
+    """SHA-256 over a manifest file, or over the files under a directory (names and contents), bounded.
+
+    For `kubectl delete -f <dir>` only .json, .yaml and .yml files count, the ones kubectl reads;
+    a kustomization (-k) can pull in any file, so there every file counts.
+    """
     p = Path(path)
     h = hashlib.sha256()
     try:
@@ -948,7 +952,7 @@ def fingerprint(path) -> str:
             dirs[:] = sorted(d for d in dirs if not d.startswith("."))
             for n in sorted(names):
                 f = Path(root) / n
-                if not f.is_file():
+                if not f.is_file() or (manifests_only and not n.lower().endswith((".json", ".yaml", ".yml"))):
                     continue
                 files += 1
                 total += f.stat().st_size

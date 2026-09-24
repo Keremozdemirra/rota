@@ -370,7 +370,7 @@ class Git(Isolated):
                                  "[credential]\n  helper =\n  helper = !f() { echo x; }; f\n")
         sec = cr.scan_git(self.ctx())
         f = {x["item"]: x for x in sec.findings}
-        self.assertEqual(f["github.com"]["detail"], "2 stored password or tokens")
+        self.assertEqual(f["github.com"]["detail"], "2 stored credentials")
         self.assertEqual(f["gitlab.example"]["severity"], "info")
         self.assertEqual(f["bitbucket.org"]["severity"], "high")
         self.assertIn("macOS Keychain", f["credential.helper osxkeychain"]["detail"])

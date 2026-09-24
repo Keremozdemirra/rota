@@ -254,7 +254,7 @@ ghe.corp.example.com:
     write(home / ".terraform.d" / "credentials.tfrc.json",
           json.dumps({"credentials": {"app.terraform.io": {"token": c["terraform"]}}}, indent=2))
 
-    sessions = home / ".claude" / "projects" / ("-" + str(project).strip("/\\").replace("/", "-").replace("\\", "-").replace(":", "-"))
+    sessions = home / ".claude" / "projects" / "-home-dev-work-app"  # Claude Code names these after the working directory
     lines = transcript_lines(c)
     write(sessions / (secrets.token_hex(16) + ".jsonl"),
           "".join(json.dumps(x, ensure_ascii=False, separators=(",", ":")) + "\n" for x in lines))
