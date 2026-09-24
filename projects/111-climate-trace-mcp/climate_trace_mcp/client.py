@@ -30,7 +30,7 @@ USER_AGENT = "climate-trace-mcp/%s (+https://github.com/Keremozdemirra/climate-t
 # CDN cache); most took 0.2-1.5 s. Someone is waiting on the other side.
 DEFAULT_TIMEOUT = 15.0
 # Tool's choice. Climate TRACE publishes monthly data releases; within one
-# process an answer an hour old is still current.
+# process an answer an hour old is still current. 256 answers bound the memory.
 CACHE_TTL = 3600.0
 CACHE_MAX = 256
 # Tool's choice. The largest answer this tool asks for is about 60 kB.

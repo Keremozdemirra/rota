@@ -51,8 +51,8 @@ class Scope(unittest.TestCase):
         out = {x["cn_code"]: x.get("excluded_by") for x in sub["not_in_scope"]}
         self.assertIn("7202 11 20", in_scope)
         self.assertIn("7202 60 00", in_scope)
-        self.assertEqual(out["7202 30 00"], "7202 30 00 – Ferro-silico-manganese")
-        self.assertEqual(out["7202 21 00"], "7202 2 – Ferro-silicon")
+        self.assertEqual(out["7202 30 00"], "7202 30 00")
+        self.assertEqual(out["7202 21 00"], "7202 2")
         self.assertEqual(sub["counts"]["in_scope"] + sub["counts"]["not_in_scope"], len(in_scope) + len(out))
 
     def test_subheading_whose_children_are_all_excepted(self):

@@ -23,7 +23,7 @@ from .safety import clean, echo, fold
 # "data is available beginning 2015 through the current year".
 MIN_YEAR_ASSETS = 2021
 MIN_YEAR_COUNTRY = 2015
-PAGE = 100  # the API's own default page size
+PAGE = 100  # the API's own default page size (OpenAPI 7.2.0, `limit` default)
 NAME_SCAN_PAGES = 5  # tool's choice: a name search reads at most 500 ranked assets
 MAX_COUNTRY_YEARS = 12  # tool's choice: one request per year, made one after another
 ALL_NO_FOREST = "all_no_forest"  # the API's value for "all sectors except forestry-and-land-use"
@@ -114,9 +114,10 @@ def _slug(value, name: str) -> str:
 
 
 def _lei_ok(value) -> bool:
-    """ISO 17442: 20 characters, the last two check digits (ISO 7064 MOD 97-10).
-
-    GLEIF's own LEI shown on gleif.org, 506700GE1G29325QX363, passes (checked 2026-09-24).
+    """An LEI: "a unique 20-character alphanumeric code" (GLEIF,
+    https://www.gleif.org/en/organizational-identity/lei-vlei/the-legal-entity-identifier-lei,
+    checked 2026-09-24), whose last two characters are check digits (ISO 17442,
+    ISO/IEC 7064 MOD 97-10). GLEIF's own LEI shown on that page, 506700GE1G29325QX363, passes.
     """
     if not isinstance(value, str) or not _LEI.match(value):
         return False

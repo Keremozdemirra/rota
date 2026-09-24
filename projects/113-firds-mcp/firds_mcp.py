@@ -472,11 +472,12 @@ def _fetch(url: str, source: str, accept: str):
             failure = f"cannot connect ({_masked(e.reason)})"
         except SourceError as e:
             raise SourceError(source, e.kind, e.detail) from None
+        except (http.client.HTTPException, OSError) as e:
+            # IncompleteRead, BadStatusLine, RemoteDisconnected, a reset in mid-answer. Before
+            # ValueError, because a certificate error is both an OSError and a ValueError.
+            failure = f"connection failed ({type(e).__name__})"
         except ValueError:
             raise SourceError(source, "network", "the configured URL is not valid") from None
-        except (http.client.HTTPException, OSError) as e:
-            # IncompleteRead, BadStatusLine, RemoteDisconnected, a reset in mid-answer.
-            failure = f"connection failed ({type(e).__name__})"
         if failure:
             # A reset connection is usually gone a second later; a timeout is not retried,
             # because the person waiting would wait twice (tool's choice).

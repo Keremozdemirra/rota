@@ -121,7 +121,7 @@ def render_country(res) -> str:
             n = b.get("subsector") or b.get("sector")
             if n:
                 latest[n] = b.get("value") or 0
-    # Largest first, by the most recent year that has the row.
+    # Largest first, so the rows that carry the total come first.
     names = sorted(latest, key=lambda n: -latest[n])
     rows = [[""] + [str(y["year"]) for y in years],
             ["total"] + [_t(y["total"]["value"]) if y.get("total") else "no data" for y in years],

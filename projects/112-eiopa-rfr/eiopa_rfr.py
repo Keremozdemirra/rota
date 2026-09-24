@@ -586,7 +586,7 @@ def fetch_listing() -> dict:
             main = parse_rss(http_get(RSS_FEED, "EIOPA's RFR RSS feed"))
             if main:
                 sources.append(RSS_FEED)
-                warnings.append("release list taken from EIOPA's RSS feed, which covers releases from 2022-12-31")
+                warnings.append("release list taken from EIOPA's RSS feed instead of the RFR page")
         except RfrError as e:
             warnings.append(str(e))
     archive = []
@@ -847,6 +847,16 @@ def _release_paths(ref: dt.date) -> tuple[Path, Path]:
     return base / f"{stem}.zip", base / f"{stem}.json"
 
 
+def _usable(rel: dict) -> bool:
+    """The parsed form this version writes; anything else is re-read from the zip."""
+    try:
+        return (rel["format"] == PARSER_VERSION and isinstance(rel["reference_date"], str)
+                and all(isinstance(rel["curves"][v]["columns"], list) and isinstance(rel["curves"][v]["sheet"], str)
+                        and isinstance(rel["curves"][v]["first_rate_row"], int) for v in SHEETS))
+    except (KeyError, TypeError):
+        return False
+
+
 def _cached(ref: dt.date) -> dict | None:
     zpath, jpath = _release_paths(ref)
     rel = _load_json(jpath)
@@ -854,16 +864,19 @@ def _cached(ref: dt.date) -> dict | None:
         return None
     if rel.get("stale") and not offline():
         return None  # EIOPA's link changed since download: fetch it again
-    if rel.get("format") == PARSER_VERSION and isinstance(rel.get("curves"), dict):
+    if _usable(rel):
         return rel
-    # parsed by another version of this tool: re-read the stored zip, keep its provenance
+    # written by another version of this tool, or damaged: re-read the stored zip, keep its provenance
     try:
-        fresh = parse_release(zpath.read_bytes(), rel["source"].get("file") or zpath.name, ref)
+        fresh = parse_release(zpath.read_bytes(), clean_text(rel["source"].get("file") or zpath.name), ref)
     except (OSError, RfrError):
         return None
     fresh.pop("workbook", None)
     fresh["source"] = rel["source"]
-    _write_atomic(jpath, json.dumps(fresh, ensure_ascii=False).encode("utf-8"))
+    try:
+        _write_atomic(jpath, json.dumps(fresh, ensure_ascii=False).encode("utf-8"))
+    except OSError:
+        pass  # answering matters more than caching
     return fresh
 
 
@@ -893,8 +906,11 @@ def store_release(data: bytes, source: dict, expect: dt.date | None) -> dict:
         rel["warnings"].append(f"EIOPA's file differs from the copy retrieved {previous['source'].get('retrieved')}"
                                " (EIOPA may republish technical information)")
     rel["source"] = dict(source, sha256=digest, bytes=len(data), workbook=rel.pop("workbook"))
-    _write_atomic(zpath, data)
-    _write_atomic(jpath, json.dumps(rel, ensure_ascii=False).encode("utf-8"))
+    try:
+        _write_atomic(zpath, data)
+        _write_atomic(jpath, json.dumps(rel, ensure_ascii=False).encode("utf-8"))
+    except OSError as e:
+        rel["warnings"].append(f"not cached: cannot write {cache_dir()} ({e.strerror or type(e).__name__})")
     return rel
 
 
@@ -957,6 +973,10 @@ def get_listing(refresh: bool = False) -> dict:
     cached = _load_json(path)
     if cached is not None and (cached.get("format") != PARSER_VERSION or not isinstance(cached.get("releases"), list)):
         cached = None
+    if cached is not None:
+        cached["releases"] = [r for r in cached["releases"] if isinstance(r, dict)
+                              and re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(r.get("reference_date")))
+                              and isinstance(r.get("file"), str) and isinstance(r.get("url"), (str, type(None)))]
     if offline():
         listing = cached or _listing_from_cache()
         listing["warnings"] = list(listing.get("warnings") or []) + [
@@ -983,8 +1003,12 @@ def get_listing(refresh: bool = False) -> dict:
             f"{e}; using the release list {'fetched ' + when if when else 'of the local cache'}"]
         fallback["from_cache"] = True
         return fallback
-    _mark_republished(listing)
-    _write_atomic(path, json.dumps(listing, ensure_ascii=False, indent=1).encode("utf-8"))
+    try:
+        _mark_republished(listing)
+        _write_atomic(path, json.dumps(listing, ensure_ascii=False, indent=1).encode("utf-8"))
+    except OSError as e:
+        listing["warnings"].append(f"release list not cached: cannot write {cache_dir()} "
+                                   f"({e.strerror or type(e).__name__})")
     listing["from_cache"] = False
     return listing
 

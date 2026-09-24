@@ -82,6 +82,18 @@ class PackagingTest(fx.HomeIsolated):
                 text = path.read_bytes().decode("utf-8", "ignore")
                 self.assertIsNone(pattern.search(text), str(path))
 
+    def test_no_invisible_or_bidi_characters_in_sources(self):
+        # They can make code read differently from what runs ("Trojan Source"); tests spell them as escapes.
+        invisible = re.compile("[\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+        for path in ROOT.rglob("*"):
+            if path.is_file() and path.suffix in (".py", ".md", ".yml", ".toml", ".json", ".yaml", ".in") \
+                    and "__pycache__" not in path.parts:
+                self.assertIsNone(invisible.search(path.read_text(encoding="utf-8")), str(path))
+
+    def test_readme_ends_with_what_this_is_not(self):
+        headings = re.findall(r"(?m)^## (.+)$", read("README.md"))
+        self.assertEqual(headings[-1], "What this is not")
+
     def test_no_generic_top_level_modules(self):
         top = {p.stem for p in ROOT.glob("*.py")}
         self.assertEqual(top & {"hook", "doctor", "server", "cli", "utils"}, set())
