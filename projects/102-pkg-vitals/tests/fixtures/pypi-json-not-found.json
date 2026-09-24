@@ -1,0 +1,9 @@
+{
+ "url": "https://pypi.org/pypi/this-package-does-not-exist-9f3k/json",
+ "recorded": "2026-09-24",
+ "status": 404,
+ "trimmed": "404 body, unchanged",
+ "body": {
+  "message": "Not Found"
+ }
+}

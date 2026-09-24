@@ -1,0 +1,8 @@
+{
+ "_provenance": "Constructed: a 200 whose body is an HTML page, what a captive portal or a misconfigured proxy returns in place of the API.",
+ "status": 200,
+ "headers": {
+  "Content-Type": "text/html; charset=utf-8"
+ },
+ "body": "<!doctype html><html><head><title>Sign in to the network</title></head><body>Accept the terms to continue.</body></html>"
+}

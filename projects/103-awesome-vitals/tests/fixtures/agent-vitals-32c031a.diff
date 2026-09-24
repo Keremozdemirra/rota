@@ -1,0 +1,53 @@
+diff --git a/README.md b/README.md
+index 9e02102..4ad3dec 100644
+--- a/README.md
++++ b/README.md
+@@ -17,10 +17,6 @@ GitHub metadata, and keeps the answers as a time series:
+-The same questions, asked of the MCP servers you actually run. `doctor` reads the
+-configs of Claude Code, Claude Desktop, Cursor, VS Code, Windsurf, Gemini CLI and
+-Codex, works out which package or repository each server starts, and reports when
+-that repository was last pushed, whether it is archived or deprecated, what licence
+-it carries, and whether the entry is pinned to a version at all.
+-
+-```bash
+-uvx mcp-vitals            # or, with nothing installed:
+-curl -sL https://raw.githubusercontent.com/Keremozdemirra/agent-vitals/main/doctor.py | python3 -
+-```
++The same questions, asked of the MCP servers you actually run:
++[mcp-vitals](https://github.com/Keremozdemirra/mcp-vitals) reads your client configs
++and reports, for each server, when its repository was last pushed, whether it is
++archived or deprecated, what licence it carries and whether it is pinned. As a
++Claude Code plugin it asks before Claude adds a server that is archived, abandoned,
++deprecated or unlicensed.
+@@ -29,5 +25,2 @@ curl -sL https://raw.githubusercontent.com/Keremozdemirra/agent-vitals/main/doct
+-server     starts                                 repository                status     push  licence  flags
+----------  -------------------------------------  ------------------------  ---------  ----  -------  -------------------
+-whatsapp   lharries/whatsapp-mcp                  lharries/whatsapp-mcp     abandoned  438d  MIT      abandoned, unpinned
+-github     ghcr.io/github/github-mcp-server       github/github-mcp-server  active     2d    MIT      unpinned
+-github-v1  npm:@modelcontextprotocol/server-github@2025.4.8                                           deprecated, no source repository linked
++/plugin marketplace add Keremozdemirra/mcp-vitals
++/plugin install mcp-vitals@mcp-vitals
+@@ -36,9 +29 @@ github-v1  npm:@modelcontextprotocol/server-github@2025.4.8
+-- It reads `command`, `args` and `url` from each entry and never `env` or `headers`,
+-  which is where API keys live.
+-- It sends package names to npm and PyPI and owner/name pairs to the GitHub API,
+-  nothing else. `--offline` sends nothing. Nothing is installed or started.
+-- `--markdown` prints a table to paste into an issue; `--json` for scripts;
+-  `--strict` exits 1 when a server is archived, abandoned, deprecated, gone or
+-  unlicensed, for a CI job that guards a shared `.mcp.json`.
+-- Without a `GITHUB_TOKEN` the API allows 60 requests an hour; past that, repository
+-  facts come from the latest census instead, and the report says so.
++or, from a terminal, `uvx mcp-vitals`.
+@@ -221 +206 @@ open issues: maintained, wanted, and short of hands. Ranked by open issues.
+-The census is an MCP server too, standard library only, five tools: `lookup` a
++The census is an MCP server too, standard library only, four tools: `lookup` a
+@@ -223,2 +208 @@ repository's status and licence, `search` by words with status and licence
+-filters, `summary` of the latest run, the two `candidates` lists, and `doctor`,
+-which checks the servers configured on the machine it runs on.
++filters, `summary` of the latest run, and the two `candidates` lists.
+@@ -227,2 +210,0 @@ which checks the servers configured on the machine it runs on.
+-claude mcp add agent-vitals -- uvx --from mcp-vitals mcp-vitals-server
+-# or from a clone:
+@@ -306 +288 @@ written for this repository.
+-- **Code** (`collect.py`, `render.py`, `doctor.py`, `mcp_server.py`, the workflows): MIT.
++- **Code** (`collect.py`, `render.py`, the workflow): MIT.

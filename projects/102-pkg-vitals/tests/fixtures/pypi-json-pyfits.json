@@ -1,0 +1,29 @@
+{
+ "url": "https://pypi.org/pypi/pyfits/json",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "info cut to name, version, licence fields, licence classifiers, project URLs, yanked; urls cut to filename, upload time, yanked; releases and description dropped",
+ "body": {
+  "info": {
+   "name": "pyfits",
+   "version": "3.5",
+   "license": "",
+   "license_expression": null,
+   "classifiers": [],
+   "project_urls": {
+    "Homepage": "http://pyfits.readthedocs.io/en/latest/"
+   },
+   "home_page": "http://pyfits.readthedocs.io/en/latest/",
+   "yanked": false,
+   "yanked_reason": null
+  },
+  "urls": [
+   {
+    "filename": "pyfits-3.5.tar.gz",
+    "upload_time_iso_8601": "2017-12-18T20:07:27.372091Z",
+    "yanked": false,
+    "yanked_reason": null
+   }
+  ]
+ }
+}

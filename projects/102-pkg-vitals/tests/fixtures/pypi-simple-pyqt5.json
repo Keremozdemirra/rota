@@ -1,0 +1,30 @@
+{
+ "url": "https://pypi.org/simple/pyqt5/",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "kept the earliest file and the files of [], 1 of 157 files; versions cut to the first and []; file entries cut to filename, upload-time, yanked, requires-python",
+ "body": {
+  "meta": {
+   "_last-serial": 24202264,
+   "api-version": "1.4"
+  },
+  "name": "pyqt5",
+  "project-status": {
+   "status": "active"
+  },
+  "files": [
+   {
+    "filename": "PyQt5-5.6-cp35-cp35m-macosx_10_6_intel.whl",
+    "upload-time": "2016-04-28T11:07:41.076261Z",
+    "yanked": false,
+    "requires-python": null
+   }
+  ],
+  "versions": [
+   "5.6"
+  ]
+ },
+ "request_headers": {
+  "Accept": "application/vnd.pypi.simple.v1+json"
+ }
+}

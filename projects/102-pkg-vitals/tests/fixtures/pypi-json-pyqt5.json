@@ -1,0 +1,59 @@
+{
+ "url": "https://pypi.org/pypi/PyQt5/json",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "info cut to name, version, licence fields, licence classifiers, project URLs, yanked; urls cut to filename, upload time, yanked; releases and description dropped",
+ "body": {
+  "info": {
+   "name": "PyQt5",
+   "version": "5.15.11",
+   "license": "GPL v3",
+   "license_expression": null,
+   "classifiers": [],
+   "project_urls": {
+    "homepage": "https://www.riverbankcomputing.com/software/pyqt/"
+   },
+   "home_page": null,
+   "yanked": false,
+   "yanked_reason": null
+  },
+  "urls": [
+   {
+    "filename": "PyQt5-5.15.11-cp38-abi3-macosx_11_0_arm64.whl",
+    "upload_time_iso_8601": "2024-07-19T08:39:19.775514Z",
+    "yanked": false,
+    "yanked_reason": null
+   },
+   {
+    "filename": "PyQt5-5.15.11-cp38-abi3-macosx_11_0_x86_64.whl",
+    "upload_time_iso_8601": "2024-07-19T08:39:32.977825Z",
+    "yanked": false,
+    "yanked_reason": null
+   },
+   {
+    "filename": "PyQt5-5.15.11-cp38-abi3-manylinux_2_17_x86_64.whl",
+    "upload_time_iso_8601": "2024-07-19T08:39:40.561578Z",
+    "yanked": false,
+    "yanked_reason": null
+   },
+   {
+    "filename": "PyQt5-5.15.11-cp38-abi3-win32.whl",
+    "upload_time_iso_8601": "2024-07-19T08:39:46.932977Z",
+    "yanked": false,
+    "yanked_reason": null
+   },
+   {
+    "filename": "PyQt5-5.15.11-cp38-abi3-win_amd64.whl",
+    "upload_time_iso_8601": "2024-07-19T08:39:53.572866Z",
+    "yanked": false,
+    "yanked_reason": null
+   },
+   {
+    "filename": "PyQt5-5.15.11.tar.gz",
+    "upload_time_iso_8601": "2024-07-19T08:39:57.756170Z",
+    "yanked": false,
+    "yanked_reason": null
+   }
+  ]
+ }
+}

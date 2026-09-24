@@ -1,0 +1,41 @@
+{
+ "url": "https://pypi.org/pypi/apache-airflow-providers-duckdb/json",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "info cut to name, version, licence fields, licence classifiers, project URLs, yanked; urls cut to filename, upload time, yanked; releases and description dropped",
+ "body": {
+  "info": {
+   "name": "apache-airflow-providers-duckdb",
+   "version": "0.1.0rc1",
+   "license": null,
+   "license_expression": "Apache-2.0",
+   "classifiers": [],
+   "project_urls": {
+    "Bug Tracker": "https://github.com/apache/airflow/issues",
+    "Changelog": "https://airflow.staged.apache.org/docs/apache-airflow-providers-duckdb/0.1.0/changelog.html",
+    "Documentation": "https://airflow.staged.apache.org/docs/apache-airflow-providers-duckdb/0.1.0",
+    "Mastodon": "https://fosstodon.org/@airflow",
+    "Slack Chat": "https://s.apache.org/airflow-slack",
+    "Source Code": "https://github.com/apache/airflow",
+    "YouTube": "https://www.youtube.com/channel/UCSXwxpWZQ7XZ1WL3wqevChA/"
+   },
+   "home_page": null,
+   "yanked": false,
+   "yanked_reason": null
+  },
+  "urls": [
+   {
+    "filename": "apache_airflow_providers_duckdb-0.1.0rc1-py3-none-any.whl",
+    "upload_time_iso_8601": "2026-09-24T07:52:59.326493Z",
+    "yanked": false,
+    "yanked_reason": null
+   },
+   {
+    "filename": "apache_airflow_providers_duckdb-0.1.0rc1.tar.gz",
+    "upload_time_iso_8601": "2026-09-24T07:54:43.131488Z",
+    "yanked": false,
+    "yanked_reason": null
+   }
+  ]
+ }
+}

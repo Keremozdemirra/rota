@@ -1,0 +1,16 @@
+{
+ "_provenance": "Constructed from https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api (checked 2026-09-24): exceeding the primary rate limit gives a 403 or 429 with x-ratelimit-remaining 0. Limit 60 is the unauthenticated one; 203.0.113.7 is a documentation address.",
+ "status": 403,
+ "headers": {
+  "Content-Type": "application/json; charset=utf-8",
+  "X-RateLimit-Limit": "60",
+  "X-RateLimit-Remaining": "0",
+  "X-RateLimit-Used": "60",
+  "X-RateLimit-Reset": "1790244000",
+  "X-RateLimit-Resource": "core"
+ },
+ "body": {
+  "message": "API rate limit exceeded for 203.0.113.7. (But here's the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)",
+  "documentation_url": "https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting"
+ }
+}

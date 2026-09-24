@@ -1,0 +1,35 @@
+{
+ "_provenance": "Constructed from the example response GitHub documents for Get a repository (https://docs.github.com/en/rest/repos/repos#get-a-repository, checked 2026-09-24): renamed to octocat/unlicensed-example, license set to null, which is what the API returns when it detects no licence file.",
+ "status": 200,
+ "headers": {
+  "Content-Type": "application/json; charset=utf-8"
+ },
+ "body": {
+  "id": 1296271,
+  "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+  "name": "unlicensed-example",
+  "full_name": "octocat/unlicensed-example",
+  "private": false,
+  "html_url": "https://github.com/octocat/unlicensed-example",
+  "description": "This your first repo!",
+  "fork": false,
+  "url": "https://api.github.com/repos/octocat/unlicensed-example",
+  "created_at": "2011-01-26T19:01:12Z",
+  "updated_at": "2011-01-26T19:14:43Z",
+  "pushed_at": "2026-09-20T10:00:00Z",
+  "stargazers_count": 80,
+  "watchers_count": 80,
+  "forks_count": 9,
+  "open_issues_count": 0,
+  "archived": false,
+  "disabled": false,
+  "visibility": "public",
+  "license": null,
+  "default_branch": "master",
+  "owner": {
+   "login": "octocat",
+   "id": 1,
+   "type": "User"
+  }
+ }
+}

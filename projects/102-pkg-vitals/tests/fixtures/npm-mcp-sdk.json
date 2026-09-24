@@ -1,0 +1,38 @@
+{
+ "url": "https://registry.npmjs.org/@modelcontextprotocol%2Fsdk",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "kept dist-tags, time.created/modified and 1 of 80 versions; each version cut to name, version, description, licence, repository, homepage, deprecated, install scripts",
+ "body": {
+  "name": "@modelcontextprotocol/sdk",
+  "dist-tags": {
+   "latest": "1.30.1"
+  },
+  "time": {
+   "created": "2024-11-11T15:53:15.703Z",
+   "modified": "2026-09-23T16:07:00.011Z",
+   "1.30.1": "2026-09-23T16:06:59.541Z"
+  },
+  "versions": {
+   "1.30.1": {
+    "name": "@modelcontextprotocol/sdk",
+    "version": "1.30.1",
+    "description": "Model Context Protocol implementation for TypeScript",
+    "license": "MIT",
+    "repository": {
+     "url": "git+https://github.com/modelcontextprotocol/typescript-sdk.git",
+     "type": "git"
+    },
+    "homepage": "https://modelcontextprotocol.io",
+    "scripts": {}
+   }
+  },
+  "description": "Model Context Protocol implementation for TypeScript",
+  "license": "MIT",
+  "repository": {
+   "url": "git+https://github.com/modelcontextprotocol/typescript-sdk.git",
+   "type": "git"
+  },
+  "homepage": "https://modelcontextprotocol.io"
+ }
+}

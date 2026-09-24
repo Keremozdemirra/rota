@@ -1,0 +1,12 @@
+{
+ "url": "https://api.npmjs.org/downloads/point/last-week/left-pad",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "unchanged",
+ "body": {
+  "downloads": 1867144,
+  "start": "2026-09-15",
+  "end": "2026-09-21",
+  "package": "left-pad"
+ }
+}

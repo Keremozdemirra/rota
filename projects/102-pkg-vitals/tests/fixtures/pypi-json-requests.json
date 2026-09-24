@@ -1,0 +1,38 @@
+{
+ "url": "https://pypi.org/pypi/requests/json",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "info cut to name, version, licence fields, licence classifiers, project URLs, yanked; urls cut to filename, upload time, yanked; releases and description dropped",
+ "body": {
+  "info": {
+   "name": "requests",
+   "version": "2.34.2",
+   "license": "Apache-2.0",
+   "license_expression": null,
+   "classifiers": [
+    "License :: OSI Approved :: Apache Software License"
+   ],
+   "project_urls": {
+    "Documentation": "https://requests.readthedocs.io",
+    "Source": "https://github.com/psf/requests"
+   },
+   "home_page": null,
+   "yanked": false,
+   "yanked_reason": null
+  },
+  "urls": [
+   {
+    "filename": "requests-2.34.2-py3-none-any.whl",
+    "upload_time_iso_8601": "2026-05-14T19:25:26.443000Z",
+    "yanked": false,
+    "yanked_reason": null
+   },
+   {
+    "filename": "requests-2.34.2.tar.gz",
+    "upload_time_iso_8601": "2026-05-14T19:25:27.735762Z",
+    "yanked": false,
+    "yanked_reason": null
+   }
+  ]
+ }
+}

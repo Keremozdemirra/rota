@@ -1,0 +1,12 @@
+{
+ "url": "https://api.npmjs.org/downloads/point/last-week/@modelcontextprotocol/server-github",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "unchanged",
+ "body": {
+  "downloads": 88163,
+  "start": "2026-09-15",
+  "end": "2026-09-21",
+  "package": "@modelcontextprotocol/server-github"
+ }
+}

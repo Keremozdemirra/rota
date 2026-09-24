@@ -1,0 +1,11 @@
+{
+ "url": "https://pypi.org/simple/this-package-does-not-exist-9f3k/",
+ "recorded": "2026-09-24",
+ "status": 404,
+ "trimmed": "404 body, unchanged",
+ "body": "404 Not Found",
+ "request_headers": {
+  "Accept": "application/vnd.pypi.simple.v1+json"
+ },
+ "content_type": "text/plain; charset=UTF-8"
+}

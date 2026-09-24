@@ -1,0 +1,104 @@
+{
+ "_provenance": "Eight records copied from the agent-vitals census of 2026-09-23 (https://raw.githubusercontent.com/Keremozdemirra/agent-vitals/main/data/servers.json), trimmed to the fields awesome-vitals reads. Top-level keys as in the published file.",
+ "generated_at": "2026-09-23T09:49:03+00:00",
+ "source": "GitHub REST API v3, public repository metadata only",
+ "count": 8,
+ "repositories": [
+  {
+   "full_name": "TransformerOptimus/SuperAGI",
+   "stars": 17687,
+   "open_issues": 264,
+   "license": "MIT",
+   "license_state": "spdx",
+   "archived": false,
+   "created_at": "2023-05-13",
+   "pushed_at": "2025-01-22",
+   "days_since_push": 609,
+   "status": "abandoned"
+  },
+  {
+   "full_name": "lharries/whatsapp-mcp",
+   "stars": 6305,
+   "open_issues": 248,
+   "license": "MIT",
+   "license_state": "spdx",
+   "archived": false,
+   "created_at": "2025-03-29",
+   "pushed_at": "2025-07-13",
+   "days_since_push": 437,
+   "status": "abandoned"
+  },
+  {
+   "full_name": "appcypher/awesome-mcp-servers",
+   "stars": 5777,
+   "open_issues": 520,
+   "license": null,
+   "license_state": "none",
+   "archived": true,
+   "created_at": "2024-11-28",
+   "pushed_at": "2026-05-06",
+   "days_since_push": 140,
+   "status": "archived"
+  },
+  {
+   "full_name": "anthropics/skills",
+   "stars": 177733,
+   "open_issues": 1264,
+   "license": null,
+   "license_state": "none",
+   "archived": false,
+   "created_at": "2025-09-22",
+   "pushed_at": "2026-09-22",
+   "days_since_push": 1,
+   "status": "active"
+  },
+  {
+   "full_name": "n8n-io/n8n",
+   "stars": 205748,
+   "open_issues": 1151,
+   "license": null,
+   "license_state": "non-standard",
+   "archived": false,
+   "created_at": "2019-06-22",
+   "pushed_at": "2026-09-23",
+   "days_since_push": 0,
+   "status": "active"
+  },
+  {
+   "full_name": "punkpeye/awesome-mcp-servers",
+   "stars": 95447,
+   "open_issues": 2217,
+   "license": "MIT",
+   "license_state": "spdx",
+   "archived": false,
+   "created_at": "2024-11-30",
+   "pushed_at": "2026-09-23",
+   "days_since_push": 0,
+   "status": "active"
+  },
+  {
+   "full_name": "punkpeye/awesome-mcp-clients",
+   "stars": 6591,
+   "open_issues": 101,
+   "license": "MIT",
+   "license_state": "spdx",
+   "archived": false,
+   "created_at": "2025-01-11",
+   "pushed_at": "2026-06-07",
+   "days_since_push": 108,
+   "status": "stale"
+  },
+  {
+   "full_name": "BrowserMCP/mcp",
+   "stars": 7123,
+   "open_issues": 150,
+   "license": "Apache-2.0",
+   "license_state": "spdx",
+   "archived": false,
+   "created_at": "2025-03-28",
+   "pushed_at": "2025-04-24",
+   "days_since_push": 517,
+   "status": "abandoned"
+  }
+ ]
+}

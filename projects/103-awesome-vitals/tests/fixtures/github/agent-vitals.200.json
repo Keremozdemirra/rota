@@ -1,0 +1,44 @@
+{
+ "_provenance": "Recorded 2026-09-24 from GET https://api.github.com/repos/Keremozdemirra/agent-vitals, body trimmed to the fields awesome-vitals reads plus identifiers; headers trimmed to content type and rate limit.",
+ "status": 200,
+ "headers": {
+  "Content-Type": "application/json; charset=utf-8",
+  "X-RateLimit-Limit": "15000",
+  "X-RateLimit-Remaining": "14990",
+  "X-RateLimit-Resource": "core"
+ },
+ "body": {
+  "id": 1357078251,
+  "node_id": "R_kgDOUONe6w",
+  "name": "agent-vitals",
+  "full_name": "Keremozdemirra/agent-vitals",
+  "private": false,
+  "html_url": "https://github.com/Keremozdemirra/agent-vitals",
+  "description": "Daily census of the AI agent tooling ecosystem on GitHub (MCP servers, agent frameworks, skills): what is maintained, what is abandoned, what has no licence. Also an MCP server.",
+  "fork": false,
+  "url": "https://api.github.com/repos/Keremozdemirra/agent-vitals",
+  "created_at": "2026-09-04T11:50:08Z",
+  "updated_at": "2026-09-24T07:53:05Z",
+  "pushed_at": "2026-09-24T08:13:00Z",
+  "stargazers_count": 0,
+  "watchers_count": 0,
+  "forks_count": 0,
+  "open_issues_count": 1,
+  "archived": false,
+  "disabled": false,
+  "visibility": "public",
+  "license": {
+   "key": "mit",
+   "name": "MIT License",
+   "spdx_id": "MIT",
+   "url": "https://api.github.com/licenses/mit",
+   "node_id": "MDc6TGljZW5zZTEz"
+  },
+  "default_branch": "main",
+  "owner": {
+   "login": "Keremozdemirra",
+   "id": 151446743,
+   "type": "User"
+  }
+ }
+}

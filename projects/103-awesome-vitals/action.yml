@@ -1,0 +1,67 @@
+name: awesome-vitals
+description: Check every GitHub repository linked from a Markdown list for archived, gone, renamed, abandoned or unlicensed entries.
+author: Kerem Özdemir
+branding:
+  icon: check-square
+  color: gray-dark
+
+inputs:
+  path:
+    description: Markdown file to check, relative to the repository root. Several files go one per line.
+    required: false
+    default: README.md
+  mode:
+    description: "full checks every entry. pr checks only entries on lines the pull request adds; it needs actions/checkout with fetch-depth: 0."
+    required: false
+    default: full
+  fail-on:
+    description: "Comma-separated findings that fail the step: archived, gone, renamed, abandoned, stale, no-licence, non-standard-licence, unchecked. Empty to report without failing."
+    required: false
+    default: archived,gone
+  token:
+    description: Token for the GitHub REST API. The default workflow token allows 1,000 requests an hour per repository; past that, facts come from the agent-vitals census.
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - name: Check the list
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
+        AV_PATH: ${{ inputs.path }}
+        AV_MODE: ${{ inputs.mode }}
+        AV_FAIL_ON: ${{ inputs.fail-on }}
+        AV_BASE: ${{ github.event.pull_request.base.sha }}
+      run: |
+        # Inputs arrive through env and are never pasted into this script, so a
+        # path with quotes or $( ) in it stays a path.
+        paths=()
+        while read -r p; do
+          if [ -n "$p" ]; then paths+=("$p"); fi
+        done <<< "$AV_PATH"
+        if [ "${#paths[@]}" -eq 0 ]; then
+          echo "::error::awesome-vitals: the path input is empty"
+          exit 2
+        fi
+        args=(--markdown)
+        case "$AV_MODE" in
+          full) ;;
+          pr)
+            if [ -z "$AV_BASE" ]; then
+              echo "::error::awesome-vitals: mode pr needs a pull_request event"
+              exit 2
+            fi
+            # HEAD, the checked-out tree, not the pull request's head commit:
+            # the files are read from the tree, so the line numbers must be its.
+            args+=(--diff "$AV_BASE...HEAD") ;;
+          *)
+            echo "::error::awesome-vitals: mode is full or pr, not '$AV_MODE'"
+            exit 2 ;;
+        esac
+        case "$AV_FAIL_ON" in
+          ""|none) ;;
+          *) args+=(--fail-on "$AV_FAIL_ON") ;;
+        esac
+        python3 "$GITHUB_ACTION_PATH/awesome_vitals.py" "${args[@]}" -- "${paths[@]}" | tee -a "${GITHUB_STEP_SUMMARY:-/dev/null}"

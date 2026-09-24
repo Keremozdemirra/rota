@@ -1,0 +1,9 @@
+{
+ "url": "https://api.npmjs.org/downloads/point/last-week/this-package-does-not-exist-9f3k",
+ "recorded": "2026-09-24",
+ "status": 404,
+ "trimmed": "unchanged",
+ "body": {
+  "error": "package this-package-does-not-exist-9f3k not found"
+ }
+}

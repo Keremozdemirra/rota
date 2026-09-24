@@ -1,0 +1,56 @@
+{
+ "url": "https://pypi.org/simple/requests/",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "kept the earliest file and the files of ['2.32.0', '2.34.2'], 5 of 244 files; versions cut to the first and ['2.32.0', '2.34.2']; file entries cut to filename, upload-time, yanked, requires-python",
+ "body": {
+  "meta": {
+   "_last-serial": 37059094,
+   "api-version": "1.4"
+  },
+  "name": "requests",
+  "project-status": {
+   "status": "active"
+  },
+  "files": [
+   {
+    "filename": "requests-0.2.0.tar.gz",
+    "upload-time": "2011-02-14T08:49:42.641660Z",
+    "yanked": false,
+    "requires-python": null
+   },
+   {
+    "filename": "requests-2.32.0-py3-none-any.whl",
+    "upload-time": "2024-05-20T16:08:19.530618Z",
+    "yanked": "Yanked due to conflicts with CVE-2024-35195 mitigation",
+    "requires-python": ">=3.8"
+   },
+   {
+    "filename": "requests-2.32.0.tar.gz",
+    "upload-time": "2024-05-20T16:11:48.306524Z",
+    "yanked": "Yanked due to conflicts with CVE-2024-35195 mitigation",
+    "requires-python": ">=3.8"
+   },
+   {
+    "filename": "requests-2.34.2-py3-none-any.whl",
+    "upload-time": "2026-05-14T19:25:26.443000Z",
+    "yanked": false,
+    "requires-python": ">=3.10"
+   },
+   {
+    "filename": "requests-2.34.2.tar.gz",
+    "upload-time": "2026-05-14T19:25:27.735762Z",
+    "yanked": false,
+    "requires-python": ">=3.10"
+   }
+  ],
+  "versions": [
+   "0.2.0",
+   "2.32.0",
+   "2.34.2"
+  ]
+ },
+ "request_headers": {
+  "Accept": "application/vnd.pypi.simple.v1+json"
+ }
+}

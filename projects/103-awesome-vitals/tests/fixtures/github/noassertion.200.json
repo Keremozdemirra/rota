@@ -1,0 +1,41 @@
+{
+ "_provenance": "Constructed from the example response GitHub documents for Get a repository (https://docs.github.com/en/rest/repos/repos#get-a-repository, checked 2026-09-24): renamed to octocat/other-licence-example, license set to the object the API returns for a licence file it cannot match (spdx_id NOASSERTION).",
+ "status": 200,
+ "headers": {
+  "Content-Type": "application/json; charset=utf-8"
+ },
+ "body": {
+  "id": 1296272,
+  "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+  "name": "other-licence-example",
+  "full_name": "octocat/other-licence-example",
+  "private": false,
+  "html_url": "https://github.com/octocat/other-licence-example",
+  "description": "This your first repo!",
+  "fork": false,
+  "url": "https://api.github.com/repos/octocat/other-licence-example",
+  "created_at": "2011-01-26T19:01:12Z",
+  "updated_at": "2011-01-26T19:14:43Z",
+  "pushed_at": "2026-05-02T10:00:00Z",
+  "stargazers_count": 80,
+  "watchers_count": 80,
+  "forks_count": 9,
+  "open_issues_count": 0,
+  "archived": false,
+  "disabled": false,
+  "visibility": "public",
+  "license": {
+   "key": "other",
+   "name": "Other",
+   "spdx_id": "NOASSERTION",
+   "url": null,
+   "node_id": "MDc6TGljZW5zZTA="
+  },
+  "default_branch": "master",
+  "owner": {
+   "login": "octocat",
+   "id": 1,
+   "type": "User"
+  }
+ }
+}

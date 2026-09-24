@@ -1,0 +1,36 @@
+{
+ "url": "https://pypi.org/simple/apache-airflow-providers-duckdb/",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "kept the earliest file and the files of ['0.1.0rc1'], 2 of 2 files; versions cut to the first and ['0.1.0rc1']; file entries cut to filename, upload-time, yanked, requires-python",
+ "body": {
+  "meta": {
+   "_last-serial": 41400151,
+   "api-version": "1.4"
+  },
+  "name": "apache-airflow-providers-duckdb",
+  "project-status": {
+   "status": "active"
+  },
+  "files": [
+   {
+    "filename": "apache_airflow_providers_duckdb-0.1.0rc1-py3-none-any.whl",
+    "upload-time": "2026-09-24T07:52:59.326493Z",
+    "yanked": false,
+    "requires-python": ">=3.10"
+   },
+   {
+    "filename": "apache_airflow_providers_duckdb-0.1.0rc1.tar.gz",
+    "upload-time": "2026-09-24T07:54:43.131488Z",
+    "yanked": false,
+    "requires-python": ">=3.10"
+   }
+  ],
+  "versions": [
+   "0.1.0rc1"
+  ]
+ },
+ "request_headers": {
+  "Accept": "application/vnd.pypi.simple.v1+json"
+ }
+}
