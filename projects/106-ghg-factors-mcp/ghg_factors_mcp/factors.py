@@ -38,9 +38,13 @@ class Refused(ValueError):
 
 _DASHES = dict.fromkeys(map(ord, "\u2010\u2011\u2012\u2013\u2014\u2015\u2212"), "-")
 _DASHES.update(dict.fromkeys(map(ord, "\u2018\u2019\u02bc\u00b4"), "'"))
-_STOP = {"per", "of", "the", "a", "an", "and", "for", "in", "on", "to", "with", "factor", "factors", "conversion",
-         "emission", "emissions", "ghg", "desnz", "defra", "co2e", "kgco2e", "split", "co2", "ch4", "n2o",
-         "scope"}
+# Words that say how to answer, not what to look up; everything else must match a label.
+_STOP = set("""a an the of for in into on onto to from by at as with per and or vs versus is are be it its this
+that these those what which how much many me my i we our you your please give show tell find get need want
+look looking lookup value values number numbers figure figures latest current official applicable relevant
+correct use using used about can could would should do does also only just all each every separately
+separate broken down breakdown split factor factors conversion convert emission emissions ghg greenhouse
+desnz defra beis co2e kgco2e kg_co2e co2 ch4 n2o scope""".split())
 _GAS = re.compile(r"^kg CO2e of (\w+) per unit$")
 
 
@@ -297,11 +301,10 @@ def search_factors(text: str, scope: str | None = None, year: int | None = None,
         raise Refused(f"year must be a number such as {snap.years[0]}") from None
     if year not in snap.years:
         raise Refused(f"DESNZ {year} is not in the snapshot; bundled sets: {', '.join(map(str, snap.years))}")
-    # A word that appears in no DESNZ label of that year cannot narrow the search; it is
-    # dropped and reported, so "split into" or "please" do not empty the result.
+    # A word no DESNZ label of that year contains cannot match; saying which one it
+    # was tells the caller why nothing came back, instead of silently dropping it.
     vocabulary = snap.vocabulary.get(year, set())
-    ignored = [t for t in tokens if not any(w.startswith(t) for w in vocabulary)]
-    tokens = [t for t in tokens if t not in ignored]
+    unknown = [t for t in tokens if not any(w.startswith(t) for w in vocabulary)]
     want_unit = unit_key(unit) if unit else None
     try:
         limit = max(1, min(int(limit), MAX_LIMIT))
@@ -310,7 +313,7 @@ def search_factors(text: str, scope: str | None = None, year: int | None = None,
     phrase = fold(" ".join(tokens))
     hits = []
     for y, prefix, order, name_words, context_words, level3, row_scope in snap.index:
-        if not tokens or y != year or (want_scope and row_scope != want_scope):
+        if unknown or y != year or (want_scope and row_scope != want_scope):
             continue
         all_words = name_words | context_words
         if not all(any(w.startswith(t) for w in all_words) for t in tokens):
@@ -339,8 +342,11 @@ def search_factors(text: str, scope: str | None = None, year: int | None = None,
         note += (" The unit filter also matches factors published in another unit of the same kind "
                  "(e.g. kWh for MWh); convert scales between them exactly.")
     query = {"text": text, "scope": want_scope, "year": year, "unit": unit, "limit": limit, "words": tokens}
-    if ignored:
-        query["ignored_words"] = ignored
+    if unknown:
+        query["unknown_words"] = unknown
+        hint = (" For a country's grid average use grid_intensity; the DESNZ UK grid factor is found with "
+                "'electricity UK'." if {"grid", "intensity", "mix"} & set(unknown) else "")
+        note = f"No DESNZ {year} label contains {', '.join(repr(u) for u in unknown)}.{hint} " + note
     return {"query": query, "matches": len(hits), "returned": len(results), "results": results, "note": note,
             "attribution": [attribution(f"desnz-{year}")]}
 

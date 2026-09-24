@@ -56,15 +56,17 @@ class Search(SnapshotTestCase):
         self.assertIsNone(hit["value"])
         self.assertIn("blank", hit["notes"][0])
 
-    def test_no_match_is_an_empty_list(self):
+    def test_unknown_words_empty_the_result_and_are_named(self):
         r = F.search_factors("unobtainium smelting")
-        self.assertEqual((r["matches"], r["results"], r["query"]["ignored_words"]), (0, [], ["unobtainium", "smelting"]))
-        self.assertEqual(F.search_factors("diesel hovercraft")["results"], [])  # known + unknown word: no match
+        self.assertEqual((r["matches"], r["results"], r["query"]["unknown_words"]), (0, [], ["unobtainium", "smelting"]))
+        r = F.search_factors("diesel hovercraft")  # one unknown word is enough: no diesel rows pretending to fit
+        self.assertEqual((r["results"], r["query"]["unknown_words"]), ([], ["hovercraft"]))
+        self.assertIn("'hovercraft'", r["note"])
 
-    def test_words_absent_from_every_label_are_ignored_and_reported(self):
-        r = F.search_factors("please give me natural gas kwh gross numbers")
+    def test_words_about_the_request_are_not_matched(self):
+        r = F.search_factors("please give me the natural gas kWh gross numbers")
         self.assertEqual(r["results"][0]["factor_id"], GAS_GROSS)
-        self.assertEqual(r["query"]["ignored_words"], ["please", "give", "me", "numbers"])
+        self.assertEqual(r["query"]["words"], ["natural", "gas", "kwh", "gross"])
 
     def test_refusals(self):
         for kwargs, pattern in (({"text": "  "}, "empty"), ({"text": "CO2 factor per"}, "no searchable words"),
