@@ -26,8 +26,6 @@ MAX_QUOTE = 1500
 # How old a snapshot may get before answers carry a warning. This tool's
 # choice, not a legal deadline.
 STALE_AFTER_DAYS = 60
-NOT_ADVICE = ("Information, not legal advice. Only the acts published in the Official Journal of the European "
-              "Union are authentic; the consolidated text used here is a documentation tool with no legal effect.")
 CATEGORY_LEVEL = {2: "CN chapter", 4: "heading", 6: "HS subheading", 8: "CN subheading", 10: "TARIC code"}
 
 
@@ -163,6 +161,23 @@ def attribution(retrieved: str, topic: str, derived: bool = False, table_version
     return text
 
 
+def _join(names: list) -> str:
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+
+
+def disclaimer(topic: str) -> str:
+    """Information, not advice, and which acts are the legally binding ones."""
+    s = _state()
+    if topic == "country":
+        return ("Information, not legal advice. The legally binding act is "
+                f"{_act_name(s.risk['act']['celex'])}, as published in the Official Journal of the European Union.")
+    amending = [_act_name(a["celex"]) for a in s.dates.get("amending_acts", [])]
+    binding = "Regulation (EU) 2023/1115" + (" as amended by " + _join(amending) if amending else "")
+    return ("Information, not legal advice. The consolidated text used here is a documentation tool with no legal "
+            f"effect; the legally binding acts are {binding}, as published in the Official Journal of the European "
+            "Union.")
+
+
 def _common(topic: str) -> dict:
     """Provenance, attribution and disclaimer for one kind of answer."""
     s = _state()
@@ -186,7 +201,7 @@ def _common(topic: str) -> dict:
         out["legal_acts"].append(_act_name(s.risk["act"]["celex"]))
     out["attribution"] = attribution(out["checked"], topic, derived=bool(applied),
                                      table_version=s.countries.get("version"))
-    out["disclaimer"] = NOT_ADVICE
+    out["disclaimer"] = disclaimer(topic)
     age = (dt.date.fromisoformat(today()) - dt.date.fromisoformat(s.retrieved)).days
     if age > STALE_AFTER_DAYS:
         out["warning"] = (f"This snapshot was checked against CELLAR on {s.retrieved}, {age} days ago. Acts adopted "

@@ -101,7 +101,7 @@ class Parents(support.OfflineTest):
         # The record's links point at the exceptions, so no parent endpoint is asked (and 404s).
         self.assertEqual(self.net.routes(), [f"gleif/{DB}", f"gleif/{DB}_direct-parent-reporting-exception",
                                              f"gleif/{DB}_ultimate-parent-reporting-exception"])
-        self.assertIn("not beneficial owners", r["parent_note"])
+        self.assertIn("not beneficial ownership", r["parent_note"])
 
     def test_reported_parents_with_relationship_records(self):
         r = fm.lei_parents(VWIF)

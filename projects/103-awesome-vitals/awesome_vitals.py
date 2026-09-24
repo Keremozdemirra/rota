@@ -376,6 +376,14 @@ def scan(text: str, warnings: list | None = None, path: str = ""
     return found, skipped
 
 
+def inside_cwd(path: str) -> bool:
+    try:
+        rel = os.path.relpath(os.path.abspath(path))
+    except ValueError:  # another drive on Windows
+        return False
+    return rel != os.pardir and not rel.startswith(os.pardir + os.sep)
+
+
 def norm(path: str) -> str:
     """A path relative to the working directory with forward slashes, which is how git diff names files."""
     p = os.path.normpath(path)
@@ -447,19 +455,19 @@ HUNK = re.compile(r"^@@ -\d+(?:,(\d+))? \+(\d+)(?:,(\d+))? @@")
 
 
 def unquote_path(s: str) -> str:
-    """Undo git's C-style quoting of a path with unusual characters: "b/donn\\303\\251es.md"."""
-    body = s[1:-1] if len(s) >= 2 and s.endswith('"') else s[1:]
-    out, i = bytearray(), 0
+    """Undo git's C-style quoting of a path with unusual characters: "b/donn\\303\\251es.md".
+    The name ends at the closing quote; git puts a tab after it when the name has a space."""
+    out, i = bytearray(), 1
     escapes = {"n": b"\n", "t": b"\t", '"': b'"', "\\": b"\\", "a": b"\a", "b": b"\b", "f": b"\f", "r": b"\r", "v": b"\v"}
-    while i < len(body):
-        c = body[i]
-        if c == "\\" and i + 1 < len(body):
-            octal = body[i + 1:i + 4]
+    while i < len(s) and s[i] != '"':
+        c = s[i]
+        if c == "\\" and i + 1 < len(s):
+            octal = s[i + 1:i + 4]
             if re.fullmatch(r"[0-7]{3}", octal):
                 out.append(int(octal, 8) & 0xFF)
                 i += 4
                 continue
-            out += escapes.get(body[i + 1], body[i + 1].encode("utf-8"))
+            out += escapes.get(s[i + 1], s[i + 1].encode("utf-8"))
             i += 2
             continue
         out += c.encode("utf-8")
@@ -1035,6 +1043,13 @@ def main(argv: list[str] | None = None, *, today: dt.date | None = None, api: st
     if only is not None:
         scope = "selected lines"
     elif a.diff:
+        # git diff --relative leaves out a file outside the working directory, which would
+        # read as "nothing added" and pass a strict check without looking at it.
+        outside = [f for f in a.files if not inside_cwd(f)]
+        if outside:
+            print(f"awesome-vitals: --diff: {plain(outside[0], 400)} is outside the working directory; "
+                  "run from a directory that contains every file, such as the repository root", file=sys.stderr)
+            return 2
         try:
             selected = git_added_lines(a.diff, a.files)
         except (ValueError, RuntimeError) as e:

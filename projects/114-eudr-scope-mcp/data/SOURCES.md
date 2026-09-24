@@ -42,6 +42,15 @@ Country names are matched to ISO 3166-1 codes through the EU authority table htt
 - high risk countries: 4
 - authority table countries: 251
 
+## Corrigenda and proposals
+
+- 32023R1115R(01) (2024-10-01): no English version, so the English text is unaffected
+- 32023R1115R(02) (2025-02-28): no English version, so the English text is unaffected
+- 32023R1115R(03) (2025-03-28): no English version, so the English text is unaffected
+- 32023R1115R(04) (2025-12-22): no English version, so the English text is unaffected
+- 32023R1115R(05) (2026-07-02): no English version, so the English text is unaffected
+- 52026PC0661 (2026-09-10), a proposal, not law and not applied: Proposal for a COUNCIL REGULATION amending Regulations (EU) No 1380/2013, (EU) No 1308/2013, (EU) 2023/1115 and (EU) 2024/1348 of the European Parliament and of the Council, and Council Regulation (EU) 2023/2720 as regards adaptation of certain requirements and reduction of administrative burden in the Union outermost regions
+
 ## Choices made by this tool
 
 - Annex I is the consolidated text plus the amending acts listed as applied above, applied by
@@ -61,8 +70,10 @@ Country names are matched to ISO 3166-1 codes through the EU authority table htt
   meaning (Article 6(2)).
 - Country authority table: same reuse notice (https://data.europa.eu/data/datasets/country).
 - Commission web content: CC BY 4.0 (https://commission.europa.eu/legal-notice_en).
-- Attribution used in every answer: 'Source: EUR-Lex/CELLAR, Publications Office of the European
-  Union, retrieved 2026-09-24; (c) European Union. Table derived by eudr-scope-mcp.'
+- Attribution lines carried by the answers:
+  - scope and commodity answers: Source: EUR-Lex/CELLAR, Publications Office of the European Union, retrieved 2026-09-24; (c) European Union, reuse under Commission Decision 2011/833/EU. Table derived by eudr-scope-mcp: amending acts applied to the consolidated text.
+  - date answers: Source: EUR-Lex/CELLAR, Publications Office of the European Union, retrieved 2026-09-24; (c) European Union, reuse under Commission Decision 2011/833/EU. Dates read from the article texts by eudr-scope-mcp.
+  - country answers: Source: EUR-Lex/CELLAR, Publications Office of the European Union, retrieved 2026-09-24; (c) European Union, reuse under Commission Decision 2011/833/EU. Country names matched to ISO 3166-1 codes by eudr-scope-mcp through the EU 'Countries and territories' authority table (version 20260617-0).
 
 Only the texts published in the Official Journal of the European Union are authentic. The consolidated
 text says of itself: 'This text is meant purely as a documentation tool and has no legal effect.'
