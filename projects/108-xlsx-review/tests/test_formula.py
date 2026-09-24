@@ -61,7 +61,7 @@ class Shift(Case):
 
     def test_ranges_columns_rows_and_other_sheets(self):
         self.assertEqual(self.shifted("SUM($C$2:C2)+SUM(A:B)+SUM(2:3)+'My Sheet'!A1", 2, 1),
-                         "SUM($C$2:C4)+SUM(B:C)+SUM(4:5)+'My Sheet'!B3")
+                         "SUM($C$2:D4)+SUM(B:C)+SUM(4:5)+'My Sheet'!B3")
 
     def test_strings_names_and_functions_do_not_move(self):
         self.assertEqual(self.shifted('IF(A1="A1",Growth,LOG10(A1))', 1, 0), 'IF(A2="A1",Growth,LOG10(A2))')

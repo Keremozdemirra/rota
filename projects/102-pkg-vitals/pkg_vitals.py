@@ -50,7 +50,9 @@ import socket
 import sys
 import threading
 import time
+import tempfile
 import traceback
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -98,15 +100,14 @@ SERIOUS = {F_MISSING, F_PLACEHOLDER, F_NEW, F_DEPRECATED, F_YANKED, F_ARCHIVED, 
 # Only strings that match these are ever sent to a registry. npm's grammar for
 # new package names (validate-npm-package-name: lowercase, 214 characters at
 # most) and PEP 508's for PyPI; checked 2026-09-24.
-NPM_NAME = re.compile(r"^(@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*$")
-PYPI_NAME = re.compile(r"^([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9])$")
+NPM_NAME = re.compile(r"(@[a-z0-9-~][a-z0-9-._~]*/)?[a-z0-9-~][a-z0-9-._~]*")  # fullmatch only: `$` lets "\n" in
+PYPI_NAME = re.compile(r"[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9._-]*[A-Za-z0-9]")
 PYPI_REQ = re.compile(r"^([A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?)\s*(\[[^\]]*\])?\s*(.*)$", re.S)
-PYPI_PIN = re.compile(r"^v?[0-9][0-9A-Za-z.!+_-]{0,63}$")
-VERSIONISH = re.compile(r"^v?\d+(?:\.\d+)*$")
+PYPI_PIN = re.compile(r"v?[0-9][0-9A-Za-z.!+_-]{0,63}")
+VERSIONISH = re.compile(r"v?\d+(?:\.\d+)*")
 # GitHub: owner 1-39 of [A-Za-z0-9-], repository 1-100 of [A-Za-z0-9._-]
-GITHUB_SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]{0,38}/(?!\.\.?$)[A-Za-z0-9._-]{1,100}$")
+GITHUB_SLUG = re.compile(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}/(?!\.\.?\Z)[A-Za-z0-9._-]{1,100}")
 
-_CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f​-‏‪-‮⁠-⁩﻿]")
 _USERINFO = re.compile(r"(?i)\b([a-z][a-z0-9+.-]*://)[^/\s@]+@")
 _QUERY = re.compile(r"(?i)\b([a-z][a-z0-9+.-]*://[^\s?#]*)\?[^\s#>]*")
 _KEYARG = re.compile(r"(?i)(--?[a-z0-9_-]*(?:key|token|secret|passw(?:or)?d|auth|credential)[a-z0-9_-]*)(=|\s+)(?!\*\*\*)(\S+)")
@@ -133,7 +134,12 @@ def scrub(obj):
 
 
 def clean(text, n: int = 200) -> str:
-    s = " ".join(_CONTROL.sub(" ", str(text)).split())
+    """Masked first, so truncation cannot cut a secret loose from the delimiter the mask looks for; then control,
+    format, private-use and unassigned characters out (invisible text included), then cut to length."""
+    s = mask(str(text))
+    s = "".join(" " if unicodedata.category(c) == "Cc" else "" if unicodedata.category(c) in ("Cf", "Co", "Cn", "Cs")
+                else c for c in s)
+    s = " ".join(s.split())
     return s if len(s) <= n else s[: n - 3] + "..."
 
 
@@ -230,32 +236,57 @@ PYPI_INDEX_ENV = ("PIP_INDEX_URL", "UV_INDEX_URL", "UV_DEFAULT_INDEX", "UV_INDEX
 PUBLIC_HOSTS = {"registry.npmjs.org", "registry.yarnpkg.com", "pypi.org", "pypi.python.org"}
 
 
-def tokenize(command: str) -> list[str]:
+def tokenize(command: str, powershell: bool = False) -> list[str]:
     """Split a shell command line into words and operators the way the shell would.
 
     This is shlex with punctuation_chars=True and whitespace_split=True, so
-    `a;b`, `a&&b` and `a|b` split, plus the newline as one more separator."""
-    text = _strip_heredocs(re.sub(r"\\\r?\n", " ", command))  # backslash-newline continues a line
+    `a;b`, `a&&b` and `a|b` split, plus the newline as one more separator.
+    PowerShell has no backslash escape: `"C:\app\"` is a whole string there."""
+    if not powershell:
+        command = re.sub(r"\\\r?\n", " ", command)  # backslash-newline continues a line
+    text = _strip_comments(_strip_heredocs(command), powershell)
     lex = shlex.shlex(text, posix=True, punctuation_chars="();<>|&\n")
     lex.whitespace = " \t\r"  # a newline separates commands, so it must come through as a token
     lex.whitespace_split = True
-    lex.commenters = ""  # `#` starts a comment only at the start of a word, handled below
+    lex.commenters = ""  # comments are gone already; a `#` left is inside a word or a quote
+    if powershell:
+        lex.escape = ""
     try:
-        tokens = list(lex)
+        return list(lex)
     except ValueError:  # unbalanced quotes: nothing here can be read reliably
         return []
-    out, comment = [], False
-    for t in tokens:
-        if comment:
-            if "\n" in t:
-                comment = False
-                out.append("\n")
+
+
+def _strip_comments(text: str, powershell: bool = False) -> str:
+    """Drop `# ...` comments before tokenizing, so an apostrophe in one (`# don't`) cannot unbalance the quotes.
+    A `#` starts a comment only at the start of a word and outside quotes."""
+    out, quote, i, start = [], None, 0, True
+    while i < len(text):
+        c = text[i]
+        if quote:
+            out.append(c)
+            if c == quote:
+                quote = None
+            elif c == "\\" and quote == '"' and not powershell and i + 1 < len(text):
+                out.append(text[i + 1])
+                i += 1
+        elif c in "'\"":
+            quote = c
+            out.append(c)
+        elif c == "\\" and not powershell and i + 1 < len(text):
+            out += [c, text[i + 1]]
+            i += 1
+        elif c == "#" and start:
+            nl = text.find("\n", i)
+            if nl < 0:
+                break
+            i = nl
             continue
-        if t.startswith("#"):
-            comment = True
-            continue
-        out.append(t)
-    return out
+        else:
+            out.append(c)
+        start = quote is None and c in " \t\r\n;&|(){}"
+        i += 1
+    return "".join(out)
 
 
 def _strip_heredocs(text: str) -> str:
@@ -275,7 +306,7 @@ def _strip_heredocs(text: str) -> str:
 
 
 def _is_sep(t: str) -> bool:
-    return bool(t) and set(t) <= _SEP
+    return bool(t) and (set(t) <= _SEP or t in ("{", "}"))
 
 
 def _is_redirect(t: str) -> bool:
@@ -320,6 +351,8 @@ def _strip_wrappers(words: list[str]) -> tuple[dict, list[str]]:
             k, _, v = w.partition("=")
             env[k] = v
             i += 1
+        elif w in ("if", "then", "elif", "else", "do", "while", "until", "!", "{"):
+            i += 1  # `if ...; then npm i x; fi`: what follows a keyword is still a command
         elif base in ("sudo", "doas"):
             i += 1
             while i < len(words) and words[i].startswith("-"):
@@ -428,7 +461,7 @@ def npm_spec(token: str):
         return "skip", "git or URL", None
     if "/" in name and not name.startswith("@"):
         return "skip", "GitHub shorthand (owner/repo)", None
-    if not NPM_NAME.match(name) or len(name) > 214 or VERSIONISH.match(name):
+    if not NPM_NAME.fullmatch(name) or len(name) > 214 or VERSIONISH.fullmatch(name):
         return "skip", "not a valid npm package name", None
     return "target", name, spec or None
 
@@ -446,7 +479,7 @@ def pypi_spec(token: str, at_syntax: bool = False):
     if low.endswith((".whl", ".tar.gz", ".zip", ".tar.bz2", ".tgz", ".tar.xz", ".egg")):
         return "skip", "archive file", None, None
     m = PYPI_REQ.match(t)
-    if not m or not PYPI_NAME.match(m.group(1)) or VERSIONISH.match(m.group(1)):
+    if not m or not PYPI_NAME.fullmatch(m.group(1)) or VERSIONISH.fullmatch(m.group(1)):
         return "skip", "not a valid PyPI package name", None, None
     name, rest = m.group(1), m.group(3).split(";", 1)[0].strip()  # drop environment markers
     if rest and not re.match(r"(===|==|!=|~=|<=|>=|<|>|@|,|\()", rest):  # `café` is not `caf` plus a version
@@ -458,12 +491,12 @@ def pypi_spec(token: str, at_syntax: bool = False):
             return "skip", "direct reference", None, None
         spec = after or None
         # poetry and uvx read a bare version after @ as that exact version
-        if spec and PYPI_PIN.match(spec):
+        if spec and PYPI_PIN.fullmatch(spec):
             pin = spec
     else:
         spec = rest or None
         pm = re.fullmatch(r"(===?)\s*(\S+)", spec or "")
-        if pm and PYPI_PIN.match(pm.group(2)):
+        if pm and PYPI_PIN.fullmatch(pm.group(2)):
             pin = pm.group(2)
     if spec and spec.lower() == "latest":
         spec = None
@@ -1060,7 +1093,7 @@ class Net:
         return val
 
     def github(self, slug: str) -> dict:
-        if not GITHUB_SLUG.match(slug):
+        if not GITHUB_SLUG.fullmatch(slug):
             return {"error": "not an owner/name"}
         if not self.github_down:
             h = {"Accept": "application/vnd.github+json"}
@@ -1071,7 +1104,7 @@ class Net:
             if code is None:
                 lic = _d(d.get("license"))
                 spdx = lic.get("spdx_id") if isinstance(lic.get("spdx_id"), str) else None
-                name = d.get("full_name") if isinstance(d.get("full_name"), str) and GITHUB_SLUG.match(d["full_name"]) else slug
+                name = d.get("full_name") if isinstance(d.get("full_name"), str) and GITHUB_SLUG.fullmatch(d["full_name"]) else slug
                 return {"source": "GitHub API", "full_name": name, "pushed_at": _iso(d.get("pushed_at")),
                         "archived": d.get("archived") is True, "stars": _int(d.get("stargazers_count")),
                         "license": clean(spdx, 40) if spdx and spdx != "NOASSERTION" else None}
@@ -1169,9 +1202,9 @@ def repo_url(text) -> str | None:
 
 
 def github_slug(url: str | None) -> str | None:
-    m = re.match(r"https://github\.com/([A-Za-z0-9._-]+)/([A-Za-z0-9._-]+)$", url or "")
+    m = re.fullmatch(r"https://github\.com/([A-Za-z0-9._-]+)/([A-Za-z0-9._-]+)", url or "")
     slug = f"{m.group(1)}/{m.group(2)}" if m else None
-    return slug if slug and GITHUB_SLUG.match(slug) else None
+    return slug if slug and GITHUB_SLUG.fullmatch(slug) else None
 
 
 def _on_forge(url) -> bool:
@@ -1355,7 +1388,7 @@ def _not_found(r: dict, host: str, detail: str = "HTTP 404"):
 def check_npm(t: dict, net: Net, today: dt.date) -> dict:
     r = _result(t)
     host = net.host(net.npm_url)
-    if not NPM_NAME.match(t["name"]):  # parse_command never makes one, but callers can build targets by hand
+    if not NPM_NAME.fullmatch(t["name"]):  # parse_command never makes one, but callers can build targets by hand
         r["errors"].append("not a valid npm package name; not sent")
         return r
     doc = net.get(f"{net.npm_url}/{urllib.parse.quote(t['name'], safe='@')}")
@@ -1434,7 +1467,7 @@ def check_pypi(t: dict, net: Net, today: dt.date) -> dict:
     r = _result(t)
     norm = pep503(t["name"])
     host = net.host(net.pypi_url)
-    if not PYPI_NAME.match(t["name"]):
+    if not PYPI_NAME.fullmatch(t["name"]):
         r["errors"].append("not a valid PyPI package name; not sent")
         return r
     simple = net.get(f"{net.pypi_url}/simple/{norm}/", {"Accept": "application/vnd.pypi.simple.v1+json"})
@@ -1467,7 +1500,7 @@ def check_pypi(t: dict, net: Net, today: dt.date) -> dict:
 
     base = f"{net.pypi_url}/pypi/{norm}"
     pinned = False
-    if t["pin"] and PYPI_PIN.match(t["pin"]):
+    if t["pin"] and PYPI_PIN.fullmatch(t["pin"]):
         doc = net.get(f"{base}/{urllib.parse.quote(t['pin'], safe='')}/json")
         if doc.get("_error") == 404:
             _flag(r, F_NO_VERSION, f"version {clean(t['pin'], 64)} is not on {host}")

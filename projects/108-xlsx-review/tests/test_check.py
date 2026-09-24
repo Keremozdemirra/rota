@@ -39,7 +39,7 @@ class Patterns(Case):
         self.assertIn(("inconsistent-formula", "S", "D1"), found(self.book(sheets=[{"name": "S", "cells": cells}])))
 
     def test_two_odd_cells_side_by_side_are_both_found(self):
-        cells = dict(YEARS, D1="=C1*1.2", E1="=D1*1.2")
+        cells = dict(YEARS, D1="=C1*1.2", E1="=D1*1.2", G1="=F1*1.1")
         hits = [c for code, s, c in found(self.book(sheets=[{"name": "S", "cells": cells}])) if code == "inconsistent-formula"]
         self.assertEqual(hits, ["D1", "E1"])
 
