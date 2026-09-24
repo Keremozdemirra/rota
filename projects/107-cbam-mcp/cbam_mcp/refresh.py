@@ -35,6 +35,9 @@ CELLAR = legal.CELLAR
 # The consolidated text in use on 2026-09-24; used when the SPARQL lookup for a
 # newer one fails.
 PINNED_CONSOLIDATION = "02023R0956-20251020"
+# The consolidated text of the default-value act that includes Implementing Regulation
+# (EU) 2026/1740 (►M1), in use on 2026-09-24; the fallback when SPARQL cannot be asked.
+PINNED_VALUES_CONSOLIDATION = "02025R2621-20260101"
 EXCEL_URL = "https://taxation-customs.ec.europa.eu/document/download/1c05d211-80cb-4aaa-8ef0-e08005a95d7e_en"
 EXCEL_PAGE = "https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism/cbam-legislation-and-guidance_en"
 OJ_VALUES_CELEX = "32026R1740"
@@ -127,14 +130,15 @@ def sparql(query: str, fetcher=fetch, what: str = "SPARQL") -> tuple[list[dict],
 
 # ------------------------------------------------------------------ queries
 
-Q_CONSOLIDATED = """PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
+def q_consolidated(base: str) -> str:
+    return f"""PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-SELECT ?celex ?date WHERE {
-  ?base cdm:resource_legal_id_celex "32023R0956"^^xsd:string .
+SELECT ?celex ?date WHERE {{
+  ?base cdm:resource_legal_id_celex "{base}"^^xsd:string .
   ?cons cdm:act_consolidated_consolidates_resource_legal ?base ;
         cdm:resource_legal_id_celex ?celex .
-  OPTIONAL { ?cons cdm:act_consolidated_date ?date }
-} ORDER BY DESC(?celex) LIMIT 5"""
+  OPTIONAL {{ ?cons cdm:act_consolidated_date ?date }}
+}} ORDER BY DESC(?celex) LIMIT 5"""
 
 Q_LATER_ACTS = """PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
@@ -268,19 +272,26 @@ def page_links(fetcher=fetch) -> list[str]:
     return links
 
 
-def refresh_annex(today: str, fetcher=fetch) -> dict:
-    notes = []
-    celex, cons_date = PINNED_CONSOLIDATION, "2025-10-20"
+def latest_consolidation(base: str, pinned: str, fetcher, notes: list) -> tuple[str, str]:
+    """CELEX and date of the newest consolidated text of an act, or the pinned one if CELLAR cannot say."""
+    celex, date = pinned, f"{pinned[-8:-4]}-{pinned[-4:-2]}-{pinned[-2:]}"
     try:
-        rows, _ = sparql(Q_CONSOLIDATED, fetcher, "consolidated-versions query")
-        found = sorted((r for r in rows if (r.get("celex") or "").startswith("02023R0956-")),
+        rows, _ = sparql(q_consolidated(base), fetcher, f"consolidated versions of {base}")
+        prefix = "0" + base[1:] + "-"
+        found = sorted((r for r in rows if (r.get("celex") or "").startswith(prefix)),
                        key=lambda r: r.get("date") or "", reverse=True)
         if found:
-            celex, cons_date = found[0]["celex"], found[0].get("date") or cons_date
+            celex, date = found[0]["celex"], found[0].get("date") or date
         else:
-            notes.append("SPARQL listed no consolidated version; used the pinned one")
+            notes.append(f"SPARQL listed no consolidated version of {base}; used the pinned {pinned}")
     except (FetchError, parsers.ParseError) as e:
-        notes.append(f"latest consolidated version not checked ({e}); used the pinned one")
+        notes.append(f"latest consolidated version of {base} not checked ({e}); used the pinned {pinned}")
+    return celex, date
+
+
+def refresh_annex(today: str, fetcher=fetch) -> dict:
+    notes: list = []
+    celex, cons_date = latest_consolidation("32023R0956", PINNED_CONSOLIDATION, fetcher, notes)
     url = CELLAR + celex
     got = fetcher(url, accept="application/xhtml+xml", max_bytes=MAX_XHTML)
     parsed = parsers.parse_regulation_xhtml(got.body)
@@ -296,7 +307,29 @@ def refresh_annex(today: str, fetcher=fetch) -> dict:
     return doc
 
 
-def compare_with_oj(values: dict, oj: dict) -> dict:
+# The rules this tool quotes, checked in each text: the amending act carries them and its
+# recital; the consolidated text carries the annex wording but no recitals.
+OJ_QUOTES = ("RULE_NOT_LISTED", "RULE_NO_VALUE", "NO_ROUTE", "HS_GROUP_ROUTE", "DIRECT_INDIRECT_FOR_INFORMATION")
+CONSOLIDATED_QUOTES = ("RULE_NOT_LISTED", "RULE_NO_VALUE", "NO_ROUTE", "HS_GROUP_ROUTE")
+
+
+def _norm_quotes(text: str) -> str:
+    # The amending act quotes table names with “ ”, the consolidated text with ‘ ’.
+    return re.sub("[\u2018\u2019\u201c\u201d\"']", "'", text)
+
+
+def markup_sentences(paragraphs: list) -> dict:
+    """The mark-up rule of Annex I and the Annex IV sentence that applies it, verbatim."""
+    out = {"annex_i": [], "annex_iv": []}
+    for i, t in enumerate(paragraphs):
+        if t.startswith("For the calculation of the number of CBAM certificates") and not out["annex_i"]:
+            out["annex_i"] = [t] + [x for x in paragraphs[i + 1:i + 4] if "the mark-up shall be" in x]
+        elif "shall be increased by the mark-ups laid down" in t and not out["annex_iv"]:
+            out["annex_iv"] = [t]
+    return out
+
+
+def compare_with_oj(values: dict, oj: dict, quote_names=OJ_QUOTES) -> dict:
     tables, rows_cmp, rows_same, diffs = 0, 0, 0, []
     for name, rows in values["tables"].items():
         other = oj["tables"].get(name.replace("’", "'"))
@@ -317,10 +350,8 @@ def compare_with_oj(values: dict, oj: dict) -> dict:
         if a4.get(c) != oj["annex_iv"].get(c) and len(diffs) < 50:
             diffs.append({"table": "Annex IV", "line": c, "excel": a4.get(c), "official_journal": oj["annex_iv"].get(c)})
     missing_tables = sorted(set(oj["tables"]) - {n.replace("’", "'") for n in values["tables"]})
-    text = oj["text"]
-    quotes = {}
-    for name in ("RULE_NOT_LISTED", "RULE_NO_VALUE", "NO_ROUTE", "DIRECT_INDIRECT_FOR_INFORMATION"):
-        quotes[name] = getattr(legal, name)["quote"] in text
+    text = _norm_quotes(oj["text"])
+    quotes = {name: _norm_quotes(getattr(legal, name)["quote"]) in text for name in quote_names}
     return {"tables_compared": tables, "rows_compared": rows_cmp, "rows_identical": rows_same,
             "annex_iv_compared": len(a4_codes), "annex_iv_identical": a4_same,
             "tables_only_in_official_journal": missing_tables, "differences": diffs, "quotes_found": quotes}
@@ -356,15 +387,32 @@ def refresh_values(data_dir: Path, today: str, fetcher=fetch, check_oj: bool = F
             log(f"note: the Commission page lists other default-value downloads: {listed}")
     except (FetchError, parsers.ParseError) as e:
         meta["page_check"] = {"checked": today, "error": str(e)}
-    found_difference = False
+    # The consolidated default-value act: where the mark-up rule is quoted from, and a
+    # line-by-line check of the Excel against it, on every refresh.
+    notes: list = []
+    cons_celex, cons_date = latest_consolidation("32025R2621", PINNED_VALUES_CONSOLIDATION, fetcher, notes)
+    cons_got = fetcher(CELLAR + cons_celex, accept="application/xhtml+xml", max_bytes=MAX_OJ, timeout=180)
+    cons = parsers.parse_oj_default_values(cons_got.body)
+    markup = markup_sentences(cons["paragraphs"])
+    if len(markup["annex_i"]) < 2:
+        raise parsers.ParseError(f"{cons_celex}: no mark-up rule found in the introductory part of Annex I; "
+                                 "the layout or the law changed")
+    cons_check = compare_with_oj(parsed, cons, CONSOLIDATED_QUOTES)
+    meta["consolidated"] = {
+        "celex": cons_celex, "consolidation_date": cons_date, "reference": cons["reference"],
+        "url": CELLAR + cons_celex, "retrieved": today, "sha256": sha256(cons_got.body), "bytes": len(cons_got.body),
+        "amendments": cons["amendments"], "disclaimer": cons["disclaimer"], "markup": markup, "notes": notes,
+        "check": cons_check}
+    found_difference = bool(cons_check["differences"]) or not all(cons_check["quotes_found"].values())
     if check_oj:
         oj_got = fetcher(CELLAR + OJ_VALUES_CELEX, accept="application/xhtml+xml", max_bytes=MAX_OJ, timeout=180)
         oj = parsers.parse_oj_default_values(oj_got.body)
         result = compare_with_oj(parsed, oj)
+        result.pop("paragraphs", None)
         result.update({"checked": today, "celex": OJ_VALUES_CELEX, "url": CELLAR + OJ_VALUES_CELEX,
                        "sha256": sha256(oj_got.body), "bytes": len(oj_got.body)})
         meta["oj_check"] = result
-        found_difference = bool(result["differences"]) or not all(result["quotes_found"].values())
+        found_difference = found_difference or bool(result["differences"]) or not all(result["quotes_found"].values())
     else:
         previous = load_json(data_dir / FILES["values"])
         prev_meta = (previous or {}).get("meta") or {}
@@ -500,7 +548,7 @@ def run(data_dir: Path, *, only=None, check_oj: bool = False, excel_url: str = E
     def step(name, fn):
         try:
             return fn()
-        except (FetchError, parsers.ParseError, KeyError, ValueError, TypeError) as e:
+        except (FetchError, parsers.ParseError, KeyError, ValueError, TypeError, RecursionError) as e:
             failures.append(f"{name}: {e}")
             log(f"FAILED {name}: {e}; previous file kept")
             return None
