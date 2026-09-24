@@ -1,0 +1,2 @@
+# Not an action.yml: what a captive portal returns in place of one.
+<!doctype html><html><body>Sign in to the network</body></html>

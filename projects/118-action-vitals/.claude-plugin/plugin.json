@@ -1,0 +1,11 @@
+{
+  "name": "action-vitals",
+  "displayName": "Action Vitals",
+  "version": "0.1.0",
+  "description": "After Claude writes or edits a GitHub Actions workflow, tells Claude which uses: lines it touched are not pinned to a commit, archived, or on a runtime GitHub has retired, with the pinned line.",
+  "author": { "name": "Kerem Özdemir", "url": "https://keremozdemir.de" },
+  "homepage": "https://github.com/Keremozdemirra/action-vitals",
+  "repository": "https://github.com/Keremozdemirra/action-vitals",
+  "license": "MIT",
+  "keywords": ["github-actions", "workflows", "hooks", "supply-chain", "pinning"]
+}

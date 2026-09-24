@@ -1,0 +1,10 @@
+# Constructed from the examples in GitHub's metadata syntax reference,
+# https://docs.github.com/en/actions/reference/workflows-and-actions/metadata-syntax (checked 2026-09-24)
+# "runs for JavaScript actions", with the documented value for Node.js v24.
+name: 'Hello World'
+description: 'Greet someone'
+runs:
+  using: 'node24'
+  pre: 'setup.js'
+  main: 'index.js'
+  post: 'cleanup.js'

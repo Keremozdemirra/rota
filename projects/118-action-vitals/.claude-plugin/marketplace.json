@@ -1,0 +1,15 @@
+{
+  "name": "action-vitals",
+  "description": "The action-vitals plugin: facts about the GitHub Actions a workflow uses, when Claude edits it.",
+  "owner": {
+    "name": "Kerem Özdemir",
+    "url": "https://github.com/Keremozdemirra"
+  },
+  "plugins": [
+    {
+      "name": "action-vitals",
+      "source": "./",
+      "description": "After Claude writes or edits a GitHub Actions workflow, tells Claude which uses: lines it touched are not pinned to a commit, archived, or on a runtime GitHub has retired, with the pinned line."
+    }
+  ]
+}

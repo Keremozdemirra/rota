@@ -1,0 +1,8 @@
+# Constructed from the examples in GitHub's metadata syntax reference,
+# https://docs.github.com/en/actions/reference/workflows-and-actions/metadata-syntax (checked 2026-09-24)
+# The same, with node20, which the reference documents as "Use node20 for Node.js v20".
+name: 'Hello World'
+description: 'Greet someone'
+runs:
+  using: node20   # unquoted, with a comment
+  main: 'main.js'

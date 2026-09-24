@@ -1,0 +1,19 @@
+# Constructed from the examples in GitHub's metadata syntax reference,
+# https://docs.github.com/en/actions/reference/workflows-and-actions/metadata-syntax (checked 2026-09-24)
+# "runs for composite actions": the example with runs.steps[*].uses, plus the documented reference forms.
+name: 'Composite'
+description: 'Steps that use other actions'
+runs:
+  using: "composite"
+  steps:
+    - name: My first step
+      uses: actions/hello_world@main
+      with:
+        first_name: Mona
+        middle_name: The
+        last_name: Octocat
+    - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
+    - uses: $/.github/actions/my-action
+    - uses: docker://alpine:3.8
+    - run: ${{ github.action_path }}/test/script.sh
+      shell: bash

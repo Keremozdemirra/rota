@@ -1,0 +1,41 @@
+{
+ "_provenance": "Constructed from the example response GitHub documents for Get a repository (https://docs.github.com/en/rest/repos/repos#get-a-repository, checked 2026-09-24): renamed to octocat/archived-example, archived set to true.",
+ "status": 200,
+ "headers": {
+  "Content-Type": "application/json; charset=utf-8"
+ },
+ "body": {
+  "id": 1296270,
+  "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+  "name": "archived-example",
+  "full_name": "octocat/archived-example",
+  "private": false,
+  "html_url": "https://github.com/octocat/archived-example",
+  "description": "This your first repo!",
+  "fork": false,
+  "url": "https://api.github.com/repos/octocat/archived-example",
+  "created_at": "2011-01-26T19:01:12Z",
+  "updated_at": "2011-01-26T19:14:43Z",
+  "pushed_at": "2026-09-01T10:00:00Z",
+  "stargazers_count": 80,
+  "watchers_count": 80,
+  "forks_count": 9,
+  "open_issues_count": 0,
+  "archived": true,
+  "disabled": false,
+  "visibility": "public",
+  "license": {
+   "key": "mit",
+   "name": "MIT License",
+   "spdx_id": "MIT",
+   "url": "https://api.github.com/licenses/mit",
+   "node_id": "MDc6TGljZW5zZW1pdA=="
+  },
+  "default_branch": "master",
+  "owner": {
+   "login": "octocat",
+   "id": 1,
+   "type": "User"
+  }
+ }
+}

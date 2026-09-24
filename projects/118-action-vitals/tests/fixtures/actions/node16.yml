@@ -1,0 +1,7 @@
+# Constructed from the examples in GitHub's metadata syntax reference,
+# https://docs.github.com/en/actions/reference/workflows-and-actions/metadata-syntax (checked 2026-09-24)
+# The same, with node16: no longer documented; the value named in GitHub's changelog of 2023-09-22.
+name: "Hello World"
+runs:
+  using: "node16"
+  main: "main.js"

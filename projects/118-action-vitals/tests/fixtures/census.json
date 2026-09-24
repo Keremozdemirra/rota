@@ -1,0 +1,9 @@
+{
+ "_provenance": "Constructed in the shape of the agent-vitals census index (data/servers.json, generated 2026-09-23). The real census holds agent-tooling repositories; it has none of the action repositories used in these tests, so these rows are made up for them.",
+ "generated_at": "2026-09-23T09:49:03+00:00",
+ "repositories": [
+  {"full_name": "octocat/census-archived", "pushed_at": "2025-02-01", "archived": true, "stars": 3, "license": "MIT", "license_state": "spdx", "status": "archived"},
+  {"full_name": "octocat/census-old", "pushed_at": "2025-01-10", "archived": false, "stars": 9, "license": null, "license_state": "none", "status": "abandoned"},
+  {"full_name": "octocat/census-fresh", "pushed_at": "2026-09-20", "archived": false, "stars": 40, "license": "Apache-2.0", "license_state": "spdx", "status": "active"}
+ ]
+}

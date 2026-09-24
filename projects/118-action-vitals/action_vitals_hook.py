@@ -11,6 +11,8 @@ additionalContext, with the pinned line where a tag could be resolved.
 Clean lines pass silently. Anything the hook cannot parse, reach or resolve
 passes silently too: it never blocks, never denies, and never edits a file.
 All lookups share a short time budget, because someone is waiting.
+ACTION_VITALS_OFFLINE=1 makes it send nothing; ACTION_VITALS_NO_RUNTIME=1 stops
+it downloading other repositories' action.yml files.
 
 Claude Code runs every matching handler as its own process, and a plugin's
 handler and the same command in a settings file both run. So the first process
@@ -78,9 +80,11 @@ def _main() -> int:
     root = av.repo_root(path.parent) or path.parent
     entry = {"path": path, "root": root, "kind": "workflow", "text": text, "error": "", "uses": uses, "issues": []}
     token = (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN") or "").strip() or None
-    net = av.Net(token=token, census=None, timeout=TIMEOUT, git_timeout=TIMEOUT, retry=False,
-                 deadline=time.monotonic() + BUDGET)
-    results = [x for x in av.check([entry], net, av._today()) if reportable(x)]
+    offline = os.environ.get("ACTION_VITALS_OFFLINE") == "1"
+    runtime = os.environ.get("ACTION_VITALS_NO_RUNTIME") != "1"
+    net = None if offline else av.Net(token=token, census=None, timeout=TIMEOUT, git_timeout=TIMEOUT, retry=False,
+                                      runtime=runtime, deadline=time.monotonic() + BUDGET)
+    results = [x for x in av.check([entry], net, av._today(), runtime) if reportable(x)]
     if not results:
         return 0
     print(json.dumps(respond(explain(results, fp))))
@@ -149,10 +153,12 @@ def explain(results: list[dict], file_path: str) -> str:
     name = Path(file_path).name
     parts = [f"action-vitals checked the uses: lines this edit wrote in {av.clean(name, 80)}."]
     for x in results[:MAX_LINES]:
-        facts = [av.pin_phrase(x, for_model=True), av.runtime_phrase(x), av.repo_phrase(x)]
-        facts += [n for n in x["notes"] if not n.startswith("git ls-remote")]
+        repo = (x["facts"].get("repository") or {})
+        facts = [av.pin_phrase(x, for_model=True), av.runtime_phrase(x) if x["runtime"] else "",
+                 "" if repo.get("error") else av.repo_phrase(x)]
+        facts += [n for n in x["notes"] if not n.startswith(("git ls-remote", "runtime:"))]
         line = f"Line {x['line']} `{av.clean(x['uses'], 160)}`: " + "; ".join(f for f in facts if f)
-        line += f". Flags: {', '.join(x['flags'])}."
+        line += f". Flags: {', '.join(f for f in x['flags'] if f not in av.INCOMPLETE)}."
         if x["suggestion"]:
             line += f" Pinned: `uses: {x['suggestion']} # {av.tag_text(x['tag'] or x['ref'], for_model=True)}`."
         parts.append(line)

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "action-vitals"
+version = "0.1.0"
+description = "Check the GitHub Actions your workflows use: pinned to a commit or not, the commit each tag points to now, retired Node runtimes, archived repositories."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["github-actions", "workflows", "supply-chain", "pinning", "claude-code", "hooks"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/action-vitals"
+Issues = "https://github.com/Keremozdemirra/action-vitals/issues"
+Census = "https://github.com/Keremozdemirra/agent-vitals"
+
+[project.scripts]
+action-vitals = "action_vitals:main"
+action-vitals-hook = "action_vitals_hook:main"
+
+[tool.setuptools]
+py-modules = ["action_vitals", "action_vitals_hook"]

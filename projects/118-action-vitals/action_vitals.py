@@ -226,7 +226,7 @@ def plain_end(s: str) -> int:
 
 
 def comment_of(tail: str) -> str:
-    m = re.match(r"[ \t]*#[ \t]?(.*)$", tail, re.S)
+    m = re.match(r"[ \t]+#[ \t]?(.*)$", tail, re.S)  # YAML needs a blank before a comment
     return m.group(1).strip() if m else ""
 
 
@@ -553,6 +553,8 @@ class _Flow:
         line, col = self.where(i)
         if s[i] == "*":
             m = ALIAS.match(s, i)
+            if m is None:
+                raise ValueError("alias without a name")
             if path is not None:
                 self.sc.out.aliases.append({"name": m.group(1), "path": path, "line": line, "where": "value"})
                 self.sc.add(path, None, line, None, None, alias=m.group(1), style="alias")
@@ -1213,6 +1215,7 @@ def check(files: list[dict], net: Net | None, today: dt.date, runtime: bool = Tr
         net.load_runtimes([x["_runtime_key"] for x in results if x.get("_runtime_key")])
     for x in results:
         finish_runtime(x, net, today, runtime and lookup and (net.runtime if net else False))
+        x["flags"] = list(dict.fromkeys(x["flags"]))
     return results
 
 
@@ -1296,7 +1299,11 @@ def assess(f: dict, u: dict, r: dict, host: str | None, own: str | None, net: Ne
         elif SHORT_SHA.fullmatch(ref):
             x["pin"] = "short SHA"
     if refs and "error" in refs:
-        flags.append("not visible" if refs.get("missing") else "ref not resolved")
+        # a SHA pin needs no resolving; only a repository nobody can see leaves it unchecked
+        if refs.get("missing"):
+            flags.append("not visible")
+        elif r["pin"] != "sha":
+            flags.append("ref not resolved")
         x["notes"].append(f"git ls-remote: {refs['error']}")
     elif net is None and r["pin"] not in ("sha", "missing", "invalid"):
         x["notes"].append("tag or branch not resolved (--offline)")
@@ -1376,6 +1383,8 @@ def finish_runtime(x: dict, net: Net | None, today: dt.date, looked: bool) -> No
     elif x["kind"] == "remote" and not local:
         if not looked:
             x["runtime_state"] = "not checked"
+            if net is not None:
+                x["_no_runtime"] = True
         return
     state, note = runtime_state(x["runtime"], today)
     x["runtime_state"], x["runtime_note"] = state, note
@@ -1492,7 +1501,7 @@ def runtime_phrase(x: dict) -> str:
     if x["kind"] == "remote" and (x["path"] or "").startswith(".github/workflows/"):
         return "reusable workflow"
     if x["runtime_state"] == "not checked":
-        return "runtime not checked"
+        return "runtime not checked" + (" (--no-runtime)" if x.get("_no_runtime") else " (--offline)")
     if not x["runtime"]:
         return "runtime unknown" if x["kind"] == "remote" or "runtime unknown" in x["flags"] else ""
     using = clean(x["runtime"], 40) if x["runtime"].lower() in KNOWN_RUNTIMES else remote_text(x["runtime"], 40)
@@ -1520,6 +1529,11 @@ def summary(results: list[dict], files: list[dict]) -> dict:
             "runtime removed": sum(1 for x in results if "runtime removed" in x["flags"]),
             "runtime deprecated": sum(1 for x in results if "runtime deprecated" in x["flags"]),
             "not fully checked": sum(1 for x in results if incomplete(x))}
+
+
+def summary_line(s: dict) -> str:
+    return " · ".join([f"{s['files']} file" + "s" * (s["files"] != 1), f"{s['uses']} uses line" + "s" * (s["uses"] != 1)]
+                      + [f"{v} {k}" for k, v in s.items() if k not in ("files", "uses")])
 
 
 def notes(results: list[dict], net: Net | None, runtime: bool) -> list[str]:
@@ -1577,8 +1591,7 @@ def render_text(results: list[dict], files: list[dict], errors: list[str], net: 
         for x in pins:
             lines.append(f"  {x['file']}:{x['line']}  uses: {x['suggestion']} # {tag_text(x['tag'] or x['ref'])}")
         lines.append("  (--diff shows the change; --write makes it.)")
-    s = summary(results, files)
-    lines += ["", " · ".join(f"{v} {k}" for k, v in s.items())]
+    lines += ["", summary_line(summary(results, files))]
     lines += notes(results, net, runtime) + errors
     return "\n".join(lines) + "\n"
 
@@ -1601,8 +1614,7 @@ def render_markdown(results: list[dict], files: list[dict], errors: list[str], n
         out += ["", "Pinned lines (commit each tag points to now):", "", "```yaml"]
         out += [f"# {x['file']}:{x['line']}\nuses: {x['suggestion']} # {tag_text(x['tag'] or x['ref'])}" for x in pins]
         out.append("```")
-    s = summary(results, files)
-    out += ["", " · ".join(f"{v} {k}" for k, v in s.items()), ""]
+    out += ["", summary_line(summary(results, files)), ""]
     out += [f"- {esc(n)}" for n in notes(results, net, runtime) + errors]
     out += ["", "_Checked with [action-vitals](https://github.com/Keremozdemirra/action-vitals). Refs, commits, "
                 "dates and licence fields from git and public metadata, not a verdict on anyone's code._"]
@@ -1611,7 +1623,7 @@ def render_markdown(results: list[dict], files: list[dict], errors: list[str], n
 
 def to_json(results: list[dict], files: list[dict], errors: list[str], net: Net | None, today: dt.date,
             runtime: bool) -> dict:
-    rows = json.loads(json.dumps(results))
+    rows = json.loads(json.dumps([{k: v for k, v in x.items() if not k.startswith("_")} for x in results]))
     for x in rows:
         # the skill hands this to a model: names another party chose are marked as data
         for k in ("tag", "highest_tag"):
@@ -1657,6 +1669,8 @@ def main(argv: list[str] | None = None, *, net: Net | None = None) -> int:
                     help="census index used when the GitHub API cannot answer: https://, file:// or a path")
     ap.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
     a = ap.parse_args(argv)
+    if a.write and (a.json or a.markdown):
+        ap.error("--write prints the diff it makes; it cannot be combined with --json or --markdown")
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(errors="replace")
 

@@ -1,0 +1,48 @@
+{
+  "description": "action-vitals: after Claude writes or edits a GitHub Actions workflow, facts about the uses: lines it touched.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Write(//**/.github/workflows/*.yml)",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/action_vitals_hook.py\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "if": "Write(//**/.github/workflows/*.yaml)",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/action_vitals_hook.py\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "if": "Edit(//**/.github/workflows/*.yml)",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/action_vitals_hook.py\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "if": "Edit(//**/.github/workflows/*.yaml)",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/action_vitals_hook.py\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "if": "MultiEdit(//**/.github/workflows/*.yml)",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/action_vitals_hook.py\"",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "if": "MultiEdit(//**/.github/workflows/*.yaml)",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/action_vitals_hook.py\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

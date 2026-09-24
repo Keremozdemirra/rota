@@ -1,0 +1,4 @@
+# Constructed from the examples in GitHub's metadata syntax reference,
+# https://docs.github.com/en/actions/reference/workflows-and-actions/metadata-syntax (checked 2026-09-24)
+# The same, with node12: no longer documented; the value named in GitHub's changelog of 2022-09-22.
+runs: {using: node12, main: main.js}
