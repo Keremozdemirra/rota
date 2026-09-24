@@ -955,7 +955,9 @@ def _satisfies(v: tuple, comps: list) -> bool:
 
 
 def max_satisfying(versions: dict, sets: list, latest: str | None = None) -> str | None:
-    """The version npm would pick: `latest` if it matches, else the highest match that is not deprecated."""
+    """The version npm would pick for a range, as npm-pick-manifest 10 does: the `latest` tag if it matches and is
+    not deprecated, else the highest match that is not deprecated, else the highest match. (npm also weighs the
+    `engines` field against the local Node version, which a check made elsewhere cannot know.)"""
     matches = []
     for text, man in versions.items():
         v = semver(text)
@@ -963,7 +965,7 @@ def max_satisfying(versions: dict, sets: list, latest: str | None = None) -> str
             matches.append((_key(v), text, bool(isinstance(man, dict) and man.get("deprecated"))))
     if not matches:
         return None
-    if latest in {t for _, t, _ in matches}:
+    if any(t == latest and not dep for _, t, dep in matches):
         return latest
     live = [x for x in matches if not x[2]]
     return max(live or matches, key=lambda x: x[0])[1]
@@ -1398,9 +1400,8 @@ def check_npm(t: dict, net: Net, today: dt.date) -> dict:
 
 
 def _resolve_npm(versions: dict, tags: dict, spec: str | None, latest: str | None):
-    if not spec:
-        best = max((v for v in versions if semver(v)), key=lambda v: _key(semver(v)), default=None)
-        return latest or best, None
+    if not spec:  # a bare name resolves like the range `*`
+        return max_satisfying(versions, parse_range("*"), latest) or latest, None
     shown = clean(spec, 40)
     if spec in tags:
         v = tags[spec]

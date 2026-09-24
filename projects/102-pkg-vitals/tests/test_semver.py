@@ -18,12 +18,24 @@ class AgainstNodeSemver(Case):
                 self.assertEqual(pv.max_satisfying(versions, sets), expected)
 
 
+class AgainstNpmPickManifest(Case):
+    def test_the_version_npm_would_install(self):
+        ref = load("npm-pick-manifest.json")
+        doc = ref["packument"]
+        tags = doc["dist-tags"]
+        for spec, expected in ref["picked"].items():
+            with self.subTest(spec=spec):
+                version, problem = pv._resolve_npm(doc["versions"], tags, spec or None, tags["latest"])
+                self.assertEqual((version, problem), (expected, None))
+
+
 class Picking(Case):
     VERSIONS = {"1.0.0": {}, "1.1.0": {}, "1.2.0": {"deprecated": "broken"}, "2.0.0": {}}
 
     def test_latest_tag_wins_when_it_matches(self):
-        # npm prefers the version tagged latest when the range allows it, even over a higher match
+        # npm prefers the version tagged latest when the range allows it and it is not deprecated
         self.assertEqual(pv.max_satisfying(self.VERSIONS, pv.parse_range("*"), latest="1.1.0"), "1.1.0")
+        self.assertEqual(pv.max_satisfying(self.VERSIONS, pv.parse_range("^1"), latest="1.2.0"), "1.1.0")
 
     def test_deprecated_versions_are_avoided_when_possible(self):
         self.assertEqual(pv.max_satisfying(self.VERSIONS, pv.parse_range("^1.0.0")), "1.1.0")
