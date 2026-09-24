@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tieout"
+version = "0.1.0"
+description = "Tie every number in a report or deck (.docx, .pptx, .md, .txt) back to the source cells in .xlsx or .csv, allowing for rounding, percentages and scale."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["tie-out", "tick-and-tie", "audit", "consulting", "fact-check", "excel", "powerpoint", "word", "mcp", "claude-code"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Programming Language :: Python :: 3",
+  "Topic :: Office/Business :: Financial :: Spreadsheet",
+  "Topic :: Text Processing",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/tieout"
+Issues = "https://github.com/Keremozdemirra/tieout/issues"
+
+[project.scripts]
+tieout = "tieout:main"
+tieout-mcp = "tieout_mcp:main"
+
+[tool.setuptools]
+py-modules = ["tieout", "tieout_mcp"]

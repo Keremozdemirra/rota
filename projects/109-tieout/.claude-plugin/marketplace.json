@@ -1,0 +1,15 @@
+{
+  "name": "tieout",
+  "description": "The tieout plugin: a skill that ties every number in a report or deck back to the source workbook.",
+  "owner": {
+    "name": "Kerem Özdemir",
+    "url": "https://github.com/Keremozdemirra"
+  },
+  "plugins": [
+    {
+      "name": "tieout",
+      "source": "./",
+      "description": "Tie out a report or deck: find the source cell behind every number in a .docx, .pptx, .md or .txt file, allowing for rounding, percentages and scale, and list every number that does not tie."
+    }
+  ]
+}

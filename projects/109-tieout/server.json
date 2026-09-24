@@ -1,0 +1,11 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Keremozdemirra/tieout",
+  "title": "tieout",
+  "description": "Tie every number in a report or deck back to the source cells in .xlsx or .csv.",
+  "repository": {"url": "https://github.com/Keremozdemirra/tieout", "source": "github"},
+  "version": "0.1.0",
+  "packages": [{"registryType": "pypi", "identifier": "tieout", "version": "0.1.0",
+                "runtimeHint": "uvx", "transport": {"type": "stdio"},
+                "packageArguments": [{"type": "positional", "value": "mcp"}]}]
+}

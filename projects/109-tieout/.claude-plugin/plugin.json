@@ -1,0 +1,11 @@
+{
+  "name": "tieout",
+  "displayName": "tieout",
+  "version": "0.1.0",
+  "description": "Tie out a report or deck: find the source cell behind every number in a .docx, .pptx, .md or .txt file, allowing for rounding, percentages and scale, and list every number that does not tie.",
+  "author": { "name": "Kerem Özdemir", "url": "https://keremozdemir.de" },
+  "homepage": "https://github.com/Keremozdemirra/tieout",
+  "repository": "https://github.com/Keremozdemirra/tieout",
+  "license": "MIT",
+  "keywords": ["tie-out", "audit", "consulting", "excel", "powerpoint", "word", "fact-check"]
+}

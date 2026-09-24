@@ -1,0 +1,5 @@
+include README.md LICENSE server.json
+recursive-include tests *.py *.json
+recursive-include examples *.py *.xlsx *.csv *.pptx *.docx
+recursive-include .claude-plugin *.json
+recursive-include skills *.md
