@@ -43,11 +43,13 @@ _FY_ITEM = {
 TOOLS = [
     {"name": "csrd_scope",
      "description": (
-         "Decides whether an undertaking is in scope of EU CSRD sustainability reporting and from which financial year, "
-         "applying Directive 2013/34/EU (Arts. 1, 2, 3, 19a, 29a, 40a) as amended by Directive (EU) 2026/470 and the "
+         "Applies the EU-directive scope rules of CSRD sustainability reporting to the facts given and reports, per "
+         "financial year, whether the rules reach the undertaking: Directive 2013/34/EU (Arts. 1, 2, 3, 19a, 29a, 40a) as "
+         "amended by Directive (EU) 2026/470 and the "
          "application dates of Art. 5(2) Directive (EU) 2022/2464 as amended by Directives (EU) 2025/794 and 2026/470 "
          "(consolidated versions of 18 March 2026). Amounts in EUR only (never converted); employees are the average "
-         "number during the financial year. Returns in_scope (yes/no/depends), first_reporting_financial_year, one result "
+         "number during the financial year. Returns in_scope (yes/no/depends for the latest financial year assessed), "
+         "first_reporting_financial_year (with where the report is published), one result "
          "per financial year from FY2024, the rules applied with article citations and quoted provisions, "
          "questions_for_counsel where national law or legal judgement decides, facts_needed, notified national measures "
          "for member_state, and legal_basis_version (CELEX, consolidated version dates, date checked). EU-directive level "
@@ -71,6 +73,8 @@ TOOLS = [
              "parent_undertaking": {"type": "boolean", "description": "Parent of a group; give group_* figures."},
              "financial_holding_undertaking": {"type": "boolean"},
              "covered_by_parent_consolidated_sustainability_report": {"type": "boolean"},
+             "member_state_exemption_2025_2026": {"type": ["boolean", "null"],
+                                                  "description": "The Member State used the option of Art. 5(2) fifth subparagraph Directive (EU) 2022/2464 for this undertaking (FY2025-FY2026); null if unknown."},
              "financial_year_starts_on": {"type": "string", "pattern": "^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$", "description": "MM-DD, default 01-01."},
              "assume_latest_figures_continue": {"type": "boolean", "description": "Default true."},
          },
@@ -164,7 +168,7 @@ def main() -> int:
             continue
         try:
             req = json.loads(line)
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, RecursionError):
             reply(None, error={"code": -32700, "message": "parse error"})
             continue
         handle(req)

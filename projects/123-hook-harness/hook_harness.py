@@ -584,6 +584,7 @@ def rule_fires(rule_text, tool: str, tool_input: dict, ctx: Context) -> Verdict:
 _ASSIGN = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\[[^\]]*\])?\+?=")
 _REDIR = re.compile(r"\d*(?:&>>|&>|>>|>&|>\||<>|<<<|<<-|<<|<&|>|<)")
 _VAR = re.compile(r"[A-Za-z_][A-Za-z0-9_]*|[0-9]|[?$!#@*_-]")
+_ONE_VAR = re.compile(r"\$(?:[A-Za-z_][A-Za-z0-9_]*|[0-9]|[?$!#@*_-])")
 _PREFIX_WORDS = {"!", "if", "then", "elif", "else", "do", "while", "until"}
 _END_WORDS = {"fi", "done", "esac", "}"}
 _HEADER_WORDS = {"for", "select"}
@@ -745,7 +746,7 @@ class _BashParser:
             m = _REDIR.match(self.s, self.i)
             if m:
                 self.i = m.end()
-                if m.group(0).endswith(("<<", "<<-")):
+                if m.group(0).lstrip("0123456789") in ("<<", "<<-"):
                     self.every("a here-document")
                 self.blanks()
                 if self.i < self.n and self.s[self.i] not in "\n;|&)":
@@ -791,6 +792,8 @@ class _BashParser:
             w.parts.append(c)
             self.i += 1
         w.raw = self.s[start:self.i]
+        if w.bare and not _ONE_VAR.fullmatch(w.raw):
+            self.every(f"a variable joined to other text in one word ({w.raw})")
         return w
 
     def dquote(self, w: _Word):
@@ -874,6 +877,8 @@ class _BashParser:
             return
         m = _VAR.match(s, i + 1)
         if not m:
+            if not quoted:
+                self.every("a $ that starts no expansion")
             w.parts.append("$")
             self.i += 1
             return
@@ -936,6 +941,9 @@ class _BashParser:
             return
         if len(rest) == 1 and rest[0].raw in _END_WORDS:
             return
+        for w in targets:
+            if w.bare:  # a redirect to $OUT ran every handler (observed)
+                self.every(f"a redirection to {w.raw}")
         if not rest:
             for w in targets:
                 if w.dynamic:
@@ -952,7 +960,12 @@ class _BashParser:
             self.every("a variable assignment in front of a command that expands variables")
         for w in dyn:
             self.note(w)
-        texts = [" ".join(" ".join(w.value for w in rest).split())]
+        values = [w.value for w in rest]
+        if values[0] == "[":  # a [ ... ] test was matched as [[ ... ]] (observed)
+            values[0] = "[["
+            if values[-1] == "]":
+                values[-1] = "]]"
+        texts = [" ".join(" ".join(values).split())]
         if name.value == "xargs" and len(rest) > 1 and not rest[1].value.startswith("-"):
             # bare xargs is stripped, and the xargs form is checked too (observed)
             texts.append(" ".join(" ".join(w.value for w in rest[1:]).split()))
@@ -1233,7 +1246,7 @@ def path_rule(spec: str, value: str, ctx: Context) -> Verdict:
     if not path.startswith("/"):
         path = posixpath.normpath(posixpath.join(posix_path(ctx.cwd), path))
     if s.startswith("//"):
-        base, pat, anchored, how = "/", s[2:], True, "the filesystem root"
+        base, pat, anchored, how = "/", s[2:].lstrip("/"), True, "the filesystem root"
     elif s.startswith("~/"):
         base, pat, anchored, how = posix_path(ctx.home), s[2:], True, "the home directory"
     elif s.startswith("/"):
@@ -2136,7 +2149,27 @@ def lint(src: Source) -> list[Finding]:
         hs = [h for h in all_handlers if h.event == event]
         _lint_coverage(src, f, event, hs)
         _lint_fanout(src, f, event, hs)
-    return f
+    return _collapse(f)
+
+
+def _collapse(findings: list) -> list:
+    """One line for a note that repeats word for word on several handlers."""
+    out, index = [], {}
+    for x in findings:
+        k = (x.rule, x.message) if x.severity == "note" else None
+        if k and k in index:
+            index[k][1] += 1
+            continue
+        entry = [x, 1]
+        if k:
+            index[k] = entry
+        out.append(entry)
+    result = []
+    for x, n in out:
+        if n > 1:
+            x = Finding(x.rule, x.severity, f"{x.message} ({n} handlers)", x.path, x.line, x.col, x.source)
+        result.append(x)
+    return result
 
 
 def _lint_matcher(src, f, event, group, gpath):
@@ -2343,7 +2376,8 @@ def _lint_command(src: Source, f: list, h: Handler):
             f.append(src.finding("windows-interpreter", "note", "the command starts with python3. On Windows, "
                                  "Python's install manager provides python, py and pymanager; its python3 'is not "
                                  "meant to be widely used or recommended' (docs.python.org, Using Python on "
-                                 f"Windows, checked {DOCS_CHECKED}). Say in the README what Windows users need",
+                                 f"Windows, checked {DOCS_CHECKED}). Where it is missing, the shell exits 127 and "
+                                 "Claude Code reports a non-blocking hook error on every call (hooks docs)",
                                  cpath, PYWIN_DOC))
         elif spec.get("shell") != "powershell" and prog.endswith(".sh"):
             f.append(src.finding("windows-interpreter", "note", "the command runs a .sh script; on Windows Claude Code "
@@ -2407,11 +2441,16 @@ def _lint_fanout(src: Source, f: list, event: str, hs: list):
             if tool in COMMAND_RULE_TOOLS or tool == "PowerShell":
                 specific = [h for h in same if "if" not in h.spec or not names_only((_tool_rules(h) or Rule("")).spec
                                                                                      or "*")]
+                if tool == "PowerShell":
+                    more = (f"A command with a $variable or $(...) is assumed to start {len(specific)} of them at once "
+                            f"(PowerShell matching is not cross-checked)")
+                else:
+                    more = (f"A single Bash command with a $(...) or $VAR argument starts {len(specific)} of them at once; "
+                            f"a compound command with one, or a command Claude Code cannot analyse (a here-document, "
+                            f"${{VAR}}, \"$VAR\"), starts all {len(same)}")
                 f.append(src.finding("fan-out", "warning", f"{len(same)} {event} handlers run {shown!r} for {tool} calls, "
-                                     f"one process per matching handler. A {tool} command with $(...) or a $VAR starts "
-                                     f"{len(specific)} of them at once, and one Claude Code cannot analyse (a "
-                                     f"here-document, ${{VAR}}, a quoted \"$VAR\") starts all {len(same)}. One handler "
-                                     "with the filtering inside the script avoids this", same[0].path, HOOKS_DOC))
+                                     f"one process per matching handler. {more}. One handler that filters inside the "
+                                     "script starts one", same[0].path, HOOKS_DOC))
             elif tool in PATH_RULE_FIELDS:
                 rules = [(h, (_tool_rules(h) or Rule("")).spec) for h in same]
                 if any(spec is None for _h, spec in rules):
@@ -2437,6 +2476,15 @@ def _lint_fanout(src: Source, f: list, event: str, hs: list):
             else:
                 f.append(src.finding("fan-out", "warning", f"{len(same)} {event} handlers run {shown!r} for {tool} calls",
                                      same[0].path, HOOKS_DOC))
+    for tool in ("Bash", "PowerShell"):
+        wide = [h for h in hs if h.type == "command" and "if" in h.spec and (_tool_rules(h) or Rule("")).tool == tool
+                and (_tool_rules(h).spec or "*").strip() not in ("*", "") and not names_only(_tool_rules(h).spec)]
+        if wide and len(wide) <= 3:
+            f.append(src.finding("if-wide", "note", f"{', '.join(repr(h.spec['if']) for h in wide)} names more than a "
+                                 f"command, so Claude Code also runs {'this handler' if len(wide) == 1 else 'these handlers'}"
+                                 f" for any {tool} command with a $(...) or $VAR argument, and for every command it "
+                                 "cannot analyse; the script sees those commands too", wide[0].path + ("if",),
+                                 HOOKS_DOC + " (Bash matching table)"))
     keys = {}
     for h in hs:
         if h.key() in keys:
@@ -2519,9 +2567,11 @@ def run_report(src: Source, suite: Suite, results: list, opts: Options) -> dict:
                         "errors": counts["error"]}}
 
 
-def _case_line(c: dict) -> str:
+def _case_line(c: dict, dry: bool = False) -> str:
     tool = f" {c['tool_name']}" if c["tool_name"] else ""
     procs = f"{c['processes']} process{'es' if c['processes'] != 1 else ''}"
+    if dry:
+        return f"{c['status'].upper():5} {c['name']}  ({c['event']}{tool}, {procs}; not run)"
     return f"{c['status'].upper():5} {c['name']}  ({c['event']}{tool}, {procs}, decision {c['decision']}, " \
            f"{c['duration']:.2f} s)"
 
@@ -2529,7 +2579,7 @@ def _case_line(c: dict) -> str:
 def render_run_text(rep: dict, verbose: bool = False) -> str:
     out = [f"{rep['tool']} run {rep['hooks_file']} {rep['cases_file']}" + (" (dry run)" if rep["dry_run"] else "")]
     for c in rep["cases"]:
-        out.append(_case_line(c))
+        out.append(_case_line(c, rep["dry_run"]))
         detail = verbose or c["status"] != "pass"
         for ch in c["checks"]:
             if not ch["ok"] or verbose:
@@ -2562,8 +2612,8 @@ def render_run_markdown(rep: dict) -> str:
            "| Case | Status | Event | Processes | Decision | Seconds |", "|---|---|---|---:|---|---:|"]
     for c in rep["cases"]:
         tool = f" {c['tool_name']}" if c["tool_name"] else ""
-        out.append(f"| {_md(c['name'])} | {c['status']} | {c['event']}{tool} | {c['processes']} | {c['decision']} | "
-                   f"{c['duration']:.2f} |")
+        decision, secs = ("not run", "") if rep["dry_run"] else (c["decision"], f"{c['duration']:.2f}")
+        out.append(f"| {_md(c['name'])} | {c['status']} | {c['event']}{tool} | {c['processes']} | {decision} | {secs} |")
     for c in rep["cases"]:
         if c["status"] == "pass":
             continue

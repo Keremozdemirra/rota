@@ -262,7 +262,8 @@ class Context:
 
     def __init__(self, home, env=None, system: str | None = None, project=None, probe: bool = False,
                  now: dt.datetime | None = None):
-        self.home = home if isinstance(home, PurePath) else Path(home)
+        # normalised, so that a HOME like /home/me/work/.. still prints paths as ~/...
+        self.home = Path(os.path.abspath(home)) if isinstance(home, (str, Path)) else home
         self.env = dict(os.environ if env is None else env)
         self.system = system or platform.system()
         self.project = project
@@ -343,6 +344,15 @@ class Section:
         return {"id": self.id, "title": self.title, "paths": self.paths,
                 "findings": sorted(self.findings, key=lambda f: order[f["severity"]]),
                 "notes": self.notes, "errors": self.errors, "not_visible": self.store_note}
+
+
+def program_name(text) -> str:
+    """The base name of the program a config names, or "a program" when it is anything but a plain name:
+    a command line or an assignment there may carry a secret."""
+    m = re.match(r"\s*(?:\"([^\"]*)\"|'([^']*)'|(\S+))", str(text or ""))
+    first = next((g for g in m.groups() if g), "") if m else ""
+    base = re.split(r"[\\/]", first)[-1]
+    return base if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._+-]{0,63}", base) else "a program"
 
 
 def _a(label: str) -> str:
@@ -505,9 +515,7 @@ def scan_aws(ctx: Context) -> Section:
                 via = s.get("source_profile") or s.get("credential_source") or ""
                 p["auth"].append(("role", f"{_role(s['role_arn'])}" + (f", via {safe(via, 64)}" if via else ""), here))
             if s.get("credential_process"):
-                m = re.match(r"\s*(?:\"([^\"]*)\"|'([^']*)'|(\S+))", s["credential_process"])
-                prog = re.split(r"[\\/]", next((g for g in m.groups() if g), ""))[-1] if m else ""
-                p["auth"].append(("process", safe(prog, 40), here))
+                p["auth"].append(("process", program_name(s["credential_process"]), here))
             if s.get("web_identity_token_file"):
                 p["auth"].append(("web-identity", "", here))
     active = ctx.get("AWS_PROFILE") or ctx.get("AWS_DEFAULT_PROFILE")
@@ -954,14 +962,13 @@ def kube_user_auth(user) -> tuple[str, str]:
     if ap:
         cfg = ap.get("config") if isinstance(ap.get("config"), dict) else {}
         stored = [k for k in ("access-token", "refresh-token", "id-token", "client-secret") if cfg.get(k)]
-        name = safe(ap.get("name") or "?", 30)
+        name = program_name(ap.get("name")).replace("a program", "?")
         found.append(("high" if stored else "medium",
                       f"auth-provider {name}" + (f" with stored {', '.join(stored)}" if stored else "")))
     ex = u.get("exec") if isinstance(u.get("exec"), dict) else None
     if ex:
-        cmd = str(ex.get("command") or "")
-        base = re.split(r"[\\/]", cmd.strip())[-1] if cmd.strip() else "?"
-        found.append(("medium", f"exec plugin {safe(base, 40)} (credentials from that program at run time)"))
+        found.append(("medium", f"exec plugin {program_name(ex.get('command'))} (credentials from that program at "
+                                "run time)"))
     if not found:
         return "info", "no credentials"
     sev = "high" if any(s == "high" for s, _ in found) else "medium"
@@ -1041,8 +1048,9 @@ def _registry(key: str) -> str:
 
 
 def _helper(name) -> str:
-    n = str(name)
-    return f"docker-credential-{safe(n, 30)}" + (f" ({DOCKER_STORES[n]})" if n in DOCKER_STORES else "")
+    n = program_name(name)
+    return (f"docker-credential-{n}" if n != "a program" else "a credential helper") + \
+        (f" ({DOCKER_STORES[n]})" if n in DOCKER_STORES else "")
 
 
 def scan_docker(ctx: Context) -> Section:
@@ -1248,7 +1256,7 @@ def scan_netrc(ctx: Context) -> Section:
                 sec.add("high", host, "login and password stored" if login else "password stored",
                         where=ctx.show(p), reach=f"netrc: a password for {host} in {ctx.show(p)}")
                 if host in ("github.com", "api.github.com"):
-                    ctx.add_token(pw, ctx.show(p))
+                    ctx.add_token(pw, ctx.show(p), strict_github=False)
             else:
                 sec.add("info", host, "no password" + (", login only" if login else ""), where=ctx.show(p))
         if not entries:
@@ -1281,9 +1289,8 @@ def git_helpers(text: str) -> list:
         if in_cred and sep and k.strip().lower() == "helper":
             v = v.strip().strip("\"")
             if v:
-                first = v.split()[0]
-                out.append(re.split(r"[\\/]", first)[-1].replace("git-credential-", "") if not first.startswith("!")
-                           else "a shell command")
+                out.append("a shell command" if v.startswith("!") else
+                           program_name(v).replace("git-credential-", "", 1))
     return out
 
 
@@ -1577,7 +1584,7 @@ def scan_terraform(ctx: Context) -> Section:
                         reach=f"Terraform: an API token for {h} in {ctx.show(p)}")
         m = re.search(r'(?m)^\s*credentials_helper\s+"([^"]+)"', text)
         if m:
-            sec.add("medium", "credentials_helper", f"tokens from terraform-credentials-{safe(m.group(1), 40)}",
+            sec.add("medium", "credentials_helper", f"tokens from terraform-credentials-{program_name(m.group(1))}",
                     where=ctx.show(p))
     return sec
 
@@ -1674,6 +1681,8 @@ def scan_project(ctx: Context) -> Section:
         if seen > MAX_WALK:
             sec.notes.append(f"Stopped after {MAX_WALK} entries; files further down were not checked.")
             break
+    if not found:
+        sec.notes.append("No .env or secret-named files.")
     rels = [PurePath(os.path.relpath(p, root)).as_posix() for p in found]
     status, why = git_status(root, rels)
     if found and why:
@@ -2074,6 +2083,10 @@ def probe_one(token: str, sources: list, timeout: float) -> dict:
 def probe_github(ctx: Context, timeout: float = 10.0) -> dict:
     tokens = dict(ctx.github_tokens)
     out = {"endpoint": GITHUB_USER_API, "results": []}
+    if urllib.request.getproxies().get("https"):
+        # seen in a hosted sandbox: its proxy replaced the Authorization header with the session's own credential
+        out["note"] = ("Sent through the HTTPS proxy set in the environment. A proxy that adds its own GitHub "
+                       "credentials changes what GitHub answers, and the scopes shown would then be the proxy's.")
     if not tokens:
         print("credential-reach --probe: no GitHub token for github.com found; nothing sent.", file=sys.stderr)
         return out
@@ -2121,6 +2134,10 @@ SCANNERS = (scan_env, scan_aws, scan_gcloud, scan_azure, scan_kube, scan_docker,
             scan_git, scan_gh, scan_ssh, scan_terraform, scan_project)
 
 
+def scan_transcript_section(ctx: Context) -> Section:
+    return scan_transcripts(ctx)[0]
+
+
 def _guarded(scan, ctx: Context) -> Section:
     """One scanner's section; a bug in it becomes a reported error, never a traceback or a lost report."""
     try:
@@ -2134,7 +2151,7 @@ def _guarded(scan, ctx: Context) -> Section:
 def audit(ctx: Context, transcripts: bool = True) -> dict:
     sections = [_guarded(scan, ctx) for scan in SCANNERS]
     if transcripts:
-        sections.append(_guarded(lambda c: scan_transcripts(c)[0], ctx))
+        sections.append(_guarded(scan_transcript_section, ctx))
     probe = probe_github(ctx) if ctx.probe else None
     blast = []
     order = {s: i for i, s in enumerate(SEVERITIES)}
@@ -2210,10 +2227,12 @@ def render_text(rep: dict) -> str:
         out += ["", f"GitHub probe  (GET {rep['probe']['endpoint']}, one request per token)"]
         if not rep["probe"]["results"]:
             out.append("  no GitHub token for github.com was found; nothing was sent")
+        if rep["probe"].get("note") and rep["probe"]["results"]:
+            out.append(f"  note: {rep['probe']['note']}")
         for r in rep["probe"]["results"]:
             out.append(f"  {TAG[r['severity']]}  {', '.join(r['sources'])}: {probe_detail(r)}")
     if rep["not_found"]:
-        out += ["", "Not found: " + "; ".join(f"{s['title']} ({', '.join(s['paths'])})" if s["paths"]
+        out += ["", "Nothing found in: " + "; ".join(f"{s['title']} ({', '.join(s['paths'])})" if s["paths"]
                                               else s["title"] for s in rep["not_found"])]
     t = rep["totals"]
     out += ["", f"{t['high']} high · {t['medium']} medium · {t['info']} info"
@@ -2248,8 +2267,10 @@ def render_markdown(rep: dict) -> str:
         out += ["", "### GitHub probe", "", f"`GET {rep['probe']['endpoint']}`, one request per token.", ""]
         out += [f"- **{r['severity']}** {_md(', '.join(r['sources']))}: {_md(probe_detail(r))}"
                 for r in rep["probe"]["results"]] or ["- No GitHub token for github.com was found; nothing was sent."]
+        if rep["probe"].get("note") and rep["probe"]["results"]:
+            out.append(f"- Note: {_md(rep['probe']['note'])}")
     if rep["not_found"]:
-        out += ["", "Not found: " + "; ".join(_md(s["title"]) for s in rep["not_found"])]
+        out += ["", "Nothing found in: " + "; ".join(_md(s["title"]) for s in rep["not_found"])]
     t = rep["totals"]
     out += ["", f"{t['high']} high · {t['medium']} medium · {t['info']} info", "", f"_{_md(FOOTER)}_",
             "", "_Made with [credential-reach](https://github.com/Keremozdemirra/credential-reach)._"]

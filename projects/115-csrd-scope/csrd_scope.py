@@ -55,9 +55,10 @@ MAX_AMOUNT, MAX_EMPLOYEES, MAX_ENTITIES, MAX_NAME = 1e15, 10_000_000, 200, 200
 
 YES, NO, DEPENDS, NA = "yes", "no", "depends", "not applicable"
 
-ATTRIBUTION = ("Source: EUR-Lex / CELLAR (Publications Office of the European Union), © European Union, "
-               "reused under CC BY 4.0 (https://commission.europa.eu/legal-notice_en); legal texts {celex}; "
-               "retrieved {checked}. Derived: csrd-scope's encoding of the provisions cited, not the text itself.")
+ATTRIBUTION = ("Source: EUR-Lex / CELLAR (Publications Office of the European Union), © European Union. Reuse: Commission "
+               "Decision 2011/833/EU, Art. 4; Commission content is licensed CC BY 4.0 "
+               "(https://commission.europa.eu/legal-notice_en). Legal texts {celex}; retrieved {checked}. Derived: "
+               "csrd-scope's encoding of the provisions cited, not the text itself.")
 NOT_COVERED = (
     "Not legal advice. The answer is at EU-directive level; the obligation applies through the national law of "
     "the Member State concerned. Not covered: the content of the reports (European Sustainability Reporting "
@@ -67,21 +68,24 @@ NOT_COVERED = (
 
 QUESTIONS = {
     "national-law": (
-        "Which national provisions transpose Directive (EU) 2026/470 (deadline 19 March 2027) and Directive (EU) "
-        "2025/794 (deadline 31 December 2025) for this undertaking, and from which financial year do they apply?",
+        "Which national provisions transpose Articles 1 to 3 of Directive (EU) 2026/470 (deadline 19 March 2027) and "
+        "Directive (EU) 2025/794 (deadline 31 December 2025) for this undertaking, and from which financial year do they apply?",
         ["OMNI-5-1", "STC-3"]),
     "two-dates": (
-        "Does national law require the thresholds to be exceeded (or no longer exceeded) on two consecutive balance "
-        "sheet dates before the obligation starts (or ends)? Art. 3(10) sets that rule only for the size categories "
-        "of Art. 3(1)-(7); the Commission's Notice says timing follows the national measures.",
+        "Does national law count a threshold or size category as exceeded (or no longer exceeded) only after two "
+        "consecutive balance sheet dates? Art. 3(10) sets that rule for the size categories of Art. 3(1)-(7) as regards "
+        "'the derogations provided for in this Directive'; the text does not settle whether it governs these scope "
+        "tests, and the Commission's Notice says timing follows the national measures.",
         ["AD-3-10", "NOTICE-FAQ1", "NOTICE-FAQ2"]),
     "employees": (
         "Is the average number of employees computed as national law requires (full-time equivalents or headcount, "
         "part-time and temporary staff)? Union law does not regulate the calculation.",
         ["NOTICE-FAQ3", "OMNI-rec-7"]),
     "derogation": (
-        "Has the Member State used the option to exempt undertakings or issuers that do not exceed EUR 450 000 000 "
-        "net turnover or 1 000 employees from reporting for the financial years starting in 2025 and 2026?",
+        "Has the Member State used the option to exempt undertakings or issuers from reporting for the financial years "
+        "starting in 2025 and 2026, and does it reach this one? The text ('do not exceed a net turnover of EUR 450 000 000 "
+        "or an average number of 1 000 employees') can be read as 'below at least one threshold' (recital 31: those "
+        "outside the new scope) or as 'below both'.",
         ["CSRD-5-2-derogation", "OMNI-rec-31"]),
     "art40": (
         "Art. 40 treats a public-interest entity as a large undertaking regardless of its figures, while Art. 5(2)(a) "
@@ -154,9 +158,15 @@ QUESTIONS = {
         "separately with eu_undertaking=true.",
         ["NOTICE-FAQ48", "AD-48i-1"]),
     "designated-pie": (
-        "Has the Member State designated undertakings of this kind as public-interest entities (Art. 2(1)(d))? If so, "
-        "the result for the financial years starting in 2024 to 2026 changes.",
+        "Has the Member State designated this undertaking, or undertakings of its kind, as public-interest entities "
+        "(Art. 2(1)(d))? The result for the financial years starting in 2024 to 2026 turns on it (input designated_pie).",
         ["AD-2-1"]),
+    "transposition-2027": (
+        "Articles 1 to 3 of Directive (EU) 2026/470 must be in national law by 19 March 2027, after this financial year "
+        "starts. Under the earlier text (Art. 5(2)(b) Directive (EU) 2022/2464 as amended by Directive (EU) 2025/794), "
+        "large undertakings, parents of large groups and issuers of that size report from financial years starting on or "
+        "after 1 January 2027. Which text does national law apply to this financial year?",
+        ["CSRD2025-5-2-b", "CSRD2025-5-2-sub3-b", "OMNI-5-1"]),
     "set-off": (
         "Were the consolidated figures for the large-group test calculated with the set-off and eliminations of "
         "Art. 24(3) and (7)? Without them, Art. 3(8) raises the balance sheet total and net turnover limits by 20 %.",
@@ -209,7 +219,8 @@ class Data:
                                        "consolidated_version_date": _cons_date(lb["pinned"]["32022L2464"])},
             "amending_acts_applied": [
                 {"act": "Directive (EU) 2026/470", "celex": "32026L0470", "oj": "OJ L, 2026/470, 26.2.2026",
-                 "in_force": "2026-03-18", "transposition_deadline": "2027-03-19"},
+                 "in_force": "2026-03-18", "transposition_deadline": "2027-03-19 for Articles 1-3 (reporting, audit); "
+                 "2028-07-26 for Article 4 (due diligence)"},
                 {"act": "Directive (EU) 2025/794", "celex": "32025L0794", "oj": "OJ L, 2025/794, 16.4.2025",
                  "in_force": "2025-04-17", "transposition_deadline": "2025-12-31"},
                 {"act": "Commission Delegated Directive (EU) 2023/2775", "celex": "32023L2775",
@@ -220,7 +231,7 @@ class Data:
                               "52024XC06792 (Commission Notice C/2024/6792, interpretative, not binding)"],
             "checked": lb["checked"],
             "source": lb["endpoint"],
-            "consolidated_text_status": self.quotes["consolidated-disclaimer"]["text"],
+            "consolidated_text_status": 'EUR-Lex, on its consolidated texts: "' + self.quotes["consolidated-disclaimer"]["text"] + '"',
         }
 
     def attribution(self) -> str:
@@ -306,7 +317,7 @@ def num(v) -> str:
 TOP = {"name", "currency", "eu_undertaking", "member_state", "legal_form_in_annex_i_or_ii", "entity_type",
        "listed_on_eu_regulated_market", "only_debt_securities_min_denomination_eur_100000", "designated_pie",
        "parent_undertaking", "financial_holding_undertaking", "covered_by_parent_consolidated_sustainability_report",
-       "financial_year_starts_on", "financial_years", "assume_latest_figures_continue"}
+       "member_state_exemption_2025_2026", "financial_year_starts_on", "financial_years", "assume_latest_figures_continue"}
 FY_FIELDS = {"year", "net_turnover_eur", "average_employees", "balance_sheet_total_eur", "group_net_turnover_eur",
              "group_average_employees", "group_balance_sheet_total_eur", "eu_net_turnover_eur", "eu_subsidiaries",
              "eu_branches"}
@@ -384,7 +395,7 @@ def validate(inputs, data: Data) -> dict:
     x["listed"] = _bool(inputs, "listed_on_eu_regulated_market", errors, default=False)
     x["debt_only"] = _bool(inputs, "only_debt_securities_min_denomination_eur_100000", errors, default=None, nullable=True)
     x["designated"] = _bool(inputs, "designated_pie", errors, default=None, nullable=True)
-    x["designated_given"] = "designated_pie" in inputs and inputs["designated_pie"] is not None
+    x["ms_exemption"] = _bool(inputs, "member_state_exemption_2025_2026", errors, default=None, nullable=True)
     x["parent"] = _bool(inputs, "parent_undertaking", errors, default=False)
     x["fhu"] = _bool(inputs, "financial_holding_undertaking", errors, default=False)
     x["covered"] = _bool(inputs, "covered_by_parent_consolidated_sustainability_report", errors, default=False)
@@ -507,8 +518,8 @@ class Assessor:
             return self.years[self.last].get(key)
         return None
 
-    def has(self, year: int, key: str) -> bool:
-        return year in self.years and key in self.years[year] or (self.x["project"] and year > self.last and key in self.years[self.last])
+    def missing(self, year: int, keys) -> bool:
+        return any(self.get(year, k) is None for k in keys)
 
     def figures_source(self, year: int) -> str:
         if year in self.years:
@@ -538,16 +549,16 @@ class Assessor:
                    gt(self.get(year, pre + "average_employees"), EMPLOYEES))
 
     def with_prior_year(self, year: int, test, what: str):
-        """Literal reading: the year's own balance sheet date. If national law adds a two-date rule, the
-        answer changes only where the two years differ; that case returns None and asks counsel."""
+        """A definite answer only where the year's own balance sheet date and a two-consecutive-dates rule
+        agree; otherwise None, with the question for counsel or the missing fact."""
         cur, prev = test(year), test(year - 1)
         if cur is None:
             return None
         if prev is None:
             self.ask("two-dates")
-            self.need(f"FY{year - 1} figures ({what}): they show whether a two-balance-sheet-date rule in national "
-                      f"law would change the answer for FY{year}")
-            return cur
+            self.need(f"FY{year - 1} {what}: without them the tool cannot tell whether a two-balance-sheet-date "
+                      f"rule in national law changes the answer for FY{year}")
+            return None
         if prev == cur:
             return cur
         self.ask("two-dates")
@@ -569,32 +580,44 @@ class Assessor:
             return None
         return test(LARGE_BEFORE_2024)
 
-    def large_status(self, year: int, group: bool, depth: int = 0):
-        """Art. 3(10): a change of size category counts only if it occurs in two consecutive financial years."""
+    def hysteresis(self, year: int, group: bool, depth: int = 0):
+        """Art. 3(10) applied to the category: a change counts only if it occurs in two consecutive years."""
+        cur = self.large_raw(year, group)
+        prev = self.large_raw(year - 1, group) if depth < 10 else None
+        if cur is None or prev is None:
+            return None
+        return cur if cur == prev else self.hysteresis(year - 1, group, depth + 1)
+
+    def large_status(self, year: int, group: bool):
+        """Large undertaking (Art. 3(4)) or large group (Art. 3(7)). Definite only where the year's own
+        figures and Art. 3(10) give the same answer: whether Art. 3(10), written for 'the derogations provided
+        for in this Directive', governs this scope test is left to national law (Commission Notice, FAQ 2)."""
         key = (year, group)
         if key in self._large:
             return self._large[key]
+        pre = "group_" if group else ""
+        keys = [pre + k for k in ("balance_sheet_total_eur", "net_turnover_eur", "average_employees")]
+        what = "consolidated balance sheet total, net turnover and employees" if group else "balance sheet total, net turnover and employees"
         cur = self.large_raw(year, group)
-        prev = self.large_raw(year - 1, group) if depth < 10 else None
+        res = None
         if cur is None:
-            res = None
-        elif prev is None:
-            what = "consolidated balance sheet total, net turnover and employees" if group else "balance sheet total, net turnover and employees"
-            self.need(f"FY{year - 1} {what}: Art. 3(10) compares two consecutive financial years to decide the size category for FY{year}")
-            res = None
-        elif prev == cur:
-            res = cur
+            if self.missing(year, keys):
+                self.need(f"FY{year} {what} (Art. 3(4)/(7) size category)")
         else:
-            res = self.large_status(year - 1, group, depth + 1)
+            h = self.hysteresis(year, group)
+            if h is None:
+                if self.missing(year - 1, keys):
+                    self.need(f"FY{year - 1} {what}: Art. 3(10) compares two consecutive financial years for FY{year}")
+            elif h != cur:
+                self.ask("two-dates")
+            else:
+                res = cur
         self._large[key] = res
         return res
 
     def pie(self):
         x = self.x
-        listed = x["listed"] and x["eu"]
-        fin = x["entity_type"] in ("credit_institution", "insurance_undertaking")
-        designated = x["designated"] if x["designated_given"] else False
-        return OR(listed, fin, designated)
+        return OR(x["listed"] and x["eu"], x["entity_type"] in ("credit_institution", "insurance_undertaking"), x["designated"])
 
     def coverage(self):
         """Art. 1(1) with Annexes I and II; Art. 1(3) for credit institutions and insurance undertakings."""
@@ -602,19 +625,42 @@ class Assessor:
             return True
         return self.x["legal_form"]
 
+    def before_2026_470_deadline(self, y: int) -> bool:
+        # Arts. 1-3 of Directive (EU) 2026/470 must apply in national law by 19 March 2027 (Art. 5(1)).
+        return y == FIRST_NEW_FY and self.starts_on(y) < "2027-03-19"
+
+    def option_2025_2026(self, y: int, group: bool):
+        """Art. 5(2) fifth subparagraph: Member States 'may exempt undertakings or issuers which do not exceed a
+        net turnover of EUR 450 000 000 or an average number of 1 000 employees'. Returns (status, text)."""
+        pre = "group_" if group else ""
+        to_ok = gt(self.get(y, pre + "net_turnover_eur"), NET_TURNOVER_EUR)
+        emp_ok = gt(self.get(y, pre + "average_employees"), EMPLOYEES)
+        basis = "consolidated " if group else ""
+        if AND(to_ok, emp_ok) is True:
+            return YES, f"above both thresholds ({basis}figures), so the Member State option for 2025-2026 does not reach it"
+        ms = self.x["ms_exemption"]
+        if ms is False:
+            return YES, "the Member State did not use the 2025-2026 option for it (member_state_exemption_2025_2026=false)"
+        self.ask("derogation")
+        if ms is None:
+            return DEPENDS, f"the Member State may exempt it for FY{y} (Art. 5(2) fifth subparagraph): check national law"
+        if to_ok is False and emp_ok is False:
+            return NO, "exempted by the Member State for 2025-2026 (member_state_exemption_2025_2026=true); below both thresholds"
+        return DEPENDS, ("exempted by the Member State for 2025-2026 (input), but it exceeds one threshold or a figure is "
+                         "missing, and the option can be read as reaching only undertakings below both")
+
     # -- routes
     def route_19a(self, y: int) -> dict:
         x = self.x
         r = {"route": "individual sustainability reporting (Art. 19a Directive 2013/34/EU)"}
         if x["entity_type"] == "aif_or_ucits":
-            self.cites.update(["AD-1-4", "SFDR-2-12"])
             return {**r, "status": NO, "because": "AIFs and UCITS are excluded from Arts. 19a, 29a and 29d (Art. 1(4)).",
                     "cites": ["AD-1-4", "SFDR-2-12"]}
         emp, to = self.get(y, "average_employees"), self.get(y, "net_turnover_eur")
         if y <= LAST_WAVE1_FY:
             cites = ["CSRD-5-2-a", "AD-2-1", "AD-3-4", "AD-3-10"]
-            pie = self.pie()
-            if pie is False or self.coverage() is False:
+            pie, cov = self.pie(), self.coverage()
+            if pie is False or cov is False:
                 why = "not a public-interest entity (Art. 2(1))" if pie is False else "legal form not in Annex I or II (Art. 1(1))"
                 return {**r, "status": NO, "because": "Not in the set reporting for financial years starting in 2024-2026 "
                         f"(Art. 5(2) first subparagraph point (a)(i) Directive (EU) 2022/2464): {why}.", "cites": cites}
@@ -624,46 +670,45 @@ class Assessor:
                 self.ask("art40")
                 cites.append("AD-40")
                 large = None
-            w1 = AND(self.coverage(), pie, large, e500)
-            detail = (f"public-interest entity: {status(pie)}; large undertaking (Art. 3(4), two-year rule of Art. 3(10)): "
-                      f"{status(large)}; average employees {num(emp)} > {WAVE1_EMPLOYEES}: {status(e500)}")
+            w1 = AND(cov, pie, large, e500)
+            detail = (f"public-interest entity: {status(pie)}; large undertaking (Art. 3(4)): {status(large)}; "
+                      f"average employees {num(emp)} > {WAVE1_EMPLOYEES}: {status(e500)}")
             if w1 is False:
                 return {**r, "status": NO, "because": "Not in the set reporting for financial years starting in 2024-2026 "
                         f"(Art. 5(2) first subparagraph point (a)(i) Directive (EU) 2022/2464): {detail}.", "cites": cites}
             if w1 is None:
+                if pie is None:
+                    self.ask("designated-pie")
                 return {**r, "status": DEPENDS, "because": f"Cannot decide the 2024-2026 test: {detail}.", "cites": cites}
             if y == FIRST_WAVE1_FY:
                 res = {**r, "status": YES, "because": f"Reports for FY2024 under Art. 5(2) first subparagraph point (a)(i): {detail}.", "cites": cites}
             else:
-                new = self.new_test(y, False)
-                cites = cites + ["CSRD-5-2-derogation"]
-                if new is True:
-                    res = {**r, "status": YES, "because": f"Reports under point (a)(i) ({detail}); the Member State option for "
-                           f"2025-2026 does not reach it because it exceeds {eur(NET_TURNOVER_EUR)} and {num(EMPLOYEES)} employees.", "cites": cites}
-                else:
-                    self.ask("derogation")
-                    res = {**r, "status": DEPENDS, "because": f"In the 2024-2026 set ({detail}), but the Member State may exempt it for "
-                           f"FY{y} because it does not exceed both {eur(NET_TURNOVER_EUR)} and {num(EMPLOYEES)} employees "
-                           f"(net turnover {eur(to)}, {num(emp)} employees): check national law.", "cites": cites}
+                st, why = self.option_2025_2026(y, False)
+                res = {**r, "status": st, "because": f"In the 2024-2026 set ({detail}); {why}.", "cites": cites + ["CSRD-5-2-derogation"]}
             return self.exemption(res, y, individual=True)
         cites = ["AD-19a-1", "CSRD-5-2-b"]
         if x["entity_type"] in ("credit_institution", "insurance_undertaking"):
             cites.append("AD-1-3")
-        t = self.with_prior_year(y, lambda z: self.new_test(z, False), "net turnover and average employees")
-        v = AND(self.coverage(), t)
+        cov = self.coverage()
+        t = self.with_prior_year(y, lambda z: self.new_test(z, False), "net turnover and average employees") if cov is not False else None
+        v = AND(cov, t)
         numbers = f"net turnover {eur(to)} (threshold {eur(NET_TURNOVER_EUR)}), average employees {num(emp)} (threshold {num(EMPLOYEES)})"
         if v is True:
             res = {**r, "status": YES, "because": f"{numbers}: both exceeded (Art. 19a(1); applies from financial years starting "
                    "on or after 1 January 2027, Art. 5(2) first subparagraph point (b)(i)).", "cites": cites}
+        elif v is False and cov is False:
+            res = {**r, "status": NO, "because": "Legal form not in Annex I or II (Art. 1(1)).", "cites": cites + ["AD-1-1"]}
         elif v is False:
-            why = "legal form not in Annex I or II (Art. 1(1))" if self.coverage() is False else f"{numbers}: not both exceeded"
-            res = {**r, "status": NO, "because": f"{why}.", "cites": cites + (["AD-1-1"] if self.coverage() is False else [])}
+            res = {**r, "status": NO, "because": f"{numbers}: not both exceeded.", "cites": cites}
+            if self.before_2026_470_deadline(y):
+                res = self.old_text_2027(res, self.large_status(y, False), "a large undertaking (Art. 3(4))",
+                                         ["CSRD2025-5-2-b", "OMNI-5-1"])
         else:
             why = []
-            if self.coverage() is None:
+            if cov is None:
                 why.append("legal form not stated (Art. 1(1), Annexes I and II)")
             if t is None:
-                why.append(f"{numbers}: missing figures, or the result differs between FY{y - 1} and FY{y}")
+                why.append(f"{numbers}: a figure is missing or the answer differs between FY{y - 1} and FY{y}")
             res = {**r, "status": DEPENDS, "because": "; ".join(why) + ".", "cites": cites}
         return self.exemption(res, y, individual=True)
 
@@ -676,39 +721,36 @@ class Assessor:
         gemp, gto = self.get(y, "group_average_employees"), self.get(y, "group_net_turnover_eur")
         if y <= LAST_WAVE1_FY:
             cites = ["CSRD-5-2-a", "AD-2-1", "AD-3-7", "AD-3-10"]
-            pie = self.pie()
-            if pie is False or self.coverage() is False:
+            pie, cov = self.pie(), self.coverage()
+            if pie is False or cov is False:
                 why = "not a public-interest entity (Art. 2(1))" if pie is False else "legal form not in Annex I or II (Art. 1(1))"
                 return {**r, "status": NO, "because": "Not in the set reporting for financial years starting in 2024-2026 "
                         f"(Art. 5(2) first subparagraph point (a)(ii)): {why}.", "cites": cites}
             large = self.large_status(y, True)
             e500 = self.with_prior_year(y, lambda z: gt(self.get(z, "group_average_employees"), WAVE1_EMPLOYEES),
                                         "consolidated average employees")
-            w1 = AND(self.coverage(), pie, large, e500)
-            detail = (f"public-interest entity: {status(pie)}; parent of a large group (Art. 3(7), two-year rule of Art. 3(10)): "
-                      f"{status(large)}; consolidated average employees {num(gemp)} > {WAVE1_EMPLOYEES}: {status(e500)}")
             if large is not None:
                 self.ask("set-off")
+            w1 = AND(cov, pie, large, e500)
+            detail = (f"public-interest entity: {status(pie)}; parent of a large group (Art. 3(7)): {status(large)}; "
+                      f"consolidated average employees {num(gemp)} > {WAVE1_EMPLOYEES}: {status(e500)}")
             if w1 is False:
                 return {**r, "status": NO, "because": "Not in the set reporting for financial years starting in 2024-2026 "
                         f"(Art. 5(2) first subparagraph point (a)(ii)): {detail}.", "cites": cites}
             if w1 is None:
+                if pie is None:
+                    self.ask("designated-pie")
                 return {**r, "status": DEPENDS, "because": f"Cannot decide the 2024-2026 test: {detail}.", "cites": cites}
             if y == FIRST_WAVE1_FY:
                 res = {**r, "status": YES, "because": f"Reports for FY2024 under point (a)(ii): {detail}.", "cites": cites}
             else:
-                cites = cites + ["CSRD-5-2-derogation"]
-                if self.new_test(y, True) is True:
-                    res = {**r, "status": YES, "because": f"Reports under point (a)(ii) ({detail}); above both thresholds on a "
-                           "consolidated basis, so the 2025-2026 Member State option does not reach it.", "cites": cites}
-                else:
-                    self.ask("derogation")
-                    res = {**r, "status": DEPENDS, "because": f"In the 2024-2026 set ({detail}), but the Member State may exempt it "
-                           f"for FY{y} (consolidated net turnover {eur(gto)}, {num(gemp)} employees): check national law.", "cites": cites}
+                st, why = self.option_2025_2026(y, True)
+                res = {**r, "status": st, "because": f"In the 2024-2026 set ({detail}); {why}.", "cites": cites + ["CSRD-5-2-derogation"]}
             return self.fhu(self.exemption(res, y, individual=False), y)
         cites = ["AD-29a-1", "CSRD-5-2-b"]
-        t = self.with_prior_year(y, lambda z: self.new_test(z, True), "consolidated net turnover and average employees")
         cov = self.coverage()
+        t = self.with_prior_year(y, lambda z: self.new_test(z, True), "consolidated net turnover and average employees") \
+            if cov is not False else None
         if x["entity_type"] in ("credit_institution", "insurance_undertaking") and x["legal_form"] is not True:
             # Art. 1(3) reaches these regardless of legal form only if the undertaking itself exceeds the thresholds.
             ind = self.new_test(y, False)
@@ -726,16 +768,40 @@ class Assessor:
         if v is True:
             res = {**r, "status": YES, "because": f"{numbers}: both exceeded (Art. 29a(1); from financial years starting on or "
                    "after 1 January 2027, Art. 5(2) first subparagraph point (b)(ii)).", "cites": cites}
+        elif v is False and cov is False and t is not False:
+            res = {**r, "status": NO, "because": "Legal form not in Annex I or II (Art. 1(1)).", "cites": cites}
         elif v is False:
-            why = "legal form not in Annex I or II (Art. 1(1))" if cov is False and t is not False else f"{numbers}: not both exceeded"
-            res = {**r, "status": NO, "because": f"{why}.", "cites": cites}
+            res = {**r, "status": NO, "because": f"{numbers}: not both exceeded.", "cites": cites}
+            if self.before_2026_470_deadline(y) and self.coverage() is not False:
+                res = self.old_text_2027(res, self.large_status(y, True), "the parent of a large group (Art. 3(7))",
+                                         ["CSRD2025-5-2-b", "OMNI-5-1"])
         else:
-            res = {**r, "status": DEPENDS, "because": f"{numbers}: cannot decide (missing figures or legal form, the two years "
-                   "differ, or a question for counsel).", "cites": cites}
+            res = {**r, "status": DEPENDS, "because": f"{numbers}: cannot decide (a figure or the legal form is missing, the "
+                   "two years differ, or a question for counsel).", "cites": cites}
         return self.fhu(self.exemption(res, y, individual=False), y)
+
+    def old_text_2027(self, res: dict, large, what: str, cites: list) -> dict:
+        """FY2027 starting before 19 March 2027: national law may still carry Art. 5(2)(b) as amended by
+        Directive (EU) 2025/794 (large undertakings, parents of large groups, issuers of that size)."""
+        if large is False:
+            return res
+        self.ask("transposition-2027")
+        extra = (f" It is {what} under the text before Directive (EU) 2026/470, which national law may still apply to a "
+                 "financial year starting before the transposition deadline of 19 March 2027." if large else
+                 " Whether it is covered by the text before Directive (EU) 2026/470 (large undertakings from FY2027) "
+                 "cannot be decided on the figures given.")
+        return {**res, "status": DEPENDS, "because": res["because"] + extra, "cites": res["cites"] + cites}
 
     def route_issuer(self, y: int) -> dict:
         """Art. 4(5) Directive 2004/109/EC with Art. 5(2) third subparagraph Directive (EU) 2022/2464."""
+        res = self._issuer(y)
+        if self.x["debt_only"] is None and res["status"] == YES:
+            res.update(status=DEPENDS, because=res["because"] + " Unless its only securities admitted to trading are debt "
+                       "securities of at least EUR 100 000 per unit, which Art. 8(1)(b) of Directive 2004/109/EC exempts "
+                       "(only_debt_securities_min_denomination_eur_100000 not given).", cites=res["cites"] + ["TD-8-1-b"])
+        return res
+
+    def _issuer(self, y: int) -> dict:
         x = self.x
         r = {"route": "issuer with securities on an EU regulated market (Art. 4(5) Directive 2004/109/EC)"}
         if x["debt_only"] is True:
@@ -748,30 +814,25 @@ class Assessor:
             return {**r, "status": DEPENDS, "because": "Listed AIF or UCITS: see the question for counsel.", "cites": ["AD-1-4", "TD-4-5"]}
         self.ask("issuer")
         emp, to = self.get(y, "average_employees"), self.get(y, "net_turnover_eur")
+        grp_large = self.large_status(y, True) if x["parent"] else False
         if y <= LAST_WAVE1_FY:
             cites = ["CSRD-5-2-sub3-a", "TD-2-1-d", "AD-3-4", "AD-3-10"]
             ind = AND(self.large_status(y, False),
                       self.with_prior_year(y, lambda z: gt(self.get(z, "average_employees"), WAVE1_EMPLOYEES), "average employees"))
-            grp = AND(x["parent"], self.large_status(y, True),
-                      self.with_prior_year(y, lambda z: gt(self.get(z, "group_average_employees"), WAVE1_EMPLOYEES),
-                                           "consolidated average employees")) if x["parent"] else False
+            grp = AND(grp_large, self.with_prior_year(y, lambda z: gt(self.get(z, "group_average_employees"), WAVE1_EMPLOYEES),
+                                                      "consolidated average employees")) if x["parent"] else False
             w1 = OR(ind, grp)
             if w1 is False:
                 return {**r, "status": NO, "because": "Not a large undertaking with more than 500 employees, nor the parent of a "
                         "large group with more than 500 employees (Art. 5(2) third subparagraph point (a)).", "cites": cites}
             if w1 is None:
-                return {**r, "status": DEPENDS, "because": "Cannot decide the 2024-2026 issuer test (missing figures or a question for counsel).",
-                        "cites": cites}
+                return {**r, "status": DEPENDS, "because": "Cannot decide the 2024-2026 issuer test (a figure is missing, the "
+                        "years differ, or a question for counsel).", "cites": cites}
             if y == FIRST_WAVE1_FY:
                 return {**r, "status": YES, "because": "Issuer that is a large undertaking (or parent of a large group) with more "
                         "than 500 employees: reports for FY2024 (Art. 5(2) third subparagraph point (a)).", "cites": cites}
-            above = OR(self.new_test(y, False), AND(x["parent"], self.new_test(y, True)))
-            if above is True:
-                return {**r, "status": YES, "because": "In the 2024-2026 issuer set and above both thresholds, so the 2025-2026 "
-                        "Member State option does not reach it.", "cites": cites + ["CSRD-5-2-derogation"]}
-            self.ask("derogation")
-            return {**r, "status": DEPENDS, "because": f"In the 2024-2026 issuer set, but the Member State may exempt it for FY{y}: "
-                    "check national law.", "cites": cites + ["CSRD-5-2-derogation"]}
+            st, why = self.option_2025_2026(y, x["parent"])
+            return {**r, "status": st, "because": f"In the 2024-2026 issuer set; {why}.", "cites": cites + ["CSRD-5-2-derogation"]}
         cites = ["CSRD-5-2-sub3-b", "TD-4-5", "AD-19a-1", "AD-29a-1"]
         t_ind = self.with_prior_year(y, lambda z: self.new_test(z, False), "net turnover and average employees")
         t_grp = self.with_prior_year(y, lambda z: self.new_test(z, True), "consolidated figures") if x["parent"] else False
@@ -779,8 +840,12 @@ class Assessor:
         numbers = f"net turnover {eur(to)}, {num(emp)} employees" + (
             f"; consolidated {eur(self.get(y, 'group_net_turnover_eur'))}, {num(self.get(y, 'group_average_employees'))} employees"
             if x["parent"] else "")
-        return {**r, "status": status(v), "because": f"Issuer test from FY2027 (Art. 5(2) third subparagraph point (b)): {numbers}; "
-                f"thresholds {eur(NET_TURNOVER_EUR)} and {num(EMPLOYEES)} employees, both to be exceeded.", "cites": cites}
+        res = {**r, "status": status(v), "because": f"Issuer test from FY2027 (Art. 5(2) third subparagraph point (b)): {numbers}; "
+               f"thresholds {eur(NET_TURNOVER_EUR)} and {num(EMPLOYEES)} employees, both to be exceeded.", "cites": cites}
+        if v is False and self.before_2026_470_deadline(y):
+            res = self.old_text_2027(res, OR(self.large_status(y, False), grp_large), "an issuer of large-undertaking size",
+                                     ["CSRD2025-5-2-sub3-b", "OMNI-5-1"])
+        return res
 
     def route_40a(self, y: int) -> dict:
         x = self.x
@@ -794,15 +859,19 @@ class Assessor:
             return gt(self.get(z, "eu_net_turnover_eur"), THIRD_COUNTRY_EU_TURNOVER_EUR)
         a = AND(eu_turnover(y - 1), eu_turnover(y))        # the report year and the one before
         b = AND(eu_turnover(y - 2), eu_turnover(y - 1))    # the two years before the report year
-        if a is not None and b is not None and a != b:
-            self.ask("40a-two-years")
-            cond = None
-        elif a is None or b is None:
-            cond = a if b is None and a is False else b if a is None and b is False else None
-            if cond is None:
-                self.need(f"eu_net_turnover_eur for FY{y - 2}, FY{y - 1} and FY{y} (Art. 40a(1) fifth subparagraph)")
+        if a is not None and b is not None:
+            cond = a if a == b else None
+            if a != b:
+                self.ask("40a-two-years")
         else:
-            cond = a
+            # One reading unknown: the answer cannot be definite, whatever the other reading says.
+            cond = None
+            gaps = [f"FY{z}" for z in (y - 2, y - 1, y) if self.get(z, "eu_net_turnover_eur") is None]
+            if gaps:
+                self.need(f"eu_net_turnover_eur for {', '.join(gaps)} (Art. 40a(1) fifth subparagraph, "
+                          f"'each of the last two consecutive financial years', for FY{y})")
+            if a is not None or b is not None:
+                self.ask("40a-two-years")
         prev = y - 1
         subs = self.get(prev, "eu_subsidiaries")
         branches = self.get(prev, "eu_branches")
@@ -873,6 +942,13 @@ class Assessor:
         return res
 
     # -- assembly
+    PUBLICATION = {
+        "individual": ("the management report, within 12 months after the balance sheet date (Art. 30(1) Directive 2013/34/EU)", "AD-30-1"),
+        "consolidated": ("the consolidated management report, within 12 months after the balance sheet date (Art. 30(1) Directive 2013/34/EU)", "AD-30-1"),
+        "issuer": ("the annual financial report, at the latest four months after the end of the financial year (Art. 4(1) Directive 2004/109/EC)", "TD-4-1"),
+        "third-country": ("the Art. 40a report, published by the EU subsidiary or branch within 12 months of the balance sheet date (Art. 40d(1) Directive 2013/34/EU)", "AD-40d-1"),
+    }
+
     def run(self) -> dict:
         x = self.x
         end = max(FIRST_40A_FY, self.last)
@@ -896,22 +972,12 @@ class Assessor:
             by_fy.append({"financial_year": f"FY{y}", "year": y, "starts_on": self.starts_on(y),
                           "figures": self.figures_source(y), "in_scope": overall, "routes": routes})
 
-        # A designation as public-interest entity (Art. 2(1)(d)) can only matter for 2024-2026.
-        if x["eu"] and not x["designated_given"] and self.pie() is False:
-            probe = Assessor({**x, "designated": True, "designated_given": True}, self.d)
-            if any(probe.route_19a(y)["status"] != next(r for r in f["routes"] if r["route"].startswith("individual"))["status"]
-                   for y, f in zip(window, by_fy) if y <= LAST_WAVE1_FY):
-                self.ask("designated-pie")
-
         firsts = [f for f in by_fy if f["in_scope"] == YES]
         pending = [f for f in by_fy if f["in_scope"] == DEPENDS]
         first = firsts[0] if firsts else None
         earliest_dep = pending[0] if pending else None
-        if first and earliest_dep and earliest_dep["year"] < first["year"]:
-            frfy = None
-        else:
-            frfy = first
-        overall = YES if firsts else DEPENDS if pending else NO
+        frfy = None if (first and earliest_dep and earliest_dep["year"] < first["year"]) else first
+        latest = by_fy[-1]
 
         if x["eu"]:
             self.ask("national-law")
@@ -943,17 +1009,28 @@ class Assessor:
             notes.append(f"Figures for {span} repeat the FY{self.last} figures (assume_latest_figures_continue=true); "
                          "other figures can give another answer.")
 
-        summary = self.summary(by_fy, overall, frfy, earliest_dep)
+        published = None
+        if frfy:
+            kinds = []
+            for rt in frfy["routes"]:
+                if rt["status"] != YES:
+                    continue
+                kind = ("individual" if rt["route"].startswith("individual") else "consolidated" if rt["route"].startswith("consolidated")
+                        else "issuer" if rt["route"].startswith("issuer") else "third-country")
+                if kind not in kinds:
+                    kinds.append(kind)
+            published = [self.PUBLICATION[k][0] for k in kinds]
+            self.cites.update(self.PUBLICATION[k][1] for k in kinds)
+
         out = {
             "tool": f"csrd-scope {VERSION}",
             "undertaking": x["name"],
             "question": "Is this undertaking in scope of the CSRD sustainability reporting requirements, and from which financial year?",
-            "in_scope": overall,
-            "summary": summary,
+            "in_scope": latest["in_scope"],
+            "in_scope_applies_to": f"{latest['financial_year']}, the latest financial year assessed; by_financial_year has every year",
+            "summary": self.summary(by_fy, frfy, earliest_dep),
             "first_reporting_financial_year": (
-                {"financial_year": frfy["financial_year"], "starts_on": frfy["starts_on"],
-                 "report_published": "with the management report, within 12 months after the balance sheet date (Art. 30(1)); "
-                                     "issuers: annual financial report within four months (Art. 4(1) Directive 2004/109/EC)"}
+                {"financial_year": frfy["financial_year"], "starts_on": frfy["starts_on"], "report_published": published}
                 if frfy else None),
             "earliest_possible_financial_year": earliest_dep["financial_year"] if (earliest_dep and not frfy) else None,
             "by_financial_year": [{k: v for k, v in f.items() if k != "year"} for f in by_fy],
@@ -969,25 +1046,25 @@ class Assessor:
             "what_this_is_not": NOT_COVERED,
             "attribution": self.d.attribution(),
         }
-        self.cites.update(["AD-30-1"])
         out["provisions"] = self.d.provisions(self.cites)
         return out
 
-    def summary(self, by_fy, overall, frfy, dep) -> str:
-        parts = []
+    def summary(self, by_fy, frfy, dep) -> str:
         run = []
         for f in by_fy:
             if run and run[-1][0] == f["in_scope"]:
                 run[-1][2] = f["financial_year"]
             else:
                 run.append([f["in_scope"], f["financial_year"], f["financial_year"]])
-        for st, a, b in run:
-            span = a if a == b else f"{a}-{b}"
-            parts.append(f"{span}: {st}")
-        head = {YES: "In scope", NO: "Not in scope on the figures given", DEPENDS: "Depends"}[overall]
-        first = f"; first reporting financial year {frfy['financial_year']} (starts {frfy['starts_on']})" if frfy else ""
-        tail = f"; earliest possible {dep['financial_year']}, subject to the questions and facts listed" if (dep and not frfy) else ""
-        return f"{head}{first}{tail}. By financial year: " + ", ".join(parts) + "."
+        years = "; ".join(f"{a if a == b else a + '-' + b}: {st}" for st, a, b in run)
+        if frfy:
+            tail = f"First reporting financial year: {frfy['financial_year']} (starts {frfy['starts_on']})."
+        elif dep:
+            tail = (f"First reporting financial year not determined: earliest possible {dep['financial_year']}, "
+                    "subject to the questions for counsel and facts needed.")
+        else:
+            tail = "No reporting obligation in the financial years assessed, on the figures given."
+        return f"By financial year: {years}. {tail}"
 
     def chain(self, by_fy) -> list[dict]:
         x = self.x
@@ -1055,7 +1132,9 @@ def thresholds(data: Data | None = None) -> dict:
         {"id": "third-country", "applies_from": "financial years starting on or after 1 January 2028",
          "test": f"third-country undertaking with EU net turnover > {eur(THIRD_COUNTRY_EU_TURNOVER_EUR)} in each of the last two "
                  f"consecutive financial years, with an EU subsidiary whose net turnover > {eur(SUBSIDIARY_OR_BRANCH_EUR)} in the "
-                 f"preceding financial year, or (without such a subsidiary) an EU branch above {eur(SUBSIDIARY_OR_BRANCH_EUR)}",
+                 f"preceding financial year, or an EU branch above {eur(SUBSIDIARY_OR_BRANCH_EUR)} where the third-country "
+                 "undertaking has no 'subsidiary undertaking as referred to in the first subparagraph' (whether that means any "
+                 "EU subsidiary or one above EUR 200 000 000 is open; csrd-scope asks counsel when it matters)",
          "cites": ["AD-40a-1-2", "AD-40a-1-4", "AD-40a-1-5", "CSRD-5-2-sub2"]},
         {"id": "protected-undertaking-value-chain",
          "test": f"not a scope test: value-chain undertakings with at most {num(EMPLOYEES)} average employees in the preceding "
@@ -1103,8 +1182,13 @@ def timeline(data: Data | None = None) -> dict:
         {"what": "transposition of Directive (EU) 2022/2464", "date": "2024-07-06"},
         {"what": "transposition of Delegated Directive (EU) 2023/2775", "date": "2024-12-24", "cites": ["DD-2-1"]},
         {"what": "transposition of Directive (EU) 2025/794", "date": "2025-12-31", "cites": ["STC-3"]},
-        {"what": "transposition of Arts. 1-3 of Directive (EU) 2026/470", "date": "2027-03-19", "cites": ["OMNI-5-1"]},
+        {"what": "transposition of Arts. 1-3 of Directive (EU) 2026/470 (reporting, audit)", "date": "2027-03-19", "cites": ["OMNI-5-1"]},
+        {"what": "transposition of Art. 4 of Directive (EU) 2026/470 (due diligence, Directive (EU) 2024/1760)", "date": "2028-07-26",
+         "cites": ["OMNI-5-1"]},
         {"what": "publication of the management report", "date": "within 12 months after the balance sheet date", "cites": ["AD-30-1"]},
+        {"what": "publication of the annual financial report by issuers", "date": "at the latest four months after the end of the financial year",
+         "cites": ["TD-4-1"]},
+        {"what": "publication of the Art. 40a report", "date": "within 12 months of the balance sheet date", "cites": ["AD-40d-1"]},
     ]
     ids = [c for r in rows + history + deadlines for c in r.get("cites", [])]
     return {"as_of": d.legal["checked"], "reporting": rows, "history": history, "deadlines": deadlines,
@@ -1224,6 +1308,8 @@ def build_inputs(a) -> dict:
             return json.loads(raw)
         except json.JSONDecodeError as e:
             raise InputError([f"--input: not valid JSON ({e.msg} at line {e.lineno})"]) from None
+        except RecursionError:
+            raise InputError(["--input: JSON nested too deeply"]) from None
     if a.eu is None:
         raise InputError(["say --eu or --non-eu (or give --input FILE)"])
     fys = {}
@@ -1252,6 +1338,8 @@ def build_inputs(a) -> dict:
         inp["designated_pie"] = _tri(a.designated_pie)
     if a.debt_only:
         inp["only_debt_securities_min_denomination_eur_100000"] = _tri(a.debt_only)
+    if a.member_state_exemption_2025_2026:
+        inp["member_state_exemption_2025_2026"] = _tri(a.member_state_exemption_2025_2026)
     return inp
 
 
@@ -1276,6 +1364,8 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--parent", action="store_true", help="parent undertaking of a group (give group_* figures)")
     c.add_argument("--financial-holding", action="store_true")
     c.add_argument("--covered-by-parent", action="store_true", help="included in a parent's consolidated sustainability report")
+    c.add_argument("--member-state-exemption-2025-2026", choices=["yes", "no", "unknown"],
+                   help="the Member State used the Art. 5(2) fifth-subparagraph option for this undertaking")
     c.add_argument("--fy", action="append", metavar="YEAR,key=value,...",
                    help="figures for one financial year, e.g. 2027,net_turnover_eur=480000000,average_employees=1200")
     c.add_argument("--eu-subsidiary", action="append", metavar="YEAR:NAME=EUR")

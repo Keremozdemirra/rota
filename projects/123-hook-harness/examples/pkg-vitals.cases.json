@@ -1,0 +1,42 @@
+{
+  "description": "Cases for the pkg-vitals plugin's hooks (hooks/hooks.json). Run: hook-harness run <pkg-vitals>/hooks/hooks.json examples/pkg-vitals.cases.json --scratch-home",
+  "cases": [
+    {
+      "name": "npm install of a deprecated package asks",
+      "tool_name": "Bash",
+      "tool_input": {"command": "npm install left-pad"},
+      "expect": {"handlers": 1, "decision": "ask", "reason_contains": ["left-pad", "deprecated"], "max_duration": 20}
+    },
+    {
+      "name": "a package name that is not on npm asks",
+      "tool_name": "Bash",
+      "tool_input": {"command": "cd app && npm i this-package-does-not-exist-hh-4k2q"},
+      "expect": {"handlers": 1, "decision": "ask", "reason_contains": "this-package-does-not-exist-hh-4k2q", "max_duration": 20}
+    },
+    {
+      "name": "PowerShell installs are checked too",
+      "tool_name": "PowerShell",
+      "tool_input": {"command": "Set-Location app; npm install left-pad"},
+      "expect": {"handlers": 1, "decision": "ask", "max_duration": 20}
+    },
+    {
+      "name": "a healthy install passes silently",
+      "tool_name": "Bash",
+      "tool_input": {"command": "pip install requests"},
+      "expect": {"handlers": 1, "decision": "none", "max_duration": 20}
+    },
+    {
+      "name": "a command with no installer starts one process and returns fast",
+      "tool_name": "Bash",
+      "tool_input": {"command": "ls -la \"$HOME\" && echo $(date)"},
+      "expect": {"handlers": 1, "decision": "none", "max_duration": 2}
+    },
+    {
+      "name": "file tools start nothing",
+      "event": "PreToolUse",
+      "tool_name": "Write",
+      "tool_input": {"file_path": "package.json", "content": "{}"},
+      "expect": {"handlers": 0}
+    }
+  ]
+}

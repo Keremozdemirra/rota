@@ -538,3 +538,33 @@ class EmptyRuns(Base):
         code, data, _ = self.run_json(repo, "--base", "HEAD~1", "--test-cmd", f'"{PY}" -c "print(1)"')
         self.assertEqual(data["counts"]["survived"], 7)
         self.assertIn("every mutant survived", " ".join(data["notes"]))
+
+
+class SystemErrors(Base):
+    def test_no_temporary_directory(self):
+        repo = self.calc_repo()
+        with mock.patch("tempfile.mkdtemp", side_effect=PermissionError(13, "Permission denied", "/tmp/x")):
+            code, data, _ = self.run_json(repo, "--base", "HEAD~1", "--test-cmd", UNITTEST)
+        self.assertEqual(code, 2)
+        self.assertEqual(data["error"], "Permission denied (/tmp/x)")
+
+    def test_a_file_is_not_a_repository(self):
+        f = self.tmp / "file.txt"
+        f.write_text("x")
+        code, out, _ = self.run_main(["-C", f])
+        self.assertEqual(code, 2)
+        self.assertIn("not a directory", out)
+
+    @unittest.skipUnless(POSIX, "process groups")
+    def test_background_processes_do_not_outlive_a_passing_run(self):
+        work = self.tmp / "w"
+        work.mkdir()
+        result = dm.run_command("sleep 30 & echo $! > pid.txt; exit 0", work, dict(os.environ), 20)
+        self.assertEqual(result.exit_code, 0)
+        pid = int((work / "pid.txt").read_text())
+        for _ in range(50):
+            if not alive(pid):
+                break
+            time.sleep(0.1)
+        self.assertFalse(alive(pid))
+        self.assertLess(result.seconds, 10)

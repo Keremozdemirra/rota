@@ -1,0 +1,52 @@
+{
+  "description": "Cases for the mcp-vitals plugin's hooks (hooks/hooks.json). Run from anywhere: hook-harness run <mcp-vitals>/hooks/hooks.json examples/mcp-vitals.cases.json --scratch-home",
+  "project_dir": "mcp-vitals-project",
+  "cases": [
+    {
+      "name": "claude mcp add of a deprecated npm server asks",
+      "tool_name": "Bash",
+      "tool_input": {"command": "claude mcp add github -- npx -y @modelcontextprotocol/server-github"},
+      "expect": {"handlers": 1, "decision": "ask", "reason_contains": "deprecated", "max_duration": 20}
+    },
+    {
+      "name": "the same command through PowerShell asks too",
+      "tool_name": "PowerShell",
+      "tool_input": {"command": "claude mcp add github -- npx -y @modelcontextprotocol/server-github"},
+      "expect": {"handlers": 1, "decision": "ask", "max_duration": 20}
+    },
+    {
+      "name": "an unrelated command starts no handler",
+      "tool_name": "Bash",
+      "tool_input": {"command": "git status --porcelain"},
+      "expect": {"handlers": 0, "decision": "none"}
+    },
+    {
+      "name": "an unrelated command with $PATH still starts the handler, which stays silent",
+      "tool_name": "Bash",
+      "tool_input": {"command": "echo $PATH"},
+      "expect": {"handlers": 1, "decision": "none", "max_duration": 5}
+    },
+    {
+      "name": "Write of .mcp.json gives Claude the facts",
+      "event": "PostToolUse",
+      "tool_name": "Write",
+      "tool_input": {"file_path": ".mcp.json", "content": "{\"mcpServers\": {\"github\": {\"command\": \"npx\", \"args\": [\"-y\", \"@modelcontextprotocol/server-github\"]}}}"},
+      "tool_response": {"type": "update", "filePath": ".mcp.json"},
+      "expect": {"handlers": 1, "context_contains": "deprecated", "max_duration": 20}
+    },
+    {
+      "name": "Edit of .mcp.json gives Claude the facts",
+      "event": "PostToolUse",
+      "tool_name": "Edit",
+      "tool_input": {"file_path": ".mcp.json", "old_string": "\"github\": {}", "new_string": "\"github\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"@modelcontextprotocol/server-github\"]\n    }"},
+      "expect": {"handlers": 1, "context_contains": "deprecated", "max_duration": 20}
+    },
+    {
+      "name": "Write of another JSON file starts no handler",
+      "event": "PostToolUse",
+      "tool_name": "Write",
+      "tool_input": {"file_path": "package.json", "content": "{}"},
+      "expect": {"handlers": 0}
+    }
+  ]
+}

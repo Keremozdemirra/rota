@@ -1,0 +1,14 @@
+{
+ "recorded": "2026-09-24",
+ "request": "GET https://api.github.com/user with a random ghp_ token made at run time (not a real token)",
+ "status": 401,
+ "headers": {
+  "content-type": "application/json; charset=utf-8",
+  "x-github-media-type": "github.v3; format=json"
+ },
+ "body": {
+  "message": "Bad credentials",
+  "documentation_url": "https://docs.github.com/rest",
+  "status": "401"
+ }
+}

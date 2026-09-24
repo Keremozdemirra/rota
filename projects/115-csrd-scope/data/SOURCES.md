@@ -11,11 +11,14 @@ CELLAR metadata with this snapshot.
   website is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence.
   This means that reuse is allowed, provided appropriate credit is given and changes are indicated."
 - Commission Decision 2011/833/EU on the reuse of Commission documents, Article 4: "All documents shall
-  be available for reuse: (a) for commercial or non-commercial purposes [...]".
+  be available for reuse: (a) for commercial or non-commercial purposes [...]". The Publications Office
+  copyright page refers EUR-Lex content to the EUR-Lex notice and says, for the conditions of reuse of
+  CELLAR content, "please contact us at op-copyright@publications.europa.eu".
 - The EUR-Lex legal notice (https://eur-lex.europa.eu/content/legal-notice/legal-notice.html) answered
   HTTP 202 with an empty body from the build environment on 2026-09-24 and could not be read.
 - Attribution used in every answer: `Source: EUR-Lex / CELLAR (Publications Office of the European Union),
-  © European Union, CC BY 4.0; derived: csrd-scope's encoding of the provisions cited`.
+  © European Union. Reuse: Commission Decision 2011/833/EU, Art. 4; Commission content is licensed CC BY 4.0
+  [...] Derived: csrd-scope's encoding of the provisions cited, not the text itself.`
 - What is bundled: identifiers, dates, titles, short verbatim quotations of the provisions the rules
   encode, the legal-form lists of Annexes I and II, and national-measure metadata. No personal data.
 

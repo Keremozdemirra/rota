@@ -61,7 +61,7 @@ NO_TESTS = re.compile(r"(?m)^Ran 0 tests in |^NO TESTS RAN|\bno tests ran\b|\bco
 
 # ---------------------------------------------------------------- cleaning and masking
 
-CONTROL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f​-‏  ‪-‮⁦-⁩﻿]")
+CONTROL = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f\u200b-\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069\ufeff]")
 ANSI = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]|\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)?")  # colours, terminal titles
 SECRET_WORD = re.compile(r"(?i)key|token|secret|passw|pwd|auth|credential|cookie|session|bearer|signature|"
                          r"private|access")
@@ -897,7 +897,7 @@ def _subcommand(args) -> str:
 
 def toplevel(path: Path) -> Path:
     if not path.is_dir():
-        raise Stop(f"{clean(str(path), 200)}: no such directory")
+        raise Stop(f"{clean(str(path), 200)}: " + ("not a directory" if path.exists() else "no such directory"))
     p = git(path, "rev-parse", "--show-toplevel", check=False)
     if p.returncode != 0:
         why = clean(mask_text(p.stderr.decode("utf-8", "replace")), 200)
@@ -1157,6 +1157,11 @@ def run_command(cmd, cwd: Path, env: dict, timeout: float) -> RunResult:
     timed_out = False
     try:
         proc.wait(timeout=timeout)
+        if os.name == "posix":
+            try:  # a server or helper the tests left running would disturb the next mutant's run
+                os.killpg(proc.pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                pass
     except subprocess.TimeoutExpired:
         timed_out = True
         _kill(proc)
@@ -1716,7 +1721,11 @@ def main(argv: list[str] | None = None) -> int:
     except KeyboardInterrupt:
         report = report or _empty_report()
         done = sum(1 for c in selected if c.result is not None)
-        report["error"] = f"interrupted after {done} of {len(selected)} mutants"
+        report["error"] = "interrupted" + (f" after {done} of {len(selected)} mutants" if selected else "")
+    except OSError as e:  # a full disk, an unwritable temporary directory: say so, without a traceback
+        report = report or _empty_report()
+        where = f" ({clean(e.filename, 200)})" if getattr(e, "filename", None) else ""
+        report["error"] = f"{e.strerror or clean(e, 200)}{where}"
     finally:
         for sig, old in handlers.items():
             signal.signal(sig, old)

@@ -497,6 +497,20 @@ class Terraform(Isolated):
             self.assertTrue(cr.scan_terraform(self.ctx()).errors, bad)
 
 
+class ProgramNames(unittest.TestCase):
+    def test_only_plain_program_names_are_printed(self):
+        secret = rand(24)
+        for text, want in (("aws", "aws"), ("/usr/local/bin/kubelogin --x", "kubelogin"), ('"C:\\A B\\v.exe" y', "v.exe"),
+                           ("TOKEN=" + secret + " vault", "a program"), ("sh -c 'echo " + secret + "'", "sh"),
+                           ("", "a program"), (None, "a program"), ("$(" + secret + ")", "a program")):
+            self.assertEqual(cr.program_name(text), want, text)
+
+    def test_kube_exec_command_line_is_not_printed(self):
+        secret = rand(24)
+        sev, how = cr.kube_user_auth({"exec": {"command": "API_TOKEN=" + secret + " /bin/fetch"}})
+        self.assertEqual((sev, how), ("medium", "exec plugin a program (credentials from that program at run time)"))
+
+
 class EnvFiles(unittest.TestCase):
     def test_parse(self):
         text = ("\ufeff# c\nexport A=1\nB = 'two words' # comment\nC=\"multi\nline\"\nD=plain # tail\nE=\n"

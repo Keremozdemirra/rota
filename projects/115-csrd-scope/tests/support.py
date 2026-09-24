@@ -126,7 +126,9 @@ class Isolated(unittest.TestCase):
 
 
 def eu(years, **kw):
-    base = {"currency": "EUR", "eu_undertaking": True, "legal_form_in_annex_i_or_ii": True, "financial_years": years}
+    # designated_pie is a fact the user states; cases about an unknown designation pass it explicitly.
+    base = {"currency": "EUR", "eu_undertaking": True, "legal_form_in_annex_i_or_ii": True, "designated_pie": False,
+            "financial_years": years}
     base.update(kw)
     return base
 

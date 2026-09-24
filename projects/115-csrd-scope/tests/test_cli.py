@@ -23,9 +23,9 @@ def run(*argv):
 
 class Cli(Isolated):
     def test_check_examples(self):
-        expected = {"fictional-eu-manufacturer.json": "first reporting financial year FY2027",
-                    "fictional-listed-wave1.json": "FY2025-FY2026: depends",
-                    "fictional-non-eu-group.json": "first reporting financial year FY2028"}
+        expected = {"fictional-eu-manufacturer.json": "First reporting financial year: FY2027",
+                    "fictional-listed-wave1.json": "FY2025-FY2027: depends",
+                    "fictional-non-eu-group.json": "First reporting financial year: FY2028"}
         for name, fragment in expected.items():
             with self.subTest(name):
                 code, out, err = run("check", "--input", str(EXAMPLES / name))
@@ -40,7 +40,7 @@ class Cli(Isolated):
         self.assertEqual(json.loads(out)["in_scope"], "yes")
 
     def test_check_from_flags(self):
-        code, out, err = run("check", "--eu", "--legal-form", "yes", "--member-state", "FR",
+        code, out, err = run("check", "--eu", "--legal-form", "yes", "--designated-pie", "no", "--member-state", "FR",
                              "--fy", "2026,net_turnover_eur=480_000_000,average_employees=1200",
                              "--fy", "2027,net_turnover_eur=480000000,average_employees=1200", "--json")
         self.assertEqual(code, 0, err)

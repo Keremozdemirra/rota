@@ -24,7 +24,7 @@ of credential sits where, and never printed, logged or sent.
 
 ```
 credential-reach 0.1.0: what an agent running as you here can reach
-checked 2026-09-24T13:47:14Z on Linux · home /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/cr-demo/home · project ~/work/app
+checked 2026-09-24T13:53:20Z on Linux · home /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/cr-demo/home · project ~/work/app
 No secret values are shown: names, locations, hosts, profiles, lengths and presence only.
 
 Blast radius
@@ -75,7 +75,7 @@ SSH keys  (~/.ssh)
   not visible here: macOS can keep a key's passphrase in the Keychain (UseKeychain), and a running ssh-agent holds unlocked keys; neither is queried, so a passphrase-protected key may still be usable.
 [...]
 Claude Code transcripts  (~/.claude/projects)
-  high    ~/.claude/projects/-home-dev-work-app/79b29f57c351bd40e0844507a845208b.jsonl  aws-access-key-id 1 in 1 line, github-classic-pat 1 in 1 line, private-key 1 in 1 line, url-password 1 in 1 line
+  high    ~/.claude/projects/-home-dev-work-app/7f0d1ba1f658fa7f79534401927f77e7.jsonl  aws-access-key-id 1 in 1 line, github-classic-pat 1 in 1 line, private-key 1 in 1 line, url-password 1 in 1 line
   note: 4 secret-shaped strings in 1 of 2 files (github-classic-pat 1, aws-access-key-id 1, private-key 1, url-password 1). They are plaintext copies of what passed through a tool; `credential-reach --redact` replaces them after a confirmation and a backup.
 
 GitHub probe  (GET https://api.github.com/user, one request per token)
@@ -148,7 +148,7 @@ prompt) it sees exactly the environment Claude Code's Bash tool passes to comman
 Exit codes: without `--strict`, 0 (2 for a bad `--project`). With `--strict`: 1 when a
 finding is `high`; else 2 when a file could not be read or parsed, or a probe could not
 reach GitHub; else 0. With `--redact`: 0 done or nothing to do, 1 not confirmed, 2 stdin
-is not a terminal or a file could not be rewritten.
+is not a terminal, or a transcript could not be read or rewritten.
 
 ### Severity
 
@@ -218,6 +218,12 @@ checked 2026-09-24), or is a 40-character hex token in `GITHUB_TOKEN`, `GH_TOKEN
 github.com entry. Tokens for
 GitHub Enterprise hosts are never sent to github.com. Using a token for this request is a
 use of it; GitHub may record it, for example in the token's last-used date.
+
+If `HTTPS_PROXY` is set, the request goes through that proxy, and the report says so
+without printing the proxy's address. A proxy that inserts its own GitHub credentials
+changes the answer: in the hosted sandbox this tool was built in, requests to
+api.github.com sent through its proxy came back as the sandbox's own account, whatever
+token they carried. The live check above ran without the proxy variables.
 
 There is no other network code in the tool.
 

@@ -1,5 +1,6 @@
 """--probe: one GET per GitHub token to api.github.com/user, header parsing, failures, and silence without it."""
 import http.client
+import io
 import json
 import os
 import socket
@@ -63,12 +64,31 @@ class Probe(Isolated):
         _, rep, _, _ = self.run_probe(Response(b"{}", headers={"X-OAuth-Scopes": ""}))
         self.assertEqual(rep["probe"]["results"][0]["scopes"], [])
 
+    def test_a_proxy_is_mentioned_but_not_printed(self):
+        proxy_pw = rand(16)
+        os.environ["HTTPS_PROXY"] = f"http://me:{proxy_pw}@proxy.example:3128"
+        code, out, err, _ = self.run_probe(401, argv=())
+        self.assertIn("Sent through the HTTPS proxy", out)
+        self.assertNotIn(proxy_pw, out + err)
+        self.assertNotIn("proxy.example", out + err.replace("HTTPS_PROXY", ""))
+
     def test_rejected_token(self):
         _, rep, _, _ = self.run_probe(401)
         r = rep["probe"]["results"][0]
         self.assertEqual((r["checked"], r["valid"]), (True, False))
         self.assertIn("rejected (401)", r["result"])
         self.assertFalse(rep["incomplete"])
+
+    def test_recorded_github_401(self):
+        fx = json.loads((Path(__file__).resolve().parent / "fixtures" / "github-user-401.json").read_text(encoding="utf-8"))
+        hdrs = http.client.HTTPMessage()
+        for k, v in fx["headers"].items():
+            hdrs[k] = v
+        err = urllib.error.HTTPError("https://api.github.com/user", fx["status"], "Unauthorized", hdrs,
+                                     io.BytesIO(json.dumps(fx["body"]).encode()))
+        _, rep, _, _ = self.run_probe(err)
+        r = rep["probe"]["results"][0]
+        self.assertEqual((r["status"], r["valid"], r["checked"]), (401, False, True))
 
     def test_failures_mark_the_run_incomplete(self):
         for failure in (403, 500, urllib.error.URLError("down"), socket.timeout("slow"),
