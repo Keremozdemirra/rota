@@ -182,7 +182,7 @@ class Unverified(unittest.TestCase):
             return re.sub(r'(title="32025R2650"\s*>)' + chr(0x25BA) + r"(M2</a>)", r"\1\2", t)
 
         def act(t):
-            return re.sub(r"in Annex I, in the table, the line", "in the table, the line", t)
+            return re.sub(r"in Annex\s+I, in the table, the line", "in the table, the line", t)
         result = build(support.FakeCellar(edits={"doc:02023R1115-20251226": cons, "doc:32025R2650": act}))
         d = result["application_dates"]
         self.assertEqual(result["annex_i"]["consolidated"]["amended_by"], ["32024R3234"])

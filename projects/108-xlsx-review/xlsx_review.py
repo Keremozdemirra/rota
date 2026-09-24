@@ -2277,7 +2277,7 @@ def diff(before: Workbook, after: Workbook, align: bool = True) -> dict:
             ch = _change(kind, a, b, (ar, ac), (r, c), bcell, acell)
             if adjusted is not None:
                 ch["adjusted"] = "=" + adjusted
-                ch["reason"] = f"the formula text is unchanged but the cells it referred to moved; adjusted, it would read ={clip(adjusted, 120)}"
+                ch["reason"] = f"references not moved with the cells; adjusted it would read ={clip(visible(mask(adjusted)), 120)}"
             changes.append(ch)
         for key, acell in a.cells.items():
             if key not in seen:
@@ -2805,11 +2805,24 @@ def _limit_findings(findings: list, limit: int):
     return shown, dropped
 
 
+def _formula_out(s):
+    """A formula for JSON: secrets masked on the whole text first, then truncated (masking after
+    truncation could cut the delimiter the mask looks for)."""
+    return clip(strip_controls(mask(s)), FORMULA_LIMIT) if isinstance(s, str) else s
+
+
 def finding_json(f: dict) -> dict:
     d = dict(f["details"])
     for k in ("target", "detail"):
         if d.get(k):
             d[k] = remote(d[k])
+    for k in ("formula", "refers_to", "pattern", "own_pattern"):
+        if d.get(k):
+            d[k] = _formula_out(d[k])
+    if d.get("neighbours"):
+        d["neighbours"] = [{"cell": n["cell"], "formula": _formula_out(n["formula"])} for n in d["neighbours"]]
+    if d.get("sheets"):
+        d["sheets"] = [remote(x) for x in d["sheets"]]
     if "name" in d and d["name"]:
         d["name"] = strip_controls(d["name"])
     return {"code": f["code"], "severity": f["severity"], "sheet": f["sheet"], "cell": f["cell"],
@@ -3070,6 +3083,10 @@ def diff_json(result: dict, limit: int) -> dict:
         for k in ("target", "detail"):
             if ch.get(k):
                 ch[k] = remote(ch[k])
+        if ch["change"].startswith("name-"):
+            for k in ("before", "after"):
+                if ch.get(k):
+                    ch[k] = _formula_out(ch[k])
         wbc.append(ch)
     risks = []
     for x in result["risks"]:
@@ -3154,8 +3171,13 @@ def explain_json(res: dict) -> dict:
     if cell is not None and cell.formula is not None:
         out["cached_value"] = _value(cell, True) if cell.kind is not None else None
     precedents = []
+    for k in ("master_formula", "r1c1"):
+        if out.get(k):
+            out[k] = _formula_out(out[k])
     for p in res.get("precedents", []):
         p = dict(p)
+        if p.get("refers_to"):
+            p["refers_to"] = _formula_out(p["refers_to"])
         if "content" in p:
             p["content"] = _json_content(p["content"])
         if p.get("link"):
