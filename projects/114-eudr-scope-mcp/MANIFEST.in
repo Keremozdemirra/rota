@@ -1,0 +1,3 @@
+include LICENSE README.md server.json
+recursive-include data *.json *.md
+recursive-include tests *.py *.json *.xhtml

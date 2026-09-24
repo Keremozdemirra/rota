@@ -34,6 +34,7 @@ import re
 import stat
 import sys
 import zipfile
+import zlib
 import xml.etree.ElementTree as ET
 from collections import deque
 from urllib.parse import unquote
@@ -760,6 +761,8 @@ class Workbook:
 # ---------------------------------------------------------------- reading the package
 
 _OLE_MAGIC = b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"
+# What extracting a damaged member raises: a bad CRC, a broken deflate stream, a short file.
+_ZIP_ERRORS = (zipfile.BadZipFile, zlib.error, OSError, EOFError, ValueError, RuntimeError)
 _ASCII_LOWER = {i: i + 32 for i in range(65, 91)}
 # ECMA-376 Part 2 (5th edition, 2021), §6.2.5: DTDs "enable Denial of Service attacks,
 # typically through the use of an internal entity expansion technique" and "shall not be
@@ -863,7 +866,7 @@ class _Package:
             raise _PartError(part, f"declares {info.file_size} bytes uncompressed, over the {MAX_PART_BYTES}-byte limit")
         try:
             return _Guarded(self.zip.open(info), part)
-        except (zipfile.BadZipFile, NotImplementedError, RuntimeError, OSError, ValueError, EOFError) as e:
+        except _ZIP_ERRORS + (NotImplementedError,) as e:
             raise _PartError(part, f"cannot be extracted: {e}") from None
 
     def read(self, part) -> bytes:
@@ -876,7 +879,7 @@ class _Package:
                     break
                 chunks.append(b)
             return b"".join(chunks)
-        except (zipfile.BadZipFile, OSError, EOFError, ValueError, RuntimeError) as e:
+        except _ZIP_ERRORS as e:
             raise _PartError(part, f"cannot be extracted: {e}") from None
         finally:
             stream.close()
@@ -1072,7 +1075,7 @@ def _read_shared_strings(pkg, part) -> list:
                 root.clear()
     except ET.ParseError as e:
         raise _PartError(part, f"is not well-formed XML ({e})") from None
-    except (zipfile.BadZipFile, OSError, EOFError, ValueError, RuntimeError) as e:
+    except _ZIP_ERRORS as e:
         raise _PartError(part, f"cannot be extracted: {e}") from None
     finally:
         stream.close()
@@ -1129,7 +1132,7 @@ def _read_sheet(pkg, part, sheet: Sheet, sst, wb: Workbook) -> None:
                 el.clear()
     except ET.ParseError as e:
         raise _PartError(part, f"is not well-formed XML ({e})") from None
-    except (zipfile.BadZipFile, OSError, EOFError, ValueError, RuntimeError) as e:
+    except _ZIP_ERRORS as e:
         raise _PartError(part, f"cannot be extracted: {e}") from None
     finally:
         stream.close()
@@ -2686,7 +2689,7 @@ def textconv(wb: Workbook) -> str:
         lines.append(f"[sheet] {visible(s.name)}" + (f" ({', '.join(extra)})" if extra else ""))
     for nm in wb.names:
         scope = (quote_sheet(wb.sheets[nm.scope].name) + "!") if nm.scope is not None and nm.scope < len(wb.sheets) else ""
-        lines.append(f"[name] {scope}{visible(nm.name)} = ={visible(mask(nm.formula))}" + (" (hidden)" if nm.hidden else ""))
+        lines.append(f"[name] {scope}{visible(nm.name)} refers to ={visible(mask(nm.formula))}" + (" (hidden)" if nm.hidden else ""))
     for link in wb.links:
         target = visible(mask(link.target)) if link.target else (visible(link.detail) if link.detail else "?")
         lines.append(f"[link {link.index}] {link.kind}: {target}")

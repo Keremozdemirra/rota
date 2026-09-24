@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.DS_Store
+build/
+dist/
+*.egg-info/
+.venv/
+# Nothing here reads credentials; an .env written by hand should still never be committed.
+.env
+.env.*

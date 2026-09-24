@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eudr-scope-mcp"
+version = "0.1.0"
+description = "EU Deforestation Regulation scope and dates as an MCP server and CLI: Annex I by CN code, application dates, country risk, with legal sources."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["eudr", "deforestation", "regulation-2023-1115", "cn-code", "customs", "compliance", "mcp", "mcp-server"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Legal Industry",
+  "Programming Language :: Python :: 3",
+  "Topic :: Office/Business",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/eudr-scope-mcp"
+Issues = "https://github.com/Keremozdemirra/eudr-scope-mcp/issues"
+
+[project.scripts]
+eudr-scope-mcp = "eudr_scope_mcp.cli:main"
+
+[tool.setuptools]
+packages = ["eudr_scope_mcp", "eudr_scope_mcp.data"]
+
+# The snapshot lives in data/ at the repository root and ships inside the package.
+[tool.setuptools.package-dir]
+"eudr_scope_mcp.data" = "data"
+
+[tool.setuptools.package-data]
+"eudr_scope_mcp.data" = ["*.json", "*.md"]

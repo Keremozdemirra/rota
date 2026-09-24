@@ -1,0 +1,10 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Keremozdemirra/eudr-scope-mcp",
+  "title": "EUDR scope and dates",
+  "description": "EU Deforestation Regulation: Annex I scope by CN code, application dates, country risk",
+  "repository": {"url": "https://github.com/Keremozdemirra/eudr-scope-mcp", "source": "github"},
+  "version": "0.1.0",
+  "packages": [{"registryType": "pypi", "identifier": "eudr-scope-mcp", "version": "0.1.0",
+                "runtimeHint": "uvx", "transport": {"type": "stdio"}}]
+}
