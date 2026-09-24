@@ -374,7 +374,7 @@ def _datapoints_from_sheet(sheet, header, stats: dict, seen_ids: dict) -> list:
 def _layout(texts: set, fields: set, ids: list, sheet_names: list) -> str:
     if "revised esrs" in texts or fields & {"disaggregations", "condition_ref", "ig3_mapping"}:
         return "revised"
-    if "voluntary" in fields or any(n.strip().upper().endswith(" MDR") for n in sheet_names):
+    if any(t.startswith("may v") for t in texts) or any(n.strip().upper().endswith(" MDR") for n in sheet_names):
         return "ig3"
     prefixed = sum(1 for i in ids if re.match(r"^ESRS\d{2}_", i))
     if ids and prefixed * 2 > len(ids):

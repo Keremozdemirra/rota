@@ -1,0 +1,13 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Keremozdemirra/esrs-datapoints-mcp",
+  "title": "ESRS Datapoints",
+  "description": "Search EFRAG's ESRS datapoint list from your own downloaded copy; bundles no EFRAG content",
+  "repository": {"url": "https://github.com/Keremozdemirra/esrs-datapoints-mcp", "source": "github"},
+  "version": "0.1.0",
+  "packages": [{"registryType": "pypi", "identifier": "esrs-datapoints-mcp", "version": "0.1.0",
+                "runtimeHint": "uvx", "transport": {"type": "stdio"},
+                "environmentVariables": [{"name": "ESRS_DATAPOINTS_XLSX",
+                                          "description": "Path(s) to the ESRS datapoint workbook(s) you downloaded from EFRAG, separated like PATH entries",
+                                          "format": "string", "isRequired": false, "isSecret": false}]}]
+}

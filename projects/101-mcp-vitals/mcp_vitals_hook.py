@@ -35,8 +35,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import mcp_vitals  # noqa: E402
 
-# Short: this runs while someone waits for a command to start.
-TIMEOUT = float(os.environ.get("MCP_VITALS_HOOK_TIMEOUT", "6"))
+# Short: this runs while someone waits for a command to start. Per request, and for the whole
+# run, which must end inside hooks.json's 20-second timeout or Claude Code discards the answer.
+DEFAULT_TIMEOUT = 6.0
+BUDGET = 15.0
+# A `claude mcp add` line is a few hundred characters; shlex needs seconds for a megabyte.
+MAX_COMMAND = 16384
 CONFIG_NAMES = {".mcp.json", "mcp.json", "claude_desktop_config.json", "mcp_config.json"}
 # `claude mcp add` options that take a value, so neither the value nor the
 # command after it is taken for the server name (`claude mcp add --help`,
@@ -49,11 +53,12 @@ ADD_JSON_VALUE_FLAGS = {"-s", "--scope"}
 
 PUNCTUATION = "();<>|&\n"
 REDIRECTS = {">", ">>", "<", "<<", "<<<", ">&", "<&", "&>", "&>>", ">|", "<>"}
-# Commands that run another command, and their options that take a value.
-WRAPPERS = {"sudo": {"-u", "-g", "-C", "-D", "-h", "-p", "-r", "-t", "-U", "--user", "--group"},
-            "doas": {"-u", "-C"}, "env": {"-u", "--unset", "-C", "--chdir", "-S", "--split-string"},
-            "timeout": {"-s", "--signal", "-k", "--kill-after"}, "time": set(), "nohup": set(),
-            "command": set(), "exec": {"-a"}}
+# The wrappers Claude Code strips before matching the `if` rule (permissions docs, "Wrappers",
+# checked 2026-09-24), with their options that take a value. Only these reach the hook: `sudo`,
+# `env`, `bash -c` and the like do not match `Bash(claude mcp add*)`, so the hook never sees them.
+WRAPPERS = {"timeout": {"-s", "--signal", "-k", "--kill-after"}, "time": {"-f", "--format", "-o", "--output"},
+            "nice": {"-n", "--adjustment"}, "nohup": set(), "stdbuf": {"-i", "-o", "-e", "--input", "--output", "--error"},
+            "command": set(), "builtin": set(), "noglob": set(), "xargs": set()}
 WINDOWS_PATH = re.compile(r"(?<![A-Za-z0-9])[A-Za-z]:\\")
 
 
@@ -100,6 +105,10 @@ def _claude_at(words: list[str]) -> int | None:
         if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", w, re.S):
             i += 1
         elif name in WRAPPERS:
+            if name == "xargs" and i + 1 < len(words) and words[i + 1].startswith("-"):
+                return None  # only a bare xargs is stripped
+            if name == "command" and i + 1 < len(words) and words[i + 1] in ("-v", "-V"):
+                return None  # `command -v` looks a command up; it runs nothing
             i += 1
             while i < len(words) and words[i].startswith("-"):
                 i += 2 if words[i] in WRAPPERS[name] else 1
@@ -112,6 +121,8 @@ def _claude_at(words: list[str]) -> int | None:
 
 def parse_add(command: str, shell: str = "bash") -> list[dict]:
     """Server entries a `claude mcp add` or `add-json` command line would create."""
+    if len(command) > MAX_COMMAND:
+        return []
     out = []
     # a compound line (`cd x && claude mcp add ...`) may hold more than one
     for words in split_commands(command, shell):
@@ -183,8 +194,9 @@ def _parse_add_json(rest: list[str]) -> dict | None:
 
 
 def entry(name: str, command: str = "", args: list[str] | None = None, url: str = "") -> dict:
+    command, args = mcp_vitals.command_line(command, list(args or []))  # `claude mcp add x "npx -y pkg KEY"`
     return {"client": "Claude Code", "config": "claude mcp add", "name": name,
-            "command": command, "args": list(args or []), "url": url}
+            "command": command, "args": args, "url": url}
 
 
 def _servers(data: dict, path: Path) -> dict[str, dict]:
@@ -272,6 +284,14 @@ def explain(r: dict) -> str:
     return f"{', '.join(parts)}. Flags: {', '.join(r['flags'])}."
 
 
+def request_timeout() -> float:
+    try:
+        t = float(os.environ.get("MCP_VITALS_HOOK_TIMEOUT", DEFAULT_TIMEOUT))
+    except ValueError:  # `6s`, say: fall back rather than fail
+        return DEFAULT_TIMEOUT
+    return t if 0 < t <= BUDGET else DEFAULT_TIMEOUT
+
+
 def main() -> int:
     try:
         return _main()
@@ -299,7 +319,8 @@ def _main() -> int:
     if not servers:
         return 0
 
-    net = mcp_vitals.Net(False, os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN"), timeout=TIMEOUT, census=False)
+    net = mcp_vitals.Net(False, os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN"), timeout=request_timeout(),
+                         census=False, budget=BUDGET)
     found = findings(servers, net)
     if not found:
         return 0

@@ -1,0 +1,651 @@
+{
+ "edition": "2026",
+ "celex": "32026R1560",
+ "eli": "http://data.europa.eu/eli/reg_del/2026/1560/oj",
+ "act": "Commission Delegated Regulation (EU) 2026/1560",
+ "standard": "sustainability reporting standard for voluntary use ('Voluntary Standard'), Annex I",
+ "title": "COMMISSION DELEGATED REGULATION (EU) 2026/1560 of 3 July 2026 supplementing Directive 2013/34/EU of the European Parliament and of the Council by establishing sustainability reporting standards for voluntary use by undertakings protected by the value chain cap (Text with EEA relevance)",
+ "oj": "OJ L, 2026/1560, 21.9.2026",
+ "published": "2026-09-21",
+ "source": {
+  "url": "https://publications.europa.eu/resource/celex/32026R1560",
+  "sha256": "2a1d369e351eb4eb77779bb8fcff5e786b550bda9e8a9c18f1d87bc2daec3653",
+  "bytes": 363434,
+  "etag": "\"Con-20260921031243000\"",
+  "last_modified": "Mon, 21 Sep 2026 01:12:43 GMT",
+  "retrieved": "2026-09-24"
+ },
+ "licence": {
+  "terms": "https://commission.europa.eu/legal-notice_en",
+  "quote": "Unless otherwise indicated (e.g. in individual copyright notices), content owned by the EU on this website is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence. This means that reuse is allowed, provided appropriate credit is given and changes are indicated.",
+  "policy": "Commission Decision 2011/833/EU on the reuse of Commission documents, http://data.europa.eu/eli/dec/2011/833/oj",
+  "licence": "CC BY 4.0, https://creativecommons.org/licenses/by/4.0/",
+  "checked": "2026-09-24"
+ },
+ "changes": "Text extracted from the English XHTML of the Official Journal: whitespace normalised, table layout flattened (cells joined by ' | '), footnotes and appendices left out, images replaced by a marker.",
+ "annex_i": [
+  {
+   "n": "1",
+   "heading": "Objective of this Standard and to which undertakings it applies",
+   "code": null,
+   "related": [],
+   "text": "The objective of this sustainability reporting standard for voluntary use (‘Voluntary Standard’) is to support undertakings not subject to sustainability reporting requirements in all of the following:\n(a) providing information that will help satisfy the data needs of undertakings subject to mandatory reporting requirements under Directive 2013/34/EU of the European Parliament and of the Council (Accounting Directive) (1) requesting sustainability information from undertakings in their value chain;\n(b) providing information that will help satisfy the data needs of banks and investors, therefore helping undertakings in their access to finance;\n(c) improving the management of the sustainability issues they face, i.e. environmental and social challenges such as pollution, workforce health and safety. This will support their competitive growth and enhance their resilience in the short, medium and long term;\n(d) contributing to a more sustainable and inclusive economy."
+  },
+  {
+   "n": "2",
+   "heading": "Objective of this Standard and to which undertakings it applies",
+   "code": null,
+   "related": [],
+   "text": "This Standard is voluntary. It is intended for undertakings (2) which, on their balance sheet dates, do not exceed an average number of 1 000 employees during the preceding financial year."
+  },
+  {
+   "n": "3",
+   "heading": "Objective of this Standard and to which undertakings it applies",
+   "code": null,
+   "related": [],
+   "text": "This Standard covers the same sustainability issues as the European Sustainability Reporting Standards (ESRS) (3). However, it is proportionate and therefore takes into account the capacities and fundamental characteristics of the undertakings for which it is intended, including micro undertakings."
+  },
+  {
+   "n": "4",
+   "heading": "Objective of this Standard and to which undertakings it applies",
+   "code": null,
+   "related": [],
+   "text": "Consistency with ESRS has been carefully considered in the preparation of this Standard while defining proportionate requirements. This Standard does not impose legal reporting obligations unlike the ESRS."
+  },
+  {
+   "n": "5",
+   "heading": "Objective of this Standard and to which undertakings it applies",
+   "code": null,
+   "related": [],
+   "text": "Undertakings can access practical information about the application of this Voluntary Standard on EFRAG’s website and Knowledge Hub. These resources provide guidance and support, including relevant templates, regarding this sustainability reporting standard."
+  },
+  {
+   "n": "6",
+   "heading": "Structure of this Standard",
+   "code": null,
+   "related": [],
+   "text": "This Standard has two modules that the undertaking can use to prepare its sustainability report:\n(a) Basic Module: Disclosures B1 and B2 and Basic Metrics (B3 to B11). This module is the target approach for micro-undertakings and constitutes a minimum requirement for other undertakings; and\n(b) Comprehensive Module: this module sets datapoints in addition to disclosures B1-B11, which are likely to be requested by banks, investors and corporate clients of the undertaking on top of the Basic Module.\nParagraph 27 below illustrates the available options for the preparation of a sustainability report using this Standard by adopting one or both modules."
+  },
+  {
+   "n": "7",
+   "heading": "Structure of this Standard",
+   "code": null,
+   "related": [],
+   "text": "Applying the Basic Module is a prerequisite for applying the Comprehensive Module."
+  },
+  {
+   "n": "8",
+   "heading": "Structure of this Standard",
+   "code": null,
+   "related": [],
+   "text": "This Standard contains different kinds of datapoints, including essential datapoints that an undertaking needs to report when applying the standard, datapoints that are only needed in certain specified circumstances subject to the ‘if applicable’ principle described in paragraph 15, datapoints that are voluntary, and datapoints that are to be considered only when reporting sector-specific information. To ensure that the standard is proportionate for undertakings of different sizes, some datapoints are voluntary for undertakings with 10 employees or less even though they are essential datapoints for other undertakings applying the standard. The standard uses text in square brackets to identify such cases."
+  },
+  {
+   "n": "9",
+   "heading": "Structure of this Standard",
+   "code": null,
+   "related": [],
+   "text": "Appendix A Defined terms includes the definitions of the terms used in this Standard. Throughout the Voluntary Standard, the terms defined in the glossary of definitions (Appendix A) are set in bold italics, except when a defined term is used more than once in the same paragraph."
+  },
+  {
+   "n": "10",
+   "heading": "Complying with this Standard",
+   "code": null,
+   "related": [],
+   "text": "This Standard sets requirements that allow the undertaking to provide relevant information on the following:\n(a) how it has had and is likely to have a positive or negative impact on people or on the environment in the short, medium or long term;\n(b) how environmental and social issues have affected or are likely to affect its financial position, performance and cash flows in the short, medium or long term."
+  },
+  {
+   "n": "11",
+   "heading": "Complying with this Standard",
+   "code": null,
+   "related": [],
+   "text": "The undertaking shall report information that is relevant, faithful, comparable, understandable and verifiable."
+  },
+  {
+   "n": "12",
+   "heading": "Complying with this Standard",
+   "code": null,
+   "related": [],
+   "text": "Depending on the type of activities carried out by the undertaking, the inclusion of additional information (metrics and/or narrative disclosures) not covered in this Standard is appropriate in order to disclose sustainability information regarding issues that are common in the undertaking’s sector (i.e. typically encountered by businesses or entities operating within a specific industry or field) or that are specific to the undertaking, as this supports the preparation of relevant, faithful, comparable, understandable and verifiable information. This includes the consideration of information on Scope 3 GHG emissions (see paragraphs 49 to 52 of this Standard). Appendix B provides a list of possible sustainability issues."
+  },
+  {
+   "n": "13",
+   "heading": "Complying with this Standard",
+   "code": null,
+   "related": [],
+   "text": "The undertaking may complement the metrics from the Basic and Comprehensive modules with additional qualitative and/or quantitative information where appropriate in accordance with paragraph 12 above."
+  },
+  {
+   "n": "14",
+   "heading": "Comparative information",
+   "code": null,
+   "related": [],
+   "text": "From the second year of reporting, the undertaking shall report comparative information in respect of the previous year except for metrics disclosed for the first time."
+  },
+  {
+   "n": "15",
+   "heading": "If applicable principle",
+   "code": null,
+   "related": [],
+   "text": "Certain disclosures only apply to specific circumstances (4). In particular, the instructions provided in each disclosure specify such circumstances and the information that is to be reported only if considered ‘applicable’ by the undertaking. When one of these disclosures is omitted, it is assumed to not be applicable."
+  },
+  {
+   "n": "16",
+   "heading": "Inclusion of subsidiaries in the reported data",
+   "code": null,
+   "related": [],
+   "text": "If the undertaking is a parent undertaking of a group, it is recommended that it prepares its sustainability report on a consolidated basis, including information from its subsidiaries."
+  },
+  {
+   "n": "17",
+   "heading": "Inclusion of subsidiaries in the reported data",
+   "code": null,
+   "related": [],
+   "text": "If the parent undertaking has prepared its sustainability report on a consolidated basis, including information from its subsidiaries, the subsidiary undertakings are exempted from reporting."
+  },
+  {
+   "n": "18",
+   "heading": "Timing and location of the sustainability report",
+   "code": null,
+   "related": [],
+   "text": "If a sustainability report is prepared to meet the needs of large undertakings or banks that require an update annually, it shall be prepared annually. If the undertaking prepares financial statements, the sustainability report shall be prepared with reference to a period of time that is consistent with the preparation of the financial statement. If specific datapoints did not change from the previous reporting year, the undertaking may indicate that no changes occurred and refer to the information provided for that specific datapoint in the previous year’s report."
+  },
+  {
+   "n": "19",
+   "heading": "Timing and location of the sustainability report",
+   "code": null,
+   "related": [],
+   "text": "If the undertaking prepares an Environmental Statement according to Regulation (EC) No 1221/2009 (EMAS) (5), it may present disclosures required by EMAS and by this voluntary standard in a single report. In this case, the disclosures that are common to EMAS and to the voluntary standard shall be presented only once."
+  },
+  {
+   "n": "20",
+   "heading": "Timing and location of the sustainability report",
+   "code": null,
+   "related": [],
+   "text": "The primary function of this report is to inform actual or potential business counterparties. The undertaking may decide to make its sustainability report available to the public. In this case, the undertaking may present its sustainability report in a separate section of the management report if it has one. Otherwise, the undertaking may present its sustainability report as a separate document."
+  },
+  {
+   "n": "21",
+   "heading": "Timing and location of the sustainability report",
+   "code": null,
+   "related": [],
+   "text": "To avoid publishing the same information twice, the undertaking may refer in its sustainability report to disclosures published in other documents that can be accessed at the same time and from the same document set as the sustainability report (6)."
+  },
+  {
+   "n": "22",
+   "heading": "Omission of information",
+   "code": null,
+   "related": [],
+   "text": "When disclosing information under this Standard, the undertaking may omit the following information:\n(a) in exceptional cases, information the disclosure of which would be seriously prejudicial to the commercial position of the undertaking;\n(b) information corresponding to intellectual capital, intellectual property, know-how, technological information, or the results of innovation, that qualifies as a trade secret;\n(c) classified information;\n(d) other information that is to be protected from unauthorised access or disclosure because of obligations laid down in other Union legal acts or in national law, or in order to safeguard the privacy or security of a natural person or the security of a legal person.\nThe undertaking may only omit information under the first subparagraph if it meets all of the following conditions:\ni. for each datapoint omitted, the undertaking discloses the fact that it has used this exemption (pursuant to point (b) under disclosure B1 in paragraph 27); and\nii. the undertaking reassesses at each reporting date whether the information may still be omitted."
+  },
+  {
+   "n": "23",
+   "heading": "Coherence and linkages with disclosures in financial statements",
+   "code": null,
+   "related": [],
+   "text": "If the undertaking also prepares financial statements, the information provided in its sustainability report following this Standard shall:\n(a) be coherent with what is reported in the financial statements for the same period;\n(b) be presented in a way that facilitates the understanding of the linkages that exist with the information reported in financial statements, for example by using appropriate cross-references."
+  },
+  {
+   "n": "24",
+   "heading": "Basic Module",
+   "code": null,
+   "related": [],
+   "text": "The undertaking shall report on its environmental, social and business conduct issues (together ‘sustainability issues’) using the B1 to B11 disclosures below."
+  },
+  {
+   "n": "25",
+   "heading": "Basic Module",
+   "code": null,
+   "related": [],
+   "text": "If the undertaking wants to provide more comprehensive information once it has completed the disclosures required from B1 to B11, it may additionally report on disclosures selected from the Comprehensive Module."
+  },
+  {
+   "n": "26",
+   "heading": "Basic Module",
+   "code": null,
+   "related": [],
+   "text": "Additional guidance on disclosures B1 to B11 is available on EFRAG’s website and Knowledge Hub."
+  },
+  {
+   "n": "27",
+   "heading": "B1 – Basis for preparation",
+   "code": "B1",
+   "related": [],
+   "text": "The undertaking shall disclose:\n(a) which of the following options it has selected and make an explicit statement of compliance with this voluntary standard using the selected option:\n  i. OPTION A: Basic Module (only);\n  ii. OPTION B: Basic Module and Comprehensive Module.\nA module shall be complied with in its entirety. However, an item of disclosure under the ‘if applicable principle’ is to be reported only if the circumstances specified in the disclosure are considered applicable to the undertaking. Hence, if an item of ‘if applicable’ disclosure is omitted, it is assumed that that item is not applicable to the undertaking (paragraph 15).\n(b) if the undertaking has omitted a disclosure in accordance with paragraph 22 on omission of information, the undertaking shall indicate the disclosures that it has omitted.\n(c) whether the sustainability report has been prepared on an individual basis (i.e. the report is limited to the undertaking’s information only) or on a consolidated basis (i.e. the report includes information about the undertaking and its subsidiaries);\n(d) in case of a consolidated sustainability report, the list of the subsidiaries, including their registered address (7), covered in the report; and\n(e) the following information:\n  i. the undertaking’s legal form;\n  ii. NACE sector classification code(s);\n  iii. size of the balance sheet (total assets in monetary units);\n  iv. turnover (in monetary units);\n  v. number of employees in headcount or full-time equivalents;\n  vi. country of primary operations and location of significant asset(s); and\n  vii. geolocation of sites owned, leased or managed."
+  },
+  {
+   "n": "28",
+   "heading": "B1 – Basis for preparation",
+   "code": "B1",
+   "related": [],
+   "text": "If the undertaking has obtained any sustainability-related certification or label, it shall provide a brief description of those (including, where relevant, the issuers of the certification or label, date and rating score)."
+  },
+  {
+   "n": "29",
+   "heading": "B2 – Practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "B2",
+   "related": [],
+   "text": "If the undertaking has put in place specific practices, policies or future initiatives for transitioning towards a more sustainable economy, it shall state so. In such cases, the undertaking shall state whether it has:\n(a) practices, which in this context may include, for instance, efforts to reduce the undertaking’s water and electricity consumption, to reduce GHG emissions or to prevent pollution, and initiatives to improve product safety as well as current initiatives to improve working conditions and equal treatment in the workplace, and partnerships related to sustainability projects;\n(b) policies on sustainability issues, whether they are publicly available, and any separate environmental, social or governance policies for addressing sustainability issues;\n(c) any future initiatives or forward-looking plans that are being implemented on sustainability issues; and\n(d) targets to monitor the implementation of the policies."
+  },
+  {
+   "n": "30",
+   "heading": "B2 – Practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "B2",
+   "related": [],
+   "text": "Such practices, policies and future initiatives include what the undertaking does to reduce its negative impacts and to enhance its positive impacts on people and the environment, in order to contribute to a more sustainable economy. Appendix B provides a list of possible sustainability issues that could be covered in this disclosure."
+  },
+  {
+   "n": "31",
+   "heading": "B2 – Practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "B2",
+   "related": [],
+   "text": "If the undertaking also reports on the Comprehensive module, it shall complement the information provided under B2 with the datapoints found in C2."
+  },
+  {
+   "n": "32",
+   "heading": "B3 – Energy and greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "[Voluntary for undertakings with 10 employees or less] The undertaking shall disclose its total energy consumption in MWh. If it can obtain the necessary information to provide such a breakdown, the undertaking shall also disclose a breakdown as per the table below:\n| Renewable energy | Non-renewable energy | Total\nElectricity (as reflected in utility billings) | | |\nFuels | | |"
+  },
+  {
+   "n": "33",
+   "heading": "B3 – Energy and greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "[Voluntary for undertakings with 10 employees or less] The undertaking shall disclose its estimated absolute gross greenhouse gas (GHG) emissions generated during the reporting period in metric tonnes of CO2 equivalent (tCO2eq) considering the content of the GHG Protocol Corporate Accounting and Reporting Standard (2004), including:\n(a) the Scope 1 GHG emissions in tCO2eq (from owned or controlled sources); and\n(b) the location-based Scope 2 emissions in tCO2eq (i.e. emissions from the generation of purchased energy, such as electricity, heat, steam or cooling)."
+  },
+  {
+   "n": "34",
+   "heading": "B4 – Pollution of air, water and soil",
+   "code": "B4",
+   "related": [],
+   "text": "The undertaking shall disclose the emissions of pollutants to air, water and soil from its own operations that it is required to report to competent authorities by EU or national law, or that it voluntarily reports according to an Environmental Management System. If this information is already publicly available, the undertaking may alternatively refer to the document where it is reported, for example, by providing the relevant URL link or embedding a hyperlink."
+  },
+  {
+   "n": "35",
+   "heading": "B5 – Biodiversity",
+   "code": "B5",
+   "related": [],
+   "text": "If the undertaking has sites or locations in or near a biodiversity-sensitive area (BSA), it shall disclose them, and the name of the BSA."
+  },
+  {
+   "n": "36",
+   "heading": "B6 – Water",
+   "code": "B6",
+   "related": [],
+   "text": "[Voluntary for undertakings with 10 employees or less] The undertaking shall disclose its total water withdrawal, i.e. the amount of water drawn into the boundaries of the organisation (or facility)."
+  },
+  {
+   "n": "37",
+   "heading": "B6 – Water",
+   "code": "B6",
+   "related": [],
+   "text": "[Voluntary for undertakings with 10 employees or less] If the undertaking has production processes in place which significantly consume water (e.g. thermal energy processes like drying or power production, production of goods, agricultural irrigation, etc.), it shall disclose its water consumption calculated as the difference between its water withdrawal and water discharge from its production processes. [Voluntary for undertakings with 10 employees or less] In addition, these undertakings shall separately present the amount of water consumed at sites located in areas with water stress."
+  },
+  {
+   "n": "38",
+   "heading": "B7 – Resource use, circular economy and waste management",
+   "code": "B7",
+   "related": [],
+   "text": "[Voluntary for undertakings with 10 employees or less] The undertaking shall disclose whether it applies circular economy principles and, if so, how it applies these principles."
+  },
+  {
+   "n": "39",
+   "heading": "B7 – Resource use, circular economy and waste management",
+   "code": "B7",
+   "related": [],
+   "text": "The undertaking shall disclose:\n(a) [Voluntary for undertakings with 10 employees or less] the total weight of waste generated, with a breakdown between hazardous and non- hazardous waste;\n(b) [Voluntary for undertakings with 10 employees or less] the proportion of waste diverted to recycling or preparation for reuse;\n(c) [Voluntary for undertakings with 10 employees or less] if the undertaking operates in a sector using significant material flows (for example manufacturing, construction, packaging or others), the annual mass-flow of relevant materials used."
+  },
+  {
+   "n": "40",
+   "heading": "B8 – Workforce – General characteristics",
+   "code": "B8",
+   "related": [],
+   "text": "The undertaking shall disclose the number of employees in headcount or full-time equivalent for the following metrics:\n(a) type of employment contract (temporary or permanent);\n(b) gender;\n(c) country of the employment contract, if the undertaking operates in more than one country."
+  },
+  {
+   "n": "41",
+   "heading": "B9 – Workforce – Health and safety",
+   "code": "B9",
+   "related": [],
+   "text": "The undertaking shall disclose the following information regarding its employees:\n(a) the number and rate of recordable work-related accidents;\n(b) subject to legal restrictions, the sum of the fatalities as a result of recordable work-related accidents and recordable work-related ill health."
+  },
+  {
+   "n": "42",
+   "heading": "B10 – Workforce – Remuneration, collective bargaining and training",
+   "code": "B10",
+   "related": [],
+   "text": "The undertaking shall disclose:\n(a) whether the employees receive pay that is equal or above applicable minimum wage for the country it reports on, determined directly by the national minimum wage law or through a collective bargaining agreement;\n(b) if the undertaking is already required by EU law (8) or other national regulations to report the percentage gap in pay between its female and male employees, it shall disclose it;\n(c) the percentage of employees covered by collective bargaining agreements;\n(d) the average number of annual training hours per employee."
+  },
+  {
+   "n": "43",
+   "heading": "B11 – Convictions and fines for corruption and bribery",
+   "code": "B11",
+   "related": [],
+   "text": "In case of convictions and fines in the reporting period, the undertaking shall disclose the number of convictions, and the total amount of fines incurred for the violation of anti- corruption and anti- bribery laws."
+  },
+  {
+   "n": "44",
+   "heading": "Comprehensive Module",
+   "code": null,
+   "related": [],
+   "text": "This module provides disclosures to address in a comprehensive way the information needs of the undertaking’s business partners, such as investors, banks and corporate clients in addition to the ones included in the Basic Module. The disclosures in this module reflect financial market participants and corporate clients’ respective obligations under relevant laws and regulations. They also reflect the information needed by the business partners to assess the sustainability risk profile of the undertaking, e.g. as a (potential) supplier or a (potential) borrower."
+  },
+  {
+   "n": "45",
+   "heading": "Comprehensive Module",
+   "code": null,
+   "related": [],
+   "text": "Additional guidance on disclosures C1 to C9 is available on EFRAG’s website and Knowledge Hub."
+  },
+  {
+   "n": "46",
+   "heading": "C1 – Strategy: Business Model and Sustainability – Related Initiatives",
+   "code": "C1",
+   "related": [],
+   "text": "The undertaking shall disclose the key elements of its business model and strategy, including:\n(a) [Voluntary for undertakings with 10 employees or less] a description of significant groups of products and/or services offered;\n(b) [Voluntary for undertakings with 10 employees or less] a description of significant market(s) the undertaking operates in (such as B2B, wholesale, retail, countries);\n(c) [Voluntary for undertakings with 10 employees or less] a description of main business relationships (such as key suppliers, customers, distribution channels); and\n(d) [Voluntary for undertakings with 10 employees or less] if the strategy has key elements that relate to or affect sustainability issues, a brief description of those key elements."
+  },
+  {
+   "n": "47",
+   "heading": "C2 – Description of practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "C2",
+   "related": [],
+   "text": "If the undertaking has put in place specific practices, policies or future initiatives for transitioning towards a more sustainable economy, which it has already reported under disclosure B2 in the Basic Module, it shall briefly describe them. In case the practice, policy, or future initiative covers suppliers or clients, the undertaking shall mention it. In addittion, if the undertaking has identified targets to monitor the implementation of policies in B2, it shall briefly describe them."
+  },
+  {
+   "n": "48",
+   "heading": "C2 – Description of practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "C2",
+   "related": [],
+   "text": "The undertaking may indicate the most senior level in the undertaking (i.e. a person or a body) that is accountable for implementing those practices, policies and future initiatives when this has been determined by the undertaking."
+  },
+  {
+   "n": "49",
+   "heading": "Consideration when reporting on GHG emissions under B3 (Basic Module)",
+   "code": null,
+   "related": [
+    "B3"
+   ],
+   "text": "Depending on the type of activities carried out by the undertaking, disclosing a quantification of its Scope 3 GHG emissions can be appropriate (see paragraph 12 of this Standard) to yield relevant information on the undertaking’s value chain impacts on climate change. Undertakings operating with manufacturing, agrifood, real estate construction and packaging processes are likely to have significant Scope 3 categories, which may be considered relevant for reporting in the undertaking’s sector."
+  },
+  {
+   "n": "50",
+   "heading": "Consideration when reporting on GHG emissions under B3 (Basic Module)",
+   "code": null,
+   "related": [
+    "B3"
+   ],
+   "text": "Scope 3 emissions are indirect GHG emissions (other than Scope 2) that derive from an undertaking’s value chain. They include the activities that are upstream of the undertaking’s operations (e.g. purchased goods and services, purchased capital goods, transportation of purchased goods, etc.) and activities that are downstream of the undertaking’s operations (e.g. transport and distribution of the undertaking’s products, use of sold products, investments, etc.)."
+  },
+  {
+   "n": "51",
+   "heading": "Consideration when reporting on GHG emissions under B3 (Basic Module)",
+   "code": null,
+   "related": [
+    "B3"
+   ],
+   "text": "If the undertaking decides to provide this metric, it should refer to the 15 types of Scope 3 GHG emissions identified by the GHG Protocol Corporate Standard and detailed by the GHG Protocol Corporate Value Chain (Scope 3) Accounting and Reporting Standard. When it reports on Scope 3 GHG emissions, the undertaking shall include significant Scope 3 categories (as per the Corporate Value Chain (Scope 3) Accounting and Reporting Standard) based on its own assessment of relevant Scope 3 categories. Undertakings can find further guidance on specific calculation methods for each category in the GHG Protocol’s Technical guidance for Calculating Scope 3 Emissions."
+  },
+  {
+   "n": "52",
+   "heading": "Consideration when reporting on GHG emissions under B3 (Basic Module)",
+   "code": null,
+   "related": [
+    "B3"
+   ],
+   "text": "When reporting its Scope 1 and Scope 2 emissions, if the undertaking discloses entity-specific information on its Scope 3 emissions, it shall present it together with the information specified under B3 – Energy and greenhouse gas emissions."
+  },
+  {
+   "n": "53",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "[Voluntary for undertakings with 10 employees or less] If the undertaking has established GHG emission reduction targets, it shall disclose its targets in absolute values for Scope 1 and Scope 2 emissions. In line with paragraphs 49 to 52 above and if it has set Scope 3 reduction targets, the undertaking shall also provide targets for significant Scope 3 emissions. In particular, it shall provide:\n(a) the target year and target year value;\n(b) the base year and base year value;\n(c) the units used for targets;\n(d) the share of Scope 1, Scope 2 and, if disclosed, Scope 3 that the target concerns; and\n(e) a list of main actions it seeks to implement to achieve its targets."
+  },
+  {
+   "n": "54",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "If the undertaking that operates in high climate impact sectors (9) has adopted a transition plan for climate change mitigation, it may provide information about it, including an explanation of how it is contributing to reduce GHG emissions."
+  },
+  {
+   "n": "55",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "In case the undertaking operates in high-climate impact sectors and does not have a transition plan for climate change mitigation in place, it shall indicate whether and, if so, when it will adopt such a transition plan."
+  },
+  {
+   "n": "56",
+   "heading": "C4 – Climate risks",
+   "code": "C4",
+   "related": [],
+   "text": "[Voluntary for undertakings with 10 employees or less] If the undertaking has identified climate-related hazards and climate-related transition events, creating climate-related risks for the undertaking, it shall:\n(a) briefly describe such climate-related hazards and climate-related transition events;\n(b) disclose how it has assessed the exposure and sensitivity of its assets, activities and value chain to these hazards and transition events;\n(c) disclose the time horizons of any climate-related hazards and transition events identified; and\n(d) disclose whether it has undertaken climate change adaptation actions for any climate-related hazards and transition events."
+  },
+  {
+   "n": "57",
+   "heading": "C4 – Climate risks",
+   "code": "C4",
+   "related": [],
+   "text": "The undertaking may disclose the potential adverse effects of climate risks that may affect its financial performance or business operations in the short, medium or long term, indicating whether it assesses the risks to be high, medium, low."
+  },
+  {
+   "n": "58",
+   "heading": "C5 – Additional (general) workforce characteristics",
+   "code": "C5",
+   "related": [],
+   "text": "[Voluntary for undertakings with 10 employees or less] The undertaking shall disclose the employee turnover rate for the reporting period."
+  },
+  {
+   "n": "59",
+   "heading": "C5 – Additional (general) workforce characteristics",
+   "code": "C5",
+   "related": [],
+   "text": "The undertaking may disclose the female-to-male ratio at management level for the reporting period."
+  },
+  {
+   "n": "60",
+   "heading": "C5 – Additional (general) workforce characteristics",
+   "code": "C5",
+   "related": [],
+   "text": "The undertaking may disclose the number of those self-employed without personnel who are working exclusively for the undertaking, and temporary workers provided by undertakings primarily engaged in ‘employment activities’."
+  },
+  {
+   "n": "61",
+   "heading": "C6 – Additional own workforce information – Human rights policies and processes",
+   "code": "C6",
+   "related": [],
+   "text": "The undertaking shall disclose an answer to the following questions:\n(a) [Voluntary for undertakings with 10 employees or less] Does the undertaking have a code of conduct or human rights policy for its own workforce? (YES/NO)\n(b) If yes, does this cover:\n  i. child labour (YES/NO);\n  ii. forced labour (YES/NO);\n  iii. human trafficking (YES/NO);\n  iv. discrimination (YES/NO);\n  v. accident prevention (YES/NO); or\n  vi. other? (YES/NO – if yes, specify).\n(c) [Voluntary for undertakings with 10 employees or less] Does the undertaking have a complaints-handling mechanism for its own workforce? (YES/NO)"
+  },
+  {
+   "n": "62",
+   "heading": "C7 – Human rights incidents",
+   "code": "C7",
+   "related": [],
+   "text": "The undertaking shall disclose an answer to the following questions:\n(a) [Voluntary for undertakings with 10 employees or less] Does the undertaking have confirmed incidents in its own workforce related to:\n  i. child labour (YES/NO);\n  ii. forced labour (YES/NO);\n  iii. human trafficking (YES/NO);\n  iv. discrimination (YES/NO); or\n  v. other? (YES/NO – if yes, specify).\n(b) If yes, the undertaking may describe the actions being taken to address the incidents described above.\n(c) [Voluntary for undertakings with 10 employees or less] Is the undertaking aware of any confirmed incidents involving workers in the value chain, affected communities, consumers and end-users identified in the reporting period? If yes, specify."
+  },
+  {
+   "n": "63",
+   "heading": "C8 – Revenues from certain activities",
+   "code": "C8",
+   "related": [],
+   "text": "If the undertaking is active in one or more of the following sectors, it shall disclose related revenues derived from activities in:\n(a) the prohibited weapons industry (10) (anti-personnel mines, cluster munitions, chemical weapons or biological weapons);\n(b) the cultivation and production of tobacco (11);\n(c) the fossil fuel (coal, oil and gas) sector, including a disaggregation of revenues derived from coal, oil and gas (12);\n(d) chemicals production (13), i.e. whether its activities fall under Division 20.2 of Annex I to Regulation (EC) No 1893/2006."
+  },
+  {
+   "n": "64",
+   "heading": "C9 – Gender diversity ratio in the governance body",
+   "code": "C9",
+   "related": [],
+   "text": "If the undertaking has a governance body in place, the undertaking shall disclose the related gender diversity ratio."
+  }
+ ],
+ "value_chain_cap": [
+  {
+   "code": "B1",
+   "reference": "Para 27, point (a), subpoints (i) and (ii)",
+   "datapoint": "Selected module option (basic and/or comprehensive)",
+   "cap_10_or_fewer_employees": true,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B1",
+   "reference": "Para 27, point (c)",
+   "datapoint": "Choice of reporting basis (individual or consolidated)",
+   "cap_10_or_fewer_employees": true,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B1",
+   "reference": "Para 27, point (e), subpoints from (i) to (vii)",
+   "datapoint": "General undertaking’s information",
+   "cap_10_or_fewer_employees": true,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B3",
+   "reference": "Para 32, first sentence",
+   "datapoint": "Total energy consumption in MWh",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B3",
+   "reference": "Para 33",
+   "datapoint": "Estimated absolute gross greenhouse gas (GHG) emissions",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B6",
+   "reference": "Para 36",
+   "datapoint": "Total water withdrawal",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B7",
+   "reference": "Para 38, first sentence",
+   "datapoint": "Circular economy principles application",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B7",
+   "reference": "Para 39, point (a)",
+   "datapoint": "Total weight of waste generated, with a breakdown between hazardous and non-hazardous waste",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B7",
+   "reference": "Para 39, point (b)",
+   "datapoint": "Proportion of waste diverted to recycling or reuse",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B8",
+   "reference": "Para 40, point (a)",
+   "datapoint": "Number of employees (in headcount or full-time equivalent) per type of employment contract",
+   "cap_10_or_fewer_employees": true,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B8",
+   "reference": "Para 40, point (b)",
+   "datapoint": "Number of employees (in headcount or full-time equivalent) per gender",
+   "cap_10_or_fewer_employees": true,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B9",
+   "reference": "Para 41, point (a)",
+   "datapoint": "Number and rate of recordable work-related accidents",
+   "cap_10_or_fewer_employees": true,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B10",
+   "reference": "Para 42, point (a)",
+   "datapoint": "Whether the employees receive pay that is equal or above applicable minimum wage for the country it reports on",
+   "cap_10_or_fewer_employees": true,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B10",
+   "reference": "Para 42, point (c)",
+   "datapoint": "Percentage of employees covered by collective bargaining agreements",
+   "cap_10_or_fewer_employees": true,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "B10",
+   "reference": "Para 42, point (d)",
+   "datapoint": "Average number of annual training hours per employee",
+   "cap_10_or_fewer_employees": true,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "C1",
+   "reference": "Para 46, point (a)",
+   "datapoint": "Description of significant groups of products and/or services offered",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "C1",
+   "reference": "Para 46, point (b)",
+   "datapoint": "Description of significant market(s) the undertaking operates in",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "C1",
+   "reference": "Para 46, point (c)",
+   "datapoint": "Description of main business relationships",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "C5",
+   "reference": "Para 58",
+   "datapoint": "Employee turnover rate",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "C6",
+   "reference": "Para 61, point (a)",
+   "datapoint": "Code of conduct or human rights policy",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "C6",
+   "reference": "Para 61, point (c)",
+   "datapoint": "Complaints-handling mechanism",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "C7",
+   "reference": "Para 62, point (a), subpoints from (i) to (v)",
+   "datapoint": "Confirmed incidents in its own workforce",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  },
+  {
+   "code": "C7",
+   "reference": "Para 62, point (c), first sentence",
+   "datapoint": "Confirmed incidents involving workers in the value chain, affected communities, consumers and end-users",
+   "cap_10_or_fewer_employees": false,
+   "cap_more_than_10_employees": true
+  }
+ ],
+ "entry_into_force": "2026-09-24",
+ "value_chain_cap_applies": "financial years beginning on or after 2027-01-01",
+ "article_4": "Article 4\nEntry into force and application\nThis Regulation shall enter into force on the third day following that of its publication in the Official Journal of the European Union.\nArticle 3 shall apply from the financial years beginning on or after 1 January 2027.",
+ "recital_5": "(5) From the date of entry into force of this Regulation, Recommendation (EU) 2025/1710 should be considered as no longer producing any legal effects. However, financial institutions, financial market participants, insurance undertakings and credit institutions, are still encouraged to limit as far as possible their requests for sustainability information from undertakings with 1 000 employees or less for purposes beyond sustainability reporting under Directive 2013/34/EU to the information specified in Annex I to this Regulation. Member States are also encouraged to raise awareness among undertakings with 1 000 employees or less about the benefits of voluntarily reporting sustainability information in accordance with Annex I to this Regulation, and take appropriate measures at national level to foster the implementation and acceptance of the standard as well as to support the automatic digitalisation of voluntary sustainability reporting based on the standard. To minimise compliance costs, undertakings applying this standard are not obliged to seek assurance for the information that they report."
+}

@@ -1,0 +1,15 @@
+{
+  "name": "xlsx-review",
+  "description": "The xlsx-review plugin: a pull-request-style review of spreadsheet changes, at formula level.",
+  "owner": {
+    "name": "Kerem Özdemir",
+    "url": "https://github.com/Keremozdemirra"
+  },
+  "plugins": [
+    {
+      "name": "xlsx-review",
+      "source": "./",
+      "description": "Shows what changed in an Excel workbook at formula level and flags the edits that usually break models."
+    }
+  ]
+}

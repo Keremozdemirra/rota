@@ -83,7 +83,9 @@ class Decisions(Case):
     def test_secrets_in_registry_text_are_masked(self):
         doc = copy.deepcopy(load("npm-left-pad.json")["body"])
         doc["versions"]["1.3.0"]["deprecated"] = "moved to https://bot:hunter2@git.example/x?token=abc NPM_TOKEN=s3cr3t"
-        net = FakeNet({"https://registry.npmjs.org/left-pad": (200, doc)}, census=False)
+        manifest = dict(doc["versions"]["1.3.0"])  # the hook reads the one version's manifest
+        net = FakeNet({"https://registry.npmjs.org/left-pad": (200, doc),
+                       "https://registry.npmjs.org/left-pad/1.3.0": (200, manifest)}, census=False)
         reason = self.respond("npm i left-pad", net=net)["hookSpecificOutput"]["permissionDecisionReason"]
         for secret in ("hunter2", "token=abc", "s3cr3t"):
             self.assertNotIn(secret, reason)

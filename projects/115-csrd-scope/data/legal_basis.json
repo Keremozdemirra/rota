@@ -1,0 +1,775 @@
+{
+ "schema": 1,
+ "checked": "2026-09-24",
+ "endpoint": "https://publications.europa.eu/webapi/rdf/sparql",
+ "pinned": {
+  "32013L0034": "02013L0034-20260318",
+  "32022L2464": "02022L2464-20260318",
+  "32004L0109": "02004L0109-20240109",
+  "32019R2088": "02019R2088-20260702"
+ },
+ "acts": {
+  "32004L0109": {
+   "cellar_work": "http://publications.europa.eu/resource/cellar/222f03e7-c991-408f-a0f1-f9b680b6433f",
+   "in_force": true,
+   "date_document": "2004-12-15",
+   "end_of_validity": "9999-12-31",
+   "title": "Directive 2004/109/EC of the European Parliament and of the Council of 15 December 2004 on the harmonisation of transparency requirements in relation to information about issuers whose securities are admitted to trading on a regulated market and amending Directive 2001/34/EC"
+  },
+  "32013L0034": {
+   "cellar_work": "http://publications.europa.eu/resource/cellar/aef88894-e08d-11e2-9165-01aa75ed71a1",
+   "in_force": true,
+   "date_document": "2013-06-26",
+   "end_of_validity": "9999-12-31",
+   "title": "Directive 2013/34/EU of the European Parliament and of the Council of 26 June 2013 on the annual financial statements, consolidated financial statements and related reports of certain types of undertakings, amending Directive 2006/43/EC of the European Parliament and of the Council and repealing Council Directives 78/660/EEC and 83/349/EEC  Text with EEA relevance"
+  },
+  "32022L2464": {
+   "cellar_work": "http://publications.europa.eu/resource/cellar/59e70288-7ce5-11ed-9887-01aa75ed71a1",
+   "in_force": true,
+   "date_document": "2022-12-14",
+   "end_of_validity": "9999-12-31",
+   "title": "Directive (EU) 2022/2464 of the European Parliament and of the Council of 14 December 2022 amending Regulation (EU) No 537/2014, Directive 2004/109/EC, Directive 2006/43/EC and Directive 2013/34/EU, as regards corporate sustainability reporting (Text with EEA relevance)"
+  },
+  "32025L0794": {
+   "cellar_work": "http://publications.europa.eu/resource/cellar/8a789948-1a5f-11f0-b1a3-01aa75ed71a1",
+   "in_force": true,
+   "date_document": "2025-04-14",
+   "end_of_validity": "9999-12-31",
+   "title": "Directive (EU) 2025/794 of the European Parliament and of the Council of 14 April 2025 amending Directives (EU) 2022/2464 and (EU) 2024/1760 as regards the dates from which Member States are to apply certain corporate sustainability reporting and due diligence requirements (Text with EEA relevance)"
+  },
+  "32023L2775": {
+   "cellar_work": "http://publications.europa.eu/resource/cellar/6dc9213a-9fa2-11ee-b164-01aa75ed71a1",
+   "in_force": true,
+   "date_document": "2023-10-17",
+   "end_of_validity": "9999-12-31",
+   "title": "Commission Delegated Directive (EU) 2023/2775 of 17 October 2023 amending Directive 2013/34/EU of the European Parliament and of the Council as regards the adjustments of the size criteria for micro, small, medium-sized and large undertakings or groups"
+  },
+  "32019R2088": {
+   "cellar_work": "http://publications.europa.eu/resource/cellar/4f50e277-1a53-11ea-8c1f-01aa75ed71a1",
+   "in_force": true,
+   "date_document": "2019-11-27",
+   "end_of_validity": "9999-12-31",
+   "title": "Regulation (EU) 2019/2088 of the European Parliament and of the Council of 27 November 2019 on sustainability‐related disclosures in the financial services sector (Text with EEA relevance)"
+  },
+  "32026L0470": {
+   "cellar_work": "http://publications.europa.eu/resource/cellar/2f337274-12b4-11f1-8870-01aa75ed71a1",
+   "in_force": true,
+   "date_document": "2026-02-24",
+   "end_of_validity": "9999-12-31",
+   "title": "Directive (EU) 2026/470 of the European Parliament and of the Council of 24 February 2026 amending Directives 2006/43/EC, 2013/34/EU, (EU) 2022/2464 and (EU) 2024/1760 as regards certain corporate sustainability reporting requirements and certain corporate sustainability due diligence requirements (Text with EEA relevance)"
+  },
+  "52024XC06792": {
+   "cellar_work": "http://publications.europa.eu/resource/cellar/edc4d6e7-a15f-11ef-85f0-01aa75ed71a1",
+   "date_document": "2024-11-13",
+   "title": "Commission Notice on the interpretation of certain legal provisions in Directive 2013/34/EU (Accounting Directive), Directive 2006/43/EC (Audit Directive), Regulation (EU) No 537/2014 (Audit Regulation), Directive 2004/109/EC (Transparency Directive), Delegated Regulation (EU) 2023/2772 (first set of European Sustainability Reporting Standards, first ESRS delegated act), and Regulation (EU) 2019/2088 (Sustainable Finance Disclosures Regulation, SFDR) as regards sustainability reporting"
+  }
+ },
+ "consolidated_versions": {
+  "32013L0034": [
+   {
+    "celex": "02013L0034-20270130",
+    "date": "2027-01-30"
+   },
+   {
+    "celex": "02013L0034-20260318",
+    "date": "2026-03-18"
+   },
+   {
+    "celex": "02013L0034-20240528",
+    "date": "2024-05-28"
+   },
+   {
+    "celex": "02013L0034-20240109",
+    "date": "2024-01-09"
+   },
+   {
+    "celex": "02013L0034-20230105",
+    "date": "2023-01-05"
+   },
+   {
+    "celex": "02013L0034-20211221",
+    "date": "2021-12-21"
+   },
+   {
+    "celex": "02013L0034-20141211",
+    "date": "2014-12-11"
+   },
+   {
+    "celex": "02013L0034-20141205",
+    "date": "2014-12-05"
+   },
+   {
+    "celex": "02013L0034-20130719",
+    "date": "2013-07-19"
+   }
+  ],
+  "32004L0109": [
+   {
+    "celex": "02004L0109-20240109",
+    "date": "2024-01-09"
+   },
+   {
+    "celex": "02004L0109-20230105",
+    "date": "2023-01-05"
+   },
+   {
+    "celex": "02004L0109-20210318",
+    "date": "2021-03-18"
+   },
+   {
+    "celex": "02004L0109-20131126",
+    "date": "2013-11-26"
+   },
+   {
+    "celex": "02004L0109-20110104",
+    "date": "2011-01-04"
+   },
+   {
+    "celex": "02004L0109-20080320",
+    "date": "2008-03-20"
+   }
+  ],
+  "32019R2088": [
+   {
+    "celex": "02019R2088-20260702",
+    "date": "2026-07-02"
+   },
+   {
+    "celex": "02019R2088-20240109",
+    "date": "2024-01-09"
+   },
+   {
+    "celex": "02019R2088-20200712",
+    "date": "2020-07-12"
+   }
+  ],
+  "32022L2464": [
+   {
+    "celex": "02022L2464-20260318",
+    "date": "2026-03-18"
+   },
+   {
+    "celex": "02022L2464-20250417",
+    "date": "2025-04-17"
+   },
+   {
+    "celex": "02022L2464-20221216",
+    "date": "2022-12-16"
+   }
+  ]
+ },
+ "amending_acts_since_2023": {
+  "32013L0034": [
+   {
+    "celex": "32026L0470",
+    "date": "2026-02-24",
+    "title": "Directive (EU) 2026/470 of the European Parliament and of the Council of 24 February 2026 amending Directives 2006/43/EC, 2013/34/EU, (EU) 2022/2464 and (EU) 2024/1760 as regards certain corporate sustainability reporting requirements and certain corporate sustainability due diligence requirements (Text with EEA relevance)"
+   },
+   {
+    "celex": "32025L0002",
+    "date": "2024-11-27",
+    "title": "Directive (EU) 2025/2 of the European Parliament and of the Council of 27 November 2024 amending Directive 2009/138/EC as regards proportionality, quality of supervision, reporting, long-term guarantee measures, macro-prudential tools, sustainability risks and group and cross-border supervision, and amending Directives 2002/87/EC and 2013/34/EU (Text with EEA relevance)"
+   },
+   {
+    "celex": "32024L1306",
+    "date": "2024-04-29",
+    "title": "Directive (EU) 2024/1306 of the European Parliament and of the Council of 29 April 2024 amending Directive 2013/34/EU as regards the time limits for the adoption of sustainability reporting standards for certain sectors and for certain third-country undertakings (Text with EEA relevance)"
+   },
+   {
+    "celex": "32023L2864",
+    "date": "2023-12-13",
+    "title": "Directive (EU) 2023/2864 of the European Parliament and of the Council of 13 December 2023 amending certain Directives as regards the establishment and functioning of the European single access point (Text with EEA relevance)"
+   },
+   {
+    "celex": "32023L2775",
+    "date": "2023-10-17",
+    "title": "Commission Delegated Directive (EU) 2023/2775 of 17 October 2023 amending Directive 2013/34/EU of the European Parliament and of the Council as regards the adjustments of the size criteria for micro, small, medium-sized and large undertakings or groups"
+   }
+  ],
+  "32022L2464": [
+   {
+    "celex": "32026L0470",
+    "date": "2026-02-24",
+    "title": "Directive (EU) 2026/470 of the European Parliament and of the Council of 24 February 2026 amending Directives 2006/43/EC, 2013/34/EU, (EU) 2022/2464 and (EU) 2024/1760 as regards certain corporate sustainability reporting requirements and certain corporate sustainability due diligence requirements (Text with EEA relevance)"
+   },
+   {
+    "celex": "32025L0794",
+    "date": "2025-04-14",
+    "title": "Directive (EU) 2025/794 of the European Parliament and of the Council of 14 April 2025 amending Directives (EU) 2022/2464 and (EU) 2024/1760 as regards the dates from which Member States are to apply certain corporate sustainability reporting and due diligence requirements (Text with EEA relevance)"
+   }
+  ]
+ },
+ "related_since_2024": [
+  {
+   "base": "32004L0109",
+   "rel": "consolidates",
+   "celex": "02004L0109-20240109",
+   "date": "2024-01-09"
+  },
+  {
+   "base": "32013L0034",
+   "rel": "amends",
+   "celex": "32024L1306",
+   "date": "2024-04-29"
+  },
+  {
+   "base": "32013L0034",
+   "rel": "amends",
+   "celex": "32025L0002",
+   "date": "2024-11-27"
+  },
+  {
+   "base": "32013L0034",
+   "rel": "amends",
+   "celex": "32026L0470",
+   "date": "2026-02-24"
+  },
+  {
+   "base": "32013L0034",
+   "rel": "consolidates",
+   "celex": "02013L0034-20240109",
+   "date": "2024-01-09"
+  },
+  {
+   "base": "32013L0034",
+   "rel": "consolidates",
+   "celex": "02013L0034-20240528",
+   "date": "2024-05-28"
+  },
+  {
+   "base": "32013L0034",
+   "rel": "consolidates",
+   "celex": "02013L0034-20260318",
+   "date": "2026-03-18"
+  },
+  {
+   "base": "32013L0034",
+   "rel": "consolidates",
+   "celex": "02013L0034-20270130",
+   "date": "2027-01-30"
+  },
+  {
+   "base": "32013L0034",
+   "rel": "corrects",
+   "celex": "32013L0034R(07)",
+   "date": "2024-07-24",
+   "languages": [
+    "SPA"
+   ]
+  },
+  {
+   "base": "32013L0034",
+   "rel": "corrects",
+   "celex": "32013L0034R(08)",
+   "date": "2025-10-08",
+   "languages": [
+    "MLT"
+   ]
+  },
+  {
+   "base": "32019R2088",
+   "rel": "amends",
+   "celex": "32024R3005",
+   "date": "2024-11-27"
+  },
+  {
+   "base": "32019R2088",
+   "rel": "consolidates",
+   "celex": "02019R2088-20240109",
+   "date": "2024-01-09"
+  },
+  {
+   "base": "32019R2088",
+   "rel": "consolidates",
+   "celex": "02019R2088-20260702",
+   "date": "2026-07-02"
+  },
+  {
+   "base": "32022L2464",
+   "rel": "amends",
+   "celex": "32025L0794",
+   "date": "2025-04-14"
+  },
+  {
+   "base": "32022L2464",
+   "rel": "amends",
+   "celex": "32026L0470",
+   "date": "2026-02-24"
+  },
+  {
+   "base": "32022L2464",
+   "rel": "consolidates",
+   "celex": "02022L2464-20250417",
+   "date": "2025-04-17"
+  },
+  {
+   "base": "32022L2464",
+   "rel": "consolidates",
+   "celex": "02022L2464-20260318",
+   "date": "2026-03-18"
+  },
+  {
+   "base": "32022L2464",
+   "rel": "corrects",
+   "celex": "32022L2464R(04)",
+   "date": "2024-08-16",
+   "languages": [
+    "LIT"
+   ]
+  },
+  {
+   "base": "32022L2464",
+   "rel": "corrects",
+   "celex": "32022L2464R(05)",
+   "date": "2024-11-20",
+   "languages": [
+    "FRA"
+   ]
+  },
+  {
+   "base": "32022L2464",
+   "rel": "corrects",
+   "celex": "32022L2464R(06)",
+   "date": "2025-05-07",
+   "languages": [
+    "DEU"
+   ]
+  },
+  {
+   "base": "32022L2464",
+   "rel": "corrects",
+   "celex": "32022L2464R(07)",
+   "date": "2025-09-11",
+   "languages": [
+    "GLE"
+   ]
+  },
+  {
+   "base": "32022L2464",
+   "rel": "corrects",
+   "celex": "32022L2464R(08)",
+   "date": "2025-10-08",
+   "languages": [
+    "BUL",
+    "CES",
+    "DEU",
+    "ELL",
+    "EST",
+    "FIN",
+    "HRV",
+    "HUN",
+    "ITA",
+    "LAV",
+    "MLT",
+    "NLD",
+    "POL",
+    "POR",
+    "RON",
+    "SLK",
+    "SPA"
+   ]
+  },
+  {
+   "base": "32022L2464",
+   "rel": "corrects",
+   "celex": "32022L2464R(09)",
+   "date": "2026-07-01",
+   "languages": [
+    "CES"
+   ]
+  },
+  {
+   "base": "32026L0470",
+   "rel": "corrects",
+   "celex": "32026L0470R(01)",
+   "date": "2026-04-22",
+   "languages": [
+    "LIT"
+   ]
+  }
+ ],
+ "documents": {
+  "02013L0034-20260318": {
+   "url": "https://publications.europa.eu/resource/celex/02013L0034-20260318",
+   "resolved_url": "http://publications.europa.eu/resource/cellar/cd97a7c2-2267-11f1-8c3a-01aa75ed71a1.0007.02/DOC_1",
+   "bytes": 758297,
+   "sha256": "20710edfbe1a975cd3dd9f6751442fa597546b48e6410c604d9c11f3b271b31d",
+   "retrieved": "2026-09-24"
+  },
+  "02022L2464-20260318": {
+   "url": "https://publications.europa.eu/resource/celex/02022L2464-20260318",
+   "resolved_url": "http://publications.europa.eu/resource/cellar/37c35a2b-2255-11f1-8c3a-01aa75ed71a1.0007.02/DOC_1",
+   "bytes": 295274,
+   "sha256": "27e8029ef340028ce8cc5181e635eb32eeb48b97c366d2177d0551923e857440",
+   "retrieved": "2026-09-24"
+  },
+  "32026L0470": {
+   "url": "https://publications.europa.eu/resource/celex/32026L0470",
+   "resolved_url": "http://publications.europa.eu/resource/cellar/2f337274-12b4-11f1-8870-01aa75ed71a1.0006.03/DOC_1",
+   "bytes": 388853,
+   "sha256": "8eb95f167657537d3a285927bce1f086dba0b1a33426f938da0ef48fe40bb966",
+   "retrieved": "2026-09-24"
+  },
+  "32025L0794": {
+   "url": "https://publications.europa.eu/resource/celex/32025L0794",
+   "resolved_url": "http://publications.europa.eu/resource/cellar/8a789948-1a5f-11f0-b1a3-01aa75ed71a1.0006.03/DOC_1",
+   "bytes": 33961,
+   "sha256": "9b1ae0bd3d5313f7b294a3ec5dd771ffd900666673ffb52431ce07969a5055f2",
+   "retrieved": "2026-09-24"
+  },
+  "32023L2775": {
+   "url": "https://publications.europa.eu/resource/celex/32023L2775",
+   "resolved_url": "http://publications.europa.eu/resource/cellar/6dc9213a-9fa2-11ee-b164-01aa75ed71a1.0006.03/DOC_1",
+   "bytes": 32111,
+   "sha256": "145fef26262d9a267c44594ca79b4e564f6c74fe1b435c8102e13a33d2d6cce9",
+   "retrieved": "2026-09-24"
+  },
+  "02013L0034-20230105": {
+   "url": "https://publications.europa.eu/resource/celex/02013L0034-20230105",
+   "resolved_url": "http://publications.europa.eu/resource/cellar/3945a181-91c6-11ed-b508-01aa75ed71a1.0001.03/DOC_1",
+   "bytes": 692064,
+   "sha256": "2af0b26d2f8a93f9eb08b4d3b3783e7a5cc89642dfc8b217eec76d6e85d101cf",
+   "retrieved": "2026-09-24"
+  },
+  "02013L0034-20240528": {
+   "url": "https://publications.europa.eu/resource/celex/02013L0034-20240528",
+   "resolved_url": "http://publications.europa.eu/resource/cellar/d4642632-2807-11ef-a195-01aa75ed71a1.0007.02/DOC_1",
+   "bytes": 712597,
+   "sha256": "67e5bf2f66bed5d63350c75fbba1a028e520306df1114b46b42a97ec766da8a9",
+   "retrieved": "2026-09-24"
+  },
+  "02004L0109-20240109": {
+   "url": "https://publications.europa.eu/resource/celex/02004L0109-20240109",
+   "resolved_url": "http://publications.europa.eu/resource/cellar/aa467f94-c57b-11ee-95d9-01aa75ed71a1.0006.02/DOC_1",
+   "bytes": 270670,
+   "sha256": "6f97a4e64fc1c5e901dcc15446ba8d7581af0a520e5cb4af4469049d49354662",
+   "retrieved": "2026-09-24"
+  },
+  "52024XC06792": {
+   "url": "https://publications.europa.eu/resource/celex/52024XC06792",
+   "resolved_url": "http://publications.europa.eu/resource/cellar/edc4d6e7-a15f-11ef-85f0-01aa75ed71a1.0006.03/DOC_1",
+   "bytes": 1474894,
+   "sha256": "364d7147140c026df914d784da5d2d0904a0e07e4e417b31b72f6ea52e42adf2",
+   "retrieved": "2026-09-24"
+  },
+  "02019R2088-20260702": {
+   "url": "https://publications.europa.eu/resource/celex/02019R2088-20260702",
+   "resolved_url": "http://publications.europa.eu/resource/cellar/1bc0fbfd-69c2-11f1-ae88-01aa75ed71a1.0001.02/DOC_1",
+   "bytes": 121157,
+   "sha256": "5cb7fc10620a38ce3cad0fb96769c794e78f4b4bb8b4ca2d55d3fc9a51ecce20",
+   "retrieved": "2026-09-24"
+  }
+ },
+ "quotes": {
+  "consolidated-disclaimer": {
+   "celex": "02013L0034-20260318",
+   "cite": "Consolidated text header (EUR-Lex)",
+   "text": "This text is meant purely as a documentation tool and has no legal effect."
+  },
+  "AD-1-1": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 1(1) Directive 2013/34/EU",
+   "text": "The coordination measures prescribed by this Directive shall apply to the laws, regulations and administrative provisions of the Member States relating to the types of undertakings listed: (a) in Annex I; (b) in Annex II, where all of the direct or indirect members of the undertaking having otherwise unlimited liability in fact have limited liability by reason of those members being undertakings which are: (i) of the types listed in Annex I; or (ii) not governed by the law of a Member State but which have a legal form comparable to those listed in Annex I."
+  },
+  "AD-1-3": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 1(3) first subparagraph Directive 2013/34/EU",
+   "text": "The coordination measures prescribed by Articles 19a, 29a, 29d, 30 and 33, point (aa) of the second subparagraph of Article 34(1), Article 34(2) and (3), and Article 51 of this Directive shall also apply to the laws, regulations and administrative provisions of the Member States relating to the following undertakings regardless of their legal form, provided that those undertakings are undertakings which, on their balance sheet dates, exceed a net turnover of EUR 450 000 000 and an average number of 1 000 employees during the financial year: (a) insurance undertakings within the meaning of Article 2(1) of Council Directive 91/674/EEC (1); (b) credit institutions as defined in point (1) of Article 4(1) of Regulation (EU) No 575/2013"
+  },
+  "AD-1-3-2": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 1(3) second subparagraph Directive 2013/34/EU",
+   "text": "Member States may choose not to apply the coordination measures referred to in the first subparagraph of this paragraph to the undertakings listed in points (2) to (23) of Article 2(5) of Directive 2013/36/EU"
+  },
+  "AD-1-4": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 1(4) Directive 2013/34/EU",
+   "text": "The coordination measures prescribed by Articles 19a, 29a and 29d shall not apply to the European Financial Stability Facility (EFSF) established by the EFSF Framework Agreement or to financial products listed in points (b) and (f) of point (12) of Article 2 of Regulation (EU) 2019/2088"
+  },
+  "AD-2-1": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 2(1) Directive 2013/34/EU",
+   "text": "‘public-interest entities’ means undertakings within the scope of Article 1 which are: (a) governed by the law of a Member State and whose transferable securities are admitted to trading on a regulated market of any Member State within the meaning of point (14) of Article 4(1) of Directive 2004/39/EC of the European Parliament and of the Council of 21 April 2004 on markets in financial instruments (5); (b) credit institutions as defined in point (1) of Article 4 of Directive 2006/48/EC of the European Parliament and of the Council of 14 June 2006 relating to the taking up and pursuit of the business of credit institutions (6), other than those referred to in Article 2 of that Directive; (c) insurance undertakings within the meaning of Article 2(1) of Council Directive 91/674/EEC of 19 December 1991 on the annual accounts of insurance undertakings (7); or (d) designated by Member States as public-interest entities, for instance undertakings that are of significant public relevance because of the nature of their business, their size or the number of their employees;"
+  },
+  "AD-2-5": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 2(5) Directive 2013/34/EU",
+   "text": "‘net turnover’ means the amounts derived from the sale of products and the provision of services after deducting sales rebates and value added tax and other taxes directly linked to turnover; however, for insurance undertakings referred to in point (a) of the first subparagraph of Article 1(3) of this Directive, ‘net turnover’ shall be defined in accordance with Article 35 and point 2 of Article 66 of Council Directive 91/674/EEC (9); for credit institutions referred to in point (b) of the first subparagraph of Article 1(3) of this Directive, ‘net turnover’ shall be defined in accordance with point (c) of Article 43(2) of Council Directive 86/635/EEC (10); and for undertakings falling under the scope of Article 40a(1) of this Directive, ‘net turnover’ means the revenue as defined by or within the meaning of the financial reporting framework on the basis of which the financial statements of the undertaking are prepared;"
+  },
+  "AD-2-15": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 2(15) Directive 2013/34/EU",
+   "text": "‘financial holding undertakings’ means undertakings the sole object of which is to acquire holdings in other undertakings and to manage such holdings and turn them to profit, without involving themselves directly or indirectly in the management of those undertakings, without prejudice to their rights as shareholders;"
+  },
+  "AD-3-4": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 3(4) Directive 2013/34/EU",
+   "text": "Large undertakings shall be undertakings which on their balance sheet dates exceed at least two of the three following criteria: (a) balance sheet total: EUR 25 000 000; (b) net turnover: EUR 50 000 000; (c) average number of employees during the financial year: 250."
+  },
+  "AD-3-7": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 3(7) Directive 2013/34/EU",
+   "text": "Large groups shall be groups consisting of parent and subsidiary undertakings to be included in a consolidation and which, on a consolidated basis, exceed the limits of at least two of the three following criteria on the balance sheet date of the parent undertaking: (a) balance sheet total: EUR 25 000 000; (b) net turnover: EUR 50 000 000; (c) average number of employees during the financial year: 250."
+  },
+  "AD-3-8": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 3(8) Directive 2013/34/EU",
+   "text": "Member States shall permit the set-off referred to in Article 24(3) and any elimination as a consequence of Article 24(7) not to be effected when the limits in paragraphs 5 to 7 of this Article are calculated. In such cases, the limits for the balance sheet total and net turnover criteria shall be increased by 20 %."
+  },
+  "AD-3-10": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 3(10) Directive 2013/34/EU",
+   "text": "Where, on its balance sheet date, an undertaking or a group exceeds or ceases to exceed the limits of two of the three criteria set out in paragraphs 1 to 7, that fact shall affect the application of the derogations provided for in this Directive only if it occurs in two consecutive financial years."
+  },
+  "AD-3-13": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 3(13) Directive 2013/34/EU",
+   "text": "In order to adjust for the effects of inflation, the Commission shall at least every five years review and, where appropriate, amend, by means of delegated acts in accordance with Article 49, the thresholds referred to in the following provisions, taking into account measures of inflation as published in the Official Journal of the European Union: (a) paragraphs 1 to 7 of this Article; (b) the fourth subparagraph of Article 19(1), the first subparagraph of Article 19a(1), the first subparagraph of Article 29a(1); and (c) the second, fourth and fifth subparagraphs of Article 40a(1)."
+  },
+  "AD-19a-1": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 19a(1) first subparagraph Directive 2013/34/EU",
+   "text": "Undertakings which, on their balance sheet dates, exceed a net turnover of EUR 450 000 000 and an average number of 1 000 employees during the financial year shall include in their management report information necessary to understand the undertaking’s impacts on sustainability matters, and information necessary to understand how sustainability matters affect the undertaking’s development, performance and position."
+  },
+  "AD-19a-3-protected": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 19a(3) second subparagraph point (b) Directive 2013/34/EU",
+   "text": "‘protected undertaking’ means an undertaking which: (i) does not exceed, on its balance sheet date, an average number of 1 000 employees during the preceding financial year; and (ii) is in the value chain of a reporting undertaking;"
+  },
+  "AD-19a-9": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 19a(9) first subparagraph Directive 2013/34/EU",
+   "text": "Provided that the conditions set out in the second subparagraph of this paragraph are met, an undertaking which is a subsidiary undertaking shall be exempted from the obligations set out in paragraphs 1 to 4 of this Article (“the exempted subsidiary undertaking”) if such undertaking and its subsidiary undertakings are included in the consolidated management report of a parent undertaking, drawn up in accordance with Articles 29 and 29a."
+  },
+  "AD-19a-10": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 19a(10) Directive 2013/34/EU",
+   "text": "The exemption laid down in paragraph 9 shall also apply to public-interest entities subject to the requirements of this Article."
+  },
+  "AD-29a-1": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 29a(1) first subparagraph Directive 2013/34/EU",
+   "text": "Parent undertakings of a group which, on its balance sheet date, exceeds, on a consolidated basis, a net turnover of EUR 450 000 000 and an average number of 1 000 employees during the financial year shall include in the consolidated management report information necessary to understand the group’s impacts on sustainability matters, and information necessary to understand how sustainability matters affect the group’s development, performance and position."
+  },
+  "AD-29a-7a": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 29a(7a) Directive 2013/34/EU",
+   "text": "By way of derogation from paragraph 1, Member States shall ensure that parent undertakings that are financial holding undertakings whose subsidiary undertakings’ business models and operations are independent of one another may choose not to include in their consolidated management report the information referred to in paragraph 1."
+  },
+  "AD-29a-8": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 29a(8) first subparagraph Directive 2013/34/EU",
+   "text": "Provided that the conditions set out in the second subparagraph of this paragraph are met, a parent undertaking which is a subsidiary undertaking shall be exempted from the obligations set out in paragraphs 1 to 5 of this Article (the ‘exempted parent undertaking’) if such parent undertaking and its subsidiary undertakings are included in the consolidated management report of another undertaking, drawn up in accordance with Article 29 and this Article."
+  },
+  "AD-29a-9": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 29a(9) Directive 2013/34/EU",
+   "text": "The exemption laid down in paragraph 8 shall also apply to public-interest entities subject to the requirements of this Article."
+  },
+  "AD-30-1": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 30(1) Directive 2013/34/EU",
+   "text": "Member States shall ensure that undertakings publish within a reasonable period of time, which shall not exceed 12 months after the balance sheet date"
+  },
+  "AD-40": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 40 Directive 2013/34/EU",
+   "text": "A public-interest entity shall be treated as a large undertaking regardless of its net turnover, balance sheet total or average number of employees during the financial year."
+  },
+  "AD-40a-1-1": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 40a(1) first subparagraph Directive 2013/34/EU",
+   "text": "A Member State shall require that a subsidiary undertaking established in its territory whose ultimate parent undertaking is governed by the law of a third country publish and make accessible a sustainability report covering the information specified in points (a)(iii) to (a)(v), points (b) to (f) and, where appropriate, point (h) of Article 29a(2) at the group level of that ultimate third-country parent undertaking."
+  },
+  "AD-40a-1-2": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 40a(1) second subparagraph Directive 2013/34/EU",
+   "text": "The first subparagraph shall only apply to subsidiary undertakings which, on their balance sheet dates, exceed a net turnover of EUR 200 000 000 in the preceding financial year."
+  },
+  "AD-40a-1-3": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 40a(1) third subparagraph Directive 2013/34/EU",
+   "text": "A Member State shall require that a branch located in its territory, and which is a branch of an undertaking governed by the law of a third country, which is either not part of a group or is ultimately held by an undertaking that is formed in accordance with the law of a third country publish and make accessible a sustainability report covering the information specified in points (a)(iii) to (a)(v), points (b) to (f) and, where appropriate, point (h) of Article 29a(2), at the group level, or, if not applicable, the individual level, of the third-country undertaking."
+  },
+  "AD-40a-1-4": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 40a(1) fourth subparagraph Directive 2013/34/EU",
+   "text": "The rule referred to in the third subparagraph shall only apply to a branch where the third-country undertaking does not have a subsidiary undertaking as referred to in the first subparagraph, and where the branch generated a net turnover exceeding EUR 200 000 000 in the preceding financial year."
+  },
+  "AD-40a-1-5": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 40a(1) fifth subparagraph Directive 2013/34/EU",
+   "text": "The first and third subparagraphs shall only apply to the subsidiary undertakings or branches referred to in those subparagraphs where the third-country undertaking, at its group level, or, if not applicable, the individual level, generated a net turnover in the Union exceeding EUR 450 000 000 for each of the last two consecutive financial years."
+  },
+  "AD-40a-1-7": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 40a(1) seventh subparagraph Directive 2013/34/EU",
+   "text": "By way of derogation from the first and third subparagraphs, where the third-country undertaking is a financial holding undertaking whose subsidiary undertakings’ business models and operations are independent of one another, Member States shall ensure that the subsidiaries and the branches may decide not to publish and make accessible the sustainability report referred to in the first and third subparagraphs."
+  },
+  "AD-48i-1": {
+   "celex": "02013L0034-20260318",
+   "cite": "Art. 48i(1) first subparagraph Directive 2013/34/EU",
+   "text": "Until 6 January 2030, Member States shall permit a Union subsidiary undertaking which is subject to Article 19a or 29a and whose parent undertaking is not governed by the law of a Member State to prepare consolidated sustainability reporting, in accordance with the requirements of Article 29a, that includes all Union subsidiary undertakings of such parent undertaking that are subject to Article 19a or 29a."
+  },
+  "CSRD-5-2-a": {
+   "celex": "02022L2464-20260318",
+   "cite": "Art. 5(2) first subparagraph point (a) Directive (EU) 2022/2464",
+   "text": "Member States shall apply the measures necessary to comply with Article 1, with the exception of point (14): (a) for financial years starting between 1 January 2024 and 31 December 2026: (i) to large undertakings within the meaning of Article 3(4) of Directive 2013/34/EU which are public-interest entities as defined in point (1) of Article 2 of that Directive exceeding on their balance sheet dates the average number of 500 employees during the financial year; (ii) to public-interest entities as defined in point (1) of Article 2 of Directive 2013/34/EU which are parent undertakings of a large group within the meaning of Article 3(7) of that Directive exceeding on its balance sheet dates, on a consolidated basis, the average number of 500 employees during the financial year;"
+  },
+  "CSRD-5-2-b": {
+   "celex": "02022L2464-20260318",
+   "cite": "Art. 5(2) first subparagraph point (b) Directive (EU) 2022/2464",
+   "text": "for financial years starting on or after 1 January 2027: (i) to undertakings which, on their balance sheet dates, exceed a net turnover of EUR 450 000 000 and an average number of 1 000 employees during the financial year; (ii) to parent undertakings of a group which, on its balance sheet dates, exceeds, on a consolidated basis, a net turnover of EUR 450 000 000 and an average number of 1 000 employees during the financial year."
+  },
+  "CSRD-5-2-sub2": {
+   "celex": "02022L2464-20260318",
+   "cite": "Art. 5(2) second subparagraph Directive (EU) 2022/2464",
+   "text": "Member States shall apply the measures necessary to comply with point (14) of Article 1 for financial years starting on or after 1 January 2028."
+  },
+  "CSRD-5-2-sub3-a": {
+   "celex": "02022L2464-20260318",
+   "cite": "Art. 5(2) third subparagraph point (a) Directive (EU) 2022/2464",
+   "text": "Member States shall apply the measures necessary to comply with Article 2: (a) for financial years starting between 1 January 2024 and 31 December 2026: (i) to issuers as defined in point (d) of Article 2(1) of Directive 2004/109/EC which are large undertakings within the meaning of Article 3(4) of Directive 2013/34/EU exceeding on their balance sheet dates the average number of 500 employees during the financial year; (ii) to issuers as defined in point (d) of Article 2(1) of Directive 2004/109/EC which are parent undertakings of a large group within the meaning of Article 3(7) of Directive 2013/34/EU exceeding on its balance sheet dates, on a consolidated basis, the average number of 500 employees during the financial year;"
+  },
+  "CSRD-5-2-sub3-b": {
+   "celex": "02022L2464-20260318",
+   "cite": "Art. 5(2) third subparagraph point (b) Directive (EU) 2022/2464",
+   "text": "(i) to issuers as defined in point (d) of Article 2(1) of Directive 2004/109/EC which are undertakings which, on their balance sheet dates, exceed a net turnover of EUR 450 000 000 and an average number of 1 000 employees during the financial year; (ii) to issuers as defined in point (d) of Article 2(1) of Directive 2004/109/EC which are parent undertakings of a group which, on its balance sheet dates, exceeds, on a consolidated basis, a net turnover of EUR 450 000 000 and an average number of 1 000 employees during the financial year."
+  },
+  "CSRD-5-2-derogation": {
+   "celex": "02022L2464-20260318",
+   "cite": "Art. 5(2) fifth subparagraph Directive (EU) 2022/2464",
+   "text": "By way of derogation from point (a) of the first subparagraph and point (a) of the third subparagraph, Member States may exempt undertakings or issuers which do not exceed a net turnover of EUR 450 000 000 or an average number of 1 000 employees during the financial year, on a consolidated basis where applicable, from complying with the measures necessary to comply with Article 1, with the exception of point (14), and with Article 2, for the financial years starting between 1 January 2025 and 31 December 2026."
+  },
+  "OMNI-title": {
+   "celex": "32026L0470",
+   "cite": "Directive (EU) 2026/470, title",
+   "text": "DIRECTIVE (EU) 2026/470 OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL of 24 February 2026 amending Directives 2006/43/EC, 2013/34/EU, (EU) 2022/2464 and (EU) 2024/1760 as regards certain corporate sustainability reporting requirements and certain corporate sustainability due diligence requirements"
+  },
+  "OMNI-oj": {
+   "celex": "32026L0470",
+   "cite": "Directive (EU) 2026/470, Official Journal reference",
+   "text": "L series 2026/470 26.2.2026"
+  },
+  "OMNI-rec-7": {
+   "celex": "32026L0470",
+   "cite": "Recital (7) Directive (EU) 2026/470",
+   "text": "the obligation to prepare and publish sustainability reporting at individual level should be limited to undertakings with a net turnover exceeding EUR 450 000 000 and an average of more than 1 000 employees during the financial year, as defined in the national measures transposing Directive 2013/34/EU."
+  },
+  "OMNI-rec-31": {
+   "celex": "32026L0470",
+   "cite": "Recital (31) Directive (EU) 2026/470",
+   "text": "Nevertheless, with a view to reducing burden as swiftly as possible, Member States should be able to exempt such undertakings from reporting obligations as regards the financial years beginning between 1 January 2025 and 31 December 2026."
+  },
+  "OMNI-5-1": {
+   "celex": "32026L0470",
+   "cite": "Art. 5(1) Directive (EU) 2026/470",
+   "text": "Member States shall bring into force the laws, regulations and administrative provisions necessary to comply with Articles 1, 2 and 3 by 19 March 2027."
+  },
+  "OMNI-6": {
+   "celex": "32026L0470",
+   "cite": "Art. 6 Directive (EU) 2026/470",
+   "text": "This Directive shall enter into force on the twentieth day following that of its publication in the Official Journal of the European Union."
+  },
+  "STC-oj": {
+   "celex": "32025L0794",
+   "cite": "Directive (EU) 2025/794, Official Journal reference",
+   "text": "L series 2025/794 16.4.2025"
+  },
+  "STC-1": {
+   "celex": "32025L0794",
+   "cite": "Art. 1 Directive (EU) 2025/794",
+   "text": "Article 5(2) of Directive (EU) 2022/2464 is amended as follows: (a) the first subparagraph is amended as follows: (i) in point (b), the introductory wording is replaced by the following: ‘for financial years starting on or after 1 January 2027:’; (ii) in point (c), the introductory wording is replaced by the following: ‘for financial years starting on or after 1 January 2028:’; (b) the third subparagraph is amended as follows: (i) in point (b), the introductory wording is replaced by the following: ‘for financial years starting on or after 1 January 2027:’; (ii) in point (c), the introductory wording is replaced by the following: ‘for financial years starting on or after 1 January 2028:’."
+  },
+  "STC-3": {
+   "celex": "32025L0794",
+   "cite": "Art. 3(1) Directive (EU) 2025/794",
+   "text": "Member States shall bring into force the laws, regulations and administrative provisions necessary to comply with this Directive by 31 December 2025."
+  },
+  "STC-4": {
+   "celex": "32025L0794",
+   "cite": "Art. 4 Directive (EU) 2025/794",
+   "text": "This Directive shall enter into force on the day following that of its publication in the Official Journal of the European Union."
+  },
+  "DD-2-1": {
+   "celex": "32023L2775",
+   "cite": "Art. 2(1) second and third subparagraphs Delegated Directive (EU) 2023/2775",
+   "text": "They shall apply those provisions for financial years beginning on or after 1 January 2024. By way of derogation from the second subparagraph, Member States may allow undertakings to apply those provisions for financial year beginning on or after 1 January 2023."
+  },
+  "ADOLD-3-4": {
+   "celex": "02013L0034-20230105",
+   "cite": "Art. 3(4) Directive 2013/34/EU before Delegated Directive (EU) 2023/2775",
+   "text": "Large undertakings shall be undertakings which on their balance sheet dates exceed at least two of the three following criteria: (a) balance sheet total: EUR 20 000 000; (b) net turnover: EUR 40 000 000; (c) average number of employees during the financial year: 250."
+  },
+  "AD2024-19a-10": {
+   "celex": "02013L0034-20240528",
+   "cite": "Art. 19a(10) Directive 2013/34/EU before Directive (EU) 2026/470",
+   "text": "The exemption laid down in paragraph 9 shall also apply to public-interest entities subject to the requirements of this Article, with the exception of large undertakings which are public-interest entities defined in point (a) of point (1) of Article 2 of this Directive."
+  },
+  "AD2024-29a-9": {
+   "celex": "02013L0034-20240528",
+   "cite": "Art. 29a(9) Directive 2013/34/EU before Directive (EU) 2026/470",
+   "text": "The exemption laid down in paragraph 8 shall also apply to public-interest entities subject to the requirements of this Article, with the exception of large undertakings which are public-interest entities defined in point (a) of point (1) of Article 2 of this Directive."
+  },
+  "TD-2-1-d": {
+   "celex": "02004L0109-20240109",
+   "cite": "Art. 2(1)(d) Directive 2004/109/EC",
+   "text": "‘issuer’ means a natural person, or a legal entity governed by private or public law, including a State, whose securities are admitted to trading on a regulated market."
+  },
+  "TD-4-5": {
+   "celex": "02004L0109-20240109",
+   "cite": "Art. 4(5) Directive 2004/109/EC",
+   "text": "The management report shall be drawn up in accordance with Articles 19, 19a and 20, and Article 29d(1) of Directive 2013/34/EU, and shall include the specifications adopted pursuant to Article 8(4) of Regulation (EU) 2020/852, when drawn up by undertakings referred to in those provisions."
+  },
+  "TD-8-1-b": {
+   "celex": "02004L0109-20240109",
+   "cite": "Art. 8(1)(b) Directive 2004/109/EC",
+   "text": "an issuer exclusively of debt securities admitted to trading on a regulated market, the denomination per unit of which is at least EUR 100 000 or, in the case of debt securities denominated in a currency other than euro, the value of such denomination per unit is, at the date of the issue, equivalent to at least EUR 100 000."
+  },
+  "NOTICE-status": {
+   "celex": "52024XC06792",
+   "cite": "Commission Notice C/2024/6792, introduction",
+   "text": "The replies to the FAQs contained in this Notice clarify the provisions already contained in the applicable legislation. They do not extend in any way the rights and obligations deriving from such legislation nor introduce any additional requirements."
+  },
+  "NOTICE-FAQ1": {
+   "celex": "52024XC06792",
+   "cite": "Commission Notice C/2024/6792, FAQ 1",
+   "text": "The rules to determine the size of an undertaking for sustainability reporting purposes rely on the existing rules for financial reporting purposes applying to the undertaking on the basis of the Member State in which it has its registered office (76). These rules are set out in the national measures transposing the preexisting Accounting Directive."
+  },
+  "NOTICE-FAQ2": {
+   "celex": "52024XC06792",
+   "cite": "Commission Notice C/2024/6792, FAQ 2",
+   "text": "The rules to determine the size category of an undertaking for sustainability reporting purposes, when that undertaking is evolving during the course of a given financial year, rely on the existing rules for financial reporting purposes (see also FAQ 1). These rules are set out in the national measures transposing the preexisting Accounting Directive."
+  },
+  "NOTICE-FAQ3": {
+   "celex": "52024XC06792",
+   "cite": "Commission Notice C/2024/6792, FAQ 3",
+   "text": "Union legislation does not regulate the calculation of the average number of employees for the purpose of the undertaking’s categorisation under the Accounting Directive. However, Member States may have adopted national rules or provided guidance on this matter. In the absence of national rules or guidance, undertakings may use Article 5 of Commission Recommendation of 6 May 2003 concerning the definition of micro, small and medium-sized enterprises (77) as guidance regarding the measurement of staff headcount, as a proxy of an average number of employees"
+  },
+  "NOTICE-40a": {
+   "celex": "52024XC06792",
+   "cite": "Commission Notice C/2024/6792, Section II (Article 40a, pre-2026 thresholds)",
+   "text": "Based on Article 40a of the Accounting Directive, where a third-country undertaking that generates a net turnover of more than EUR 150 million in the Union (for each of the last two consecutive financial years) has a subsidiary in the Union that is subject to Articles 19a/29a Accounting Directive, or, in the absence of such subsidiary, a branch in the Union that generated a net turnover of more than EUR 40 million (in the preceding financial year), the subsidiary or the branch will have to publish and make accessible sustainability information at the group level of the third-country parent undertaking."
+  },
+  "NOTICE-FAQ43": {
+   "celex": "52024XC06792",
+   "cite": "Commission Notice C/2024/6792, FAQ 43",
+   "text": "To avoid double reporting by the subsidiaries and branches of the same third-country undertaking, Member States may allow for one subsidiary or branch established or located in its territory to comply with the obligation in Article 40a of the Accounting Directive by providing a link to the sustainability report published by another Union subsidiary or branch of the third-country undertaking."
+  },
+  "NOTICE-FAQ48": {
+   "celex": "52024XC06792",
+   "cite": "Commission Notice C/2024/6792, FAQ 48",
+   "text": "Therefore, a Union subsidiary publishing a sustainability report at the group level of its third-country parent company according to the provisions of Article 40a does not exempt the Union subsidiary itself nor its own subsidiaries from complying with the reporting obligations of Articles 19a and/or 29a."
+  },
+  "NOTICE-fn18": {
+   "celex": "52024XC06792",
+   "cite": "Commission Notice C/2024/6792, footnote 18",
+   "text": "Relevant reporting requirements for undertakings governed by the law of a third country: Article 4(5) Transparency Directive (which cross-refers to Articles 19a and 29a Accounting Directive) and Article 40a Accounting Directive."
+  },
+  "SFDR-2-12": {
+   "celex": "02019R2088-20260702",
+   "cite": "Art. 2(12) Regulation (EU) 2019/2088",
+   "text": "‘financial product’ means: (a) a portfolio managed in accordance with point (6) of this Article; (b) an alternative investment fund (AIF); (c) an IBIP; (d) a pension product; (e) a pension scheme; (f) a UCITS; or (g) a PEPP;"
+  }
+ }
+}

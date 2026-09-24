@@ -234,6 +234,74 @@ NPM_REGISTRY_ENV = ("npm_config_registry", "NPM_CONFIG_REGISTRY", "YARN_REGISTRY
                     "BUN_CONFIG_REGISTRY")
 PYPI_INDEX_ENV = ("PIP_INDEX_URL", "UV_INDEX_URL", "UV_DEFAULT_INDEX", "UV_INDEX")
 PUBLIC_HOSTS = {"registry.npmjs.org", "registry.yarnpkg.com", "pypi.org", "pypi.python.org"}
+UV_INDEX_ENV = ("UV_INDEX_URL", "UV_DEFAULT_INDEX", "UV_INDEX", "UV_EXTRA_INDEX_URL")
+
+# From the user's own configuration only these keys are used. The files also hold
+# auth tokens (`//host/:_authToken=`, passwords in URLs): every other line is
+# skipped unparsed, and of a matching value only the host is kept.
+_NPMRC_KEY = re.compile(r"\s*(registry|@[a-z0-9-~][a-z0-9-._~]*:registry)\s*=\s*(\S+)\s*", re.I)
+_PIP_KEY = re.compile(r"\s*(index[-_]url|extra[-_]index[-_]url)\s*[=:]\s*(\S+)\s*", re.I)
+_UV_KEY = re.compile(r"""\s*(index-url|extra-index-url|default-index|url)\s*=\s*(.+)""", re.I)
+
+
+def _config_lines(path: Path, key: re.Pattern):
+    """(key, value) for the lines of a config file that match `key`; nothing else leaves this function."""
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace") if path.is_file() else ""
+    except OSError:
+        return []
+    return [(m.group(1).lower(), m.group(2)) for m in map(key.fullmatch, text.splitlines()) if m]
+
+
+def _pip_config_files(env) -> list[Path]:
+    home = Path.home()
+    files = [Path("/etc/pip.conf"), Path("/etc/xdg/pip/pip.conf"), home / ".pip" / "pip.conf",
+             Path(env.get("XDG_CONFIG_HOME") or home / ".config") / "pip" / "pip.conf",
+             home / "Library" / "Application Support" / "pip" / "pip.conf"]
+    if env.get("APPDATA"):
+        files.append(Path(env["APPDATA"]) / "pip" / "pip.ini")
+    if env.get("VIRTUAL_ENV"):
+        files.append(Path(env["VIRTUAL_ENV"]) / ("pip.ini" if os.name == "nt" else "pip.conf"))
+    if env.get("PIP_CONFIG_FILE"):
+        files.append(Path(env["PIP_CONFIG_FILE"]))
+    return files
+
+
+def registry_config(cwd: str | None, env) -> dict:
+    """The registries and indexes the user configured: npm's `registry` and `@scope:registry` from the project's
+    and the user's .npmrc, pip's `index-url` from pip's config files, uv's index settings from uv.toml and
+    pyproject.toml. Values are hosts (None for a public registry); nothing else is read."""
+    npmrcs = [Path.home() / ".npmrc"] + [d / ".npmrc" for d in reversed(list(_upward(cwd)))]
+    npm = {}
+    for f in npmrcs:  # later files (nearer the project) win, as they do for npm
+        for k, v in _config_lines(f, _NPMRC_KEY):
+            npm[k] = _index_host(v)
+    pip = None
+    for f in _pip_config_files(env):
+        for k, v in _config_lines(f, _PIP_KEY):
+            if k.replace("_", "-") == "index-url":
+                pip = _index_host(v)
+    uv = None
+    uv_files = [Path(env.get("XDG_CONFIG_HOME") or Path.home() / ".config") / "uv" / "uv.toml"]
+    for d in reversed(list(_upward(cwd))):
+        uv_files += [d / "uv.toml", d / "pyproject.toml"]
+    for f in uv_files:
+        section = None if f.name == "uv.toml" else ""
+        try:
+            lines = f.read_text(encoding="utf-8", errors="replace").splitlines() if f.is_file() else []
+        except OSError:
+            lines = []
+        for line in lines:
+            head = line.strip()
+            if head.startswith("["):
+                section = head.strip("[] ")
+                continue
+            # uv.toml keys sit at the top level or in [[index]]; pyproject's under [tool.uv] and [[tool.uv.index]]
+            m = _UV_KEY.fullmatch(line) if section in (None, "index", "tool.uv", "tool.uv.index") else None
+            if m and (m.group(1).lower() != "url" or section in ("index", "tool.uv.index")):
+                for url in re.findall(r"""["']([^"']+)["']""", m.group(2)):
+                    uv = uv or _index_host(url)
+    return {"npm": npm, "pip": pip, "uv": uv}
 
 
 def tokenize(command: str, powershell: bool = False) -> list[str]:
@@ -260,9 +328,20 @@ def tokenize(command: str, powershell: bool = False) -> list[str]:
 def _strip_comments(text: str, powershell: bool = False) -> str:
     """Drop `# ...` comments before tokenizing, so an apostrophe in one (`# don't`) cannot unbalance the quotes.
     A `#` starts a comment only at the start of a word and outside quotes."""
-    out, quote, i, start = [], None, 0, True
+    out, quote, i, start, tick = [], None, 0, True, None
     while i < len(text):
         c = text[i]
+        if c == "`" and not powershell and quote != "'":
+            # `cmd` runs cmd, inside double quotes too: split it out as a command of its own
+            if tick is None:
+                out.append('"\n' if quote == '"' else "\n")
+                tick, quote = quote, None
+            else:
+                out.append('\n"' if tick == '"' else "\n")
+                quote, tick = (tick if tick == '"' else None), None
+            i += 1
+            start = True
+            continue
         if quote:
             out.append(c)
             if c == quote:
@@ -425,6 +504,9 @@ def scan(args: list[str], values: set, capture: set = frozenset(), first_only: b
 
 def _index_host(url: str) -> str | None:
     """The host of a registry or index URL, or None when it is the public one. Never the credentials in it."""
+    name, eq, rest = url.partition("=")
+    if eq and "://" in rest and "://" not in name:  # uv's named form: --index corp=https://...
+        url = rest
     try:
         host = urllib.parse.urlsplit(url.strip()).hostname or ""
     except ValueError:
@@ -542,11 +624,12 @@ def _local_bin(cwd: str | None, name: str) -> bool:
 class _Found:
     """What one command line would fetch from npm or PyPI, and what it names that is not a registry package."""
 
-    def __init__(self, cwd: str | None, env):
-        self.cwd, self.env = cwd, env
+    def __init__(self, cwd: str | None, env, powershell: bool = False):
+        self.cwd, self.env, self.powershell = cwd, env, powershell
         self.targets: list[dict] = []
         self.skipped: list[dict] = []
         self.seen: set = set()
+        self.configs: dict = {}
 
     def skip(self, spec: str, via: str, reason: str):
         self.skipped.append({"spec": clean(spec, 120), "via": via, "reason": reason})
@@ -564,7 +647,7 @@ class _Found:
             return
         name = a
         here = cwd or self.cwd
-        index = index or self._env_index(eco)
+        index = index or self._index_for(eco, name, via, here)
         if index:
             # the package comes from somewhere else; its name stays on this machine
             self.skip(shown, via, f"installs from {index}, which pkg-vitals does not query")
@@ -582,17 +665,23 @@ class _Found:
         self.targets.append({"ecosystem": eco, "name": name, "spec": spec, "pin": pin, "requested": clean(shown, 120),
                              "via": via, "scope": scope, "cwd": here})
 
-    def _env_index(self, eco: str) -> str | None:
-        names = NPM_REGISTRY_ENV if eco == "npm" else PYPI_INDEX_ENV
-        for k in names:
+    def _index_for(self, eco: str, name: str, via: str, cwd: str | None) -> str | None:
+        uv = via.startswith("uv")
+        for k in NPM_REGISTRY_ENV if eco == "npm" else PYPI_INDEX_ENV + (UV_INDEX_ENV if uv else ()):
             if self.env.get(k):
                 return _index_host(self.env[k])
         if eco == "pypi" and str(self.env.get("PIP_NO_INDEX", "")).lower() in ("1", "true", "yes", "on"):
             return "local files (PIP_NO_INDEX)"
-        return None
+        if cwd not in self.configs:
+            self.configs[cwd] = registry_config(cwd, self.env)
+        cfg = self.configs[cwd]
+        if eco == "npm":
+            scope = name.split("/")[0].lower() + ":registry" if name.startswith("@") else None
+            return cfg["npm"][scope] if scope in cfg["npm"] else cfg["npm"].get("registry")
+        return cfg["uv"] if uv else cfg["pip"]
 
 
-def parse_command(command: str, cwd: str | None = None, env=None) -> dict:
+def parse_command(command: str, cwd: str | None = None, env=None, powershell: bool = False) -> dict:
     """Every npm or PyPI package an install command line would fetch.
 
     Handles compound lines (`cd app && npm i a; pip install b | tee log`),
@@ -600,7 +689,7 @@ def parse_command(command: str, cwd: str | None = None, env=None) -> dict:
     value-taking options. Returns {"targets": [...], "skipped": [...]}; a target
     is a dict with ecosystem, name, spec (version or range as written), pin
     (exact version or None), via, scope ("project" or "tool") and cwd."""
-    found = _Found(cwd, os.environ if env is None else env)
+    found = _Found(cwd, os.environ if env is None else env, powershell)
     _parse_into(found, command, 0)
     return {"targets": found.targets, "skipped": found.skipped}
 
@@ -608,7 +697,7 @@ def parse_command(command: str, cwd: str | None = None, env=None) -> dict:
 def _parse_into(found: _Found, command: str, depth: int):
     if depth > 3:
         return
-    for words in split_commands(tokenize(command)):
+    for words in split_commands(tokenize(command, found.powershell)):
         assigned, words = _strip_wrappers(_drop_redirects(words))
         if not words:
             continue
@@ -659,8 +748,12 @@ def _parse_words(found: _Found, words: list[str], depth: int):
         _node_run(found, tool, via, args)
     elif re.fullmatch(r"pip(3(\.\d+)?)?", head):
         _pip(found, args, "pip install", PIP_VALUES)
-    elif re.fullmatch(r"(python|pypy)(3(\.\d+)?)?|py", head) and args[:2] == ["-m", "pip"]:
-        _pip(found, args[2:], "python -m pip install", PIP_VALUES)
+    elif re.fullmatch(r"(python|pypy)(3(\.\d+)?)?|py", head):
+        i = 0
+        while i < len(args) and args[i].startswith("-") and args[i] not in ("-m", "-c"):
+            i += 2 if args[i] in ("-W", "-X") else 1  # `py -3.12`, `python -I` and the like come first
+        if args[i:i + 2] == ["-m", "pip"]:
+            _pip(found, args[i + 2:], "python -m pip install", PIP_VALUES)
     elif head == "uv":
         _uv(found, args)
     elif head == "uvx":
@@ -702,6 +795,9 @@ def _node(found: _Found, tool: str, args: list[str]):
         return
     _, early, _ = scan(args[: len(args) - len(rest)], cfg["values"], capture={"--registry"})  # `npm --registry X i y`
     scope = "project"
+    if tool == "yarn" and verb == "workspace" and rest:  # yarn workspace <name> add x
+        _node(found, tool, rest[1:])
+        return
     if tool == "yarn" and verb == "global":
         verb, rest = _verb(rest, cfg["values"])
         scope = "tool"
@@ -760,9 +856,13 @@ def _node_create(found: _Found, tool: str, verb: str, args: list[str], index: st
               requested=init)
 
 
+_UV_INDEX_FLAGS = ("-i", "--index-url", "--default-index", "--index", "--extra-index-url")
+
+
 def _pypi_index(got: dict, flags: set, keys=("-i", "--index-url", "--default-index", "--index")) -> str | None:
-    # `--index-url`/`--default-index` replace PyPI; uv's `--index` is searched before PyPI and wins when it has
-    # the name. `--extra-index-url` and `--find-links` add sources while pip still asks PyPI, so those are checked.
+    # `--index-url`/`--default-index` replace PyPI. uv searches its `--index` and `--extra-index-url` before PyPI
+    # and takes the first that has the name (uv's default index strategy), so for uv those are private too. pip
+    # asks PyPI as well as an `--extra-index-url`, so for pip that name reaches PyPI anyway and is checked.
     if "--no-index" in flags:
         return "local files (--no-index)"
     for k in keys:
@@ -773,17 +873,18 @@ def _pypi_index(got: dict, flags: set, keys=("-i", "--index-url", "--default-ind
     return None
 
 
-def _pip(found: _Found, args: list[str], via: str, values: set):
+def _pip(found: _Found, args: list[str], via: str, values: set, index_flags=("-i", "--index-url", "--default-index",
+                                                                              "--index")):
     verb, rest = _verb(args, PIP_GENERAL)
     if verb != "install":
         return
-    cap = {"-r", "--requirement", "-e", "--editable", "-i", "--index-url", "--default-index", "--index"}
+    cap = {"-r", "--requirement", "-e", "--editable"} | set(index_flags)
     pos, got, flags = scan(rest, values, capture=cap)
     for r in got.get("-r", []) + got.get("--requirement", []):
         found.skip(f"-r {r}", via, "requirements file: pass its names to `pkg-vitals pypi` to check them")
     for e in got.get("-e", []) + got.get("--editable", []):
         found.skip(f"-e {e}", via, "editable install from a path or URL")
-    index = _pypi_index(got, flags)
+    index = _pypi_index(got, flags, index_flags)
     for _, p in pos:
         found.add("pypi", p, via, "project", index=index)
 
@@ -791,25 +892,29 @@ def _pip(found: _Found, args: list[str], via: str, values: set):
 def _uv(found: _Found, args: list[str]):
     verb, rest = _verb(args, UV_GLOBAL)
     if verb == "add":
-        pos, got, flags = scan(rest, UV_ADD_VALUES, capture={"-r", "--requirements", "-i", "--index-url", "--default-index",
-                                                              "--index"})
+        pos, got, flags = scan(rest, UV_ADD_VALUES, capture={"-r", "--requirements"} | set(_UV_INDEX_FLAGS))
         for r in got.get("-r", []) + got.get("--requirements", []):
             found.skip(f"-r {r}", "uv add", "requirements file: pass its names to `pkg-vitals pypi` to check them")
-        index = _pypi_index(got, flags)
+        index = _pypi_index(got, flags, _UV_INDEX_FLAGS)
         for _, p in pos:
             found.add("pypi", p, "uv add", "project", index=index)
+    elif verb == "run":  # uv run --with x script.py: the --with packages are fetched
+        _, got, flags = scan(rest, UV_RUN_VALUES, capture={"--with", "-w", "-i", "--index-url", "--default-index",
+                                                           "--index", "--extra-index-url"}, first_only=True)
+        index = _pypi_index(got, flags, _UV_INDEX_FLAGS)
+        for w in got.get("--with", []) + got.get("-w", []):
+            found.add("pypi", w, "uv run --with", "tool", index=index)
     elif verb == "pip":
         sub, rest2 = _verb(rest, UV_GLOBAL)
         if sub == "install":
-            _pip(found, ["install"] + rest2, "uv pip install", UV_PIP_VALUES)
+            _pip(found, ["install"] + rest2, "uv pip install", UV_PIP_VALUES, _UV_INDEX_FLAGS)
     elif verb == "tool":
         sub, rest2 = _verb(rest, UV_GLOBAL)
         if sub == "run":
             _uv_run(found, rest2, "uv tool run")
         elif sub == "install":
-            pos, got, flags = scan(rest2, UV_RUN_VALUES, capture={"--with", "-w", "-i", "--index-url", "--default-index",
-                                                                  "--index"})
-            index = _pypi_index(got, flags)
+            pos, got, flags = scan(rest2, UV_RUN_VALUES, capture={"--with", "-w"} | set(_UV_INDEX_FLAGS))
+            index = _pypi_index(got, flags, _UV_INDEX_FLAGS)
             for _, p in pos:
                 found.add("pypi", p, "uv tool install", "tool", at_syntax=True, index=index)
             for w in got.get("--with", []) + got.get("-w", []):
@@ -817,9 +922,9 @@ def _uv(found: _Found, args: list[str]):
 
 
 def _uv_run(found: _Found, args: list[str], via: str):
-    cap = {"--from", "--with", "-w", "-i", "--index-url", "--default-index", "--index"}
+    cap = {"--from", "--with", "-w"} | set(_UV_INDEX_FLAGS)
     pos, got, flags = scan(args, UV_RUN_VALUES, capture=cap, first_only=True)
-    index = _pypi_index(got, flags)
+    index = _pypi_index(got, flags, _UV_INDEX_FLAGS)
     if got.get("--from"):
         found.add("pypi", got["--from"][-1], via, "tool", at_syntax=True, index=index)
     elif pos:
@@ -834,7 +939,7 @@ def _poetry(found: _Found, args: list[str]):
         return
     pos, got, _ = scan(rest, POETRY_VALUES, capture={"--source"})
     # a named source is an index poetry was told about; PyPI may not be where the package comes from
-    index = "a poetry source named with --source" if got.get("--source") else None
+    index = "a poetry source named with --source" if got.get("--source") and got["--source"][-1].lower() != "pypi" else None
     for _, p in pos:
         found.add("pypi", p, "poetry add", "project", at_syntax=True, index=index)
 
@@ -848,6 +953,11 @@ def _pipx(found: _Found, args: list[str]):
             found.add("pypi", p, "pipx install", "tool", index=index)
         for p in got.get("--preinstall", []):
             found.add("pypi", p, "pipx install", "tool", index=index)
+    elif verb == "inject":  # pipx inject <app> pkg...: the first positional is the app's environment
+        pos, got, flags = scan(rest, PIPX_VALUES, capture={"--index-url", "-i"})
+        index = _pypi_index(got, flags, ("--index-url", "-i"))
+        for _, p in pos[1:]:
+            found.add("pypi", p, "pipx inject", "tool", index=index)
     elif verb == "run":
         pos, got, flags = scan(rest, PIPX_VALUES, capture={"--spec", "--with", "--index-url", "-i"}, first_only=True)
         index = _pypi_index(got, flags, ("--index-url", "-i"))
@@ -1034,7 +1144,7 @@ class Net:
         self.deadline = time.monotonic() + budget if budget else None
         # Overrides exist for a mirror that serves the same APIs, and for the tests' local server.
         self.npm_url = env.get("PKG_VITALS_NPM_REGISTRY", "https://registry.npmjs.org").rstrip("/")
-        self.downloads_url = env.get("PKG_VITALS_NPM_DOWNLOADS", "https://api.npmjs.org/downloads/point/last-week").rstrip("/")
+        self.downloads_url = env.get("PKG_VITALS_NPM_DOWNLOADS", "https://api.npmjs.org/downloads/point").rstrip("/")
         self.pypi_url = env.get("PKG_VITALS_PYPI", "https://pypi.org").rstrip("/")
         self.github_url = env.get("PKG_VITALS_GITHUB_API", "https://api.github.com").rstrip("/")
         self.census_url = env.get("PKG_VITALS_CENSUS", CENSUS)
@@ -1369,7 +1479,7 @@ def _result(t: dict) -> dict:
             "via": t["via"], "scope": t["scope"], "exists": None, "version": None, "first_published": None,
             "age_days": None, "version_published": None, "deprecated": None, "yanked": None, "project_status": None,
             "install_scripts": {}, "licence": None, "repository": None, "repo": None, "downloads_week": None,
-            "flags": [], "serious": [], "notes": [], "errors": [], "_licence_raw": None}
+            "flags": [], "serious": [], "notes": [], "errors": [], "complete": True, "_licence_raw": None}
 
 
 def _flag(r: dict, flag: str, text: str | None = None):
@@ -1385,13 +1495,27 @@ def _not_found(r: dict, host: str, detail: str = "HTTP 404"):
                         "registry pkg-vitals does not query")
 
 
-def check_npm(t: dict, net: Net, today: dt.date) -> dict:
+CORGI = {"Accept": "application/vnd.npm.install-v1+json"}  # npm's abbreviated metadata
+
+
+def _downloaded_before(net: Net, name: str, today: dt.date, new_days: int) -> bool:
+    """True if the package was downloaded in the year before the `new` window, so it was published before it:
+    a small answer that spares fetching a popular package's full metadata to learn its creation date."""
+    end = today - dt.timedelta(days=new_days + 1)
+    d = net.get(f"{net.downloads_url}/{(end - dt.timedelta(days=364)).isoformat()}:{end.isoformat()}/{name}")
+    return _int(d.get("downloads")) is not None and d["downloads"] > 0
+
+
+def check_npm(t: dict, net: Net, today: dt.date, light: bool = False, new_days: int = NEW_DAYS) -> dict:
+    """npm facts. `light` (the hook) reads the abbreviated metadata and the one version's manifest instead of the
+    full document, which runs to 31 MB for a popular package (next, checked 2026-09-24)."""
     r = _result(t)
     host = net.host(net.npm_url)
     if not NPM_NAME.fullmatch(t["name"]):  # parse_command never makes one, but callers can build targets by hand
         r["errors"].append("not a valid npm package name; not sent")
         return r
-    doc = net.get(f"{net.npm_url}/{urllib.parse.quote(t['name'], safe='@')}")
+    base = f"{net.npm_url}/{urllib.parse.quote(t['name'], safe='@')}"
+    doc = net.get(base, CORGI if light else None)
     code = doc.get("_error")
     if code == 404:
         _not_found(r, host)
@@ -1417,6 +1541,25 @@ def check_npm(t: dict, net: Net, today: dt.date) -> dict:
     r["version"] = _safe_version(version)
     man = versions.get(version, {}) if version else {}
     top = versions.get(latest, {}) if latest else man
+    if light:
+        for v in {version, latest if latest and latest.endswith("-security") else None} - {None}:
+            full = net.get(f"{base}/{urllib.parse.quote(v, safe='')}")
+            if full.get("_error") is None:
+                versions[v] = full
+            elif v == version:
+                r["errors"].append(f"{host}: {describe(full['_error'])} for version {r['version']}")
+                r["complete"] = False
+        man = versions.get(version, {}) if version else {}
+        top = versions.get(latest, {}) if latest else man
+        if not times.get("created"):
+            modified = _date(doc.get("modified"))
+            if modified and (today - modified).days >= new_days:
+                pass  # unchanged since before the window, so created before it: not new, date not needed
+            elif not _downloaded_before(net, t["name"], today, new_days):
+                times = _d(net.get(base).get("time"))  # new or unused: its full metadata is small
+                if not times:
+                    r["errors"].append(f"{host}: publish dates unavailable")
+                    r["complete"] = False
 
     created = times.get("created") or min((times[v] for v in versions if isinstance(times.get(v), str)), default=None)
     r["first_published"] = _date(created).isoformat() if _date(created) else None
@@ -1445,8 +1588,12 @@ def check_npm(t: dict, net: Net, today: dt.date) -> dict:
 
 
 def _resolve_npm(versions: dict, tags: dict, spec: str | None, latest: str | None):
-    if not spec:  # a bare name resolves like the range `*`
-        return max_satisfying(versions, parse_range("*"), latest) or latest, None
+    if not spec or spec.strip() == "*":
+        # npm takes the `latest` tag for a bare name or `*` whatever it is, pre-release included, unless deprecated
+        if latest and not versions[latest].get("deprecated"):
+            return latest, None
+        v = max_satisfying(versions, parse_range("*"), latest)
+        return (v, None) if v else (None, "no published version npm would install")
     shown = clean(spec, 40)
     if spec in tags:
         v = tags[spec]
@@ -1510,7 +1657,9 @@ def check_pypi(t: dict, net: Net, today: dt.date) -> dict:
     else:
         doc = net.get(f"{base}/json")
     if doc.get("_error") is not None:
+        # without the release's metadata the yank status, licence and repository are unknown, not absent
         r["errors"].append(f"{host} JSON API: {describe(doc['_error'])}")
+        r["complete"] = False
     info = _d(doc.get("info"))
     r["version"] = _safe_version(info.get("version"))
     urls = [u for u in doc.get("urls") or [] if isinstance(u, dict)] if isinstance(doc.get("urls"), list) else []
@@ -1572,7 +1721,7 @@ _ORDER = {f: i for i, f in enumerate([F_MISSING, F_PLACEHOLDER, F_QUARANTINED, F
 
 
 def examine(targets: list[dict], net: Net | None, today: dt.date, *, new_days: int = NEW_DAYS,
-            downloads: str = "all") -> list[dict]:
+            downloads: str = "all", light: bool = False) -> list[dict]:
     """Registry, repository and licence facts for each target, with flags.
 
     `downloads` is "all", "serious" (the hook: only to give an ask some context)
@@ -1589,7 +1738,7 @@ def examine(targets: list[dict], net: Net | None, today: dt.date, *, new_days: i
     licence_lock = threading.Lock()
 
     def one(t: dict) -> dict:
-        r = check_npm(t, net, today) if t["ecosystem"] == "npm" else check_pypi(t, net, today)
+        r = check_npm(t, net, today, light, new_days) if t["ecosystem"] == "npm" else check_pypi(t, net, today)
         raw = r.pop("_licence_raw", None)
         if r["exists"]:
             if r["age_days"] is not None and r["age_days"] < new_days:
@@ -1597,12 +1746,12 @@ def examine(targets: list[dict], net: Net | None, today: dt.date, *, new_days: i
                                 f"packages first published less than {new_days} days ago (its own threshold)")
             if r["repository"]:
                 repo_facts(r, net, today)
-            elif F_PLACEHOLDER not in r["flags"]:
+            elif F_PLACEHOLDER not in r["flags"] and r["complete"]:
                 _flag(r, F_NO_REPO, "the package metadata links no source repository")
             if r["install_scripts"]:
                 what = "; ".join(f"{k}: {v}" for k, v in r["install_scripts"].items())
                 _flag(r, F_SCRIPTS, f"runs code at install time ({what})")
-            if raw is None and F_PLACEHOLDER not in r["flags"]:
+            if raw is None and F_PLACEHOLDER not in r["flags"] and r["complete"]:
                 _flag(r, F_NO_LICENCE, "declares no licence")
             if t["scope"] == "project" and strong_copyleft(raw):
                 key = (t["ecosystem"], t["cwd"])
@@ -1618,7 +1767,7 @@ def examine(targets: list[dict], net: Net | None, today: dt.date, *, new_days: i
         r["flags"].sort(key=lambda f: (f not in r["serious"], _ORDER.get(f, 99)))
         r["notes"].sort(key=lambda n: (n["flag"] not in r["serious"], _ORDER.get(n["flag"], 99)))
         if t["ecosystem"] == "npm" and r["exists"] and (downloads == "all" or (downloads == "serious" and r["serious"])):
-            d = net.get(f"{net.downloads_url}/{t['name']}")
+            d = net.get(f"{net.downloads_url}/last-week/{t['name']}")
             if isinstance(d.get("downloads"), int) and not isinstance(d.get("downloads"), bool):
                 r["downloads_week"] = d["downloads"]
         return r
@@ -1657,7 +1806,15 @@ def repo_status(r: dict) -> str:
 
 
 def unchecked(results: list[dict]) -> list[dict]:
-    return [r for r in results if r["exists"] is None]
+    return [r for r in results if r["exists"] is None or not r.get("complete", True)]
+
+
+# Skips that are not a failure to check: nothing is fetched, or the user asked for it
+BENIGN_SKIPS = ("no package names", "runs the binary already in node_modules/.bin", "matches PKG_VITALS_IGNORE")
+
+
+def unchecked_skips(skipped: list[dict]) -> list[dict]:
+    return [s for s in skipped if not s["reason"].startswith(BENIGN_SKIPS)]
 
 
 def summary_line(results: list[dict]) -> str:
@@ -1849,7 +2006,7 @@ def main(argv: list[str] | None = None) -> int:
     if a.strict and not a.offline:
         if any(r["serious"] for r in results):
             return 1
-        if unchecked(results):
+        if unchecked(results) or unchecked_skips(parsed["skipped"]):
             return 2
     return 0
 
@@ -1884,7 +2041,7 @@ def hook_response(payload, net: Net | None = None, today: dt.date | None = None)
     if not isinstance(command, str) or not command.strip():
         return None
     cwd = payload.get("cwd") if isinstance(payload.get("cwd"), str) else None
-    parsed = parse_command(command, cwd=cwd)
+    parsed = parse_command(command, cwd=cwd, powershell=payload.get("tool_name") == "PowerShell")
     if not parsed["targets"]:
         return None
     if net is None:
@@ -1895,7 +2052,7 @@ def hook_response(payload, net: Net | None = None, today: dt.date | None = None)
                   token=os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN"),
                   budget=_env_float("PKG_VITALS_BUDGET", 15.0))
     results = examine(parsed["targets"], net, today or utc_today(),
-                      new_days=int(_env_float("PKG_VITALS_NEW_DAYS", NEW_DAYS)), downloads="serious")
+                      new_days=int(_env_float("PKG_VITALS_NEW_DAYS", NEW_DAYS)), downloads="serious", light=True)
     found = [r for r in results if r["serious"]]
     if not found:
         return None
@@ -1903,15 +2060,52 @@ def hook_response(payload, net: Net | None = None, today: dt.date | None = None)
                                    "permissionDecisionReason": explain(found)}}
 
 
-def hook_main() -> int:
+# A command that names none of these cannot install from npm or PyPI. The hook
+# runs on every shell command, so this check comes before any real work.
+QUICK = re.compile(r"(?i)\b(npm|npx|pnpm|pnpx|yarn|bun|bunx|pip[0-9.]*|pipx|python[0-9.]*|pypy[0-9.]*|py|uv|uvx|poetry)\b")
+
+
+def claim(tool_use_id) -> bool:
+    """True for the first process that takes this tool call. Claude Code runs every matching handler as its own
+    process (a plugin copy and a settings copy of the same hook both run); an O_EXCL file per tool_use_id lets
+    exactly one of them work. When no lock can be taken, work anyway: a check done twice beats none."""
+    key = re.sub(r"[^A-Za-z0-9_-]", "", str(tool_use_id or ""))[:120]
+    if not key:
+        return True
+    try:
+        uid = os.getuid() if hasattr(os, "getuid") else None
+        d = Path(tempfile.gettempdir()) / f"pkg-vitals-{uid if uid is not None else 'user'}"
+        d.mkdir(mode=0o700, exist_ok=True)
+        if d.is_symlink() or (uid is not None and d.stat().st_uid != uid):
+            return True
+        now = time.time()
+        for e in os.scandir(d):  # claims older than ten minutes belong to finished calls
+            try:
+                if now - e.stat().st_mtime > 600:
+                    os.unlink(e.path)
+            except OSError:
+                pass
+        os.close(os.open(str(d / key), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600))
+        return True
+    except FileExistsError:
+        return False
+    except OSError:
+        return True
+
+
+def hook_main(raw=None) -> int:
     """Claude Code PreToolUse hook: reads the payload on stdin, answers on stdout, never denies."""
     try:
-        # bytes, decoded here: a Windows console's default encoding is not the UTF-8 Claude Code sends
-        raw = sys.stdin.buffer.read() if hasattr(sys.stdin, "buffer") else sys.stdin.read()
+        if raw is None:
+            # bytes, decoded here: a Windows console's default encoding is not the UTF-8 Claude Code sends
+            raw = sys.stdin.buffer.read() if hasattr(sys.stdin, "buffer") else sys.stdin.read()
         payload = json.loads(raw.decode("utf-8") if isinstance(raw, bytes) else raw)
     except (ValueError, UnicodeDecodeError, OSError):
         return 0
     try:
+        command = _d(_d(payload).get("tool_input")).get("command")
+        if not isinstance(command, str) or not QUICK.search(command) or not claim(payload.get("tool_use_id")):
+            return 0
         out = hook_response(payload)
     except Exception:  # noqa: BLE001 - a hook that breaks the tool call over its own bug is worse than none
         traceback.print_exc()  # stderr of a hook that exits 0 goes to Claude Code's debug log only

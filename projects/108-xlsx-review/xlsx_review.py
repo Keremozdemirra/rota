@@ -1148,7 +1148,7 @@ def _read_cell(el, r, c, cells, sheet, followers, sst, wb) -> None:
         if ctag == "f":
             f_el = ch
         elif ctag == "v":
-            v_text = ch.text
+            v_text = ch.text or ""  # Excel writes <v/> for a formula whose result is empty text
         elif ctag == "is":
             is_el = ch
     if f_el is None and v_text is None and is_el is None:
@@ -1201,13 +1201,13 @@ def _read_cell(el, r, c, cells, sheet, followers, sst, wb) -> None:
         if v_text is not None:
             cell.kind, cell.value = "s", _xstring(v_text)
     elif t == "b":
-        if v_text is not None:
+        if v_text:
             cell.kind, cell.value = "b", v_text.strip() in ("1", "true", "TRUE")
     elif t == "e":
-        if v_text is not None:
+        if v_text and v_text.strip():
             cell.kind, cell.value = "e", v_text.strip()
     elif t == "d":
-        if v_text is not None:
+        if v_text and v_text.strip():
             cell.kind, cell.value = "d", v_text.strip()
     else:
         if v_text is not None and v_text.strip() != "":
@@ -1301,7 +1301,7 @@ def _read_link(pkg, rels, rid, index, wb) -> Link:
 
 # ---------------------------------------------------------------- per-formula analysis
 
-F_REFERR, F_STRUCT, F_EXTERNAL = 1, 2, 4
+F_REFERR, F_STRUCT, F_EXTERNAL, F_RELATIVE = 1, 2, 4, 8
 
 
 class FInfo:
@@ -1353,6 +1353,8 @@ def _info(tokens, r, c) -> FInfo:
             refs.append((ref, not (stack and stack[-1] in POSITION_ONLY)))
             if ref.kind == "error":
                 flags |= F_REFERR
+            elif ref.relative():
+                flags |= F_RELATIVE
             if ref.book is not None:
                 flags |= F_EXTERNAL
         elif kind == "name":
@@ -1656,8 +1658,11 @@ def _pattern_findings(sheet: Sheet) -> list:
 
     Tool's choices: the cells on both sides must carry one pattern and at least one side must be
     a run of two or more copies of it, so that two unrelated line items that happen to share a
-    shape (Gross profit = B2-B3 and EBITDA = B4-B5) do not make the row between them "odd"; and a
-    run of up to two odd cells still counts as sitting between its neighbours."""
+    shape (Gross profit = B2-B3 and EBITDA = B4-B5) do not make the row between them "odd"; a run
+    of up to two odd cells still counts as sitting between its neighbours. For formulas, the
+    neighbours' pattern must contain a relative reference (formulas made only of $-references are
+    links, identical whether copied or typed), and a formula that repeats along the other axis is
+    that axis's pattern (a report table whose columns each hold their own formula)."""
     cells, info = sheet.cells, sheet.info
     out = []
 
@@ -1707,10 +1712,13 @@ def _pattern_findings(sheet: Sheet) -> list:
         if own is None:
             continue
         for dr, dc, axis in ((0, 1, "row"), (1, 0, "column")):
+            if pattern(r - dc, c - dr) == own or pattern(r + dc, c + dr) == own:
+                continue  # a copy along the other axis: this cell belongs to that pattern
             same = lambda rr, cc: pattern(rr, cc) == own  # noqa: E731
             p1, a, run1 = probe(r, c, -dr, -dc, same)
             p2, b, run2 = probe(r, c, dr, dc, same)
-            if p1 is not None and p1 == p2 and p1 != own and (run1 or run2):
+            if (p1 is not None and p1 == p2 and p1 != own and (run1 or run2)
+                    and info[a].flags & F_RELATIVE):
                 out.append(_finding("inconsistent-formula", "warning", sheet.name, r, c, formula="=" + cell.formula,
                                     axis=axis, neighbours=[_neighbour(sheet, *a), _neighbour(sheet, *b)],
                                     pattern="=" + p1, own_pattern="=" + own))
@@ -2970,10 +2978,10 @@ def _wb_change_text(ch: dict) -> str:
     return k
 
 
-def _risk_text(x: dict) -> str:
+def _risk_text(x: dict, with_location: bool = True) -> str:
     if x.get("finding"):
         return describe(x["finding"])
-    loc = (quote_sheet(x["sheet"]) + "!" + x["cell"]) if x.get("sheet") and x.get("cell") else ""
+    loc = (quote_sheet(x["sheet"]) + "!" + x["cell"]) if with_location and x.get("sheet") and x.get("cell") else ""
     reason = x.get("reason") or x["code"]
     if x.get("target"):
         reason += ": " + clip(visible(x["target"]), 80)
@@ -3117,7 +3125,7 @@ def diff_markdown(result: dict, limit: int) -> str:
         out += ["#### Risks", "", "| Severity | Where | What |", "| --- | --- | --- |"]
         for x in result["risks"][:limit]:
             loc = (quote_sheet(x["sheet"]) + "!" + x["cell"]) if x.get("sheet") and x.get("cell") else ""
-            out.append(f"| {x['severity']} | {_md(visible(loc))} | {_md(_risk_text(x))} |")
+            out.append(f"| {x['severity']} | {_md(visible(loc))} | {_md(_risk_text(x, with_location=False))} |")
         out.append("")
     if result["workbook"]:
         out += ["#### Workbook", ""] + ["- " + _md(_wb_change_text(ch)) for ch in result["workbook"]] + [""]

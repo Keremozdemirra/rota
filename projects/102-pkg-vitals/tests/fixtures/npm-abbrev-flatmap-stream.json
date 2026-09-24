@@ -1,0 +1,22 @@
+{
+ "url": "https://registry.npmjs.org/flatmap-stream",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "abbreviated metadata; 1 of 1 versions, each cut to name, version, deprecated, hasInstallScript",
+ "body": {
+  "name": "flatmap-stream",
+  "modified": "2022-05-02T14:26:06.405Z",
+  "dist-tags": {
+   "latest": "0.0.1-security"
+  },
+  "versions": {
+   "0.0.1-security": {
+    "name": "flatmap-stream",
+    "version": "0.0.1-security"
+   }
+  }
+ },
+ "request_headers": {
+  "Accept": "application/vnd.npm.install-v1+json"
+ }
+}

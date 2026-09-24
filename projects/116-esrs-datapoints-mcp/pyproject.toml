@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "esrs-datapoints-mcp"
+version = "0.1.0"
+description = "Query EFRAG's ESRS datapoint list from your own downloaded copy, as an MCP server and CLI. Bundles no EFRAG content."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["esrs", "csrd", "efrag", "sustainability-reporting", "datapoints", "mcp", "model-context-protocol", "mcp-server"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Programming Language :: Python :: 3",
+  "Topic :: Office/Business :: Financial :: Accounting",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/esrs-datapoints-mcp"
+Issues = "https://github.com/Keremozdemirra/esrs-datapoints-mcp/issues"
+
+[project.scripts]
+esrs-datapoints-mcp = "esrs_datapoints_mcp.cli:main"
+
+[tool.setuptools]
+packages = ["esrs_datapoints_mcp"]

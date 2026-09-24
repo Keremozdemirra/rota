@@ -1,0 +1,28 @@
+{
+ "url": "https://registry.npmjs.org/@modelcontextprotocol%2Fserver-github",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "abbreviated metadata; 2 of 13 versions, each cut to name, version, deprecated, hasInstallScript",
+ "body": {
+  "name": "@modelcontextprotocol/server-github",
+  "modified": "2026-09-17T12:02:03.936Z",
+  "dist-tags": {
+   "latest": "2025.4.8"
+  },
+  "versions": {
+   "2025.4.8": {
+    "name": "@modelcontextprotocol/server-github",
+    "version": "2025.4.8",
+    "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info."
+   },
+   "0.6.2": {
+    "name": "@modelcontextprotocol/server-github",
+    "version": "0.6.2",
+    "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info."
+   }
+  }
+ },
+ "request_headers": {
+  "Accept": "application/vnd.npm.install-v1+json"
+ }
+}

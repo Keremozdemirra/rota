@@ -50,10 +50,12 @@ class Web:
     def __init__(self, answers=None):
         self.answers = dict(answers or {})
         self.requests = []
+        self.timeouts = []
 
     def __call__(self, req, timeout=None):
         url = req.full_url
         self.requests.append((url, {k.lower(): v for k, v in req.header_items()}))
+        self.timeouts.append(timeout)
         answer = self.answers.get(url, 404)
         if isinstance(answer, BaseException):
             raise answer

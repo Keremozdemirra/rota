@@ -42,8 +42,10 @@ def source_block(indexes: list) -> dict:
             acts.append(act)
     return {
         "versions": [_version_view(ix) for ix in indexes],
-        "content": ("Datapoint content is EFRAG's (c) EFRAG, read from your own copy of the workbook on this "
-                    "machine. This tool does not distribute it and is not affiliated with EFRAG."),
+        "content": ("Datapoint content is EFRAG's (c) EFRAG" + (
+            "" if all(ix.get("official") for ix in indexes) else " where the file is EFRAG's workbook")
+            + ", read from your own copy of the workbook on this machine. This tool does not distribute it and "
+              "is not affiliated with EFRAG."),
         "status": ("EFRAG describes these lists as non-authoritative support material. The binding text is the "
                    "act below. Information, not legal advice."),
         "binding_text": acts or [sources.binding_act("revised")],
@@ -468,9 +470,11 @@ def _changed(x: dict, y: dict) -> list:
         out.append("data_type")
     if x.get("conditional") != y.get("conditional"):
         out.append("conditional")
-    if x.get("voluntary") != y.get("voluntary"):
+    # None means the file has no such column: unknown, not a change.
+    if None not in (x.get("voluntary"), y.get("voluntary")) and x.get("voluntary") != y.get("voluntary"):
         out.append("voluntary")
-    if subject_to_phase_in(x) != subject_to_phase_in(y):
+    px, py = subject_to_phase_in(x), subject_to_phase_in(y)
+    if None not in (px, py) and px != py:
         out.append("phase_in")
     if sorted(x.get("eu_legislation", [])) != sorted(y.get("eu_legislation", [])):
         out.append("eu_legislation")

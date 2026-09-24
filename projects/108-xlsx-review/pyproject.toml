@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xlsx-review"
+version = "0.1.0"
+description = "A pull-request-style review for spreadsheets: formula-level diffs of .xlsx files and the edits that usually break models."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["excel", "xlsx", "spreadsheet", "diff", "review", "formulas", "financial-model", "git", "mcp", "claude-code"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Programming Language :: Python :: 3",
+  "Topic :: Office/Business :: Financial :: Spreadsheet",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/xlsx-review"
+Issues = "https://github.com/Keremozdemirra/xlsx-review/issues"
+
+[project.scripts]
+xlsx-review = "xlsx_review:main"
+
+[tool.setuptools]
+py-modules = ["xlsx_review", "xlsx_review_mcp"]

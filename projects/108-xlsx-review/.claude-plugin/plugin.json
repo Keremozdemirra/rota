@@ -1,0 +1,11 @@
+{
+  "name": "xlsx-review",
+  "displayName": "xlsx-review",
+  "version": "0.1.0",
+  "description": "Shows what changed in an Excel workbook at formula level and flags the edits that usually break models: formulas replaced by numbers, inconsistent formulas, #REF!, circular references, external links.",
+  "author": { "name": "Kerem Özdemir", "url": "https://keremozdemir.de" },
+  "homepage": "https://github.com/Keremozdemirra/xlsx-review",
+  "repository": "https://github.com/Keremozdemirra/xlsx-review",
+  "license": "MIT",
+  "keywords": ["excel", "xlsx", "spreadsheet", "diff", "review", "formulas"]
+}

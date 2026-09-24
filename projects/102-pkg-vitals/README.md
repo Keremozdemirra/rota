@@ -26,7 +26,7 @@ against the paper on 2026-09-24):
 The paper also notes (section 6.1) that checking names against the registry is not
 enough, because whoever registers an invented name makes it exist. So pkg-vitals asks
 more than "is it there": when was it first published, is the version deprecated or
-yanked, does it run code at install time, is there a source repository and is it
+yanked, does it run code at install time (npm), is there a source repository and is it
 archived, which licence does it declare. As a Claude Code plugin it does this before
 the install commands Claude runs (the forms are listed under Install), and asks you when
 something is off.
@@ -126,15 +126,18 @@ That adds:
 - **A skill.** Ask "is this package safe to add?" or "check my dependencies" and Claude
   runs the check and explains the result.
 
-The hook needs `python3` on your `PATH`. It runs for these commands, alone or inside a
-compound line (`cd app && npm i x; pip install y`): `npm install|i|add|exec|create|init`,
-`npx`, `pnpm add|install|i|dlx|create`, `pnpx`, `yarn add|global add|dlx|create`,
-`bun add|install|i|x|create`, `bunx`, `pip install`, `pip3 install`,
-`python -m pip install`, `python3 -m pip install`, `py -m pip install`, `uv add`,
-`uv pip install`, `uv tool install`, `uv tool run`, `uvx`, `poetry add`, `pipx install`,
-`pipx run`. Claude Code matches these `if` rules against each subcommand, after
-stripping wrappers such as `timeout` and `nice`, so a command written another way
-(`sudo pip install x`, `pip3.12 install x`) does not start the hook.
+The hook needs `python3` on your `PATH`. It is one handler for Bash and PowerShell, so it
+sees every shell command. A command that names no installer ends there, before any check:
+24 ms median, 34 ms at most, over 20 runs (2026-09-24, Python start-up included). A lock
+file per tool call in the temp directory makes sure a call gets one working process even
+if the hook is installed twice. It understands these commands, alone, in compound lines
+(`cd app && npm i x; pip install y`), in `if`/`for`/`while` bodies, `{ ...; }`,
+`bash -c`, `cmd /c` and PowerShell blocks: `npm install|i|add|exec|x|create|init` (with
+`-w`), `npx`, `pnpm add|install|i|dlx|create` (with `--filter`), `pnpx`,
+`yarn add|global add|workspace <name> add|dlx|create`, `bun add|install|i|x|create`,
+`bunx`, `pip`/`pip3`/`pip3.12 install`, `python -m pip install` (any `python3.x`, `py -3.x`,
+a virtualenv's `bin/pip`), `uv add`, `uv pip install`, `uv tool install|run`,
+`uv run --with`, `uvx`, `poetry add`, `pipx install|run|inject`.
 
 ### Command line
 
@@ -163,7 +166,8 @@ uvx pkg-vitals -- "cd app && npm i x; pip install y"
 
 Exit codes: 0 when the check ran (with `--strict`: nothing serious); 1 with `--strict`
 and a serious flag; 2 for a usage error, or with `--strict` when a package could not be
-checked (registry unreachable, rate-limited, timed out).
+checked (registry unreachable, rate-limited, timed out, an answer missing) or was named
+but not looked up (an invalid name, a local path, a private registry).
 
 ### In CI
 
@@ -176,20 +180,20 @@ checked (exit 2):
 
 ### As a hook, without the plugin
 
-In `.claude/settings.json`, one handler per command form and shell (the plugin's
-`hooks/hooks.json` has the full list):
+In `.claude/settings.json`: one handler, no `if` list. Claude Code runs every matching
+handler as its own process, so the script does the filtering itself.
 
 ```json
 {
   "hooks": {
     "PreToolUse": [{ "matcher": "Bash|PowerShell", "hooks": [
-      { "type": "command", "if": "Bash(npm install*)", "command": "uvx --from pkg-vitals pkg-vitals-hook", "timeout": 20 },
-      { "type": "command", "if": "Bash(pip install*)", "command": "uvx --from pkg-vitals pkg-vitals-hook", "timeout": 20 },
-      { "type": "command", "if": "PowerShell(npm install*)", "command": "uvx --from pkg-vitals pkg-vitals-hook", "timeout": 20 }
+      { "type": "command", "command": "pkg-vitals-hook", "timeout": 20 }
     ]}]
   }
 }
 ```
+
+With `pkg-vitals` installed (`pipx install pkg-vitals`), `pkg-vitals-hook` is on your `PATH`.
 
 ### Settings
 
@@ -225,7 +229,8 @@ In `.claude/settings.json`, one handler per command form and shell (the plugin's
 Repository status uses the same thresholds as the
 [agent-vitals](https://github.com/Keremozdemirra/agent-vitals) census and
 [mcp-vitals](https://github.com/Keremozdemirra/mcp-vitals): `active` means a push within
-30 days, `slowing` 31 to 90, `stale` 91 to 365, `abandoned` over a year.
+30 days, `slowing` 31 to 90, `stale` 91 to 365, `abandoned` over a year. These
+thresholds are the census's own choice, not a standard.
 
 For a range such as `@scope/pkg@^2`, pkg-vitals picks the version npm would install
 (the `latest` tag if it matches and is not deprecated, else the highest matching version
@@ -241,8 +246,8 @@ stripped of control characters and cut to length, so Claude reads it as a quotat
 
 | Source | What pkg-vitals reads | Terms |
 | --- | --- | --- |
-| npm registry, `registry.npmjs.org/<name>` | dist-tags, versions, deprecation, scripts, licence, repository, publish times | [npm Open-Source Terms](https://docs.npmjs.com/policies/open-source-terms), last updated 2022-03-10 |
-| npm download counts, `api.npmjs.org/downloads/point/last-week/<name>` | downloads in the last 7 available days ([docs](https://github.com/npm/registry/blob/main/docs/download-counts.md)) | as above |
+| npm registry, `registry.npmjs.org/<name>` | dist-tags, versions, deprecation, scripts, licence, repository, publish times. The hook reads the abbreviated metadata and the one version's manifest instead of the full document, which runs to 31 MB for `next` (2026-09-24) | [npm Open-Source Terms](https://docs.npmjs.com/policies/open-source-terms), last updated 2022-03-10 |
+| npm download counts, `api.npmjs.org/downloads/point/<period>/<name>` | downloads in the last 7 available days; in the hook also the year before the `new` window, whose downloads prove a package is older than the window ([docs](https://github.com/npm/registry/blob/main/docs/download-counts.md)) | as above |
 | PyPI JSON simple API, `pypi.org/simple/<name>/` | project status, file upload times | [PyPI Terms of Service](https://policies.python.org/pypi.org/Terms-of-Service/), effective 2025-02-25 |
 | PyPI JSON API, `pypi.org/pypi/<name>[/<version>]/json` | version, yanked, licence, project URLs ([docs](https://docs.pypi.org/api/json/)) | as above |
 | GitHub REST API, `api.github.com/repos/<owner>/<name>` | archived, last push, licence | [GitHub Terms of Service](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service), section H, effective 2026-04-27 |
@@ -264,17 +269,24 @@ scrape a third-party site for them.
 
 ## What it reads, what it sends
 
-- **Reads:** the command line it is given, and the `license` field of the nearest
-  package.json or pyproject.toml between the working directory and your home
-  directory, for the `copyleft` comparison. Never anything in the home directory itself,
-  never `.npmrc`, `pip.conf` or any credentials.
+- **Reads:** the command line it is given; the `license` field of the nearest
+  package.json or pyproject.toml between the working directory and your home directory,
+  for the `copyleft` comparison; and where your packages come from: `registry` and
+  `@scope:registry` from the project's and your `.npmrc`, `index-url` and
+  `extra-index-url` from pip's config files, and the index URLs in `uv.toml` and
+  pyproject's `[tool.uv]`. Those files also hold auth tokens: every other line is
+  skipped unparsed, and of a matching value only the host is kept.
 - **Sends:** package names that match the registry's name grammar (npm: lowercase,
   214 characters at most; PyPI: PEP 508), and pinned versions that look like versions,
   to the endpoints above; `owner/name` to the GitHub API, with your token if one is set.
   Local paths, git and URL specs, tarballs and requirements files stay on your machine.
-  So does every package a command installs from another registry or index
-  (`--registry`, `--index-url`, `--default-index`, uv's `--index`, `--no-index`,
-  `NPM_CONFIG_REGISTRY`, `PIP_INDEX_URL` and the like): those are listed as not checked.
+  So does every package a command installs from another registry or index: a
+  `--registry`, a scope's registry in `.npmrc`, `--index-url` or `index-url` in pip's
+  config, `--no-index`, uv's `--index`, `--default-index` and `--extra-index-url` (uv
+  searches those before PyPI) and the same in uv's config, `NPM_CONFIG_REGISTRY`,
+  `PIP_INDEX_URL` and the like: those are listed as not checked. pip's
+  `--extra-index-url` is the exception: pip asks PyPI for the name as well, so it is
+  checked there.
 - **Prints:** URL credentials and query strings, `--token`-style arguments and
   `KEY=value` secrets are masked in every output, the hook's reason included.
 - **Runs:** nothing. No package is installed or executed.

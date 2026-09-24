@@ -26,6 +26,18 @@
         "hooks": [
           {
             "type": "command",
+            "if": "Write(//**/*mcp*.json)",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
+            "timeout": 20
+          },
+          {
+            "type": "command",
+            "if": "Write(//**/claude_desktop_config.json)",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
+            "timeout": 20
+          },
+          {
+            "type": "command",
             "if": "Edit(//**/*mcp*.json)",
             "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
             "timeout": 20

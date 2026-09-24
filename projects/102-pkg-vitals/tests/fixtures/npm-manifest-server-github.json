@@ -1,0 +1,18 @@
+{
+ "url": "https://registry.npmjs.org/@modelcontextprotocol%2Fserver-github/2025.4.8",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "the version's manifest cut to name, version, description, licence, repository, homepage, bugs, deprecated, install scripts",
+ "body": {
+  "name": "@modelcontextprotocol/server-github",
+  "version": "2025.4.8",
+  "description": "MCP server for using the GitHub API",
+  "license": "MIT",
+  "homepage": "https://modelcontextprotocol.io",
+  "bugs": {
+   "url": "https://github.com/modelcontextprotocol/servers/issues"
+  },
+  "deprecated": "Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.",
+  "scripts": {}
+ }
+}

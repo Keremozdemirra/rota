@@ -67,7 +67,7 @@ class Store:
     def read_registry(self) -> dict:
         try:
             data = json.loads(self.registry_path.read_text(encoding="utf-8"))
-        except FileNotFoundError:
+        except (FileNotFoundError, NotADirectoryError):
             return {"format": 1, "entries": []}
         except (OSError, ValueError, UnicodeDecodeError) as e:
             self.problems.append({"path": str(self.registry_path),

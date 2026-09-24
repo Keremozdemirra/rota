@@ -34,25 +34,18 @@ class Plugin(Case):
         self.assertIn(f'version = "{plugin["version"]}"', pyproject)
         self.assertEqual(pv.VERSION, plugin["version"])
 
-    def test_hooks_cover_bash_and_powershell_alike(self):
+    def test_one_handler_for_both_shells(self):
+        # Claude Code runs every matching handler as its own process, so there is exactly one, with no `if`
+        # list: the script picks out install commands itself (standards point 13, review finding 2)
         groups = load("hooks/hooks.json")["hooks"]
         self.assertEqual(list(groups), ["PreToolUse"])
         self.assertEqual([g["matcher"] for g in groups["PreToolUse"]], ["Bash|PowerShell"])
-        rules = {}
-        for h in handlers():
-            tool, rule = re.fullmatch(r"(Bash|PowerShell)\((.+)\)", h["if"]).groups()
-            rules.setdefault(rule, set()).add(tool)
-        self.assertTrue(rules)
-        self.assertEqual({r for r, tools in rules.items() if tools != {"Bash", "PowerShell"}}, set())
+        self.assertEqual(len(handlers()), 1)
+        self.assertNotIn("if", handlers()[0])
 
-    def test_every_rule_is_a_command_the_parser_reads(self):
-        for h in handlers():
-            rule = re.fullmatch(r"\w+\((.+)\)", h["if"]).group(1)
-            command = rule.rstrip("*").rstrip() + " left-pad"
-            got = pv.parse_command(command, env={})["targets"]
-            # `npm create x` and `npm init x` fetch the initializer package create-x
-            expected = "create-left-pad" if re.search(r" (create|init)$", rule.rstrip("*").rstrip()) else "left-pad"
-            self.assertEqual([t["name"] for t in got], [expected], command)
+    def test_quick_filter_is_the_same_in_both_modules(self):
+        import pkg_vitals_hook
+        self.assertEqual(pkg_vitals_hook.QUICK.pattern, pv.QUICK.pattern)
 
     def test_hook_commands_point_at_files_that_exist(self):
         for h in handlers():

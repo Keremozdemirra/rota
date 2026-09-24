@@ -1,0 +1,33 @@
+{
+ "url": "https://registry.npmjs.org/esbuild",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "abbreviated metadata; 3 of 482 versions, each cut to name, version, deprecated, hasInstallScript",
+ "body": {
+  "name": "esbuild",
+  "modified": "2026-08-08T20:00:55.803Z",
+  "dist-tags": {
+   "latest": "0.28.2"
+  },
+  "versions": {
+   "0.28.2": {
+    "name": "esbuild",
+    "version": "0.28.2",
+    "hasInstallScript": true
+   },
+   "0.25.0": {
+    "name": "esbuild",
+    "version": "0.25.0",
+    "hasInstallScript": true
+   },
+   "0.1.0": {
+    "name": "esbuild",
+    "version": "0.1.0",
+    "hasInstallScript": true
+   }
+  }
+ },
+ "request_headers": {
+  "Accept": "application/vnd.npm.install-v1+json"
+ }
+}

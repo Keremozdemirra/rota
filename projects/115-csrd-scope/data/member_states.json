@@ -1,0 +1,170 @@
+{
+ "schema": 1,
+ "checked": "2026-09-24",
+ "endpoint": "https://publications.europa.eu/webapi/rdf/sparql",
+ "source": "Publications Office, EU Vocabularies, country authority table, use-context EU_COU",
+ "member_states": [
+  {
+   "alpha3": "AUT",
+   "name": "Austria",
+   "isg": "AT",
+   "alpha2": "AT"
+  },
+  {
+   "alpha3": "BEL",
+   "name": "Belgium",
+   "isg": "BE",
+   "alpha2": "BE"
+  },
+  {
+   "alpha3": "BGR",
+   "name": "Bulgaria",
+   "isg": "BG",
+   "alpha2": "BG"
+  },
+  {
+   "alpha3": "CYP",
+   "name": "Cyprus",
+   "isg": "CY",
+   "alpha2": "CY"
+  },
+  {
+   "alpha3": "CZE",
+   "name": "Czechia",
+   "isg": "CZ",
+   "alpha2": "CZ"
+  },
+  {
+   "alpha3": "DEU",
+   "name": "Germany",
+   "isg": "DE",
+   "alpha2": "DE"
+  },
+  {
+   "alpha3": "DNK",
+   "name": "Denmark",
+   "isg": "DK",
+   "alpha2": "DK"
+  },
+  {
+   "alpha3": "EST",
+   "name": "Estonia",
+   "isg": "EE",
+   "alpha2": "EE"
+  },
+  {
+   "alpha3": "ESP",
+   "name": "Spain",
+   "isg": "ES",
+   "alpha2": "ES"
+  },
+  {
+   "alpha3": "FIN",
+   "name": "Finland",
+   "isg": "FI",
+   "alpha2": "FI"
+  },
+  {
+   "alpha3": "FRA",
+   "name": "France",
+   "isg": "FR",
+   "alpha2": "FR"
+  },
+  {
+   "alpha3": "GRC",
+   "name": "Greece",
+   "isg": "EL",
+   "alpha2": "GR"
+  },
+  {
+   "alpha3": "HRV",
+   "name": "Croatia",
+   "isg": "HR",
+   "alpha2": "HR"
+  },
+  {
+   "alpha3": "HUN",
+   "name": "Hungary",
+   "isg": "HU",
+   "alpha2": "HU"
+  },
+  {
+   "alpha3": "IRL",
+   "name": "Ireland",
+   "isg": "IE",
+   "alpha2": "IE"
+  },
+  {
+   "alpha3": "ITA",
+   "name": "Italy",
+   "isg": "IT",
+   "alpha2": "IT"
+  },
+  {
+   "alpha3": "LTU",
+   "name": "Lithuania",
+   "isg": "LT",
+   "alpha2": "LT"
+  },
+  {
+   "alpha3": "LUX",
+   "name": "Luxembourg",
+   "isg": "LU",
+   "alpha2": "LU"
+  },
+  {
+   "alpha3": "LVA",
+   "name": "Latvia",
+   "isg": "LV",
+   "alpha2": "LV"
+  },
+  {
+   "alpha3": "MLT",
+   "name": "Malta",
+   "isg": "MT",
+   "alpha2": "MT"
+  },
+  {
+   "alpha3": "NLD",
+   "name": "Netherlands",
+   "isg": "NL",
+   "alpha2": "NL"
+  },
+  {
+   "alpha3": "POL",
+   "name": "Poland",
+   "isg": "PL",
+   "alpha2": "PL"
+  },
+  {
+   "alpha3": "PRT",
+   "name": "Portugal",
+   "isg": "PT",
+   "alpha2": "PT"
+  },
+  {
+   "alpha3": "ROU",
+   "name": "Romania",
+   "isg": "RO",
+   "alpha2": "RO"
+  },
+  {
+   "alpha3": "SWE",
+   "name": "Sweden",
+   "isg": "SE",
+   "alpha2": "SE"
+  },
+  {
+   "alpha3": "SVN",
+   "name": "Slovenia",
+   "isg": "SI",
+   "alpha2": "SI"
+  },
+  {
+   "alpha3": "SVK",
+   "name": "Slovakia",
+   "isg": "SK",
+   "alpha2": "SK"
+  }
+ ]
+}

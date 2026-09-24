@@ -107,10 +107,11 @@ def validate(schema: dict, args) -> str | None:
         if value is None:
             continue
         want = spec.get("type")
+        article = "an" if want and want[0] in "aeiou" else "a"
         if want in ("integer", "number") and isinstance(value, bool):
-            return f"{key} must be a {want}"
+            return f"{key} must be {article} {want}"
         if want and not isinstance(value, _TYPES[want]):
-            return f"{key} must be a {want}"
+            return f"{key} must be {article} {want}"
         if "minimum" in spec and value < spec["minimum"] or "maximum" in spec and value > spec["maximum"]:
             return f"{key} must be between {spec.get('minimum')} and {spec.get('maximum')}"
         if isinstance(value, str) and len(value) > 500:
@@ -197,12 +198,3 @@ class Server:
             self.handle(req)
         return 0
 
-
-def main() -> int:
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-        sys.stdin.reconfigure(encoding="utf-8", errors="replace")
-    if sys.stdin.isatty():
-        print("esrs-datapoints-mcp: waiting for MCP JSON-RPC messages on stdin. "
-              "For the command line, run: esrs-datapoints-mcp --help", file=sys.stderr)
-    return Server().serve()

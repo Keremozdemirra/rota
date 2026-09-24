@@ -1,0 +1,261 @@
+{
+ "source": "npm-pick-manifest 10.0.0 (bundled with npm 10.9.7) for packuments whose latest tag is a pre-release; the packuments are made up, the answers are npm's own",
+ "recorded": "2026-09-24",
+ "cases": [
+  {
+   "packument": {
+    "name": "demo",
+    "dist-tags": {
+     "latest": "2.0.0-beta.1"
+    },
+    "versions": {
+     "1.0.0": {
+      "name": "demo",
+      "version": "1.0.0",
+      "deprecated": "use 2"
+     },
+     "1.1.0": {
+      "name": "demo",
+      "version": "1.1.0"
+     },
+     "2.0.0-beta.1": {
+      "name": "demo",
+      "version": "2.0.0-beta.1"
+     }
+    }
+   },
+   "wanted": "",
+   "picked": "2.0.0-beta.1"
+  },
+  {
+   "packument": {
+    "name": "demo",
+    "dist-tags": {
+     "latest": "2.0.0-beta.1"
+    },
+    "versions": {
+     "1.0.0": {
+      "name": "demo",
+      "version": "1.0.0",
+      "deprecated": "use 2"
+     },
+     "1.1.0": {
+      "name": "demo",
+      "version": "1.1.0"
+     },
+     "2.0.0-beta.1": {
+      "name": "demo",
+      "version": "2.0.0-beta.1"
+     }
+    }
+   },
+   "wanted": "*",
+   "picked": "2.0.0-beta.1"
+  },
+  {
+   "packument": {
+    "name": "demo",
+    "dist-tags": {
+     "latest": "2.0.0-beta.1"
+    },
+    "versions": {
+     "1.0.0": {
+      "name": "demo",
+      "version": "1.0.0",
+      "deprecated": "use 2"
+     },
+     "1.1.0": {
+      "name": "demo",
+      "version": "1.1.0"
+     },
+     "2.0.0-beta.1": {
+      "name": "demo",
+      "version": "2.0.0-beta.1"
+     }
+    }
+   },
+   "wanted": "latest",
+   "picked": "2.0.0-beta.1"
+  },
+  {
+   "packument": {
+    "name": "demo",
+    "dist-tags": {
+     "latest": "2.0.0-beta.1"
+    },
+    "versions": {
+     "1.0.0": {
+      "name": "demo",
+      "version": "1.0.0",
+      "deprecated": "use 2"
+     },
+     "1.1.0": {
+      "name": "demo",
+      "version": "1.1.0"
+     },
+     "2.0.0-beta.1": {
+      "name": "demo",
+      "version": "2.0.0-beta.1"
+     }
+    }
+   },
+   "wanted": "^1",
+   "picked": "1.1.0"
+  },
+  {
+   "packument": {
+    "name": "demo",
+    "dist-tags": {
+     "latest": "2.0.0-beta.1"
+    },
+    "versions": {
+     "1.0.0": {
+      "name": "demo",
+      "version": "1.0.0",
+      "deprecated": "use 2"
+     },
+     "1.1.0": {
+      "name": "demo",
+      "version": "1.1.0"
+     },
+     "2.0.0-beta.1": {
+      "name": "demo",
+      "version": "2.0.0-beta.1"
+     }
+    }
+   },
+   "wanted": "x",
+   "picked": "1.1.0"
+  },
+  {
+   "packument": {
+    "name": "demo",
+    "dist-tags": {
+     "latest": "2.0.0-beta.1"
+    },
+    "versions": {
+     "1.0.0": {
+      "name": "demo",
+      "version": "1.0.0",
+      "deprecated": "use 2"
+     },
+     "1.1.0": {
+      "name": "demo",
+      "version": "1.1.0"
+     },
+     "2.0.0-beta.1": {
+      "name": "demo",
+      "version": "2.0.0-beta.1",
+      "deprecated": "beta"
+     }
+    }
+   },
+   "wanted": "",
+   "picked": "1.1.0"
+  },
+  {
+   "packument": {
+    "name": "demo",
+    "dist-tags": {
+     "latest": "2.0.0-beta.1"
+    },
+    "versions": {
+     "1.0.0": {
+      "name": "demo",
+      "version": "1.0.0",
+      "deprecated": "use 2"
+     },
+     "1.1.0": {
+      "name": "demo",
+      "version": "1.1.0"
+     },
+     "2.0.0-beta.1": {
+      "name": "demo",
+      "version": "2.0.0-beta.1",
+      "deprecated": "beta"
+     }
+    }
+   },
+   "wanted": "*",
+   "picked": "1.1.0"
+  },
+  {
+   "packument": {
+    "name": "demo",
+    "dist-tags": {
+     "latest": "2.0.0-beta.1"
+    },
+    "versions": {
+     "1.0.0": {
+      "name": "demo",
+      "version": "1.0.0",
+      "deprecated": "use 2"
+     },
+     "1.1.0": {
+      "name": "demo",
+      "version": "1.1.0"
+     },
+     "2.0.0-beta.1": {
+      "name": "demo",
+      "version": "2.0.0-beta.1",
+      "deprecated": "beta"
+     }
+    }
+   },
+   "wanted": "latest",
+   "picked": "2.0.0-beta.1"
+  },
+  {
+   "packument": {
+    "name": "demo",
+    "dist-tags": {
+     "latest": "2.0.0-beta.1"
+    },
+    "versions": {
+     "1.0.0": {
+      "name": "demo",
+      "version": "1.0.0",
+      "deprecated": "use 2"
+     },
+     "1.1.0": {
+      "name": "demo",
+      "version": "1.1.0"
+     },
+     "2.0.0-beta.1": {
+      "name": "demo",
+      "version": "2.0.0-beta.1",
+      "deprecated": "beta"
+     }
+    }
+   },
+   "wanted": "^1",
+   "picked": "1.1.0"
+  },
+  {
+   "packument": {
+    "name": "demo",
+    "dist-tags": {
+     "latest": "2.0.0-beta.1"
+    },
+    "versions": {
+     "1.0.0": {
+      "name": "demo",
+      "version": "1.0.0",
+      "deprecated": "use 2"
+     },
+     "1.1.0": {
+      "name": "demo",
+      "version": "1.1.0"
+     },
+     "2.0.0-beta.1": {
+      "name": "demo",
+      "version": "2.0.0-beta.1",
+      "deprecated": "beta"
+     }
+    }
+   },
+   "wanted": "x",
+   "picked": "1.1.0"
+  }
+ ]
+}

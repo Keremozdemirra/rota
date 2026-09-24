@@ -57,16 +57,16 @@ class Plugin(Isolated):
         self.assertEqual(sorted(h["if"] for _, h in pre), ["Bash(claude mcp add*)", "PowerShell(claude mcp add*)"])
 
     def test_edit_hook_runs_only_for_mcp_config_files(self):
-        post = handlers("PostToolUse")
-        rules = [h.get("if", "") for _, h in post]
-        for rule in rules:
-            # Edit(...) path rules cover Edit and Write; Write(...) and MultiEdit(...) path rules are never
-            # consulted (permissions docs). `//` anchors at the filesystem root, so ~/.cursor/mcp.json matches too.
-            self.assertRegex(rule, r"^Edit\(//\*\*/[^()]+\)$")
-        patterns = [re.fullmatch(r"Edit\(//\*\*/(.+)\)", r).group(1) for r in rules]
-        for name in mcp_vitals_hook.CONFIG_NAMES:
-            matching = [p for p in patterns if fnmatch.fnmatchcase(name, p)]
-            self.assertEqual(len(matching), 1, (name, matching))  # exactly one: the hook must not run twice
+        # One `if` rule matches one tool's calls (hooks docs; an Edit(...) rule does not fire for Write,
+        # observed with Claude Code 2.1.281), so Write and Edit each need a rule per file pattern.
+        rules = sorted(h.get("if", "") for _, h in handlers("PostToolUse"))
+        self.assertEqual(rules, ["Edit(//**/*mcp*.json)", "Edit(//**/claude_desktop_config.json)",
+                                 "Write(//**/*mcp*.json)", "Write(//**/claude_desktop_config.json)"])
+        for tool in ("Write", "Edit"):
+            patterns = [re.fullmatch(rf"{tool}\(//\*\*/(.+)\)", r).group(1) for r in rules if r.startswith(tool)]
+            for name in mcp_vitals_hook.CONFIG_NAMES:
+                matching = [p for p in patterns if fnmatch.fnmatchcase(name, p)]
+                self.assertEqual(len(matching), 1, (tool, name, matching))  # exactly one: never twice per call
 
     def test_skill_front_matter_and_commands(self):
         text = (ROOT / "skills" / "mcp-vitals" / "SKILL.md").read_text(encoding="utf-8")

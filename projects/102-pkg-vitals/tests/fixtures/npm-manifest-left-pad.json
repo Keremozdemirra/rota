@@ -1,0 +1,22 @@
+{
+ "url": "https://registry.npmjs.org/left-pad/1.3.0",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "the version's manifest cut to name, version, description, licence, repository, homepage, bugs, deprecated, install scripts",
+ "body": {
+  "name": "left-pad",
+  "version": "1.3.0",
+  "description": "String left pad",
+  "license": "WTFPL",
+  "repository": {
+   "url": "git+ssh://git@github.com/stevemao/left-pad.git",
+   "type": "git"
+  },
+  "homepage": "https://github.com/stevemao/left-pad#readme",
+  "bugs": {
+   "url": "https://github.com/stevemao/left-pad/issues"
+  },
+  "deprecated": "use String.prototype.padStart()",
+  "scripts": {}
+ }
+}

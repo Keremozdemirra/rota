@@ -1,0 +1,93 @@
+{
+ "url": "https://registry.npmjs.org/left-pad",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "abbreviated metadata; 15 of 15 versions, each cut to name, version, deprecated, hasInstallScript",
+ "body": {
+  "name": "left-pad",
+  "modified": "2024-04-16T05:01:57.431Z",
+  "dist-tags": {
+   "latest": "1.3.0"
+  },
+  "versions": {
+   "0.0.3": {
+    "name": "left-pad",
+    "version": "0.0.3",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "0.0.9": {
+    "name": "left-pad",
+    "version": "0.0.9",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "1.0.1": {
+    "name": "left-pad",
+    "version": "1.0.1",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "0.0.0": {
+    "name": "left-pad",
+    "version": "0.0.0",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "0.0.1": {
+    "name": "left-pad",
+    "version": "0.0.1",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "0.0.2": {
+    "name": "left-pad",
+    "version": "0.0.2",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "0.0.4": {
+    "name": "left-pad",
+    "version": "0.0.4",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "1.0.0": {
+    "name": "left-pad",
+    "version": "1.0.0",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "1.0.2": {
+    "name": "left-pad",
+    "version": "1.0.2",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "1.1.0": {
+    "name": "left-pad",
+    "version": "1.1.0",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "1.1.1": {
+    "name": "left-pad",
+    "version": "1.1.1",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "1.1.2": {
+    "name": "left-pad",
+    "version": "1.1.2",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "1.1.3": {
+    "name": "left-pad",
+    "version": "1.1.3",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "1.2.0": {
+    "name": "left-pad",
+    "version": "1.2.0",
+    "deprecated": "use String.prototype.padStart()"
+   },
+   "1.3.0": {
+    "name": "left-pad",
+    "version": "1.3.0",
+    "deprecated": "use String.prototype.padStart()"
+   }
+  }
+ },
+ "request_headers": {
+  "Accept": "application/vnd.npm.install-v1+json"
+ }
+}

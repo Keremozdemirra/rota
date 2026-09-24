@@ -1,0 +1,23 @@
+{
+ "url": "https://registry.npmjs.org/esbuild/0.28.2",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "the version's manifest cut to name, version, description, licence, repository, homepage, bugs, deprecated, install scripts",
+ "body": {
+  "name": "esbuild",
+  "version": "0.28.2",
+  "description": "An extremely fast JavaScript and CSS bundler and minifier.",
+  "license": "MIT",
+  "repository": {
+   "url": "git+https://github.com/evanw/esbuild.git",
+   "type": "git"
+  },
+  "homepage": "https://github.com/evanw/esbuild#readme",
+  "bugs": {
+   "url": "https://github.com/evanw/esbuild/issues"
+  },
+  "scripts": {
+   "postinstall": "node install.js"
+  }
+ }
+}

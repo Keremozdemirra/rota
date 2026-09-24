@@ -1,0 +1,7 @@
+# The sdist carries what the test suite and the plugin need, not only the modules.
+include README.md LICENSE xlsx_review.py xlsx_review_mcp.py server.json
+recursive-include tests *.py
+recursive-include tests/fixtures *.xlsx *.py
+recursive-include .claude-plugin *.json
+recursive-include skills *.md
+recursive-include .github *.yml

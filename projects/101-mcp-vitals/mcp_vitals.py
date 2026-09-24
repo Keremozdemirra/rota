@@ -39,7 +39,9 @@ import http.client
 import json
 import os
 import re
+import shlex
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -204,7 +206,9 @@ def _mask_arg(a: str, strict: bool) -> str:
     m = re.fullmatch(r"([A-Za-z][A-Za-z0-9-]*):\s*(.+)", a, re.S)
     if m and SECRET_WORD.search(m.group(1)):  # an HTTP header such as `Authorization: Bearer ...`
         return f"{m.group(1)}: ***"
-    return "***" if strict else _mask_value(a)
+    if strict:  # a value nobody can interpret: hide it, but a URL keeps its (masked) shape
+        return mask_url(a) if URL_LIKE.match(a) else "***"
+    return _mask_value(a)
 
 
 def mask_args(args, strict: bool = False) -> list[str]:
@@ -232,6 +236,30 @@ def host_of(url: str) -> str:
         return "?"
     host = f"[{host}]" if ":" in host else host
     return (host + (f":{port}" if port else "")) or "?"
+
+
+def split_command_line(line: str) -> list[str]:
+    """The words a shell would make of `line`. Backslashes stay literal when it holds a Windows path."""
+    lx = shlex.shlex(line, posix=True)
+    lx.whitespace_split = True
+    lx.commenters = ""
+    if re.search(r"(?<![A-Za-z0-9])[A-Za-z]:\\", line):
+        lx.escape = ""
+    try:
+        return list(lx)
+    except ValueError:  # unbalanced quotes
+        return line.split()
+
+
+def command_line(command: str, args: list[str]) -> tuple[str, list[str]]:
+    """Some configs put the whole command line, keys included, in `command`. Split it, so that
+    resolution and masking see the parts; a path with spaces that exists here stays whole."""
+    c = command.strip()
+    if re.search(r"\s", c) and not os.path.exists(c):
+        words = split_command_line(c)
+        if words:
+            return words[0], words[1:] + list(args)
+    return c, list(args)
 
 
 # ---------------------------------------------------------------- discovery
@@ -323,7 +351,7 @@ def discover(home: Path, cwd: Path, extra: list[Path]) -> tuple[list[dict], list
             real = path.resolve()
             if real in seen or not path.is_file():
                 continue
-        except OSError:
+        except (OSError, RuntimeError):  # RuntimeError: a symlink loop, on Python 3.9 to 3.12
             continue
         seen.add(real)
         data, why = read_config(path)
@@ -543,7 +571,7 @@ def _npx(args: list[str]) -> dict:
         if any(f in ("-c", "--call") for f, _ in pairs):
             return {}  # a shell line to run, not a package
         spec = args[pos] if pos is not None else None
-    return npm_spec(spec, custom) if spec else {}
+    return npm_spec(spec, custom) | {"last": args[pos] if pos is not None else spec} if spec else {}
 
 
 def _uvx(args: list[str]) -> dict:
@@ -552,7 +580,7 @@ def _uvx(args: list[str]) -> dict:
     spec = next((v for f, v in pairs if f == "--from" and v), None)
     if spec is None and pos is not None:
         spec = args[pos]
-    return py_spec(spec, custom) if spec else {}
+    return py_spec(spec, custom) | {"last": args[pos] if pos is not None else spec} if spec else {}
 
 
 def _pipx(args: list[str]) -> dict:
@@ -563,7 +591,7 @@ def _pipx(args: list[str]) -> dict:
     spec = next((v for f, v in pairs if f == "--spec" and v), None)
     if spec is None and pos is not None:
         spec = args[pos]
-    return py_spec(spec, custom) if spec else {}
+    return py_spec(spec, custom) | {"last": args[pos] if pos is not None else spec} if spec else {}
 
 
 def _uv_run(args: list[str], directory: str | None) -> dict:
@@ -574,7 +602,7 @@ def _uv_run(args: list[str], directory: str | None) -> dict:
             directory = v
     rest = args[pos:] if pos is not None else []
     where = directory or next((a for a in rest if is_path(a) or a.endswith(".py")), None)
-    return _local(where) if where else {"kind": "local", "detail": "uv run", "may_be_private": True}
+    return _local(where) | {"last": where} if where else {"kind": "local", "detail": "uv run", "may_be_private": True}
 
 
 def _uv(args: list[str]) -> dict:
@@ -619,7 +647,7 @@ def _docker(args: list[str]) -> dict:
     else:
         return {}
     pairs, pos = scan(rest, DOCKER_VALUE)
-    return image_spec(rest[pos]) if pos is not None else {}
+    return image_spec(rest[pos]) | {"last": rest[pos]} if pos is not None else {}
 
 
 def _unwrap(cmd: str, args: list[str]) -> tuple[str, list[str]]:
@@ -648,13 +676,13 @@ def _other(command: str, args: list[str]) -> dict:
     for a in [command, *args]:
         found = github_ref(a)
         if found:
-            return _git(found)
+            return _git(found) | {"last": a}
     for a in [*args, command]:
         if a and is_path(a):
             p = Path(os.path.expanduser(a))
             try:
                 if p.is_absolute() and p.exists():
-                    return _local(a)
+                    return _local(a) | {"last": a}
             except OSError:
                 continue
     return {}
@@ -663,8 +691,9 @@ def _other(command: str, args: list[str]) -> dict:
 def resolve(s: dict) -> dict:
     """Work out what an entry starts: an npm or PyPI package, a container image, a checkout, a remote URL."""
     r = {"kind": "unknown", "package": None, "version": None, "pin": None, "pinned": None, "repo": None,
-         "ref": None, "detail": "", "lookup": False, "may_be_private": False}
-    cmd, args = _basename(s["command"]), list(s["args"])
+         "ref": None, "detail": "", "lookup": False, "may_be_private": False, "last": None}
+    command, args = command_line(s["command"], s["args"])
+    cmd = _basename(command)
     if s.get("target") == "repository":
         r.update(_git(github_ref(s["args"][0]) or ("", None)), pin=None)
         return r
@@ -691,7 +720,7 @@ def resolve(s: dict) -> dict:
     elif cmd in ("docker", "podman"):
         got = _docker(args)
     if got is None:
-        got = _other(s["command"], args)
+        got = _other(command, args)
     r.update(got)
     if r["kind"] == "unknown":
         r["pin"] = None
@@ -731,8 +760,11 @@ def _pypi_licence(info: dict) -> str | None:
 
 
 class Net:
-    def __init__(self, offline: bool = False, token: str | None = None, timeout: float = 20, census: bool = True):
+    def __init__(self, offline: bool = False, token: str | None = None, timeout: float = 20, census: bool = True,
+                 budget: float | None = None):
         self.offline, self.token, self.timeout = offline, token, timeout
+        # the hook's whole run must fit in its `timeout`, or Claude Code throws the answer away
+        self.deadline = time.monotonic() + budget if budget is not None else None
         self.use_census = census  # off in the hook: the published index is 26 MB, too slow to wait on
         self.cache: dict[str, tuple] = {}
         self.github_down = False
@@ -743,9 +775,15 @@ class Net:
         """(object, None) for a JSON object, (None, HTTP status or error name) for anything else. Never raises."""
         if url in self.cache:
             return self.cache[url]
+        timeout = self.timeout
+        if self.deadline is not None:
+            left = self.deadline - time.monotonic()
+            if left < 0.5:
+                return None, "time budget used up"
+            timeout = min(timeout, left)
         req = urllib.request.Request(url, headers={"User-Agent": UA, **(headers or {})})
         try:
-            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
                 body = resp.read()
             data = json.loads(body)
             got = (data, None) if isinstance(data, dict) else (None, "malformed answer")
@@ -906,9 +944,14 @@ INCOMPLETE = {"registry unreachable", "repository unknown"}
 def examine(s: dict, net: Net | None, today: dt.date) -> dict:
     r = resolve(s)
     kind = r["kind"]
+    command, args = command_line(s["command"], s["args"])
+    # The runner's own words (up to the package, image or path) are masked by rule; what comes
+    # after belongs to the server, means anything, and is hidden. Nothing is known of an unknown.
+    cut = 0 if kind == "unknown" else next(
+        (i + 1 for i, a in enumerate(args) if r["last"] is not None and (a == r["last"] or a.endswith("=" + r["last"]))), 0)
     # Everything printed or serialised from here on is masked; the raw command line stays in `s`.
     out = {"client": s["client"], "config": s["config"], "name": clean(s["name"], 80),
-           "command": mask_command(s["command"]), "args": mask_args(s["args"], strict=kind == "unknown"),
+           "command": mask_command(command), "args": mask_args(args[:cut]) + mask_args(args[cut:], strict=True),
            "url": mask_url(s["url"]) if s["url"] else "",
            **{k: r[k] for k in ("kind", "package", "version", "pin", "pinned", "repo", "ref", "detail")},
            "flags": [], "status": "unknown", "days_since_push": None, "facts": {}}
@@ -982,7 +1025,8 @@ def what(r: dict) -> str:
     if r["kind"] == "url":
         return r["detail"][:60]
     # never the arguments of something nobody could identify: they may hold a key
-    return _basename(r["command"])[:40] or "?"
+    first = r["command"].split()[0] if r["command"].split() else ""
+    return _basename(first)[:40] or "?"
 
 
 def age(r: dict) -> str:
@@ -1086,6 +1130,8 @@ def to_json(results: list[dict], today: dt.date, searched: list[str], net: Net |
 
 def target_entry(words: list[str]) -> dict:
     """An entry for a server named on the command line rather than read from a config."""
+    if len(words) == 1 and re.search(r"\s", words[0].strip()):
+        words = split_command_line(words[0].strip()) or words
     e = {"client": "command line", "config": "", "name": clean(words[0], 80), "command": "", "args": [], "url": ""}
     one = words[0] if len(words) == 1 else None
     if one is None:

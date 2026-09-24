@@ -1,0 +1,1757 @@
+{
+ "edition": "2025",
+ "celex": "32025H1710",
+ "eli": "http://data.europa.eu/eli/reco/2025/1710/oj",
+ "act": "Commission Recommendation (EU) 2025/1710",
+ "standard": "voluntary sustainability reporting standard for SMEs (VSME), Annex I",
+ "title": "COMMISSION RECOMMENDATION (EU) 2025/1710 of 30 July 2025 on a voluntary sustainability reporting standard for small and medium-sized undertakings",
+ "oj": "OJ L, 2025/1710, 5.8.2025",
+ "published": "2025-08-05",
+ "source": {
+  "url": "https://publications.europa.eu/resource/celex/32025H1710",
+  "sha256": "4e5afeb8ac4a510a2f58b141d3f0ff4f6cfa36e67774f75fe792b08009650e48",
+  "bytes": 1564229,
+  "etag": "\"Con-20250805031145000\"",
+  "last_modified": "Tue, 05 Aug 2025 01:11:45 GMT",
+  "retrieved": "2026-09-24"
+ },
+ "licence": {
+  "terms": "https://commission.europa.eu/legal-notice_en",
+  "quote": "Unless otherwise indicated (e.g. in individual copyright notices), content owned by the EU on this website is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence. This means that reuse is allowed, provided appropriate credit is given and changes are indicated.",
+  "policy": "Commission Decision 2011/833/EU on the reuse of Commission documents, http://data.europa.eu/eli/dec/2011/833/oj",
+  "licence": "CC BY 4.0, https://creativecommons.org/licenses/by/4.0/",
+  "checked": "2026-09-24"
+ },
+ "changes": "Text extracted from the English XHTML of the Official Journal: whitespace normalised, table layout flattened (cells joined by ' | '), footnotes and appendices left out, images replaced by a marker.",
+ "annex_i": [
+  {
+   "n": "1",
+   "heading": "Objective of this Standard and to which undertakings it applies",
+   "code": null,
+   "related": [],
+   "text": "The objective of this voluntary Standard is to support micro-, small- and medium-sized undertakings in:\n(a) providing information that will help satisfy the data needs of large undertakings requesting sustainability information from their suppliers;\n(b) providing information that will help satisfy data needs from banks and investors, therefore helping undertakings in their access to finance;\n(c) improving the management of the sustainability issues they face, i.e. environmental and social challenges such as pollution, workforce health and safety. This will support their competitive growth and enhance their resilience in the short-, medium- and long-term; and\n(d) contributing to a more sustainable and inclusive economy."
+  },
+  {
+   "n": "2",
+   "heading": "Objective of this Standard and to which undertakings it applies",
+   "code": null,
+   "related": [],
+   "text": "This Standard is voluntary. It applies to undertakings (1) whose securities are not admitted to trading on a regulated market in the European Union (not listed). [Article 3 of Directive 2013/34/EU] defines three categories of small- and medium-sized undertakings based on their balance sheet total, their net turnover and their average number of employees during the financial year.\n(a) An undertaking is micro if it does not exceed two of the following thresholds:\n  (i) €450 000 in balance sheet total;\n  (ii) €900 000 in net turnover; and\n  (iii) an average of 10 employees.\n(b) An undertaking is small if it does not exceed two of the following thresholds:\n  (i) €5 million in balance sheet total;\n  (ii) €10 million in net turnover; and\n  (iii) an average of 50 employees.\n(c) An undertaking is medium if it does not exceed two of the following thresholds:\n  (i) €25 million in balance sheet total;\n  (ii) €50 million in net turnover; and\n  (iii) an average of 250 employees."
+  },
+  {
+   "n": "3",
+   "heading": "Objective of this Standard and to which undertakings it applies",
+   "code": null,
+   "related": [],
+   "text": "These undertakings fall outside the scope of the Corporate Sustainability Reporting Directive (CSRD) but are encouraged to use this Standard. This Standard covers the same sustainability issues as the European Sustainability Reporting Standards (ESRS) for large undertakings. However, it is proportionate and therefore takes into account micro-, small- and medium-sized undertakings’ fundamental characteristics. Micro-undertakings are welcome to use only certain parts of this Standard as highlighted in paragraph 5(a)."
+  },
+  {
+   "n": "4",
+   "heading": "Objective of this Standard and to which undertakings it applies",
+   "code": null,
+   "related": [],
+   "text": "Consistency with ESRS for large undertakings has been carefully considered in the preparation of this Standard while defining proportionate requirements. This Standard has no legal authority unlike the ESRS for large undertakings."
+  },
+  {
+   "n": "5",
+   "heading": "Structure of this Standard",
+   "code": null,
+   "related": [],
+   "text": "This Standard has two modules that the undertaking can use to prepare its sustainability report:\n(a) Basic Module: Disclosures B1 and B2 and Basic Metrics (B3 to B11). This module is the target approach for micro-undertakings and constitutes a minimum requirement for other undertakings; and\n(b) Comprehensive Module: this module sets datapoints in addition to disclosures B1-B11, which are likely to be requested by banks, investors and corporate clients of the undertaking on top of the Basic Module.\nParagraph 24 below illustrates the available options for the preparation of a sustainability report using this Standard by adopting one or more of these modules. Once chosen, a module shall be complied with in its entirety (with flexibility allowed under paragraph 22); however, each item of disclosure shall be provided only when it is applicable to the undertaking’s specific circumstances."
+  },
+  {
+   "n": "6",
+   "heading": "Structure of this Standard",
+   "code": null,
+   "related": [],
+   "text": "Applying the Basic Module is a prerequisite for applying the Comprehensive Module."
+  },
+  {
+   "n": "7",
+   "heading": "Structure of this Standard",
+   "code": null,
+   "related": [],
+   "text": "Appendix A Defined terms include the definitions of the terms used in this Standard. Throughout the VSME Standard, the terms defined in the glossary of definitions (Appendix A) are set in bold italics, except when a defined term is used more than once in the same paragraph."
+  },
+  {
+   "n": "8",
+   "heading": "Complying with this Standard",
+   "code": null,
+   "related": [],
+   "text": "This Standard sets requirements that allow the undertaking to provide relevant information on:\n(a) how it has had and is likely to have a positive or negative impact on people or on the environment in the short-, medium- or long-term; and\n(b) how environmental and social issues have affected or are likely to affect its financial position, performance and cash flows in the short-, medium- or long-term."
+  },
+  {
+   "n": "9",
+   "heading": "Complying with this Standard",
+   "code": null,
+   "related": [],
+   "text": "The undertaking shall report information that is relevant, faithful, comparable, understandable and verifiable."
+  },
+  {
+   "n": "10",
+   "heading": "Complying with this Standard",
+   "code": null,
+   "related": [],
+   "text": "Depending on the type of activities carried out by the undertaking, the inclusion of additional information (metrics and/or narrative disclosures) not covered in this Standard is appropriate in order to disclose sustainability issues that are common in the undertaking’s sector (i.e. typically encountered by businesses or entities operating within a specific industry or field) or that are specific to the undertaking, as this supports the preparation of relevant, faithful, comparable, understandable and verifiable information. This includes the consideration of information on Scope 3 GHG emissions (see paragraphs 50 to 53 of this Standard). Appendix B provides a list of possible sustainability issues."
+  },
+  {
+   "n": "11",
+   "heading": "Complying with this Standard",
+   "code": null,
+   "related": [],
+   "text": "The undertaking may complement the metrics from the Basic and Comprehensive modules with additional qualitative and/or quantitative information where appropriate in accordance with paragraph 10 above."
+  },
+  {
+   "n": "12",
+   "heading": "Comparative information",
+   "code": null,
+   "related": [],
+   "text": "The undertaking shall report comparative information in respect of the previous year except for metrics disclosed for the first time. The undertaking shall report comparative information from the second year of reporting."
+  },
+  {
+   "n": "13",
+   "heading": "If applicable principle",
+   "code": null,
+   "related": [],
+   "text": "Certain disclosures only apply to specific circumstances (2). In particular, the instructions provided in each disclosure specify such circumstances and the information that is to be reported only if considered ‘applicable’ by the undertaking. When one of these disclosures is omitted, it is assumed to not be applicable."
+  },
+  {
+   "n": "14",
+   "heading": "Inclusion of subsidiaries in the reported data",
+   "code": null,
+   "related": [],
+   "text": "If the undertaking is a parent company of a group, it is recommended that it prepares its sustainability report on a consolidated basis, including information from its subsidiaries."
+  },
+  {
+   "n": "15",
+   "heading": "Inclusion of subsidiaries in the reported data",
+   "code": null,
+   "related": [],
+   "text": "If the parent undertaking has prepared its sustainability report on a consolidated basis, including information from its subsidiaries, the subsidiary undertakings are exempted from reporting."
+  },
+  {
+   "n": "16",
+   "heading": "Timing and location of the sustainability report",
+   "code": null,
+   "related": [],
+   "text": "If a sustainability report is prepared to meet the needs of large undertakings or banks that require an update annually, it shall be prepared annually. If the undertaking prepares financial statements, the sustainability report shall be prepared with a period of time that is consistent with the preparation of the financial statement. If specific datapoints did not change from the previous reporting year, the undertaking may indicate that no changes occurred and refer to the information provided for that specific datapoint in the previous year’s report."
+  },
+  {
+   "n": "17",
+   "heading": "Timing and location of the sustainability report",
+   "code": null,
+   "related": [],
+   "text": "The primary function of this report is to inform actual or potential business counterparties. The undertaking may decide to make its sustainability report available to the public. In this case, the undertaking may present its sustainability report in a separate section of the management report if it has one. Otherwise, the undertaking may present its sustainability report as a separate document."
+  },
+  {
+   "n": "18",
+   "heading": "Timing and location of the sustainability report",
+   "code": null,
+   "related": [],
+   "text": "To avoid publishing the same information twice, the undertaking may refer in its sustainability report to disclosures published in other documents that can be accessed at the same time as the sustainability report (3)."
+  },
+  {
+   "n": "19",
+   "heading": "Classified and sensitive information",
+   "code": null,
+   "related": [],
+   "text": "When the provision of the disclosures in this Standard requires disclosing classified or sensitive information, the undertaking may omit such information. If the undertaking decides to omit such information, it shall state that this is the case under disclosure B1 (see paragraph 24)."
+  },
+  {
+   "n": "20",
+   "heading": "Coherence and linkages with disclosures in financial statements",
+   "code": null,
+   "related": [],
+   "text": "If the undertaking also prepares financial statements, the information provided in its sustainability report following this Standard shall:\n(a) be coherent with what is reported in the financial statements for the same period; and\n(b) be presented in a way that facilitates the understanding of the linkages that exist with the information reported in financial statements, for example by using appropriate cross-references."
+  },
+  {
+   "n": "21",
+   "heading": "Basic Module",
+   "code": null,
+   "related": [],
+   "text": "The undertaking shall report on its environmental, social and business conduct issues (together ‘sustainability issues’) using the B1 to B11 disclosures below."
+  },
+  {
+   "n": "22",
+   "heading": "Basic Module",
+   "code": null,
+   "related": [],
+   "text": "If the undertaking wants to provide more comprehensive information, it may also integrate the metrics required from B1 to B11 with disclosures, selecting them from the Comprehensive Module."
+  },
+  {
+   "n": "23",
+   "heading": "Basic Module",
+   "code": null,
+   "related": [],
+   "text": "Additional guidance on disclosures B1 to B11 is available in paragraphs 1 to 144 of Annex II of this Recommendation."
+  },
+  {
+   "n": "24",
+   "heading": "B1 – Basis for preparation",
+   "code": "B1",
+   "related": [],
+   "text": "The undertaking shall disclose:\n(a) which of the following options it has selected:\n  (i) OPTION A: Basic Module (only); or\n  (ii) OPTION B: Basic Module and Comprehensive Module;\n(b) if the undertaking has omitted a disclosure as it is deemed classified or sensitive information (see paragraph 19), the undertaking shall indicate the disclosure that has omitted.\n(c) whether the sustainability report has been prepared on an individual basis (i.e. the report is limited to the undertaking’s information only) or on a consolidated basis (i.e. the report includes information about the undertaking and its subsidiaries);\n(d) in case of a consolidated sustainability report, the list of the subsidiaries, including their registered address (4), covered in the report; and\n(e) the following information:\n  (i) the undertaking’s legal form;\n  (ii) NACE sector classification code(s);\n  (iii) size of the balance sheet (total assets in monetary units);\n  (iv) turnover (in monetary units);\n  (v) number of employees in headcount or full-time equivalents;\n  (vi) country of primary operations and location of significant asset(s); and\n  (vii) geolocation of sites owned, leased or managed."
+  },
+  {
+   "n": "25",
+   "heading": "B1 – Basis for preparation",
+   "code": "B1",
+   "related": [],
+   "text": "If the undertaking has obtained any sustainability-related certification or label, it shall provide a brief description of those (including, where relevant, the issuers of the certification or label, date and rating score)."
+  },
+  {
+   "n": "26",
+   "heading": "B2 – Practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "B2",
+   "related": [],
+   "text": "If the undertaking has put in place specific practices, policies or future initiatives for transitioning towards a more sustainable economy, it shall state so. The undertaking shall state whether it has:\n(a) practices. Practices in this context may include, for instance, efforts to reduce the undertaking’s water and electricity consumption, to reduce GHG emissions or to prevent pollution, and initiatives to improve product safety as well as current initiatives to improve working conditions and equal treatment in the workplace, sustainability training for the undertaking’s workforce and partnerships related to sustainability projects;\n(b) policies on sustainability issues, whether they are publicly available, and any separate environmental, social or governance policies for addressing sustainability issues;\n(c) any future initiatives or forward-looking plans that are being implemented on sustainability issues; and\n(d) targets to monitor the implementation of the policies and the progress achieved towards meeting such targets."
+  },
+  {
+   "n": "27",
+   "heading": "B2 – Practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "B2",
+   "related": [],
+   "text": "Such practices, policies and future initiatives include what the undertaking does to reduce its negative impacts and to enhance its positive impacts on people and the environment, in order to contribute to a more sustainable economy. Appendix B provides a list of possible sustainability issues that could be covered in this disclosure. The undertaking may use the template found in paragraph 14 of Annex II of this Recommendation to report this information."
+  },
+  {
+   "n": "28",
+   "heading": "B2 – Practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "B2",
+   "related": [],
+   "text": "If the undertaking also reports on the Comprehensive module, it shall complement the information provided under B2 with the datapoints found in C2."
+  },
+  {
+   "n": "29",
+   "heading": "B3 – Energy and greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "The undertaking shall disclose its total energy consumption in MWh, with a breakdown as per the table below, if it can obtain the necessary information to provide such a breakdown:\n| Renewable | Non-renewable | Total\nElectricity (as reflected in utility billings) | | |\nFuels | | |"
+  },
+  {
+   "n": "30",
+   "heading": "B3 – Energy and greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "The undertaking shall disclose its estimated gross greenhouse gas (GHG) emissions in tons of CO2 equivalent (tCO2eq) considering the content of the GHG Protocol Corporate Standard (version 2004), including:\n(a) the Scope 1 GHG emissions in tCO2eq (from owned or controlled sources); and\n(b) the location-based Scope 2 emissions in tCO2eq (i.e. emissions from the generation of purchased energy, such as electricity, heat, steam or cooling)."
+  },
+  {
+   "n": "31",
+   "heading": "B3 – Energy and greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "The undertaking shall disclose its GHG intensity calculated by dividing ‘gross greenhouse gas (GHG) emissions’ disclosed under paragraph 30 by ‘turnover (in monetary units)’ disclosed under paragraph 24(e)(iv) (5)."
+  },
+  {
+   "n": "32",
+   "heading": "B4 – Pollution of air, water and soil",
+   "code": "B4",
+   "related": [],
+   "text": "If the undertaking is already required by law or other national regulations to report to competent authorities its emissions of pollutants, or if it voluntarily reports on them according to an Environmental Management System, it shall disclose the pollutants it emits to air, water and soil in its own operations, with the respective amount for each pollutant. If this information is already publicly available, the undertaking may alternatively refer to the document where it is reported, for example, by providing the relevant URL link or embedding a hyperlink."
+  },
+  {
+   "n": "33",
+   "heading": "B5 – Biodiversity",
+   "code": "B5",
+   "related": [],
+   "text": "The undertaking shall disclose the number and area (in hectares or m2) of sites that it owns, has leased, or manages in or near a biodiversity sensitive area."
+  },
+  {
+   "n": "34",
+   "heading": "B5 – Biodiversity",
+   "code": "B5",
+   "related": [],
+   "text": "The undertaking may disclose metrics related to land-use (in hectares or m2):\n(a) total use of land;\n(b) total sealed area;\n(c) total nature-oriented area on-site; and\n(d) total nature-oriented area off-site."
+  },
+  {
+   "n": "35",
+   "heading": "B6 – Water",
+   "code": "B6",
+   "related": [],
+   "text": "The undertaking shall disclose its total water withdrawal, i.e. the amount of water drawn into the boundaries of the organisation (or facility); in addition, the undertaking shall separately present the amount of water withdrawn at sites located in areas of high water-stress."
+  },
+  {
+   "n": "36",
+   "heading": "B6 – Water",
+   "code": "B6",
+   "related": [],
+   "text": "If the undertaking has production processes in place which significantly consume water (e.g. thermal energy processes like drying or power production, production of goods, agricultural irrigation, etc.), it shall disclose its water consumption calculated as the difference between its water withdrawal and water discharge from its production processes."
+  },
+  {
+   "n": "37",
+   "heading": "B7 – Resource use, circular economy and waste management",
+   "code": "B7",
+   "related": [],
+   "text": "The undertaking shall disclose whether it applies circular economy principles and, if so, how it applies these principles."
+  },
+  {
+   "n": "38",
+   "heading": "B7 – Resource use, circular economy and waste management",
+   "code": "B7",
+   "related": [],
+   "text": "The undertaking shall disclose:\n(a) the total annual generation of waste broken down by type (non-hazardous and hazardous);\n(b) the total annual waste diverted to recycling or reuse; and\n(c) if the undertaking operates in a sector using significant material flows (for example manufacturing, construction, packaging or others), the annual mass-flow of relevant materials used."
+  },
+  {
+   "n": "39",
+   "heading": "B8 – Workforce – General characteristics",
+   "code": "B8",
+   "related": [],
+   "text": "The undertaking shall disclose the number of employees in headcount or full-time equivalent for the following metrics:\n(a) type of employment contract (temporary or permanent);\n(b) gender; and\n(c) country of the employment contract, if the undertaking operates in more than one country."
+  },
+  {
+   "n": "40",
+   "heading": "B8 – Workforce – General characteristics",
+   "code": "B8",
+   "related": [],
+   "text": "If the undertaking employs 50 or more employees, it shall disclose the employee turnover rate for the reporting period."
+  },
+  {
+   "n": "41",
+   "heading": "B9 – Workforce – Health and safety",
+   "code": "B9",
+   "related": [],
+   "text": "The undertaking shall disclose the following information regarding its employees:\n(a) the number and rate of recordable work-related accidents; and\n(b) the number of fatalities as a result of work-related injuries and work-related ill health."
+  },
+  {
+   "n": "42",
+   "heading": "B10 – Workforce – Remuneration, collective bargaining and training",
+   "code": "B10",
+   "related": [],
+   "text": "The undertaking shall disclose:\n(a) whether the employees receive pay that is equal or above applicable minimum wage for the country it reports on, determined directly by the national minimum wage law or through a collective bargaining agreement;\n(b) the percentage gap in pay between its female and male employees. The undertaking may omit this disclosure when its headcount is below 150 employees noting that this threshold will be reduced to 100 employees from 7 June 2031;\n(c) the percentage of employees covered by collective bargaining agreements; and\n(d) the average number of annual training hours per employee, broken down by gender."
+  },
+  {
+   "n": "43",
+   "heading": "B11 – Convictions and fines for corruption and bribery",
+   "code": "B11",
+   "related": [],
+   "text": "In case of convictions and fines in the reporting period, the undertaking shall disclose the number of convictions, and the total amount of fines incurred for the violation of anti- corruption and anti- bribery laws."
+  },
+  {
+   "n": "44",
+   "heading": "Comprehensive Module",
+   "code": null,
+   "related": [],
+   "text": "This module provides disclosures to address in a comprehensive way the information needs of the undertaking’s business partners, such as investors, banks and corporate clients in addition to the ones included in the Basic Module. The disclosures in this module reflect the financial market participants and corporate clients’ respective obligations under relevant laws and regulations. They also reflect the information needed by the business partners, to assess the sustainability risk profile of the undertaking, e.g. as a (potential) supplier or a (potential) borrower."
+  },
+  {
+   "n": "45",
+   "heading": "Comprehensive Module",
+   "code": null,
+   "related": [],
+   "text": "The text below provides the list of disclosures from C1 to C9 to be considered and reported upon, if they are applicable to the undertaking’s business and organisation. When one of these disclosures is omitted, it is assumed to not be applicable."
+  },
+  {
+   "n": "46",
+   "heading": "Comprehensive Module",
+   "code": null,
+   "related": [],
+   "text": "Additional guidance on disclosures C1 to C9 is available in paragraphs 145 to 180 of Annex II of this Recommendation."
+  },
+  {
+   "n": "47",
+   "heading": "C1 – Strategy: Business Model and Sustainability – Related Initiatives",
+   "code": "C1",
+   "related": [],
+   "text": "The undertaking shall disclose the key elements of its business model and strategy, including:\n(a) a description of significant groups of products and/or services offered;\n(b) a description of significant market(s) the undertaking operates in (such as B2B, wholesale, retail, countries);\n(c) a description of main business relationships (such as key suppliers, customers, distribution channels); and\n(d) if the strategy has key elements that relate to or affect sustainability issues, a brief description of those key elements."
+  },
+  {
+   "n": "48",
+   "heading": "C2 – Description of practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "C2",
+   "related": [],
+   "text": "If the undertaking has put in place specific practices, policies or future initiatives for transitioning towards a more sustainable economy, which it has already reported under disclosure B2 in the Basic Module, it shall briefly describe them. The undertaking may use the template found in paragraph 149 of Annex II of this Recommendation for this purpose."
+  },
+  {
+   "n": "49",
+   "heading": "C2 – Description of practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "C2",
+   "related": [],
+   "text": "The undertaking may indicate the most senior level within its employees that is accountable for implementing the policies when this has been determined by the undertaking."
+  },
+  {
+   "n": "50",
+   "heading": "Consideration when reporting on GHG emissions under B3 (Basic Module)",
+   "code": null,
+   "related": [
+    "B3"
+   ],
+   "text": "Depending on the type of activities carried out by the undertaking, disclosing a quantification of its Scope 3 GHG emissions can be appropriate (see paragraph 10 of this Standard) to yield relevant information on the undertaking’s value chain impacts on climate change."
+  },
+  {
+   "n": "51",
+   "heading": "Consideration when reporting on GHG emissions under B3 (Basic Module)",
+   "code": null,
+   "related": [
+    "B3"
+   ],
+   "text": "Scope 3 emissions are indirect GHG emissions (other than Scope 2) that derive from an undertaking’s value chain. They include the activities that are upstream of the undertaking’s operations (e.g. purchased goods and services, purchased capital goods, transportation of purchased goods, etc.) and activities that are downstream of the undertaking’s operations (e.g. transport and distribution of the undertaking’s products, use of sold products, investments, etc.)."
+  },
+  {
+   "n": "52",
+   "heading": "Consideration when reporting on GHG emissions under B3 (Basic Module)",
+   "code": null,
+   "related": [
+    "B3"
+   ],
+   "text": "If the undertaking decides to provide this metric, it should refer to the 15 types of Scope 3 GHG emissions identified by the GHG Protocol Corporate Standard and detailed by the GHG Protocol Corporate Value Chain (Scope 3) Accounting and Reporting Standard. When it reports on Scope 3 GHG emissions, the undertaking shall include significant Scope 3 categories (as per the Corporate Value Chain (Scope 3) Accounting and Reporting Standard) based on its own assessment of relevant Scope 3 categories. Undertakings can find further guidance on specific calculation methods for each category in the GHG Protocol’s Technical guidance for Calculating Scope 3 Emissions."
+  },
+  {
+   "n": "53",
+   "heading": "Consideration when reporting on GHG emissions under B3 (Basic Module)",
+   "code": null,
+   "related": [
+    "B3"
+   ],
+   "text": "When reporting its Scope 1 and Scope 2 emissions, if the undertaking discloses entity-specific information on its Scope 3 emissions, it shall present it together with the information required under B3 – Energy and greenhouse gas emissions."
+  },
+  {
+   "n": "54",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "If the undertaking has established GHG emission reduction targets, it shall disclose its targets in absolute values for Scope 1 and Scope 2 emissions. In line with paragraphs 50 to 53 above and if it has set Scope 3 reduction targets, the undertaking shall also provide targets for significant Scope 3 emissions. In particular, it shall provide:\n(a) the target year and target year value;\n(b) the base year and base year value;\n(c) the units used for targets;\n(d) the share of Scope 1, Scope 2 and, if disclosed, Scope 3 that the target concerns; and\n(e) a list of main actions it seeks to implement to achieve its targets."
+  },
+  {
+   "n": "55",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "If the undertaking that operates in high climate impact sectors (6) has adopted a transition plan for climate change mitigation, it may provide information about it, including an explanation of how it is contributing to reduce GHG emissions."
+  },
+  {
+   "n": "56",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "In case the undertaking operates in high-climate impact sectors and does not have a transition plan for climate change mitigation in place, it shall indicate whether and, if so, when it will adopt such a transition plan."
+  },
+  {
+   "n": "57",
+   "heading": "C4 – Climate risks",
+   "code": "C4",
+   "related": [],
+   "text": "If the undertaking has identified climate-related hazards and climate-related transition events, creating gross climate-related risks for the undertaking, it shall:\n(a) briefly describe such climate-related hazards and climate-related transition events;\n(b) disclose how it has assessed the exposure and sensitivity of its assets, activities and value chain to these hazards and transition events;\n(c) disclose the time horizons of any climate-related hazards and transition events identified; and\n(d) disclose whether it has undertaken climate change adaptation actions for any climate-related hazards and transition events."
+  },
+  {
+   "n": "58",
+   "heading": "C4 – Climate risks",
+   "code": "C4",
+   "related": [],
+   "text": "The undertaking may disclose the potential adverse effects of climate risks that may affect its financial performance or business operations in the short-, medium- or long-term, indicating whether it assesses the risks to be high, medium, low."
+  },
+  {
+   "n": "59",
+   "heading": "C5 – Additional (general) workforce characteristics",
+   "code": "C5",
+   "related": [],
+   "text": "If the undertaking employs 50 or more employees, it may disclose the female-to-male ratio at management level for the reporting period."
+  },
+  {
+   "n": "60",
+   "heading": "C5 – Additional (general) workforce characteristics",
+   "code": "C5",
+   "related": [],
+   "text": "If the undertaking employs 50 or more employees, it may disclose the number of those self-employed without personnel who are working exclusively for the undertaking, and temporary workers provided by undertakings primarily engaged in ‘employment activities’."
+  },
+  {
+   "n": "61",
+   "heading": "C6 – Additional own workforce information - Human rights policies and processes",
+   "code": "C6",
+   "related": [],
+   "text": "The undertaking shall disclose an answer to the following questions.\n(a) Does the undertaking have a code of conduct or human rights policy for its own workforce? (YES/NO)\n(b) If yes, does this cover:\n  (i) child labour (YES/ NO);\n  (ii) forced labour (YES/ NO);\n  (iii) human trafficking (YES/NO);\n  (iv) discrimination (YES/NO);\n  (v) accident prevention (YES/NO); or\n  (vi) other? (YES/NO – if yes, specify).\n(c) Does the undertaking have a complaints-handling mechanism for its own workforce? (YES/ NO)"
+  },
+  {
+   "n": "62",
+   "heading": "C7 – Severe negative human rights incidents",
+   "code": "C7",
+   "related": [],
+   "text": "The undertaking shall disclose an answer to the following questions:\n(a) Does the undertaking have confirmed incidents in its own workforce related to:\n  (i) child labour (YES/ NO);\n  (ii) forced labour (YES/ NO);\n  (iii) human trafficking (YES/ NO);\n  (iv) discrimination (YES/ NO); or\n  (v) other? (YES/NO – if yes, specify).\n(b) If yes, the undertaking may describe the actions being taken to address the incidents described above.\n(c) Is the undertaking aware of any confirmed incidents involving workers in the value chain, affected communities, consumers and end-users? If yes, specify."
+  },
+  {
+   "n": "63",
+   "heading": "C8 – Revenues from certain activities and exclusion from EU reference benchmarks",
+   "code": "C8",
+   "related": [],
+   "text": "If the undertaking is active in one or more of the following sectors, it shall disclose related revenues derived from activities in:\n(a) controversial weapons (anti-personnel mines, cluster munitions, chemical weapons and biological weapons);\n(b) the cultivation and production of tobacco;\n(c) fossil fuel (coal, oil and gas) sector (i.e. the undertaking derives revenues from exploration, mining, extraction, production, processing, storage, refining or distribution, including transportation, storage and trade, of fossil fuels as defined in Article 2, point (62), of Regulation (EU) 2018/1999 of the European Parliament and the Council (7)), including a disaggregation of revenues derived from coal, oil and gas; or\n(d) chemicals production if the undertaking is a manufacturer of pesticides and other agrochemical products."
+  },
+  {
+   "n": "64",
+   "heading": "C8 – Revenues from certain activities and exclusion from EU reference benchmarks",
+   "code": "C8",
+   "related": [],
+   "text": "The undertaking shall disclose whether it is excluded from any EU reference benchmarks that are aligned with the Paris Agreement as described in paragraph 177 of Annex II of this Recommendation."
+  },
+  {
+   "n": "65",
+   "heading": "C9 – Gender diversity ratio in the governance body",
+   "code": "C9",
+   "related": [],
+   "text": "If the undertaking has a governance body in place, the undertaking shall disclose the related gender diversity ratio."
+  }
+ ],
+ "annex_ii_guidance": [
+  {
+   "n": "1",
+   "heading": "Basic Module: Guidance",
+   "code": null,
+   "related": [],
+   "text": "The guidance contained in the sections below is intended to facilitate the application of the sustainability disclosure requirements contained in paragraphs 21 to 43 of Annex I to the Commission Recommendation on a voluntary sustainability reporting standard for small and medium-sized undertakings."
+  },
+  {
+   "n": "2",
+   "heading": "Basic Module: Guidance",
+   "code": null,
+   "related": [],
+   "text": "The guidance below is intended as part of an ecosystem that could include also the development of further support guides by EFRAG, further digital tools and implementation support (educational activities, stakeholders’ engagement) that aim to facilitate the understanding of some of the technical elements in the guidance."
+  },
+  {
+   "n": "3",
+   "heading": "Basic Module: Guidance",
+   "code": null,
+   "related": [],
+   "text": "This guidance supports undertakings that wish to apply the Basic Module."
+  },
+  {
+   "n": "4",
+   "heading": "B1 – Basis for Preparation",
+   "code": "B1",
+   "related": [],
+   "text": "When reporting on the legal form of the undertaking according to national legislation under paragraph 24(e)(i), the undertaking can choose from one of the following undertaking structures:\n(a) private limited liability undertaking\n(b) sole proprietorship\n(c) partnership\n(d) cooperative\n(e) other (please specify based on country specifications for legal forms)."
+  },
+  {
+   "n": "5",
+   "heading": "B1 – Basis for Preparation",
+   "code": "B1",
+   "related": [],
+   "text": "When reporting on the NACE code(s) of the undertaking under paragraph 24(e)(ii), NACE codes (Nomenclature statistique des Activités économiques dans la Communauté Européenne) are classifications of economic activities used in the European Union. They provide a standardized framework for classifying economic activities into sectors, enabling comparability and a common understanding among the various EU countries."
+  },
+  {
+   "n": "6",
+   "heading": "B1 – Basis for Preparation",
+   "code": "B1",
+   "related": [],
+   "text": "The NACE code consists of a number of digits ranging from 2 to 5 depending on the level of specificity with which the economic activity is identified. The list of NACE codes can be found in the following document: Regulation (EU) 2023/137.\nLevel Nr | Identifier | Description\n1 | Section | Sections are identified by an alphabetic letter, and they define 21 general economic areas such as agriculture, manufacturing industry or commerce.\n2 | Division | The division is identified by a two-digit numerical code and identifies a specific sector within the general economic area. There are a total of 88 divisions.\n3 | Group | The group is identified by a three-digit numerical code (also considering the division's two digits) and defines a specific area within the sector. There are about 270 groups.\n4 | Class | The class is identified by a four-digit numerical code (considering the digits of division and group) and defines a specific activity within the group. There are about 450 classes."
+  },
+  {
+   "n": "7",
+   "heading": "B1 – Basis for Preparation",
+   "code": "B1",
+   "related": [],
+   "text": "When reporting the number of employees under paragraph 24(e)(v), full-time equivalent (FTE) is the number of full-time positions in an undertaking. It can be calculated by dividing an employee's scheduled hours (total effective hours worked in a week) by the employer's hours for a full-time workweek (total hours performed by full-time employees). For example, an employee who works 25 hours every week for a company where the full-time week is 40 hours represents a 0,625 FTE (i.e. 25/ 40 hours)."
+  },
+  {
+   "n": "8",
+   "heading": "B1 – Basis for Preparation",
+   "code": "B1",
+   "related": [],
+   "text": "Headcount is the total number of people employed by the undertaking reported either at the end of the reporting period or as an average across the reporting period."
+  },
+  {
+   "n": "9",
+   "heading": "B1 – Basis for Preparation",
+   "code": "B1",
+   "related": [],
+   "text": "When reporting on the country of primary operations and the location of significant assets under paragraphs 24(e)(vi) and (vii), the undertaking shall disclose this information for each of its sites using the table below:\nSites | Address | Postal Code | City | Country | Coordinates (geolocation)\nRegistered Office (e.g.) | | | | |\nWarehouse (e.g.) | | | | |\nIndustrial Plant (e.g.) | | | | |"
+  },
+  {
+   "n": "10",
+   "heading": "B1 – Basis for Preparation",
+   "code": "B1",
+   "related": [],
+   "text": "The geolocation of an undertaking is expected to be a valuable datapoint for stakeholders for the assessment of risks and opportunities connected to the SME, particularly in relation to the sustainability issues of climate change adaptation, water, ecosystems and biodiversity."
+  },
+  {
+   "n": "11",
+   "heading": "B1 – Basis for Preparation",
+   "code": "B1",
+   "related": [],
+   "text": "The geolocation shall be provided in spatial points for single units or polygon points defining the boundaries of a larger, less unit-like site, such as a farm, mine or facility. The undertaking may also provide a cluster of points to allow for the easy identification of the concerned area. The spatial points shall be provided as coordinates, with five decimal places (e.g. 0° 00′ 0.036″)."
+  },
+  {
+   "n": "12",
+   "heading": "B1 – Basis for Preparation",
+   "code": "B1",
+   "related": [],
+   "text": "When disclosing the geolocation of sites owned, leased, or managed, the undertaking shall include the coordinates of the sites in the table shown in paragraph 73. The undertaking may use web mapping tools to identify the coordinates of sites that it owns, leases or manages. The undertaking may also use any appropriate software tools or platforms to further establish the perimeter or area of larger sites."
+  },
+  {
+   "n": "13",
+   "heading": "B1 – Basis for Preparation",
+   "code": "B1",
+   "related": [],
+   "text": "In relation to paragraph 25, sustainability-related certification can include registered eco-labels from an EU, national or international labelling scheme, corresponding to the main activity of an SME. For instance, the EU Ecolabel covers specific products, such as textiles and footwear, coverings (e.g. wood floor coverings), cleaning and personal care products, electronic equipment, or furniture. The undertaking may consult the EU Ecolabel Product Groups and Product Catalogue for further information."
+  },
+  {
+   "n": "14",
+   "heading": "B2 – Practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "B2",
+   "related": [],
+   "text": "Undertakings may use the following template to report on B2 datapoints.\n| Do you have existing sustainability practices/ policies/ future initiatives that address any of the following sustainability issues? [YES/NO] | Are they publicly available? [YES/NO] | Do the policies have any targets? [YES/NO]\nClimate Change | | |\nPollution | | |\nWater and Marine Resources | | |\nBiodiversity and Ecosystems | | |\nCircular Economy | | |\nOwn Workforce | | |\nWorkers in the Value Chain | | |\nAffected Communities | | |\nConsumers and end-users | | |\nBusiness conduct | | |"
+  },
+  {
+   "n": "15",
+   "heading": "B2 – Practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "B2",
+   "related": [],
+   "text": "If the undertaking is a cooperative, it may disclose:\n(a) the effective participation of workers, users or other interested parties or communities in governance;\n(b) the financial investment in the capital or assets of social economy entities referred to in the Council Recommendation of 29 September 2023 (excluding donations and contributions); and\n(c) any limits to the distribution of profits connected to the mutualistic nature or to the nature of the activities consisting in services of general economic interest (SGEI)."
+  },
+  {
+   "n": "16",
+   "heading": "Guidance for own workforce, workers in the value chain, affected communities and consumers and end/users",
+   "code": "B2",
+   "related": [],
+   "text": "In order to understand the sustainability issues that relate to social and human rights, refer to Appendix B for a list of possible sustainability issues. This list could help identify if the policies, practices or future initiatives are aimed at addressing negative human rights impacts in a comprehensive way or if they are limited to certain groups of affected stakeholders (for example, workers in the upstream value chain). As part of this disclosure undertakings may also disclose whether they have a process to address human rights related complaints."
+  },
+  {
+   "n": "17",
+   "heading": "Impacts on climate: energy usage and greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "Under paragraphs 29 and 30, the undertaking reports on its climate impacts, providing information about its energy use and greenhouse gas emissions. This guidance for disclosure B3 does not constitute an additional datapoint to the disclosures described in paragraphs 29 (on energy consumption) and 30 (on GHG emissions) but rather reinstates an overarching objective and provides context for the Basic disclosure B3."
+  },
+  {
+   "n": "18",
+   "heading": "Energy consumption",
+   "code": "B3",
+   "related": [],
+   "text": "Climate related impacts are significantly driven by energy consumption. Therefore, it is relevant to disclose both the quantity as well as the type – e.g. fossil fuels such as coal, oil and gas versus renewable energy – and mix of energy consumed. Examples of energy disclosures are total energy consumption broken down by fossil fuels and electricity. Other breakdowns may be reported such as consumption of purchased or self-generated electricity from renewable sources. An example of the information requested in paragraph 29 follows.\n| Renewable Energy Consumption (MWh) | Non-renewable Energy Consumption (MWh) | Total 202(x) Energy consumption (MWh)\nElectricity (as reflected in utility billings) | 300 | 186 | 486\nFuels | 3 | 7 | 10"
+  },
+  {
+   "n": "19",
+   "heading": "Energy consumption",
+   "code": "B3",
+   "related": [],
+   "text": "In case the undertaking purchases fossil fuels (e.g. natural gas, oil) or renewable fuels (e.g. biofuels, such as biodiesel and bioethanol) to generate electricity, heat or cooling for its own consumption, it has to avoid double counting. Therefore, the undertaking accounts for the energy content of the purchased fuel only as fuel consumption, but it does not account for, or report on, its electricity and heat consumption produced from that fuel yet again. In case of electricity generation from renewable energies such as solar or wind – and where no fuel use is necessary – the undertaking accounts for the amount of electricity generated and consumed as electricity consumption.\n[image in the Official Journal, not reproduced]"
+  },
+  {
+   "n": "20",
+   "heading": "Energy consumption",
+   "code": "B3",
+   "related": [],
+   "text": "The undertaking shall not offset its energy consumption by its energy production even if on site generated energy is sold to and used by a third party. The undertaking shall also avoid double counting fuel consumption when disclosing self-generated energy consumption. If the undertaking generates electricity from either a non-renewable or renewable fuel source and then consumes the generated electricity, the energy consumption shall be counted only once under fuel consumption. The share of renewable energy consumption can be calculated based on guarantees of origin, renewable energy certificates or electricity composition as stated in the electricity bill. The electricity bill may refer to electricity units consumed and specify the percentage of electricity provided coming from renewable sources and it may look like the figure below."
+  },
+  {
+   "n": "21",
+   "heading": "Energy consumption",
+   "code": "B3",
+   "related": [],
+   "text": "When preparing the information on energy consumption required under paragraph 29, the undertaking shall exclude feedstocks and fuels that are not combusted for energy purposes. The undertaking that consumes fuel as feedstocks can disclose information on this consumption separately from the required disclosures."
+  },
+  {
+   "n": "22",
+   "heading": "Conversion between different energy units",
+   "code": "B3",
+   "related": [],
+   "text": "Undertakings are to report their energy consumption in terms of final energy, which is understood as the amount of energy delivered to the undertaking, for example, the Megawatt-Hours (MWh) of electricity purchased from the utility steam received from a nearby industrial plant or diesel purchased at petrol stations. Electricity explicitly refers to heat, steam and cooling. Fuels include anything burned, e.g. gas, natural gas, biomass, etc."
+  },
+  {
+   "n": "23",
+   "heading": "Conversion between different energy units",
+   "code": "B3",
+   "related": [],
+   "text": "Paragraph 29 indicates MWh as the unit of choice for measuring energy consumption. In case of fuel or biomass, a conversion to MWh is necessary for data expressed in other units such as energy content (e.g. kJ, Btu), volume (e.g. litres, m3) or mass (e.g. metric tonnes, short tonnes)."
+  },
+  {
+   "n": "24",
+   "heading": "Conversion between different energy units",
+   "code": "B3",
+   "related": [],
+   "text": "For fuel consumption measured by mass (e.g. wood, coal), the undertaking should:\n(a) obtain the Net Calorific Value (e.g. kJ/metric ton, TJ/Gg) of the fuel (it can be a typical value published by reliable sources, e.g. IPCC, or may be provided by the supplier or attained internally);\n(b) convert the Net Calorific Value to MWh/ton, for example:\n  1 TJ = 1012 J = 277.78 MWh; 1 Gg = 109g = 1 000 t\n  11.9 TJ/Gg = 11.9 * 277.78/1 000 t = 3.31 MWh/ton; and\n(c) calculate the energy content of the mass, for example:\n  1 245 345 t * 3.31 MWh/ton = 4 117 111 MWh."
+  },
+  {
+   "n": "25",
+   "heading": "Conversion between different energy units",
+   "code": "B3",
+   "related": [],
+   "text": "For liquid fuel, the undertakings should:\n(a) convert volume information to mass, multiplying volume by fuel density, for example,\n  Diesel = 4 456 000 l; Diesel density = 0.84 kg/l\n  4 456 000 (l) * 0.84 (kg/l) = 3 743 040 kg = 3 743 t;\n(b) calculate the energy content, multiplying mass by Net Calorific Value, for example, 3 743 [t] * 43 [TJ/Gg] = 3 743 t * 43 TJ/(1 000 [t]) = 160.95 [TJ]; and\n(c) convert TJ to MWh, for example 1 TJ = 1012 J = 277.778 MWh\n  160.95 [TJ] = 277.78 [MWh/TJ] * 160.95 [TJ] = 44 708 MWh.\n  Documentation Source:\n  Data | Documentation Source\n  CDP | CDP Technical Note: Conversion of fuel data to MWh"
+  },
+  {
+   "n": "26",
+   "heading": "Greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "As for gross greenhouse gas emissions (GHG) arising from the undertaking’s activities, the requirement in paragraph 30 builds on the definitions and rules of the GHG Protocol, the leading accounting standard for GHG emissions. Under paragraph 30, undertakings are to report on their Scope 1 and Scope 2 emissions. Scope 1 GHG emissions cover direct emissions from owned or controlled sources. Scope 2 emissions are indirect GHG emissions resulting from the activities of the reporting company (as they derive from the undertaking’s consumed energy) which, however, occur at sources owned or controlled by another company. Further guidance is provided in the sections below on how to calculate Scope 1 and 2 emissions."
+  },
+  {
+   "n": "27",
+   "heading": "Greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "Scope 1 and 2 emissions may be reported in the following format.\n| 202(x) GHG emissions (tCO2e)\nScope 1 | 45\nScope 2 | 6\nTotal | 51"
+  },
+  {
+   "n": "28",
+   "heading": "Greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "The GHG Protocol is a global standard for measuring, reporting and managing GHG emissions while ensuring consistency and transparency. The corporate standard covers Scope 1, Scope 2 and Scope 3 emissions guidance for companies and other organisations (NGOs, government, etc.)."
+  },
+  {
+   "n": "29",
+   "heading": "Greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "To ensure a fair account of the undertaking’s emissions, the GHG Protocol has set a list of reporting principles:\n(a) relevance: ensuring that the GHG inventory reflects the GHG emissions of the organisation.\n(b) completeness: ensuring that the GHG inventory account for all GHG emission sources and activities within the chosen boundary;\n(c) consistency: ensuring the consistency of the methodology used to allow for comparisons over time;\n(d) transparency: disclosing the assumptions, references and methodology used when computing GHG emissions; and\n(e) accuracy: ensuring that GHG emissions data is sufficiently precise to allow users to make decisions."
+  },
+  {
+   "n": "30",
+   "heading": "Greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "In alternative to the GHG Protocol, undertakings may resort to ISO 14064-1, should it be better suited to their reporting needs."
+  },
+  {
+   "n": "31",
+   "heading": "Greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "When reporting on GHG emissions, it is important to set the appropriate boundaries to ensure that the GHG inventory is correct and to avoid double counting emissions. The GHG Protocol defines two main types of boundaries – organisational or operational boundaries.\n(a) Organisational boundary: the GHG Protocol defines it as the boundaries that determine the operations owned or controlled by the reporting undertaking depending on the consolidation approach taken. There are two approaches to consolidation of emissions – the equity or control approach. The undertaking will choose the approach that reflects its circumstances.\n(b) The equity share approach relates to accounting for GHG emissions from operations according to its shares of equity in the operation.\n(c) When using the control approach, the undertaking accounts for GHG emissions from operations over which it has either financial or operational control. Companies will use either the operational control or financial control criteria when using this approach to consolidate and capture its emissions in the report.\n  i. Financial control means that the undertaking has financial control over the operation if the former has the ability to direct the financial and operating policies of the latter with a view to gaining economic benefits from its activities.\n  ii. Operational control means that an undertaking has operational control over an operation if the former or one of its subsidiaries has full authority to introduce and implement its operating policies at the operation.\n(d) Operational boundary: the GHG Protocol defines it as the boundaries that determine the direct and indirect emissions associated with operations owned or controlled by the reporting company. This assessment offers an undertaking the ability to establish which operations and sources cause direct (Scope 1) and indirect emissions (Scope 2 and Scope 3) and to decide which indirect emissions to include resulting from its operations.\n(e) Boundary considerations need to follow the principles detailed above (consistency over time, transparency in documenting them and completeness) and are visualised in the image below (1).\n[image in the Official Journal, not reproduced]\n[image in the Official Journal, not reproduced]"
+  },
+  {
+   "n": "32",
+   "heading": "Greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "The GHG Protocol also introduces guidance as well as steps to follow to identify, calculate and track GHG emissions as visualised in the image below (2)."
+  },
+  {
+   "n": "33",
+   "heading": "Greenhouse gas emissions",
+   "code": "B3",
+   "related": [],
+   "text": "Different tools have been developed by private and public initiatives to help undertakings in developing their GHG emissions inventory and facilitating challenges related to its preparation. EFRAG maintains on its website a set of suggested GHG calculators."
+  },
+  {
+   "n": "34",
+   "heading": "Scope 1 and location-based Scope 2 emissions guidance",
+   "code": "B3",
+   "related": [],
+   "text": "Typical Scope 1 emissions include CO2 (as well as CH4 and N2O) emissions associated with fuel combustion (for example in boilers, furnaces, vehicles, etc.) and fugitive emissions from air conditioning and industrial processes."
+  },
+  {
+   "n": "35",
+   "heading": "Scope 1 and location-based Scope 2 emissions guidance",
+   "code": "B3",
+   "related": [],
+   "text": "Location-based Scope 2 includes emissions from electricity, heat, steam and cooling purchased or acquired and consumed by the reporting company. It reflects the average emissions intensity of grids on which the energy consumption occurs and uses mostly grid-average emission factor data. Typical sources of Scope 2 emissions relate to any equipment that consumes electricity (electrical engines, lights, buildings, etc.), heat (heating in industrial processes, buildings, etc.), steam (industrial processes) and cooling (industrial processes, buildings, etc.)."
+  },
+  {
+   "n": "36",
+   "heading": "Scope 1 and location-based Scope 2 emissions guidance",
+   "code": "B3",
+   "related": [],
+   "text": "Evaluating GHG emissions can be done in several ways, including by the calculation approach, measurement, or a combination of measurement and calculations. One common approach is based on calculating with use of emission factors (EF) – which may incorporate the global warming potential (GWP) of the GHG. Direct measurement using sensors (flow and concentration) can also be applied. The table below summarises the most common methods.\nGHG evaluation method | Details | Necessary data\nMeasuring | Multiplying the quantities of gas directly measured by their respective global warming potential. | Direct quantity of gas emitted obtained from gas measurement (flow, concentration, volume) Global warming potential (GWP) of the gases\nCalculating | Multiplying the activity data by the emission factor (EF) that integrates the global warming potential (GWP) | Activity data Emission factors (EF)"
+  },
+  {
+   "n": "37",
+   "heading": "Scope 1 and location-based Scope 2 emissions guidance",
+   "code": "B3",
+   "related": [],
+   "text": "The table above introduces the following terms:\n(a) activity data, which typically corresponds to the quantity of fuel consumed. It may be expressed in energy units (e.g. MWh), volume (e.g. m3 or l) or mass (e.g. tonnes or kg.). These can be accessed by the undertaking by reviewing fuel purchase receipts or utility bills:\n(b) global warming potential, which quantifies the impact of the given GHG on the climate compared to an equivalent unit of carbon dioxide; and\n(c) emission factors (EF), quantifying how much GHG is emitted per unit of activity. The emission factors frequently take into account the GWP of the GHG, in which case the undertaking does not need to consider the latter."
+  },
+  {
+   "n": "38",
+   "heading": "Scope 1 and location-based Scope 2 emissions guidance",
+   "code": "B3",
+   "related": [],
+   "text": "The table below summarises non-exhaustive sources where both emission factors (EF) and global warming potential (GWP) can be easily accessed by undertakings. Undertakings may also refer to authoritative national sources that may be more relevant to their circumstances.\nEmission factors (EF) | ADEME – Base Empreinte® IPCC – Emissions Factor Database IPCC – Guidelines for National Greenhouse Gas Inventories Association of Issuing Bodies (AIB) – Residual Mix Grid Emission Factors JRC – Historical GHG emissions factor for electricity consumption IEA - Annual GHG emission factors for World countries from electricity and heat generation (paid data set)\nGlobal warming potential (GWP) | IPCC – Global Warming Potential"
+  },
+  {
+   "n": "39",
+   "heading": "Scope 1 and location-based Scope 2 emissions guidance",
+   "code": "B3",
+   "related": [],
+   "text": "The undertakings can also find more guidance and tools on how to act and report on their GHG emissions and climate impacts by visiting the SME Climate Hub website."
+  },
+  {
+   "n": "40",
+   "heading": "Example of Scope 1 emission calculation",
+   "code": "B3",
+   "related": [],
+   "text": "Company A burns Nr. 4 fuel oil in an industrial boiler. For its financial accounting, it keeps track of its costs, and for GHG accounting purposes, it keeps track of volumes (m3) as reflected in their fuel receipts. From the receipts, it determines the annual volumes of fuel oil bought, and it keeps track as well of the fuel oil inventory on the first calendar day of the year. In 2023 it purchased 100 m3 of fuel oil. Based on its records, on 1 January 2023 it had 2.5 m3 in its reservoirs, and on 1 January 2024 it had 1 m3. Thus, it determines (through purchase and measurement of inventory) that during 2023 it consumed 101.5 m3 of fuel oil."
+  },
+  {
+   "n": "41",
+   "heading": "Example of Scope 1 emission calculation",
+   "code": "B3",
+   "related": [],
+   "text": "Using the IPCC list of emissions factors (Table 2.3, page 2.18), it estimates its emission factor to be a fifty-fifty blend of diesel oil and residual oil as 75.75 t CO2/TJ, and by using published statistics on energy, determines that its net calorific value of the fuel is 0.03921 TJ/m3. Given that the CO2 GWP equals one, its CO2 emission for this specific Scope 1 source is:\n101.5 m3 * 0.03921 TJ/m3 * 75.75 t CO2/TJ * 1 = 301.5 t CO2"
+  },
+  {
+   "n": "42",
+   "heading": "Example of Scope 1 emission calculation",
+   "code": "B3",
+   "related": [],
+   "text": "For the purpose of completeness in this example, the CH4 and N2O emissions are also calculated. Checking the IPCC list of emission factors shows that these are, respectively, 3 kg of CH4/TJ and 0.6 kg of N2O/TJ, the emissions thus being:\nCH4 emissions = 101.5 m3 * 0.03921 TJ/m3 * 3 kg CO2/TJ * 29.8 = 0.36 tCO2e\nN2O emissions = 101.5 m3 * 0.03921 TJ/m3 * 0.6 kg CO2/TJ * 273 = 0.65 tCO2e"
+  },
+  {
+   "n": "43",
+   "heading": "Example of Scope 1 emission calculation",
+   "code": "B3",
+   "related": [],
+   "text": "As mentioned, CH4 and N2O emissions add around 1 tCO2e to the CO2 value of 301.5 tCO2, which amounts to about 0.3% of the total. This could be considered well within an acceptable reporting error and so could not have been calculated and reported. Global Warming Potentials for CH4 and N2O are derived from the IPCC’s Sixth Assessment Report, Chapter 7SM."
+  },
+  {
+   "n": "44",
+   "heading": "Example of Scope 2 emission calculation",
+   "code": "B3",
+   "related": [],
+   "text": "Company A occupies an office building of 2 000 m2 in Paris, where it pays the electricity consumed for the central heating and cooling, lighting, computers and other electric equipment such as appliances. With its utility bills, it has estimated that the building consumed 282 MWh of electricity in 2022. By using an emission factor of 73 g CO2eq/kWh for France in 2022, it has estimated its Scope 2 emissions for its building electricity consumption to be\n[image in the Official Journal, not reproduced]"
+  },
+  {
+   "n": "45",
+   "heading": "Example of Scope 2 emission calculation",
+   "code": "B3",
+   "related": [],
+   "text": "Undertakings may also want to provide their market-based Scope 2 figures. Emission factors for market-based Scope 2 emissions reflect the contractual arrangements of the undertaking with its energy suppliers. Market-based emission factors can be provided by their electricity or heat suppliers as well as supported by their own purchase of Energy Attribute Certificates or Power Purchase Agreements (PPAs) or the use of residual-mix emission factors (AIB, 2024)."
+  },
+  {
+   "n": "46",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Paragraph 32 establishes that the undertaking shall disclose the pollutants it emits to air, water and soil in its own operations if such information is already required to be reported by law to competent authorities or under an Environmental Management System. This means that the undertaking will first assess whether it already reports such information, either as a legal requirement or voluntarily. If it already reports information on pollutants emissions (or is legally required to do so), the undertaking will then provide further information on such emissions according to the requirements in paragraph 32. However, if the undertaking does not yet report such information (and is not legally required to do so), it is simply required to state this to be the case."
+  },
+  {
+   "n": "47",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "In general, this requirement is expected to apply to undertakings that are operators of an industrial installation or intensive livestock farm covered by the Industrial and Livestock Rearing Emissions Directive (IED 2.0 - Directive 2024/1785/EU), amending the Industrial Emissions Directive (IED - Directive 2010/75/EU). The IED 2.0 applies to some 75 000 installations in Europe, covering activities such as burning fuel in boilers with rated power of more than 50 MW, founding in metal foundries, processing of non-ferrous metals, production of lime, manufacturing of ceramic products by firing, production of plant protection products or biocides, rearing of any mix of pigs or poultry representing 380 livestock units or more, tanning of hides, slaughterhouses, etc. In these cases, the installation must already report to the competent authority the pollutants released to air, water and soil, and the data is publicly available at the Industrial Emissions Portal Regulation (IEPR - Regulation 2024/1244/EU), replacing the European Pollutant Release and Transfer Register (E-PRTR - Regulation 166/2006/EC). Companies that operate in more than one facility do not have to report on their consolidated company-wide emissions under the EPRTR, as they report only at facility level. This Standard requires the reporting of the total amount of pollutants of all the facilities. Similarly, companies owning but not operating in a facility do not have to report to the E-PRTR but are expected to reflect their facility-owned emissions in their sustainability report."
+  },
+  {
+   "n": "48",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Likewise, if an undertaking has been identified as having to monitor and report on the pollutants listed in the E-PRTR under an Environmental Management System such as, for example, an Eco-Management and Audit Scheme (EMAS) or ISO 14001 certification. These are in principle relevant aspects for the undertaking to include in its sustainability report."
+  },
+  {
+   "n": "49",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "If an undertaking has only one facility or operates in only one facility, and if its pollution data is already publicly available, the undertaking may refer to the document where such information is provided instead of reporting it once again. Likewise, if the undertaking publishes an organisation-wide report such as, for example, an EMAS report that incorporates pollution data, it can include it in the sustainability report by reference."
+  },
+  {
+   "n": "50",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "To report information on pollutants in the sustainability report, the undertaking should indicate the type of pollutant material being reported alongside the amount emitted to air, water and soil in a suitable mass unit (e.g. t or kg)."
+  },
+  {
+   "n": "51",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Below can be found an example of how undertakings may present information on their emissions to air, water and soil divided by pollutant type.\nPollutant | Emissions (kg) | Medium of release (air, water, soil)\ne.g. Cadmium and compounds | 10 | Water\nType of pollutant 2 | |\nType of pollutant 3 | |"
+  },
+  {
+   "n": "52",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "As for the types of pollutants that need to be considered when reporting under paragraph 32, the undertaking may refer to the following main pollutants that are currently covered under EU law. Nevertheless, each undertaking shall consider the specific pollutants covered by the legislation in their respective jurisdictions."
+  },
+  {
+   "n": "53",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Examples of key pollutants to air (Directive (EU) 2024/299; Regulation (EU) 2024/1244; Air pollution from key sectors, EC, 2024; Sources and emissions of air pollutants in Europe, European Environmental Agency, 2022) are: sulphur oxides (Sox/SO2 – e.g. from energy generation and heating in manufacturing), nitrogen oxides (NOx/NO2 – e.g. from transport), non-methane volatile organic compounds (NMVOC – e.g. from agricultural activities), carbon monoxide (CO – e.g. from fossil fuel combustion), ammonia (NH3 – e.g. manure application and storage), particulate matter (PM10 – e.g. from combustion in manufacturing, transport, agricultural activities), heavy metals (Cd, Hg, Pb, As, Cr, Cu, Ni, Zn), POPs (total PAHs, HCB, PCBs, dioxins/furans), ozone-depleting substances or ‘ODS’ (chlorofluorocarbons ‘CFCs’, hydrochlorofluorocarbons ‘HCFCs’, halons), black carbon (BC – e.g. from energy consumption), etc."
+  },
+  {
+   "n": "54",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "The major sources of emissions of air pollutants in the private sector (that are also highly impactful for the entire value chain) include: (a) electricity generation from fossil fuel or biomass combustion (which may be done externally, distributed through a national grid, then consumed along the value chain activities); (b) direct stationary fossil fuel or biomass combustion within an undertaking’s activities or industrial processes, or the operation of stationary machinery or other activities that require fuel combustion; (c) transport (freight, road, rail, shipping and aviation, off-road vehicles such as those used in agriculture or construction); (d) industrial processes (all other emissions that do not stem from fuel combustion and that occur during industrial processes); (e) agriculture (livestock and manure management, crop production such as crop residue burning, manure and fertiliser application); (f) waste disposal (e.g. landfilling, incineration or open burning, or composting)."
+  },
+  {
+   "n": "55",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Below is an example of a simple methodology for developing a company's air pollutant emission inventory and calculating the emissions of respective air pollutants. This methodology is divided into the following steps; excluding the mapping of the value chain as under the VSME Standard the information required by this Disclosure Requirement is to be reported at the level of the reporting company: (1) identifying emission sources within the value chain, (2) identifying methodologies for quantifying emissions, (3) collecting activity data, (4) identifying emissions factors, and (5) quantifying emissions. The guide provides a mapping of sources of pollution to methodologies for calculating information on emissions stemming from the main air pollutants (table below). (3)\nSources of pollution | Methodology for quantifying emissions (Section in the guidance)\nElectricity | Section 4,1\nFuel combustion | Section 4,2\nTransport | Section 4,3\nIndustrial processes | Section 4,4\nAgriculture | Section 4,5\nWaste | Section 4,6"
+  },
+  {
+   "n": "56",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Below is an example of a calculation method for air pollutant emissions using the method for manufacturing outlined above. In the example considered, Mp is the quantity of material M used in (or produced by) a company’s value chain produced using process p (tonnes, litres); EFk,p is the emission factor for pollutant k for process p (g unit production-1); Emk,p are emissions of the specific pollutant k for process p (g).\nEmk,p = Mp * EFk,p"
+  },
+  {
+   "n": "57",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "For instance, a medium-sized chocolate manufacturer producing 1 750 tonnes of chocolate in 2022 would apply the default emission factor of 2 to calculate its emissions of NMVOCs, which would result in the following calculation:\n1 750 tonnes of chocolate * 2 (emission factor of NMVOCs) = 3 500 tonnes of emissions of NMVOCs."
+  },
+  {
+   "n": "58",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Transport may be another significant source of air pollution within own operations and at value chain level. In this case, to estimate the emission of a particular pollutant from road transport, for example, the entity will need to use the following formula, where FCv,f is the fuel consumption of vehicle type v using fuel f (kg); EFk,v,f is the emission factor for pollutant k for vehicle type v and fuel f (g vehicle-km-1); Emk,v,f represents the emissions of the specific pollutant k for vehicle type v and fuel f (g).\nEmk,v,f = FCv,f * EFk,v,f"
+  },
+  {
+   "n": "59",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "For example, a light commercial vehicle (LCV) running on diesel that travelled a total of 2 800 km in 2022 produced the following amount of PM10 emissions (PM10 emission factor of 1,52 g/kg):\n2 800 km * 1,52 = 4 256 grammes of emissions of PM10."
+  },
+  {
+   "n": "60",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Fuel combustion is an additional critical source of air emissions. In this case an example of a formula may be the following, where FCn is the fuel n consumed within the source category (Gj); EFk is the emission factor for this pollutant k (g/Gj); and Emk are emissions of the specific pollutant k (g).\nEmk = FCn * EFk;"
+  },
+  {
+   "n": "61",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "For example, a company consuming 3 000 000 grammes of fuel in 2020 will have an EF of 0,67 for SO2, resulting in:\n3 000 000 * 0,67 = 2 010 000 grammes of emissions of SO2. from fuel combustion in 2020."
+  },
+  {
+   "n": "62",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Examples of key pollutants to water (Regulation (EU) 2024/1244; Directive 2000/60/EC; Directive 2006/118/EC; Directive 91/676/EEC; Directive 2010/75/EU; and amendment Directive 2024/1785; Industrial pollutant releases to water in Europe, EEA, 2024) are: nitrogen (N), phosphorus (P), heavy metals (Cd, Hg, Pb as well as As, Cr, Cu, Ni, Zn), POPs and pesticides, BTEX (benzene, toluene, ethylbenzene, xylenes) and other Volatile Organic Compounds (VOCs), substances unfavourably influencing the oxygen balance (measured using parameters such as BOD, COD, etc.), total organic carbon (TOC), etc."
+  },
+  {
+   "n": "63",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Pesticides and nutrients (e.g. N and P) may be released through agricultural activities (Main sources of water pollution, EEA, 2023; Introduction to Freshwater Quality Monitoring and Assessment - Technical Guidance Document, UNEP, 2023) (e.g. manure or inorganic fertiliser application). Heavy metal concentrations may stem from mining and wastewater discharges. TOC is a generic indicator of water contamination with organic matter which indicates the presence of living material, for example in wastewater, but also surface and groundwater (usual concentration levels of less than 10 mgl-1 and 2 mgl-1, respectively). COD widely indicates the presence of industrial effluents or sewage, with values that are typically lower than 20 mgl-1 in unpolluted waters and industrial wastewaters reaching values of up to 60 000 mgl-1. BOD is normally used to determine pollution by organic matter in surface waters as well as for the efficiency of sewage treatment, and it usually features values around 2 mgl-1 in unpolluted waters and 10 mgl-1 and more in polluted waters. The release of VOCs can be the result of spills to water."
+  },
+  {
+   "n": "64",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "As for the methodology used to measure emissions to water, the EEA (Calculating emissions to water – a simplified method (ETC/ICM Report 3/2022)) recommends a simple estimation technique similar to the one used for the aforementioned air pollutants. In the formula below, ARa is the activity rate for activity a (to be chosen based on the specific activity or process; e.g. see Mp in the air emissions calculation above); EFp,a is the emission factor for pollutant p for activity a; and Emissionsp,a are emissions of the specific pollutant p for activity a.\nEmissionsp,a = ARa * EFp,a"
+  },
+  {
+   "n": "65",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Examples of key pollutants emitted to soil (Regulation (EU) 2024/1244; Directive 86/278/EEC) are: N, P, heavy metals (e.g. land application of sewage sludge), BTEX and other VOCs, POPs and pesticides."
+  },
+  {
+   "n": "66",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Overall, the private sector sources of soil pollution are mainly the products or by-products of industrial processes (e.g. production of chemicals, energy, textiles manufacturing), accidental spills of petrol-derived products, livestock and agricultural activities (e.g. irrigation with untreated wastewater, poultry rearing), production and treatment of wastewater, production and processing of metals and minerals, and transportation (Global assessment of soil pollution: Report, FAO, 2021)."
+  },
+  {
+   "n": "67",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "Several national manuals have been developed to support companies in the calculation of their emissions to air, water and soil, for example, in Australia (Emission Estimation Technique Manual for Soft Drink Manufacture, National Pollution Inventory) and South Africa (A Guide to Reporting and Estimating Emissions for the IPWIS) entities are presented with a few estimation options to choose from, depending on their possibilities: direct measurement (e.g. sampling, continuous monitoring system), mass balance, engineering calculations, emission factors (same formula as above for air and water emissions), etc. The general approach to calculating such emissions is to: 1) identify the emission sources within the facility (combustion, manufacturing, solvent evaporation, storage, fugitive); 2) make a stock of the information available; 3) identify in the list of estimation methods the most suitable one for the specific process under evaluation, the information available, and the measuring tools that can be acquired to get the data that is needed; 4) gather the data required for each method; and 5) calculate emissions. The manuals provide several formulas and examples for each emissions’ calculation method."
+  },
+  {
+   "n": "68",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "A list of emission factors for air pollutants can be found at the dedicated webpage of the European Environmental Agency. Although emission factors are more commonly used for air pollution, certain ones for surface water discharge and land disposal for specific processes were made available by the World Health Organisation. Additional emission factors for POPs may be consulted on the webpage of the Toolkit for Identification and Quantification of Releases of Dioxins, Furans and Other Unintentional POPs."
+  },
+  {
+   "n": "69",
+   "heading": "Guidance on which undertakings need to report on pollution and what pollutants undertakings need to report on.",
+   "code": "B4",
+   "related": [],
+   "text": "It is to be noted that the requirements under paragraph 32 are only applicable to SMEs operating in specific sectors. Undertakings that are involved in the provision of services (e.g. operating in co-working or shared facilities or remotely), for instance, are typically not included in the scope of this disclosure. By contrast undertakings carrying out production activities (e.g. chemicals) generally have impacts in terms of pollution and are, therefore, expected to report under this disclosure. The table below (adapted from the EMAS User Guide) provides examples of sectoral impacts, including for office services, for which pollution-related aspects may not be significant.\nActivity | Environmental aspect | Environmental impact\nTransport | — consumed machine oils, fuel consumption — vehicle emissions — tyre abrasion (fine dust) | — soil, water, air pollution — greenhouse effect, noise\nConstruction | — primary raw material (resource) consumption — air emissions, noise, vibrations, etc. From construction machinery — land consumption | — raw material availability — noise, soil, water, air pollution — destruction of ground cover — biodiversity loss\nOffice services | — consumption of materials, (e.g. paper, toner) — electricity consumption (leads to indirect CO2 emissions) | — generation of mixed municipal waste — greenhouse effect\nChemical industry | — primary raw material (resource) consumption — wastewater — emissions of volatile organic compounds — emissions of ozone-depleting substances | — raw material availability — water pollution — photochemical ozone — destruction of the ozone layer"
+  },
+  {
+   "n": "70",
+   "heading": "Guidance on how to identify sites in or near biodiversity sensitive areas",
+   "code": "B5",
+   "related": [],
+   "text": "Paragraph 33 stipulates that the undertaking shall disclose the sites it operates in that are located in or near biodiversity-sensitive areas. Biodiversity sensitive areas are defined as such by special nature protection regulation at European or international level. These comprise areas belonging to the Natura 2000 network of protected areas, UNESCO World Heritage sites and Key Biodiversity Areas (‘KBAs’) as well as other protected areas designated as requiring special protection by governmental authorities (e.g. forest-protected areas or areas lying within river basin districts)."
+  },
+  {
+   "n": "71",
+   "heading": "Guidance on how to identify sites in or near biodiversity sensitive areas",
+   "code": "B5",
+   "related": [],
+   "text": "To identify protected areas and biodiversity sensitive areas, the undertaking may refer to databases such as the World Database on Protected Areas (WDPA) (a global database to help identify marine and terrestrial protected areas), the World Database on Key Biodiversity Areas, and the IUCN Red List of Threatened Species. The undertaking may also use tools such as the Integrated Biodiversity Assessment Tool (IBAT)."
+  },
+  {
+   "n": "72",
+   "heading": "Guidance on how to identify sites in or near biodiversity sensitive areas",
+   "code": "B5",
+   "related": [],
+   "text": "Near, in the context of B5 – Biodiversity, shall refer to an area that is (partially) overlapping or adjacent to a biodiversity sensitive area."
+  },
+  {
+   "n": "73",
+   "heading": "Guidance on how to identify sites in or near biodiversity sensitive areas",
+   "code": "B5",
+   "related": [],
+   "text": "The following table shows how information on sites in or near biodiversity sensitive areas can be presented.\nLocation | Area (hectares) | Biodiversity sensitive Area | Specification (located in/near biodiversity sensitive areas)\nCountry – Site name 1 | | |\nCountry – Site name 2 | | |\nCountry – Site name 3 | | |\n... | | |"
+  },
+  {
+   "n": "74",
+   "heading": "Guidance on how to calculate and report land-use",
+   "code": "B5",
+   "related": [],
+   "text": "A ‘sealed area’ is to be understood as an area where the original soil has been covered (e.g. roads, buildings, parking lots), making it impermeable and resulting in an impact on the environment."
+  },
+  {
+   "n": "75",
+   "heading": "Guidance on how to calculate and report land-use",
+   "code": "B5",
+   "related": [],
+   "text": "Green area or ‘nature-oriented area’ is an area that primarily preserves or restores nature. Near natural/green areas may be located on the organisation’s site and may include roofs, facades, water-drainage systems or other features designed, adapted or managed to promote biodiversity. Near-natural areas may also be located off the organisation’s site if they are owned or managed by the organisation and primarily serve to promote biodiversity."
+  },
+  {
+   "n": "76",
+   "heading": "Guidance on how to calculate and report land-use",
+   "code": "B5",
+   "related": [],
+   "text": "The following table shows how information on how land-use may be presented (EMAS, 2023).\nLand-use type | Area (hectares or m2)\nTotal sealed area |\nTotal nature-oriented area on-site |\nTotal nature-oriented area off-site |\nTotal use of land |"
+  },
+  {
+   "n": "77",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "Water withdrawal relates to the amount of water an undertaking draws into its organisational boundaries from any source during the reporting period. In practice, for most undertakings this relates to the amount of water taken from the public water supply network as indicated in the utility bills. However, where applicable, water withdrawal also includes amounts of water taken from other sources such as groundwater from own wells, water taken from rivers or lakes or water received by other undertakings. In the specific case of undertakings operating in agriculture, water withdrawal would include rainwater if collected directly and stored by the undertaking."
+  },
+  {
+   "n": "78",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "Water withdrawal data can be retrieved from measurements using flow meters or water bills; indeed, in practice for most undertakings water withdrawal relates to the amount of water taken from the public water supply network as indicated in the utility bills. In cases in which direct measurements are not feasible or are deemed not sufficient and therefore need to be complemented, data on water withdrawal can be estimated using, for example, calculations models, and industry standards."
+  },
+  {
+   "n": "79",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "For example, in the case of a shared office or coworking space, a possible method to calculate the water withdrawal could be to retrieve the overall water withdrawal of the building from the water bill and calculate the water withdrawal per employee with the following equation:\nWater withdrawal per employee daily (L) = annual water withdrawal (L) / (n. of employees in the whole shared building x n. of working days).\nThe undertaking could then multiply the water withdrawal per employee for the number of its employees and the days they worked in the reporting year to obtain the final number required in the datapoint.\nTo make a numerical example applying the proposed formula, the annual water withdrawal retrieved from the water bill of a coworking space is 1 296 m3 (corresponding to 1 296 000 L), coworking space where 100 employees of different companies work together for an assumed number of 240 days a year. The assumption on the average number of days worked can be based on national statistics, for example. The water withdrawal per employee daily would be in this case:\nwater withdrawal per employee daily = 1 296 000 L / (100x240) = 54 L"
+  },
+  {
+   "n": "80",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "Assuming now that that the employees of the reporting undertaking are 25 and that they use the coworking space for 220 days a year, the yearly water withdrawal of the undertaking in the coworking space would be the water withdrawal per employee multiplied for the number of its employees and the days worked, therefore 54Lx25x220 = 297 000 L (corresponding to 297 m3)."
+  },
+  {
+   "n": "81",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "This calculation could be useful when it is possible to access the water bill of the shared building. This simple calculation method has some limitations, as it does not consider, for example, differences in use between different parts of the building (e.g. a seven-floor building could have six floors dedicated to offices and one floor with a canteen or a restaurant), which the undertaking might be able to overcome if additional data are available, further refining the basic calculation provided above as an example."
+  },
+  {
+   "n": "82",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "An alternative way to obtain water withdrawal data in the example of shared offices when it is not possible to retrieve the water bill could be to calculate it using fixture flow rates and occupancy data as primary inputs. A possible formula could be:\nTotal water withdrawal = ∑(Flow Rate×Number of Uses per Day×Number of Days per Year×Occupancy)\nwhere:\n(a) flow rates or each fixture can be retrieved from the project documentation or labels of the fixtures, for example, or estimated basing on average data publicly available if more accurate information is not retrievable;\n(b) the number of uses per day can be estimated based on averages publicly available;\n(c) ‘number of days’ stands for the number of operational days for the reporting undertaking in a year;\n(d) ‘occupancy’ represents the number of employees of the undertaking using the office; it is often calculated as full-time equivalent (FTE); and\n(e) the sign ∑ indicates that the calculations for each fixture should be summed up to obtain the total water withdrawal of the reporting undertaking operating in a shared office."
+  },
+  {
+   "n": "83",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "An additional possible source that could support the reporting of water withdrawal for undertakings operating in shared offices is the JRC Level(s) indicator 3.1: Use stage water consumption user manual as well as additional related documents and calculation sheets (see PG Section Documents | Product Bureau (europa.eu)). Furthermore, the undertaking could consult EMAS Reference Document for the Public Administration sector and EMAS Reference Document for the Construction sector as well as rating systems and certifications like, which might provide useful indications in their methodologies on how to further refine the calculation for water withdrawal in offices and shared spaces."
+  },
+  {
+   "n": "84",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "The provided examples to obtain water withdrawal data in the case of shared offices can be transposed to and applied by undertakings operating in different sectors, with adjustments that might be necessary for the sectoral and entity-specific situation the undertaking operates in. EMAS \"easy\" for small and medium enterprises and EMAS Sectoral Reference Documents (SRDs) could be consulted for SME and sector-specific methodology and indicators on water withdrawal as well as industry standards and benchmarks."
+  },
+  {
+   "n": "85",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "Water consumption is the amount of water drawn into the boundaries of the undertaking that is not discharged or planned to be discharged back into the water environment or to a third party. This typically relates to water evaporated – e.g. in thermal energy processes like drying or power production – water embedded in products – e.g. in food production – or water for irrigation purposes – e.g. used in agriculture or for watering company premises."
+  },
+  {
+   "n": "86",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "Water discharge means, for example, the amount of water transferred directly to receiving water bodies such as lakes or rivers, the public sewer or to other companies for cascading water use. It can be seen as the water output of the undertaking."
+  },
+  {
+   "n": "87",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "Water consumption can therefore be calculated as:\nWater consumption = Water Inputs – Water Outputs\nor in other words:\nWater consumption = (Water withdrawal) – Water discharges.\nFor undertakings that solely withdraw water from the public water network and discharge it into the sewer, water consumption will be close to zero and can therefore be omitted from the report.\nMore broadly, the applicability of the disclosure requirement on water consumption relates to information already requested by law, already reported, and/or appropriate for the sector."
+  },
+  {
+   "n": "88",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "A schematic view of the relationship between water withdrawal, water consumption and water discharge can be seen in the image below.\n[image in the Official Journal, not reproduced]"
+  },
+  {
+   "n": "89",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "The undertaking may provide additional explanatory information to contextualise its water withdrawal s or consumption. For example, the undertaking may highlight if rainwater is collected and used as a replacement for tap water or if water is discharged into other parties for cascading use."
+  },
+  {
+   "n": "90",
+   "heading": "Guidance on how to calculate and report on water withdrawals and water consumption",
+   "code": "B6",
+   "related": [],
+   "text": "Below can be found an example of how undertakings may present quantitative information on their withdrawals, discharges and consumption of water divided by site location.\n| Water withdrawal E.g. m3 | Water consumption E.g. m3 (if applicable)\nAll sites | |\nSites in areas with water stress | |"
+  },
+  {
+   "n": "91",
+   "heading": "Guidance for determining whether the undertaking operates in an area of high-water stress",
+   "code": "B6",
+   "related": [],
+   "text": "The undertaking can consult local (e.g. national, regional) water authorities of the place(s) it operates in to inform its assessment of water resources for the specific location(s), including the identification of areas of high-water stress. The undertaking can also consult publicly available and free tools that map out water scarcity globally. One such tool is the WRI’s Aqueduct Water Risk Atlas, which provides an interactive map of a water stress indicator (the ‘baseline water stress’, which measures the ratio of total water demand to available renewable surface and groundwater supplies) at sub-basin level. With the help of this tool, undertakings can consult the water stress baseline set for different river basins globally. Values of the baseline water stress indicator above 40% indicate an area of high-water stress."
+  },
+  {
+   "n": "92",
+   "heading": "Guidance for determining whether the undertaking operates in an area of high-water stress",
+   "code": "B6",
+   "related": [],
+   "text": "By way of illustration, the map below shows the main Iberian River basins and their water stress classification according to the WRI Aqueduct.\n[image in the Official Journal, not reproduced]\nIn this image several water basins in the Iberian Peninsula, along with their water stress classification, can be observed. Most of the southern part of the peninsula sits in an area of significant high-water stress – with the exception of the Guadiana basin (in yellow). Thus, if the undertaking has operations within the Guadalquivir basin (e.g. the Andalucia region, which has a significant high-water stress level), the undertaking would have to disaggregate its water consumption for that region/water basin. But if its operations take place within the southern part of the Guadiana river basin (where there is low water stress), then it would not be necessary to disaggregate its water consumption for that region/water basin."
+  },
+  {
+   "n": "93",
+   "heading": "Guidance for determining whether the undertaking operates in an area of high-water stress",
+   "code": "B6",
+   "related": [],
+   "text": "Other possible tools that undertakings can consult to determine their location in water stressed areas are the static map (and related dataset) provided by the European Environment Agency (EEA) Water Exploitation Index plus (WEI+) for summer and Urban Morphological Zones (UMZ) and the interactive map Water exploitation index plus (WEI+) for river basin districts (1990-2015), both presenting the water stress indicator WEI+ that measures total water consumption as a percentage of the renewable freshwater resources at sub-basin level. WEI+ values equal or greater than 40% generally indicate situations of high-water stress. It is worth underlining that WRI Aqueduct bases its baseline water stress indicator on water demand, while the EEA indicator of water stress WEI+ is based on water consumption."
+  },
+  {
+   "n": "94",
+   "heading": "Guidance on circular economy principles",
+   "code": "B7",
+   "related": [],
+   "text": "When disclosing information on its products, material use and waste management, the undertaking may provide information in relation to circular economy principles. Circular economy principles are articulated in the paragraphs below. The key circular economy principles are outlined below and the key principles considered by the European Commission are italicised.\nEliminate waste and pollution – this can be done through process improvements and also through design considerations at the level of usability, reusability, repairability, disassembly and remanufacturing.\nCirculate products and materials (at their highest value) – reusability and recycling are key for product circulation, but this is enhanced if special consideration is given to circularity at the design phase for issues such as usability, reusability, repairability, remanufacturing and disassembly. Factors such as the incorporation of biomaterials and their recirculation via the biological cycle can also be considered, for example using biodegradable crop covers instead of plastics in agriculture.\nRegenerate nature – whenever possible, human activities should seek to regenerate nature and improve or restore key ecological functions (i.e. drainage, habitat provision, thermal regulation, etc.) that may have been lost due to previous human activities."
+  },
+  {
+   "n": "95",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "The requirements in paragraph 38 may be omitted by undertakings that generate only household waste. In such cases, the undertaking will only state that it generates this type of waste."
+  },
+  {
+   "n": "96",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "When reporting on hazardous waste according to paragraph 38(a), the undertaking fulfils the requirements on radioactive waste of indicator number 9 from Table #1 of Annex 1 of the Sustainable Finance Disclosure Regulation (SFDR) (4). This SFDR indicator (ratio between tonnes of radioactive and hazardous waste) can be computed by using the numerator and denominator that the undertaking provides when reporting according to paragraph 38(a)."
+  },
+  {
+   "n": "97",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "SMEs must disclose hazardous and radioactive waste if their operations involve generating such waste. Applicability depends on the presence of hazardous or radioactive materials in business processes."
+  },
+  {
+   "n": "98",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "Undertakings are recommended to classify their hazardous waste using the European Waste Catalogue, or EWC in short (Commission decision of 18 December 2014 amending Decision 2000/532/EC on the list of waste pursuant to Directive 2008/98/EC of the European Parliament and of the Council), which categorises waste by type. Any waste marked with an asterisk (*) is classified as hazardous in the EWC, normally with reference to ‘containing hazardous substances’. For example:\n(a) medical sector: contaminated sharps like needles and syringes used in medical settings (‘wastes whose collection and disposal is subject to special requirements in order to prevent infection’ EWC Code 18 01 03*), cytotoxic and cytostatic medicines (EWC Code 18 01 08*), spent radiopharmaceuticals, and certain diagnostic equipment containing radioactive materials;\n(b) manufacturing sector: used lubricants and oils classified as hazardous (EWC Code 13 02 05*);\n(c) construction sector: asbestos-containing materials (EWC Code 17 09 03*), soil and stones containing hazardous substances (EWC Code 17 05 03*), and\n(d) batteries and accumulators: lead batteries (16 06 01*), Ni-Cd batteries (16 06 02*), batteries containing mercury (16 06 03*)."
+  },
+  {
+   "n": "99",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "Nevertheless, a waste is considered hazardous if it displays one or more of the hazardous properties listed in Annex II of the Waste Framework Directive (Directive 2008/98/EC). For easier reference, these are presented below together with the respective pictograms to help identify hazardous properties such as flammability, toxicity and corrosiveness, which may lead to waste being classified as hazardous."
+  },
+  {
+   "n": "100",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "Radioactive waste also has or can have hazardous properties that render it hazardous, namely carcinogenic, mutagenic or toxic for reproduction. Nevertheless, radioactive substances are subject to separate regulations within the EU (Council Directive 2011/70/Euratom). Companies using radioactive materials with the ability of generating radioactive waste subject to EU regulation should be aware of it. Radioactive waste should be identified based on the presence of radionuclides at levels above regulatory clearance thresholds."
+  },
+  {
+   "n": "101",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "Radioactive waste can be present in a variety of items such as medical, research and industrial equipment, smoke detectors, or sludges."
+  },
+  {
+   "n": "102",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "Hazard Pictograms for each hazard class are presented below.\nHazard pictogram | Pictogram statement, symbol and class | What does it mean?\n[image in the Official Journal, not reproduced] | ‘Gas under pressure’ Symbol: Gas cylinder Physical Hazard | — Contains gas under pressure; may explode if heated — Contains refrigerated gas; may cause cryogenic burns or injury\n[image in the Official Journal, not reproduced] | ‘Explosive’ Symbol: Exploding bomb Physical Hazard | — Unstable explosive — Explosive; mass explosion hazard — Explosive; severe projection hazard — Explosive; fire, blast or projection hazard — May mass explode in fire\n[image in the Official Journal, not reproduced] | ‘Oxidising’ Symbol: Flame over circle Physical Hazard | — May cause or intensify fire; oxidiser. — May cause fire or explosion; strong oxidiser.\n[image in the Official Journal, not reproduced] | ‘Flammable’ Symbol: Flame Physical Hazard | — Extremely flammable gas — Flammable gas — Extremely flammable aerosol — Flammable aerosol — Highly flammable liquid and vapour — Flammable liquid and vapour — Flammable solid\n[image in the Official Journal, not reproduced] | ‘Corrosive’ Symbol: Corrosion Physical Hazard / Health Hazard | — May be corrosive to metals — Causes severe skin burns and eye damage\n[image in the Official Journal, not reproduced] | ‘Health hazard/Hazardous to the ozone layer’ Symbol: Exclamation mark Health Hazard | — May cause respiratory irritation — May cause drowsiness or dizziness — May cause an allergic skin reaction — Causes serious eye irritation — Causes skin irritation — Harmful if swallowed — Harmful in contact with skin — Harmful if inhaled — Harms public health and the environment by destroying ozone in the upper atmosphere\n[image in the Official Journal, not reproduced] | ‘Acute toxicity’ Symbol: Skulls and Crossbones Health Hazard | — Fatal if swallowed — Fatal in contact with skin — Fatal if inhaled — Toxic: if swallowed — Toxic in contact with skin — Toxic if inhaled\n[image in the Official Journal, not reproduced] | ‘Serious health hazard’ Symbol: Health Hazard Health Hazard | — May be fatal if swallowed and enters airways — Causes damage to organs — May cause damage to organs — May damage fertility or the unborn child — Suspected of damaging fertility or the unborn child — May cause cancer — Suspected of causing cancer — May cause genetic defects — Suspected of causing genetic defects — May cause allergy or asthma symptoms or breathing difficulties if inhaled\n[image in the Official Journal, not reproduced] | ‘Hazardous to the environment’ Symbol: Environment Environmental Hazard | — Very toxic to aquatic life with long-lasting effects — Toxic to aquatic life with long-lasting effects\nPictograms that indicate hazardous properties, Annex V, from the Classification, Labelling and Packaging (CLP) Regulation (EC) No 1272/2008."
+  },
+  {
+   "n": "103",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "When presenting information on its waste generation or diversion from disposal, the undertaking should preferably report such information in units of weight (e.g. kg or tonnes). Nevertheless, should the units of weight be considered an inappropriate unit by the undertaking, they may alternatively disclose the aforementioned metrics in volumes (e.g. m3) instead."
+  },
+  {
+   "n": "104",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "When disclosing information on the total annual waste diverted to recycling or reuse, the undertaking should consider the waste that is sorted and sent to recycling or reuse operators (e.g. the amount of waste put into recycling container or sorting of waste into certain categories of materials and their delivery to waste treatment facilities) rather than the waste that gets effectively recycled or reused."
+  },
+  {
+   "n": "105",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "When disclosing information on waste, the undertaking may adopt the following tables.\n| Waste generated (e.g. tonnes)\nTotal waste generated, of which:\n| | Waste diverted to recycle or reuse | Waste directed to disposal\nNon-hazardous waste | | |\nType of waste1 | | |\nType of waste2 | | |\n... | | |\nHazardous waste | | |\nType of waste1 | | |\n... | | |"
+  },
+  {
+   "n": "106",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "Examples of hazardous wastes that small businesses may generate include batteries, used oils, pesticides, mercury-containing equipment and fluorescent lamps."
+  },
+  {
+   "n": "107",
+   "heading": "Guidance on total waste generation and waste diverted to recycling or reuse",
+   "code": "B7",
+   "related": [],
+   "text": "The undertaking may provide further breakdowns specifying further types of non-hazardous and hazardous wastes. In doing so, it may consider the list of waste descriptions found in the European Waste Catalogue’s social metrics."
+  },
+  {
+   "n": "108",
+   "heading": "Guidance on the annual mass-flow of relevant materials used",
+   "code": "B7",
+   "related": [],
+   "text": "The annual mass-flow is an indicator aligned with the EMAS requirements on efficiency of material consumption, and it illustrates an undertaking's dependency on specific materials in its operations (e.g. wood and steel for the construction industry). The undertaking is here required to provide information on the materials it uses, including both the materials acquired from suppliers and those sourced internally from production. To compute the annual mass-flow of the relevant materials it has used, the undertaking will need to first identify the specific key materials on which its operations are dependent and for which material efficiency needs to be evaluated (e.g. material efficiency of wood). If different types of materials are used, the undertaking will need to provide separately the annual mass-flow (i.e. total weight for each relevant material used, e.g. tonnes of wood purchased) for each key material in an appropriate manner, for example by breaking it down by the use to which they are put (EMAS User’s Guide). The mass flow of relevant materials used will result from the sum of the weight of all used materials, including raw materials, auxiliary materials, input materials, semi-finished products, or others (excluding energy sources and water).This indicator is to be preferably expressed in units of weight (e.g. kilograms or tonnes), volume (e.g. m3) or other metric units commonly used in the sector."
+  },
+  {
+   "n": "109",
+   "heading": "Guidance on how to identify manufacturing, constructions and /or packaging processes",
+   "code": "B7",
+   "related": [],
+   "text": "To identify manufacturing, construction and/or packaging processes, the undertaking may refer to the activities that fall under Section C – Manufacturing, Section F – Construction as well as Class O82.92 ‘Packaging activities’ of Annex I to Regulation (EU) 2023/137."
+  },
+  {
+   "n": "110",
+   "heading": "B8 – Workforce – General characteristics",
+   "code": "B8",
+   "related": [],
+   "text": "Full-time equivalent (FTE) is the number of full-time positions in an undertaking. It can be calculated by dividing an employee’s scheduled hours (total effective hours worked in a week) by the employer's hours for a full-time workweek (total hours performed by full-time employees). For example, an employee who works 25 hours every week for a company where the full-time week is 40 hours represents a 0,625 FTE (i.e. 25/ 40 hours)."
+  },
+  {
+   "n": "111",
+   "heading": "B8 – Workforce – General characteristics",
+   "code": "B8",
+   "related": [],
+   "text": "Headcount is the total number of people employed by the undertaking reported either at the end of the reporting period or as an average across the reporting period."
+  },
+  {
+   "n": "112",
+   "heading": "Guidance on how to present information about employees’ contract types",
+   "code": "B8",
+   "related": [],
+   "text": "The following table shows how information on employees may be presented by type of employment contract.\nType of contract | Number of employees (headcount or full-time equivalents)\nTemporary contract |\nPermanent contract |\nTotal employees |"
+  },
+  {
+   "n": "113",
+   "heading": "Guidance on how to present information about employees’ contract types",
+   "code": "B8",
+   "related": [],
+   "text": "The following table shows how information on employees may be presented by gender.\nGender | Number of employees (headcount or full-time equivalents)\nMale |\nFemale |\nOther |\nNot reported |\nTotal employees |"
+  },
+  {
+   "n": "114",
+   "heading": "Guidance on how to present information about employees’ contract types",
+   "code": "B8",
+   "related": [],
+   "text": "In some European Union Member States, it is possible for people to legally register themselves as having a third gender, often neutral, which is to be categorised as ‘other’ in the table above. If the undertaking is disclosing data about employees where this is not possible, it may explain this and indicate that the ‘other’ category is not applicable. The ‘not reported’ category applies to employees who do not disclose their gender identity."
+  },
+  {
+   "n": "115",
+   "heading": "Guidance on how to present information about employees’ contract types",
+   "code": "B8",
+   "related": [],
+   "text": "The following table shows how information on employees may be presented by countries.\nCountry (of employment contract) | Number of employees (headcount or full-time equivalents)\nCountry A |\nCountry B |\nCountry C |\nCountry D |\nTotal employees |"
+  },
+  {
+   "n": "116",
+   "heading": "Guidance on how to present information about employees’ contract types",
+   "code": "B8",
+   "related": [],
+   "text": "Definitions and types of employment contracts may vary depending on the country. If the undertaking has employees working in more than one country, it shall use the legal definitions stipulated in the national laws of the countries where the employees are based in to calculate country-level data. Such country-level data shall then be added up to calculate total numbers, disregarding differences in national legal definitions."
+  },
+  {
+   "n": "117",
+   "heading": "Guidance on how to present information about employees’ contract types",
+   "code": "B8",
+   "related": [],
+   "text": "Employee turnover refers to employees who leave the undertaking voluntarily or due to dismissal, retirement or death in service."
+  },
+  {
+   "n": "118",
+   "heading": "Guidance on how to present information about employees’ contract types",
+   "code": "B8",
+   "related": [],
+   "text": "In order to calculate the turnover rate, the formula below should be used.\n[image in the Official Journal, not reproduced]"
+  },
+  {
+   "n": "119",
+   "heading": "Guidance on the rate of recordable work-related accidents",
+   "code": "B9",
+   "related": [],
+   "text": "Based on the assumption that one full-time worker works 2 000 hours per year, the rate indicates the number of work-related accidents per 100 full-time workers over a yearly time frame. If the undertaking cannot calculate directly the number of hours worked, it may estimate this on the basis of normal or standard hours of work."
+  },
+  {
+   "n": "120",
+   "heading": "Guidance on the rate of recordable work-related accidents",
+   "code": "B9",
+   "related": [],
+   "text": "In order to calculate the rate of recordable work-related accidents of employees, the formula below should be used.\n[image in the Official Journal, not reproduced]\nExample"
+  },
+  {
+   "n": "121",
+   "heading": "Guidance on the rate of recordable work-related accidents",
+   "code": "B9",
+   "related": [],
+   "text": "Company A reported three work-related accidents in the reporting year. Company A has 40 employees, and a total number of 80 000 hours (40 x 2 000) worked in a year.\nThe rate of recordable work-related accidents is 3/80 000 x 200 000 = 7.5."
+  },
+  {
+   "n": "122",
+   "heading": "Guidance on the number of fatalities resulting from work-related injuries and work-related ill health",
+   "code": "B9",
+   "related": [],
+   "text": "Work-related injuries and work-related ill health arise from exposure to dangers at work."
+  },
+  {
+   "n": "123",
+   "heading": "Guidance on the number of fatalities resulting from work-related injuries and work-related ill health",
+   "code": "B9",
+   "related": [],
+   "text": "In case of teleworking, injuries and ill health are work-related if the injury or ill health is directly related to the performance of work rather than the general home environment."
+  },
+  {
+   "n": "124",
+   "heading": "Guidance on the number of fatalities resulting from work-related injuries and work-related ill health",
+   "code": "B9",
+   "related": [],
+   "text": "In case of injuries and ill health that occur while a person is travelling for work, these are considered work-related if the employee was performing work activities in the interest of the employer at the time of the injury or ill health. Accidents taking place when travelling, outside of the undertaking’s responsibility (i.e. regular commuting to and from work), are subject to the applicable national legislation, which regulates their categorisation as to whether they are considered work-related or not."
+  },
+  {
+   "n": "125",
+   "heading": "Guidance on the number of fatalities resulting from work-related injuries and work-related ill health",
+   "code": "B9",
+   "related": [],
+   "text": "Mental illness is considered work-related if it has been notified voluntarily by the employee and if an evaluation from a licensed healthcare professional stating that the illness in question is indeed work-related has been issued and notified, too. Health problems resulting from smoking, drug and alcohol abuse, physical inactivity, unhealthy diets and psychosocial factors not connected to work are not considered work-related."
+  },
+  {
+   "n": "126",
+   "heading": "Guidance on the number of fatalities resulting from work-related injuries and work-related ill health",
+   "code": "B9",
+   "related": [],
+   "text": "The undertaking may present separately fatalities resulting from work-related injuries and those resulting from work-related ill health."
+  },
+  {
+   "n": "127",
+   "heading": "Guidance on remuneration: minimum wage",
+   "code": "B10",
+   "related": [],
+   "text": "‘Minimum wage’ refers to the minimum compensation of employment per hour or another unit of time. Depending on the country, the minimum wage might be set directly by law or through collective bargaining agreements. The undertaking shall refer to the applicable minimum wage for the country it reports on."
+  },
+  {
+   "n": "128",
+   "heading": "Guidance on remuneration: minimum wage",
+   "code": "B10",
+   "related": [],
+   "text": "For the lowest pay category, excluding interns and apprentices, minimum wage serves as the foundation for calculating entry-level wage. Therefore, entry-level wage includes pay equal to minimum wage as well as any additional fixed payments guaranteed to employees in that category."
+  },
+  {
+   "n": "129",
+   "heading": "Guidance on remuneration: percentage gap between female and male employees",
+   "code": "B10",
+   "related": [],
+   "text": "The metric for the percentage gap between female and male employees addresses the principle of gender equality, which stipulates equal pay for equal work. The pay gap is defined as the difference of average pay levels between female and male employees expressed as the percentage of the average pay level of male employees."
+  },
+  {
+   "n": "130",
+   "heading": "Guidance on remuneration: percentage gap between female and male employees",
+   "code": "B10",
+   "related": [],
+   "text": "In order to compute this metric, all employees shall be included in the calculation. In addition, there should be two separate average pay calculations for female and male employees. See the formula below:\n[image in the Official Journal, not reproduced]"
+  },
+  {
+   "n": "131",
+   "heading": "Guidance on remuneration: percentage gap between female and male employees",
+   "code": "B10",
+   "related": [],
+   "text": "Depending on the undertaking’s remuneration policies, gross pay refers to all of the following elements:\n(a) base salary, which is the sum of guaranteed, short-term, non-variable cash compensation;\n(b) benefits in cash, which constitute the sum of the base salary and cash allowances, bonuses, commissions, cash profit-sharing and other forms of variable cash payments; and\n(c) benefits in kind (5)."
+  },
+  {
+   "n": "132",
+   "heading": "Guidance on remuneration: percentage gap between female and male employees",
+   "code": "B10",
+   "related": [],
+   "text": "The gross pay is the sum of all the applicable elements listed above."
+  },
+  {
+   "n": "133",
+   "heading": "Guidance on remuneration: percentage gap between female and male employees",
+   "code": "B10",
+   "related": [],
+   "text": "The average gross hourly pay is the weekly/annual gross pay divided by the average hours worked per week/year.\nExample"
+  },
+  {
+   "n": "134",
+   "heading": "Guidance on remuneration: percentage gap between female and male employees",
+   "code": "B10",
+   "related": [],
+   "text": "Company A has X male employees and Y female employees in total. Male employees’ gross hourly pay is €15 and female employees’ gross hourly pay is €13."
+  },
+  {
+   "n": "135",
+   "heading": "Guidance on remuneration: percentage gap between female and male employees",
+   "code": "B10",
+   "related": [],
+   "text": "The average gross hourly pay level of male employees is the sum of all their gross hourly payments divided by the total number of male employees. The average gross hourly pay level of female employees is the sum of all their gross hourly payments divided by the total number of female employees."
+  },
+  {
+   "n": "136",
+   "heading": "Guidance on remuneration: percentage gap between female and male employees",
+   "code": "B10",
+   "related": [],
+   "text": "The formula used to calculate the percentage pay gap between male and female employees is\n[image in the Official Journal, not reproduced]"
+  },
+  {
+   "n": "137",
+   "heading": "Guidance on collective bargaining coverage",
+   "code": "B10",
+   "related": [],
+   "text": "The employees covered by collective bargaining agreements are those individuals to whom the undertaking is obliged to apply the agreement. If an employee is covered by more than one collective bargaining agreement, it only needs to be counted once. If none of the employees are covered by a collective bargaining agreement, the percentage is zero."
+  },
+  {
+   "n": "138",
+   "heading": "Guidance on collective bargaining coverage",
+   "code": "B10",
+   "related": [],
+   "text": "The percentage of employees covered by collective bargaining agreements is calculated by using the following formula.\n[image in the Official Journal, not reproduced]"
+  },
+  {
+   "n": "139",
+   "heading": "Guidance on collective bargaining coverage",
+   "code": "B10",
+   "related": [],
+   "text": "The information required by this disclosure requirement may be reported as coverage rates if the collective bargaining coverage is between 0-19%, 20-39%, 40-59%, 60-79% or 80-100%."
+  },
+  {
+   "n": "140",
+   "heading": "Guidance on collective bargaining coverage",
+   "code": "B10",
+   "related": [],
+   "text": "This requirement is not aimed at obtaining the percentage of employees represented by a works council or belonging to trade unions, which can be different. The percentage of employees covered by collective bargaining agreements can be higher than the percentage of unionised employees when the collective bargaining agreements apply to both union and non-union members."
+  },
+  {
+   "n": "141",
+   "heading": "B11 – Convictions and fines for corruption and bribery",
+   "code": "B11",
+   "related": [],
+   "text": "Corruption and bribery fall under the business conduct sustainability issue."
+  },
+  {
+   "n": "142",
+   "heading": "B11 – Convictions and fines for corruption and bribery",
+   "code": "B11",
+   "related": [],
+   "text": "Under paragraph 43, the undertaking shall report on the total number of convictions and the total amount of fines incurred for violating anti- corruption and anti- bribery laws."
+  },
+  {
+   "n": "143",
+   "heading": "Guidance on convictions",
+   "code": "B11",
+   "related": [],
+   "text": "Convictions for the violation of anti- corruption and anti- bribery laws refer to any verdict of a criminal court against an individual or undertaking in respect of a criminal offence related to corruption and bribery, for example where these court decisions are entered in the criminal record of the convicting European Union Member State."
+  },
+  {
+   "n": "144",
+   "heading": "Guidance on fines",
+   "code": "B11",
+   "related": [],
+   "text": "Fines issued for the violation of anti- corruption and anti- bribery laws refer to mandatory monetary penalties resulting from violations of anti-corruption and anti-bribery laws imposed by a court, commission or other government authority, which are paid to a public treasury."
+  },
+  {
+   "n": "145",
+   "heading": "Comprehensive Module: Guidance",
+   "code": null,
+   "related": [],
+   "text": "The guidance contained in the sections below is intended to facilitate the application of the sustainability disclosure requirements contained in paragraphs 44 to 65 of Annex I to the Commission Recommendation on a voluntary sustainability reporting standard for small and medium-sized undertakings."
+  },
+  {
+   "n": "146",
+   "heading": "Comprehensive Module: Guidance",
+   "code": null,
+   "related": [],
+   "text": "The guidance below is intended as part of an ecosystem that could include also the development of further support guidance by EFRAG, further digital tools and implementation support (educational activities, stakeholders’ engagement and so forth), aiming to facilitate some of the technical elements present in the guidance."
+  },
+  {
+   "n": "147",
+   "heading": "Comprehensive Module: Guidance",
+   "code": null,
+   "related": [],
+   "text": "This guidance is intended to support the preparation of metrics in the Comprehensive Module."
+  },
+  {
+   "n": "148",
+   "heading": "C1 – Strategy: Business Model and Sustainability – Related Initiatives",
+   "code": "C1",
+   "related": [],
+   "text": "When describing the main consumers and supplier relationships under paragraph 47 (c), the undertaking shall disclose the estimated number of suppliers, and their related sectors and geographies (i.e. countries)."
+  },
+  {
+   "n": "149",
+   "heading": "C2 – Description of practices, policies and future initiatives for transitioning towards a more sustainable economy",
+   "code": "C2",
+   "related": [],
+   "text": "Undertakings may use the following template to report on C2 datapoints.\n| If you answered YES to existing practices/ policies/ future initiatives in disclosure B2, please briefly describe them along with their consequent actions. (In case the practice/ policy/ future initiative covers suppliers or clients, the undertaking shall mention it) | If you answered YES to targets in disclosure B2, please specify them. | The undertaking may indicate the most senior level within its employees that is accountable for implementing the policies when this has been determined by the undertaking.\nClimate Change | | |\nPollution | | |\nWater and Marine Resources | | |\nBiodiversity and Ecosystems | | |\nCircular Economy | | |\nOwn Workforce | | |\nWorkers in the Value Chain | | |\nAffected Communities | | |\nConsumers and end-users | | |\nBusiness conduct | | |"
+  },
+  {
+   "n": "150",
+   "heading": "Consideration when reporting on GHG emissions under B3 (Basic Module)",
+   "code": null,
+   "related": [
+    "B3"
+   ],
+   "text": "When determining whether disclosure of Scope 3 is appropriate following paragraph 50, the undertaking may screen its total Scope 3 GHG emissions based on the 15 Scope 3 categories identified by the GHG Protocol using appropriate estimates and report by incorporating this information by reference. This allows for the identification and disclosure of its significant Scope 3 categories based on the magnitude of their estimated GHG emissions and other criteria provided by the GHG Protocol Corporate Value Chain (Scope 3) Accounting and Reporting Standard (Version 2011, p. 61 and 65-68) or EN ISO 14064-1:2018 Annex H.3.2, such as financial spend, influence, related transition risks and opportunities or stakeholder views."
+  },
+  {
+   "n": "151",
+   "heading": "Consideration when reporting on GHG emissions under B3 (Basic Module)",
+   "code": null,
+   "related": [
+    "B3"
+   ],
+   "text": "SMEs operating with manufacturing, agrifood, real estate construction and packaging processes are likely to have significant Scope 3 categories (CDP Technical Note: Relevance of Scope 3 Categories by Sector, 2024), which may be considered relevant for reporting in the undertaking’s sector."
+  },
+  {
+   "n": "152",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "Emission reductions can prove to be both a challenge and opportunity for an undertaking, as it often requires changes to the strategic and operational reality of the business. The goal of reducing emissions may require a review of strategic and financial priorities. Decarbonisation may require important initial investment in, for example, electrifying a fleet of vehicles, implementing new technologies to reduce energy consumption or developing new product lines that are less reliant on carbon-intensive materials. On the other hand, implementing low-carbon solutions to achieve GHG emission reduction can significantly lessen the costs of purchased energy and materials. Undertakings embarking on their decarbonisation journey are often facing important adjustments to their business models or daily operations. For instance, a logistics and delivery services undertaking may need to redesign its fleet management to minimise potential service disruptions due to the need of regular vehicle charging. A consumer goods manufacturing undertaking planning to replace a component of its product with a sustainable, low-carbon alternative may need to allocate time and resources to product innovation and to searching for new suppliers. These efforts can, in turn, result in reducing costs, accessing new markets, creating new workplaces and attracting additional financing, making GHG emission reduction not only a challenge, but also a strategic business opportunity. In this context, targets for GHG reductions are an important measure of responding to the need for a sustainable transition, as they allow undertakings to manage the change in a systematic, controlled and organised way."
+  },
+  {
+   "n": "153",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "A GHG emission reduction target is a commitment to reduce the undertaking’s GHG emissions in a future year compared to the GHG emissions measured during a chosen base year. Actions that may lead to emission reductions include, for instance, electrification, renewable electricity, sustainable products development, etc. Disclosure C3 requires that the undertaking discloses GHG emission reduction targets for its Scope 1 and Scope 2 emissions."
+  },
+  {
+   "n": "154",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "Removals and avoided emissions shall not be accounted as reduction of the undertaking’s gross GHG emissions. This is due to the important distinction between accounting practices for gross GHG emissions (inventory accounting) and GHG removals and avoided emissions (project-based or intervention accounting). Gross GHG emissions of the undertaking are designed to track the actual emissions released to the environment, providing a consistent and comparable baseline to set up GHG targets. Avoided emissions and carbon removals, on the other hand, relate to specific project activities of the undertaking, which means that their accounting is done separately from gross GHG emissions."
+  },
+  {
+   "n": "155",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "To follow this practice, the undertaking needs to distinguish between its gross GHG emissions and other impacts which are not captured in it, such as GHG removals and avoided emissions. Removals refer to the withdrawal of GHG from the atmosphere as a result of deliberate human activities. Examples of such activities can include plant growth (transfer of atmospheric CO2 through photosynthesis) and direct air capture of CO2 and are typically linked to the subsequent storage of CO2. Avoided GHG emissions are typically referred to as emissions that would have otherwise happened but that, as a result of the undertaking’s activities, did not happen. These may include introducing new products and technologies that reduce demand for their carbon-intensive equivalents, for example insulation solutions in a building that avoid the demand for energy services therein. More information on the concepts related to carbon removals and avoided emissions can be found in the GHG Protocol Land Sector and Removals Guidance."
+  },
+  {
+   "n": "156",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "A base year is a preceding year against which the undertaking’s current GHG emissions can be measured. In general, the base year should be a recent and representative year of the undertaking’s GHG emissions in which there are verifiable data."
+  },
+  {
+   "n": "157",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "The target year is the year in the future in which the undertaking aims to achieve a certain absolute or percentage amount of GHG emission reductions. It should range over a period from one to three years from the base year to a short-term target. Longer term targets may also be included, for instance, for periods of twenty or thirty years (e.g. 2040 or 2050). Undertakings are encouraged to include target values for the short-term target year of 2030 at the least and, if feasible, for the long-term year of 2050. From 2030 onwards, it is recommended to update the base year and target year for GHG emission reduction targets after every five-year period."
+  },
+  {
+   "n": "158",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "To set a target, undertakings should consider the existing scientific evidence on GHG mitigation. The SBTi recommends a cross-sector target in GHG emissions reduction of -42% by the year 2030 and -90% by the year 2050 (base year 2020). SBTi also proposes a streamlined target-setting route for small- and medium-sized undertakings (6). Specific pathways also exist by sector and may be considered by undertakings when setting their GHG emission reduction targets."
+  },
+  {
+   "n": "159",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "To achieve a quick reduction of both direct and indirect emissions, there are some simple actions that the undertaking can take. Some actions may be easy but still able to deliver a notable emission reduction and support the undertaking reaching its targets. For instance, electrification of the vehicle fleet by replacing vehicles running on fossil fuel with electric vehicles will lead to emission reduction as soon as the previous fleet is replaced. This can mean notable emission reduction especially for a business that is reliant on transportation. Similarly, replacing commutes and business travels by car with low carbon alternatives such as bicycles or public transport is an effective, simple and achievable decarbonisation action. Another area of low-hanging fruit is to review the internal energy management and update it to energy-efficient equipment and integrate maintenance into routine business operations. By regularly maintaining equipment and machinery and replacing these with more energy-efficient alternatives when and where possible, the undertaking can reduce its energy consumption. Such equipment can include, for example, boilers, telecommunication systems, heat pumps, air-conditioning etc. Through regular maintenance their efficient operation can be ensured, wear and tear minimised and waste minimised. By also automating systems and using timers to define periods of use, the undertaking is able to lower the emissions of such equipment even further."
+  },
+  {
+   "n": "160",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "A climate transition plan for climate change mitigation is a set of present and future actions meant to align the undertaking’s business model, strategy and operations with the key overarching global goal of limiting global warming to 1.5°C. Underpinned by a GHG reduction target compatible with that goal, the importance of having a transition plan in place lies in the ability of understanding the means by which the undertaking will move towards a low-carbon economy while keeping track of the progress made. A transition plan serves as a mechanism for accountability and transparency, prompting undertakings to develop credible pathways for mitigating climate change through their actions."
+  },
+  {
+   "n": "161",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "Establishing a credible transition plan for the undertaking is something that should be supported by elements such as (a) identifying clear responsibilities and roles; (b) integrating the plan into the undertaking’s business strategy and financial planning; (c) including information on decarbonisation levers and pathways as well as quantifiable indicators that can be monitored throughout predefined timeframes; (d) allowing for regular reviewing and updating after stakeholder consultations when appropriate; and (e) covering the entirety of its own operations and, to the largest possible extent, the value chain or else providing an explanation as to any limitation."
+  },
+  {
+   "n": "162",
+   "heading": "C3 – GHG reduction targets and climate transition",
+   "code": "C3",
+   "related": [],
+   "text": "Undertakings that are disclosing targets according to the EMAS Regulation Annex IV B (d) may use its GHG reduction targets to fulfil the VSME requirement if it has set such targets. The undertaking may also support this disclosure through its implementation of the EMAS environmental management system and link to EN ISO 14001:2015 as set out by EMAS Regulation Annex II B A.6.2.1 and B.5 (environmental objectives)."
+  },
+  {
+   "n": "163",
+   "heading": "Guidance on how to identify manufacturing, constructions and /or packaging processes",
+   "code": "C3",
+   "related": [],
+   "text": "To identify manufacturing, construction and/or packaging processes, the undertaking may refer to these activities that fall under Section C – Manufacturing, Section F Construction as well as Class O82.92 ‘Packaging activities’ of Annex I to Regulation (EU) 2023/137."
+  },
+  {
+   "n": "164",
+   "heading": "C4 – Climate risks",
+   "code": "C4",
+   "related": [],
+   "text": "Climate-related hazards are drivers of climate-related physical risks that arise from the effects that climate change has on the undertaking. They can be classified into acute hazards, which arise from particular events (such as droughts, floods, extreme precipitations and wildfires), and chronic hazards (such as changing temperatures, sea level rise and soil erosion), which arise from longer-term changes in the climate (Commission delegated regulation (EU) 2021/2139). Physical risks are a function of climate-related hazards, the exposure of the undertaking’s assets and activities to these hazards, and how sensitive the undertaking is to these hazards. Examples of climate-related hazards are heat waves, increased frequency of extreme weather events, sea level rise, glacial lake outburst flood and change in precipitation and wind patterns. Climate-related physical risks can be identified and modelled by using climate scenarios that consider high emissions trajectories such as IPCC SSP5-8.5."
+  },
+  {
+   "n": "165",
+   "heading": "C4 – Climate risks",
+   "code": "C4",
+   "related": [],
+   "text": "Climate-related transition events may be (according to the Recommendations of the Task Force on Climate-related Financial Disclosures, (TCFD), 2017) policy- and legal-based (e.g. enhanced emission-reporting obligations), technology-based (e.g. costs of transition to lower emissions technology), market-based (e.g. increased cost of raw materials) and reputation-based (e.g. increased stakeholder concern)."
+  },
+  {
+   "n": "166",
+   "heading": "C4 – Climate risks",
+   "code": "C4",
+   "related": [],
+   "text": "Gross climate-related risks refer to gross physical risks and gross transition risks that may result from exposure of the undertaking's assets and business activities to climate-related hazards."
+  },
+  {
+   "n": "167",
+   "heading": "C5 – Additional (general) workforce characteristics",
+   "code": "C5",
+   "related": [],
+   "text": "To determine the female-to-male ratio, divide the number of female employees by the number of male employees at management level. This will yield the proportion of women to men in your company.\n[image in the Official Journal, not reproduced]"
+  },
+  {
+   "n": "168",
+   "heading": "C5 – Additional (general) workforce characteristics",
+   "code": "C5",
+   "related": [],
+   "text": "Management level is considered the level below the board of directors unless the undertaking has a specific definition to use."
+  },
+  {
+   "n": "169",
+   "heading": "C5 – Additional (general) workforce characteristics",
+   "code": "C5",
+   "related": [],
+   "text": "For example, if there are 28 female employees and 84 male employees at management level, the female-to-male ratio would be 1:3, meaning that for every woman at management level, there are three men."
+  },
+  {
+   "n": "170",
+   "heading": "C5 – Additional (general) workforce characteristics",
+   "code": "C5",
+   "related": [],
+   "text": "Relevant factors for an undertaking to consider in deciding whether or not to disclose the number of self-employed workers and temporary workers under paragraph 60 would be: (1) the ratio of employees to self-employed and temporary workers, especially in case of significant and/or increasing reliance or (2) when the risk of negative social impacts on self-employed or temporary workers is greater compared to the undertaking’s own employees."
+  },
+  {
+   "n": "171",
+   "heading": "C5 – Additional (general) workforce characteristics",
+   "code": "C5",
+   "related": [],
+   "text": "The following table shows how information on self-employed people without personnel that are working exclusively for the undertaking and temporary workers provided by undertakings primarily engaged in employment activities may be presented.\nTypes of workers | Number of self-employed people and temporary workers engaged in employment activities\nTotal self-employed without personnel that are working exclusively for the undertaking |\nTotal temporary workers provided by undertakings primarily engaged in employment activities |"
+  },
+  {
+   "n": "172",
+   "heading": "C5 – Additional (general) workforce characteristics",
+   "code": "C5",
+   "related": [],
+   "text": "Undertakings can refer to NACE Code O78 for temporary workers provided by undertakings primarily engaged in ‘employment activities’."
+  },
+  {
+   "n": "173",
+   "heading": "C6 – Additional own workforce information - Human rights policies and processes",
+   "code": "C6",
+   "related": [],
+   "text": "Undertakings that have a due diligence process for human rights in place can answer positively (YES) and could clarify the contents of the policies and/or processes using the drop-down menu."
+  },
+  {
+   "n": "174",
+   "heading": "C7 – Severe negative human rights incidents",
+   "code": "C7",
+   "related": [],
+   "text": "A “confirmed incident” refers to a legal action or complaint registered with the undertaking or competent authorities through a formal process, or an instance of non-compliance identified by the undertaking through established procedures. Established procedures to identify instances of non-compliance can include management system audits, formal monitoring programs, or grievance mechanisms."
+  },
+  {
+   "n": "175",
+   "heading": "C8 – Revenues from certain sectors and exclusion from EU reference benchmarks",
+   "code": "C8",
+   "related": [],
+   "text": "Fossil fuels, as defined in Article 2(62), of Regulation (EU) 2018/1999 of the European Parliament and the Council, are non-renewable carbon-based energy sources such as solid fuels, natural gas and oil."
+  },
+  {
+   "n": "176",
+   "heading": "C8 – Revenues from certain sectors and exclusion from EU reference benchmarks",
+   "code": "C8",
+   "related": [],
+   "text": "The production of chemicals refers to the activities listed under Section C Division 20.2 of Annex I to Regulation (EU) 2023/137, i.e. the manufacturing of pesticides and other agrochemical products."
+  },
+  {
+   "n": "177",
+   "heading": "C8 – Revenues from certain sectors and exclusion from EU reference benchmarks",
+   "code": "C8",
+   "related": [],
+   "text": "As defined by Article 12.1 of the Commission Delegated Regulation (EU) 2020/1818, the companies excluded from EU Paris-aligned Benchmarks are the following:\n(a) companies that derive 1% or more of their revenues from exploration, mining, extraction, distribution or refining of hard coal and lignite;\n(b) companies that derive 10% or more of their revenues from the exploration, extraction, distribution or refining of oil fuels;\n(c) companies that derive 50% or more of their revenues from the exploration, extraction, manufacturing or distribution of gaseous fuels; and\n(d) companies that derive 50% or more of their revenues from electricity generation with a GHG intensity of more than 100 g CO2 e/kWh."
+  },
+  {
+   "n": "178",
+   "heading": "C9 – Gender diversity ratio in governance body",
+   "code": "C9",
+   "related": [],
+   "text": "The governance body refers to the highest decision-making authority in a company. Depending on the jurisdiction the company is in and its legal entity classification, the governance body can vary in format."
+  },
+  {
+   "n": "179",
+   "heading": "C9 – Gender diversity ratio in governance body",
+   "code": "C9",
+   "related": [],
+   "text": "Based on the requirements in the SFDR, the gender diversity ratio of the governance body is calculated as an average ratio of female to male board members.\n[image in the Official Journal, not reproduced]\nExample"
+  },
+  {
+   "n": "180",
+   "heading": "C9 – Gender diversity ratio in governance body",
+   "code": "C9",
+   "related": [],
+   "text": "The governance body of a certain SME is composed of six members, including three women. The gender diversity ratio is one – for every female member there is one male member."
+  }
+ ]
+}

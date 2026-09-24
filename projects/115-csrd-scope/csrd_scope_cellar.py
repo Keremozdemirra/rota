@@ -48,6 +48,7 @@ PINNED = {
     "32013L0034": "02013L0034-20260318",
     "32022L2464": "02022L2464-20260318",
     "32004L0109": "02004L0109-20240109",
+    "32019R2088": "02019R2088-20260702",
 }
 BASE_ACTS = ("32013L0034", "32022L2464")
 ACTS = ("32013L0034", "32022L2464", "32025L0794", "32026L0470", "32023L2775",
@@ -59,7 +60,7 @@ NIM_DIRECTIVES = ("32022L2464", "32025L0794", "32026L0470")
 DOCUMENTS = (
     "02013L0034-20260318", "02022L2464-20260318", "32026L0470", "32025L0794",
     "32023L2775", "02013L0034-20230105", "02013L0034-20240528", "02004L0109-20240109",
-    "52024XC06792", "32019R2088",
+    "52024XC06792", "02019R2088-20260702",
 )
 
 # (id, document, citation, first words, last words). The quote is the text from the
@@ -235,7 +236,7 @@ QUOTES = (
     ("NOTICE-fn18", "52024XC06792", "Commission Notice C/2024/6792, footnote 18",
      "Relevant reporting requirements for undertakings governed by the law of a third country:",
      "and Article 40a Accounting Directive."),
-    ("SFDR-2-12", "32019R2088", "Art. 2(12) Regulation (EU) 2019/2088",
+    ("SFDR-2-12", "02019R2088-20260702", "Art. 2(12) Regulation (EU) 2019/2088",
      "‘financial product’ means:", "a PEPP;"),
 )
 
@@ -259,7 +260,7 @@ SELECT DISTINCT ?celex ?work ?inforce ?date ?endvalid ?title WHERE {
 Q_CONSOLIDATED = """PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 SELECT DISTINCT ?base ?celex ?date WHERE {
-  VALUES ?base { "32013L0034"^^xsd:string "32022L2464"^^xsd:string "32004L0109"^^xsd:string }
+  VALUES ?base { "32013L0034"^^xsd:string "32022L2464"^^xsd:string "32004L0109"^^xsd:string "32019R2088"^^xsd:string }
   ?b cdm:resource_legal_id_celex ?base .
   ?cons cdm:act_consolidated_consolidates_resource_legal ?b ;
         cdm:resource_legal_id_celex ?celex .
@@ -301,14 +302,40 @@ SELECT DISTINCT ?dir ?c ?country ?notif ?ojn ?ojno ?e ?t WHERE {
 
 Q_EU_COUNTRIES = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX lemon: <http://lemon-model.net/lemon#>
-SELECT DISTINCT ?c ?label ?n ?type WHERE {
+SELECT DISTINCT ?c ?label ?n WHERE {
   ?c lemon:context <http://publications.europa.eu/resource/authority/use-context/EU_COU> ;
      skos:inScheme <http://publications.europa.eu/resource/authority/country> ;
-     skos:prefLabel ?label ;
-     skos:notation ?n .
+     skos:prefLabel ?label .
   FILTER(lang(?label) = "en")
-  BIND(DATATYPE(?n) AS ?type)
+  OPTIONAL { ?c skos:notation ?n }
 }"""
+
+# Consolidated texts can lag behind the acts that amend or correct them. Every act relied
+# on is checked for amendments, corrigenda and consolidations dated 2024 or later.
+Q_AFTER = """PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT DISTINCT ?base ?rel ?celex ?date WHERE {
+  VALUES ?base { %s }
+  ?b cdm:resource_legal_id_celex ?base .
+  { ?x cdm:resource_legal_amends_resource_legal ?b . BIND("amends" AS ?rel) }
+  UNION { ?x cdm:resource_legal_corrects_resource_legal ?b . BIND("corrects" AS ?rel) }
+  UNION { ?x cdm:act_consolidated_consolidates_resource_legal ?b . BIND("consolidates" AS ?rel) }
+  ?x cdm:resource_legal_id_celex ?celex .
+  OPTIONAL { ?x cdm:work_date_document ?d1 }
+  OPTIONAL { ?x cdm:act_consolidated_date ?d2 }
+  BIND(COALESCE(?d2, ?d1) AS ?date)
+  FILTER(?date >= "2024-01-01"^^xsd:date)
+}"""
+
+Q_LANGS = """PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT DISTINCT ?celex ?lang WHERE {
+  VALUES ?celex { %s }
+  ?w cdm:resource_legal_id_celex ?celex .
+  ?e cdm:expression_belongs_to_work ?w ; cdm:expression_uses_language ?l .
+  BIND(REPLACE(STR(?l), "^.*/", "") AS ?lang)
+}"""
+CORRIGENDUM_RE = re.compile(r"^[0-9]{5}[A-Z]{1,2}[0-9]{4,5}R\([0-9]{2}\)$")
 
 QUERIES = {"acts": None, "consolidated": Q_CONSOLIDATED, "amending": Q_AMENDING,
            "national_measures": Q_NIM, "eu_countries": Q_EU_COUNTRIES}
@@ -322,6 +349,37 @@ def acts_query() -> str:
     for c in ACTS:
         _check_celex(c)
     return Q_ACTS % " ".join(f'"{c}"^^xsd:string' for c in ACTS)
+
+
+def after_query() -> str:
+    return Q_AFTER % " ".join(f'"{_check_celex(c)}"^^xsd:string' for c in ACTS)
+
+
+def related_since_2024(run=None) -> list[dict]:
+    """Amendments, corrigenda (with the languages they correct) and consolidations since 2024."""
+    run = run or sparql
+    rows = []
+    for r in run(after_query()):
+        base, rel, celex = r.get("base"), r.get("rel"), r.get("celex", "")
+        if base not in ACTS or rel not in ("amends", "corrects", "consolidates"):
+            continue
+        # A consolidation row also comes back for every act that a consolidated text of
+        # another act includes; keep only the act's own consolidated versions.
+        if rel == "consolidates" and not celex.startswith("0" + base[1:]):
+            continue
+        rows.append({"base": base, "rel": rel, "celex": celex, "date": r.get("date")})
+    corr = sorted({x["celex"] for x in rows if x["rel"] == "corrects" and CORRIGENDUM_RE.match(x["celex"])})
+    langs: dict = {}
+    if corr:
+        values = " ".join(f'"{c}"^^xsd:string' for c in corr)
+        for r in run(Q_LANGS % values):
+            if r.get("celex") in corr and re.fullmatch(r"[A-Z]{3}", r.get("lang", "")):
+                langs.setdefault(r["celex"], set()).add(r["lang"])
+    for x in rows:
+        if x["rel"] == "corrects":
+            x["languages"] = sorted(langs.get(x["celex"], set()))
+    dedup = {(x["base"], x["rel"], x["celex"]): x for x in rows}
+    return sorted(dedup.values(), key=lambda x: (x["base"], x["rel"], x["date"] or "", x["celex"]))
 
 
 def _check_celex(celex: str) -> str:
@@ -462,24 +520,22 @@ def parse_annexes(text: str, eu_names: dict) -> dict:
     a3 = text.find("ANNEX III", a2 + 1) if a2 >= 0 else -1
     if min(a1, a2, a3) < 0:
         raise SourceError("Annexes I and II not found in the consolidated text")
+    labels = sorted(list(eu_names) + list(ANNEX_ALIASES) + ["United Kingdom"], key=len, reverse=True)
+    # Entries start with a dash and a Member State name; a dash inside an entry (Malta's
+    # Annex II entry has one) is not followed by a name.
+    head = re.compile(r"— (?:In )?(?:the )?(" + "|".join(re.escape(x) for x in labels) + r")\b:?\s*")
     for key, chunk in (("annex_i", text[a1:a2]), ("annex_ii", text[a2:a3])):
-        for entry in chunk.split(" — ")[1:]:
-            entry = entry.strip()
-            name = re.sub(r"^(?:In )?(?:the )?", "", entry)
-            match = None
-            for label in sorted(list(eu_names) + list(ANNEX_ALIASES), key=len, reverse=True):
-                if name.startswith(label):
-                    match = label
-                    break
-            if match is None:
-                country = re.split(r"[:]", name, 1)[0].strip()
-                if country.startswith("United Kingdom"):
-                    out["not_eu_member_states"].append(f"{key}: United Kingdom")
-                    continue
-                raise SourceError(f"unrecognised Member State in {key}: {country[:40]!r}")
-            forms = name[len(match):].lstrip(": ").rstrip(" ;.")
-            label = ANNEX_ALIASES.get(match, match)
-            out[key][eu_names[label]] = forms
+        found = list(head.finditer(chunk))
+        if not found:
+            raise SourceError(f"no Member State entries found in {key}")
+        for n, m in enumerate(found):
+            stop = found[n + 1].start() if n + 1 < len(found) else len(chunk)
+            forms = chunk[m.end():stop].strip().rstrip(" ;.")
+            name = m.group(1)
+            if name == "United Kingdom":
+                out["not_eu_member_states"].append(f"{key}: United Kingdom")
+                continue
+            out[key][eu_names[ANNEX_ALIASES.get(name, name)]] = forms
     for key in ("annex_i", "annex_ii"):
         if len(out[key]) != len(eu_names):
             raise SourceError(f"{key} lists {len(out[key])} EU Member States, expected {len(eu_names)}")
@@ -535,7 +591,7 @@ def build_snapshot(today: str | None = None, run=sparql, fetch=fetch_document) -
         if not re.fullmatch(r"[A-Z]{3}", code):
             continue
         rec = countries.setdefault(code, {"alpha3": code, "name": r.get("label")})
-        typ = (r.get("type") or r.get("n@type") or "").rsplit("#", 1)[-1]
+        typ = (r.get("n@type") or "").rsplit("#", 1)[-1]
         if typ == "ISO_3166_1_ALPHA_2":
             rec["alpha2"] = r.get("n")
         elif typ == "ISG_COU":
@@ -574,9 +630,12 @@ def build_snapshot(today: str | None = None, run=sparql, fetch=fetch_document) -
     eu_names = {m["name"]: m["alpha2"] for m in member_states}
     annexes = parse_annexes(texts[PINNED["32013L0034"]], eu_names)
 
+    related = related_since_2024(run)
+
     legal_basis = {
         "schema": 1, "checked": today, "endpoint": SPARQL_ENDPOINT, "pinned": dict(PINNED),
         "acts": acts, "consolidated_versions": consolidated, "amending_acts_since_2023": amending,
+        "related_since_2024": related,
         "documents": documents, "quotes": quotes,
     }
     return {
@@ -615,7 +674,7 @@ def sources_markdown(snap: dict) -> str:
         "- What is bundled: identifiers, dates, titles, short verbatim quotations of the provisions the rules",
         "  encode, the legal-form lists of Annexes I and II, and national-measure metadata. No personal data.", "",
         "## Endpoints", "",
-        f"- SPARQL: {lb['endpoint']} (queries in `csrd_scope_cellar.py`: `Q_ACTS`, `Q_CONSOLIDATED`, `Q_AMENDING`, `Q_NIM`, `Q_EU_COUNTRIES`)",
+        f"- SPARQL: {lb['endpoint']} (queries in `csrd_scope_cellar.py`: `Q_ACTS`, `Q_CONSOLIDATED`, `Q_AMENDING`, `Q_AFTER`, `Q_LANGS`, `Q_NIM`, `Q_EU_COUNTRIES`)",
         f"- Documents: {CELEX_RESOURCE}<CELEX> with `Accept: application/xhtml+xml` and `Accept-Language: eng`", "",
         "## Acts", "", "| CELEX | Date | In force | Title |", "| --- | --- | --- | --- |",
     ]
@@ -632,6 +691,24 @@ def sources_markdown(snap: dict) -> str:
     for base, acts in lb["amending_acts_since_2023"].items():
         for a in acts:
             lines.append(f"- {base} <- {a['celex']} ({a['date']}): {a['title'][:150]}")
+    lines += ["", "## Amendments, corrigenda and consolidations since 2024 (every act relied on)", "",
+              "A consolidated text can lag behind acts that amend or correct it, so each act relied on is checked.",
+              "Corrigenda that do not correct the English version (ENG) do not change the text this tool quotes.", "",
+              "| Act | Relation | CELEX | Date | Languages corrected |", "| --- | --- | --- | --- | --- |"]
+    for x in lb.get("related_since_2024", []):
+        lines.append(f"| {x['base']} | {x['rel']} | {x['celex']} | {x['date']} | {' '.join(x.get('languages', [])) if x['rel'] == 'corrects' else ''} |")
+    lines += ["", "## Verification notes (2026-09-24, by hand, recorded here because they are not re-derived by refresh)", "",
+              "- 02013L0034-20270130 is dated in the future. A text comparison with 02013L0034-20260318 found no difference",
+              "  except the list of amending acts, which adds Directive (EU) 2025/2 (32025L0002). Its Article 2 replaces",
+              "  Art. 19a(6) of Directive 2013/34/EU from 30 January 2027; Directive (EU) 2026/470 had already deleted that",
+              "  paragraph. The rules use 02013L0034-20260318.",
+              "- 02019R2088-20260702 (after amending Regulation (EU) 2024/3005): Art. 2(12) is identical to the original text 32019R2088.",
+              "- Directive (EU) 2026/470 was published in OJ L 2026/470 on 26.2.2026 and enters into force on the twentieth day",
+              "  following publication (Art. 6), i.e. 18 March 2026, the date of the consolidated versions used.",
+              "- The Commission Notice C/2024/6792 predates Directive (EU) 2026/470; it is cited only for points the",
+              "  amendment did not change (size timing, employee averaging, Article 40a mechanics) and it is not binding.",
+              "- No amending act dated after 2026-03-18 is listed for 32013L0034 or 32022L2464, and no corrigendum since 2024",
+              "  corrects the English version of any act relied on (table above). `verify-sources` repeats this check.", ""]
     lines += ["", "## Documents quoted", "", "| CELEX | Bytes | SHA-256 | Retrieved |", "| --- | --- | --- | --- |"]
     for c, d in lb["documents"].items():
         lines.append(f"| {c} | {d['bytes']} | `{d['sha256']}` | {d['retrieved']} |")
@@ -674,11 +751,18 @@ def verify(snapshot: dict, run=sparql, nim_snapshot: dict | None = None) -> dict
     for base in PINNED:
         if base not in live_cons:
             findings.append({"kind": "no consolidated versions returned", "act": base})
-    known_amend = {b: {a["celex"] for a in acts} for b, acts in snapshot["amending_acts_since_2023"].items()}
-    for r in run(Q_AMENDING):
-        if r.get("base") in BASE_ACTS and r.get("celex") and r["celex"] not in known_amend.get(r["base"], set()):
-            findings.append({"kind": "new amending act", "act": r["base"], "celex": r["celex"], "date": r.get("date"),
-                             "title": (r.get("title") or "")[:200]})
+    known_rel = {(x["base"], x["rel"], x["celex"]) for x in snapshot.get("related_since_2024", [])}
+    for x in related_since_2024(run):
+        if (x["base"], x["rel"], x["celex"]) in known_rel:
+            continue
+        if x["rel"] == "corrects":
+            kind = "new corrigendum to the English text" if "ENG" in x.get("languages", []) \
+                else "new corrigendum (other language versions only)"
+        elif x["rel"] == "amends":
+            kind = "new amending act"
+        else:
+            kind = "new consolidated version"
+        findings.append({"kind": kind, **x})
     for r in run(acts_query()):
         c = r.get("celex")
         if c in snapshot["acts"] and "inforce" in r:

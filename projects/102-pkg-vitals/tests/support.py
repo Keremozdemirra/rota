@@ -20,7 +20,7 @@ import pkg_vitals  # noqa: E402
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 BASES = {  # public endpoint -> path prefix on the local server
     "https://registry.npmjs.org": "/npm",
-    "https://api.npmjs.org/downloads/point/last-week": "/downloads",
+    "https://api.npmjs.org/downloads/point": "/downloads",
     "https://pypi.org": "/pypi",
     "https://api.github.com": "/github",
 }
@@ -49,10 +49,17 @@ class Case(unittest.TestCase):
         home = mock.patch("pathlib.Path.home", return_value=self.home)
         home.start()
         self.addCleanup(home.stop)
+        (self.home / "tmp").mkdir()
+        tmp_dir = mock.patch.object(tempfile, "tempdir", str(self.home / "tmp"))  # the hook's claim files land here
+        tmp_dir.start()
+        self.addCleanup(tmp_dir.stop)
 
 
 def load(name: str) -> dict:
     return json.loads((FIXTURES / name).read_text(encoding="utf-8"))
+
+
+CORGI = " [abbreviated]"  # key suffix for an answer to npm's abbreviated-metadata Accept header
 
 
 def recorded(github: str = "sandbox") -> dict:
@@ -67,9 +74,10 @@ def recorded(github: str = "sandbox") -> dict:
         d = load(f.name)
         if "url" not in d or "status" not in d:  # a reference answer, not an HTTP exchange
             continue
+        corgi = "install-v1" in (d.get("request_headers") or {}).get("Accept", "")
         if f.name.startswith("github-") and (github == "sandbox") != (f.name == "github-403-sandbox.json"):
             continue
-        out[d["url"]] = (d["status"], d["body"])
+        out[d["url"] + (CORGI if corgi else "")] = (d["status"], d["body"])
     if github == "live":
         out["https://api.github.com/repos/stevemao/left-pad"] = out["https://api.github.com/repos/left-pad/left-pad"]
     return out
@@ -88,6 +96,9 @@ class FakeNet(pkg_vitals.Net):
             self.answers[self.census_url] = (200, census_body)
 
     def get(self, url, headers=None):
+        if "install-v1" in (headers or {}).get("Accept", ""):
+            # a registry that ignores the Accept header answers with the full document, so fall back to that
+            url = url + CORGI if url + CORGI in self.answers else url
         self.requested.append(url)
         if url not in self.answers:
             self.missing.append(url)
@@ -190,7 +201,10 @@ def fixture_routes(github: str = "sandbox") -> dict:
 
 
 def clean_env(extra: dict) -> dict:
-    """The environment for a subprocess: no tokens, no proxy for the local server, a scratch HOME."""
-    env = {k: v for k, v in os.environ.items() if k not in ("GITHUB_TOKEN", "GH_TOKEN") and not k.startswith("PKG_VITALS_")}
+    """The environment for a subprocess: no tokens, no proxy for the local server, a scratch HOME and TMPDIR."""
+    env = {k: v for k, v in os.environ.items() if k not in AMBIENT and not k.startswith("PKG_VITALS_")}
     env.update(extra)
+    if "HOME" in extra and "TMPDIR" not in extra:
+        env["TMPDIR"] = str(Path(extra["HOME"]) / "tmp")
+        Path(env["TMPDIR"]).mkdir(exist_ok=True)
     return env

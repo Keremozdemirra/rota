@@ -57,8 +57,8 @@ class ParseAdd(Isolated):
         self.assertEqual(e["args"], ["pkg"])
 
     def test_wrappers_and_assignments(self):
-        for cmd in ("FOO=1 claude mcp add a -- npx pkg", "sudo -u root claude mcp add a -- npx pkg",
-                    "timeout -s KILL 30 claude mcp add a -- npx pkg", "/usr/local/bin/claude mcp add a -- npx pkg"):
+        for cmd in ("FOO=1 claude mcp add a -- npx pkg", "timeout -s KILL 30 claude mcp add a -- npx pkg",
+                    "/usr/local/bin/claude mcp add a -- npx pkg"):
             self.assertEqual(self.one(cmd)["args"], ["pkg"], cmd)
 
     def test_powershell(self):

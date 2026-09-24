@@ -1,0 +1,19 @@
+{
+ "url": "https://registry.npmjs.org/flatmap-stream/0.0.1-security",
+ "recorded": "2026-09-24",
+ "status": 200,
+ "trimmed": "the version's manifest cut to name, version, description, licence, repository, homepage, bugs, deprecated, install scripts",
+ "body": {
+  "name": "flatmap-stream",
+  "version": "0.0.1-security",
+  "description": "security holding package",
+  "repository": {
+   "url": "git+https://github.com/npm/security-holder.git",
+   "type": "git"
+  },
+  "homepage": "https://github.com/npm/security-holder#readme",
+  "bugs": {
+   "url": "https://github.com/npm/security-holder/issues"
+  }
+ }
+}

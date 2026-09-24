@@ -1,0 +1,1866 @@
+{
+ "schema": 1,
+ "checked": "2026-09-24",
+ "endpoint": "https://publications.europa.eu/webapi/rdf/sparql",
+ "directives": [
+  "32022L2464",
+  "32025L0794",
+  "32026L0470"
+ ],
+ "measures": [
+  {
+   "directive": "32022L2464",
+   "country": "AUT",
+   "celex": "72022L2464AUT_202601283",
+   "notified": "2026-02-19",
+   "official_journal": "Bundesgesetzblatt für die Republik Österreich ( BGBl. ) BGBl. I Nr. 6/2026",
+   "eli": "https://www.ris.bka.gv.at/eli/bgbl/I/2026/6/20260218",
+   "title": "Bundesgesetz, mit dem ein Drittlandunternehmen-Berichterstattungsgesetz erlassen wird und das Unternehmensgesetzbuch, das Aktiengesetz, das GmbH-Gesetz, das Genossenschaftsgesetz, das Genossenschaftsrevisionsgesetz 1997, das SE-Gesetz, das SCE-Gesetz, das Arbeitsverfassungsgesetz, das Wirtschaftstre"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "BEL",
+   "celex": "72022L2464BEL_202405899",
+   "notified": "2024-12-20",
+   "official_journal": "Moniteur Belge C − 2024/011683",
+   "eli": null,
+   "title": "FOD ECONOMIE- Wet betreffende de openbaarmaking van duurzaamheidsinformatie door bepaalde vennootschappen en groepen en de assurance van duurzaamheidsinformatie en houdende diverse bepalingen"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "BEL",
+   "celex": "72022L2464BEL_202501748",
+   "notified": "2025-03-27",
+   "official_journal": "Moniteur Belge 72",
+   "eli": null,
+   "title": "Arrêté royal du 16 mars 2025 visant à transposer certaines dispositions de la directive (UE) 2022/2464 du parlement européen et du conseil du 14 décembre 2022 modifiant le règlement (UE) n° 537/2014 et les directives 2004/109/CE, 2006/43/CE et 2013/34/UE en ce qui concerne la publication d'informati"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "BEL",
+   "celex": "72022L2464BEL_202602343",
+   "notified": "2026-04-13",
+   "official_journal": "Moniteur Belge C − 2026/002729",
+   "eli": null,
+   "title": "Koninklijk besluit tot wijziging van het koninklijk besluit van 21 juli 2017 betreffende de toekenning van de hoedanigheid van bedrijfsrevisor alsook de inschrijving en registratie in het openbaar register van de bedrijfsrevisoren en het koninklijk besluit van 27 november 2022 betreffende de registr"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "BGR",
+   "celex": "72022L2464BGR_202403785",
+   "notified": "2024-08-28",
+   "official_journal": "Държавен вестник 72",
+   "eli": null,
+   "title": "ЗАКОН ЗА ИЗМЕНЕНИЕ И ДОПЪЛНЕНИЕ НА ЗАКОНА ЗА СЧЕТОВОДСТВОТО"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "BGR",
+   "celex": "72022L2464BGR_202404028",
+   "notified": "2024-09-20",
+   "official_journal": "Държавен вестник 79",
+   "eli": null,
+   "title": "Закон за изменение и допълнение на Закона за независимия финансов одит"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CYP",
+   "celex": "72022L2464CYP_202504451",
+   "notified": "2025-08-01",
+   "official_journal": "Cyprus Gazette 5051",
+   "eli": null,
+   "title": "Ο περί Εταιρειών (Τροποποιητικός) Νόμος του 2025"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CYP",
+   "celex": "72022L2464CYP_202504452",
+   "notified": "2025-08-01",
+   "official_journal": "Cyprus Gazette 5051",
+   "eli": null,
+   "title": "Ο περί Ελεγκτών (Τροποποιητικός) Νόμος του 2025."
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CYP",
+   "celex": "72022L2464CYP_202504453",
+   "notified": "2025-08-01",
+   "official_journal": "Cyprus Gazette 5051",
+   "eli": null,
+   "title": "Ο περί των Προϋποθέσεων Διαφάνειας (Κινητές Αξίες προς Διαπραγμάτευση σε Ρυθμιζόμενη Αγορά)(Τροποποιητικός) Νόμος του 2025."
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_26312",
+   "notified": "2004-01-27",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 563/1991 Sb., o účetnictví"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_26358",
+   "notified": "2004-01-27",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 492/2000 Sb., kterým se mění zákon č. 586/1992 Sb., o daních z příjmů, ve znění pozdějších předpisů, a některé další zákony"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_26772",
+   "notified": "2004-02-19",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 437/2003 Sb., kterým se mění zákon č. 563/1991 Sb., o účetnictví, ve znění pozdějších předpisů, a některé další zákony"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_30620",
+   "notified": "2004-08-30",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 256/2004 Sb., o podnikání na kapitálovém trhu"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_161541",
+   "notified": "2009-04-14",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 93/2009 Sb., o auditorech a o změně některých zákonů (zákon o auditorech)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_175638",
+   "notified": "2011-01-05",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 410/2010 Sb., kterým se mění zákon č. 563/1991 Sb., o účetnictví, ve znění pozdějších předpisů"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_184618",
+   "notified": "2011-07-18",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 188/2011 Sb., kterým se mění zákon č. 189/2004 Sb., o kolektivním investování, ve znění pozdějších předpisů, a další související zákony"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_207678",
+   "notified": "2013-07-12",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 239/2012 Sb., kterým se mění zákon č. 563/1991 Sb., o účetnictví, ve znění pozdějších předpisů, a další související zákony"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_208590",
+   "notified": "2013-08-21",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 90/2012 Sb., o obchodních společnostech a družstvech (zákon o obchodních korporacích)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_230728",
+   "notified": "2015-10-14",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 334/2014 Sb., kterým se mění zákon č. 93/2009 Sb., o auditorech a o změně některých zákonů (zákon o auditorech), ve znění pozdějších předpisů"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_230729",
+   "notified": "2015-10-14",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 221/2015 Sb., kterým se mění zákon č. 563/1991 Sb., o účetnictví, ve znění pozdějších předpisů, a některé další zákony"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_240815",
+   "notified": "2016-09-21",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 299/2016 Sb., kterým se mění zákon č. 93/2009 Sb., o auditorech a o změně některých zákonů (zákon o auditorech), ve znění pozdějších předpisů, a další související zákony"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_249427",
+   "notified": "2017-07-24",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 183/2017 Sb., kterým se mění některé zákony v souvislosti s přijetím zákona o odpovědnosti za přestupky a řízení o nich a zákona o některých přestupcích"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_259345",
+   "notified": "2018-06-05",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 94/2018 Sb., kterým se mění zákon č. 280/2009 Sb., daňový řád, ve znění pozdějších předpisů, a další související zákony"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_202058864",
+   "notified": "2020-12-18",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 527/2020 Sb., kterým se mění zákon č. 253/2008 Sb., o některých opatřeních proti legalizaci výnosů z trestné činnosti a financování terorismu, ve znění pozdějších předpisů, a další související zákony, zákony související s přijetím zákona o evidenci skutečných majitelů a zákon č. 186/2016 Sb"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_202202899",
+   "notified": "2022-05-04",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 96/2022 Sb., kterým se mění některé zákony v oblasti finančního trhu zejména v souvislosti s implementací předpisů Evropské unie týkajících se unie kapitálových trhů"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_202303575",
+   "notified": "2023-06-20",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 172/2023 Sb., kterým se mění některé zákony v souvislosti s přijetím zákona o ochraně oznamovatelů"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "CZE",
+   "celex": "72022L2464CZE_202306696",
+   "notified": "2023-12-20",
+   "official_journal": "Sbirka Zakonu CR",
+   "eli": null,
+   "title": "Zákon č. 349/2023 Sb., kterým se mění některé zákony v souvislosti s konsolidací veřejných rozpočtů"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "DNK",
+   "celex": "72022L2464DNK_202402423",
+   "notified": "2024-06-06",
+   "official_journal": "Lovtidende A 480",
+   "eli": "https://www.retsinformation.dk/eli/lta/2024/480",
+   "title": "Lov nr. 480 af 22. maj 2024 om ændring af årsregnskabsloven, revisorloven og forskellige andre love (Gennemførelse af EU-direktiv om virksomheders bæredygtighedsrapportering og EU-direktiv om forhøjelse af størrelsesgrænser i regnskabsdirektivet m.v.)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "DNK",
+   "celex": "72022L2464DNK_202601249",
+   "notified": "2026-02-18",
+   "official_journal": "Lovtidende A 1636",
+   "eli": "https://www.retsinformation.dk/eli/lta/2025/1636",
+   "title": "Lov nr. 1636 af 16. december 2025 om ændring af årsregnskabsloven, lov om finansiel virksomhed, lov om forsikringsvirksomhed og lov om fondsmæglerselskaber og investeringsservice og -aktiviteter"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "EST",
+   "celex": "72022L2464EST_202500116",
+   "notified": "2025-01-07",
+   "official_journal": "Elektrooniline Riigi Teataja RT I, 07.01.2025, 1",
+   "eli": null,
+   "title": "Raamatupidamise seaduse muutmise ja sellest tulenevalt teiste seaduste muutmise seadus"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "EST",
+   "celex": "72022L2464EST_202500118",
+   "notified": "2025-01-07",
+   "official_journal": "Elektrooniline Riigi Teataja RT I, 07.01.2025, 13",
+   "eli": null,
+   "title": "Audiitortegevuse seadus"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "EST",
+   "celex": "72022L2464EST_202500119",
+   "notified": "2025-01-07",
+   "official_journal": "Elektrooniline Riigi Teataja RT I, 07.01.2025, 3",
+   "eli": null,
+   "title": "Töötajate usaldusisiku seadus"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "EST",
+   "celex": "72022L2464EST_202500120",
+   "notified": "2025-01-07",
+   "official_journal": "Elektrooniline Riigi Teataja RT I, 07.01.2025, 4",
+   "eli": null,
+   "title": "Väärtpaberituru seadus"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "EST",
+   "celex": "72022L2464EST_202500121",
+   "notified": "2025-01-07",
+   "official_journal": "Elektrooniline Riigi Teataja RT I, 07.01.2025, 11",
+   "eli": null,
+   "title": "Raamatupidamise seadus"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "EST",
+   "celex": "72022L2464EST_202502902",
+   "notified": "2025-05-21",
+   "official_journal": "Elektrooniline Riigi Teataja RT I, 09.05.2025, 4",
+   "eli": null,
+   "title": "Vandeaudiitori või tunnustatud siseaudiitori juhendamisel praktiseerimise ning kutsealal tegutsemise tõendamise kord"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "EST",
+   "celex": "72022L2464EST_202502903",
+   "notified": "2025-05-21",
+   "official_journal": "Elektrooniline Riigi Teataja RT I, 09.05.2025, 3",
+   "eli": null,
+   "title": "Arvestusala eksperdi kutseeksami programm"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "EST",
+   "celex": "72022L2464EST_202503900",
+   "notified": "2025-07-07",
+   "official_journal": "Elektrooniline Riigi Teataja RT I, 17.06.2025, 4",
+   "eli": null,
+   "title": "Kohtule dokumentide esitamise kord"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "EST",
+   "celex": "72022L2464EST_202503901",
+   "notified": "2025-07-07",
+   "official_journal": "Elektrooniline Riigi Teataja RT I, 11.06.2025, 14",
+   "eli": null,
+   "title": "Audiitortegevuse registri asutamine ja registri pidamise põhimäärus"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "FIN",
+   "celex": "72022L2464FIN_202404152",
+   "notified": "2024-10-01",
+   "official_journal": "Suomen säädöskokoelma  (SK) 746/2012",
+   "eli": null,
+   "title": "Arvopaperimarkkinalaki / Värdepappersmarknadslag (746/2012) 14.12.2012, viimeksi muutettuna / ändrad senast genom (1260/2023) 21.12.2023"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "FIN",
+   "celex": "72022L2464FIN_202404154",
+   "notified": "2024-10-01",
+   "official_journal": "Suomen säädöskokoelma  (SK) 1336/1997",
+   "eli": null,
+   "title": "Kirjanpitolaki / Bokföringslag (1336/1997) 30.12.1997, viimeksi muutettuna / ändrad senast genom (1249/2023) 21.12.2023"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "FIN",
+   "celex": "72022L2464FIN_202404155",
+   "notified": "2024-10-01",
+   "official_journal": "Suomen säädöskokoelma  (SK) 624/2006",
+   "eli": null,
+   "title": "Osakeyhtiölaki / Aktiebolagslag (624/2006) 21.7.2006, viimeksi muutettuna / ändrad senast genom (1252/2023) 21.12.2023"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "FIN",
+   "celex": "72022L2464FIN_202404157",
+   "notified": "2024-10-01",
+   "official_journal": "Suomen säädöskokoelma  (SK) 878/2008",
+   "eli": null,
+   "title": "Laki Finanssivalvonnasta (878/2008) 19.12.2008, viimeksi muutettuna / ändrad senast genom (1261/2023) 21.12.2023"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "FIN",
+   "celex": "72022L2464FIN_202404160",
+   "notified": "2024-10-01",
+   "official_journal": "Suomen säädöskokoelma  (SK) 1141/2015",
+   "eli": null,
+   "title": "Tilintarkastuslaki / Revisonslag (1141/2015) 18.9.2015, viimeksi muutettuna / ändrad senast genom (1250/2023) 21.12.2023"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "FIN",
+   "celex": "72022L2464FIN_202404164",
+   "notified": "2024-10-01",
+   "official_journal": "Suomen säädöskokoelma  (SK) 1442/2015",
+   "eli": null,
+   "title": "Työ- ja elinkeinoministeriön asetus tilintarkastajan hyväksymisedellytyksistä / Arbetsoch näringsministeriets förordning om krav för godkännande av revisorer (1442/2015) 7.12.2015, viimeksi muutettuna / ändrad senast genom (392/2024) 25.6.2024"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "FIN",
+   "celex": "72022L2464FIN_202404166",
+   "notified": "2024-10-01",
+   "official_journal": "Suomen säädöskokoelma  (SK) 1020/2012",
+   "eli": null,
+   "title": "Valtiovarainministeriön asetus arvopaperin liikkeeseenlaskijan säännöllisestä tiedonantovelvollisuudesta / Finansministeriets förordning om regelbunden informationsskyldighet för värdepappersemittenter (1020/2012) 20.12.2012, viimeksi muutettuna / ändrad senast genom (1441/2016) 29.12.2016"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "FIN",
+   "celex": "72022L2464FIN_202404957",
+   "notified": "2024-11-15",
+   "official_journal": "Suomen säädöskokoelma  (SK) 605/2024",
+   "eli": null,
+   "title": "Laki kirjanpitolain 1 ja 7 luvun muuttamisesta / Lag om ändring av 1 och 7 kap. i bokföringslagen (605/2024) 8.11.2024"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "FRA",
+   "celex": "72022L2464FRA_202301625",
+   "notified": "2023-03-13",
+   "official_journal": "Journal Officiel de la République Française  (JORF)",
+   "eli": null,
+   "title": "LOI n° 2023-171 du 9 mars 2023 portant diverses dispositions d'adaptation au droit de l'Union européenne dans les domaines de l'économie, de la santé, du travail, des transports et de l'agriculture (NOR : ECOX2229741L) publiée au JORF n°0059 du 10 mars 2023"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "FRA",
+   "celex": "72022L2464FRA_202306619",
+   "notified": "2023-12-18",
+   "official_journal": "Journal Officiel de la République Française  (JORF)",
+   "eli": "https://www.legifrance.gouv.fr/eli/ordonnance/2023/12/6/JUSC2327648R/jo/texte",
+   "title": "Ordonnance n° 2023-1142 du 6 décembre 2023 relative à la publication et à la certification d'informations en matière de durabilité et aux obligations environnementales, sociales et de gouvernement d'entreprise des sociétés commerciales"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "FRA",
+   "celex": "72022L2464FRA_202400085",
+   "notified": "2024-01-09",
+   "official_journal": "Journal Officiel de la République Française  (JORF)",
+   "eli": "https://www.legifrance.gouv.fr/eli/decret/2023/12/30/JUSC2327667D/jo/texte",
+   "title": "Décret n° 2023-1394 du 30 décembre 2023 pris en application de l'ordonnance n° 2023-1142 du 6 décembre 2023 relative à la publication et à la certification d'informations en matière de durabilité et aux obligations environnementales, sociales et de gouvernement d'entreprise des sociétés commerciales"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "GRC",
+   "celex": "72022L2464GRC_202500258",
+   "notified": "2025-01-14",
+   "official_journal": "Εφημερίς της Κυβερνήσεως (ΦΕΚ) (Τεύχος Α) 202",
+   "eli": null,
+   "title": "Ενσωμάτωση της Οδηγίας (ΕΕ) 2022/2464 του Ευρωπαϊκού Κοινοβουλίου και του Συμβουλί- ου, της 14ης Δεκεμβρίου 2022, για την τροπο- ποίηση του Κανονισμού (ΕΕ) 537/2014, της Οδη- γίας 2004/109/ΕΚ, της Οδηγίας 2006/43/ΕΚ και της Οδηγίας 2013/34/ΕΕ, όσον αφορά την υπο- βολή εκθέσεων βιωσιμότητας από τις ε"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "GRC",
+   "celex": "72022L2464GRC_202600818",
+   "notified": "2026-01-28",
+   "official_journal": "Εφημερίς της Κυβερνήσεως (ΦΕΚ) (Τεύχος Α) 219",
+   "eli": null,
+   "title": "Σύσταση και λειτουργία Ανεξάρτητης Αρχής Ελέγχου της Αγοράς και Προστασίας του Κατα- ναλωτή, ρυθμίσεις για την Επιτροπή Ανταγωνι- σμού και λοιπές διατάξεις."
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HRV",
+   "celex": "72022L2464HRV_202403763",
+   "notified": "2024-08-23",
+   "official_journal": "Narodne Novine 85/2024",
+   "eli": null,
+   "title": "Zakon o računovodstvu NN 85/24"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HRV",
+   "celex": "72022L2464HRV_202403764",
+   "notified": "2024-08-23",
+   "official_journal": "Narodne Novine 85/2024",
+   "eli": null,
+   "title": "Zakon o izmjenama i dopunama Zakona o reviziji NN 85/24"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HRV",
+   "celex": "72022L2464HRV_202403765",
+   "notified": "2024-08-23",
+   "official_journal": "Narodne Novine 27/2024",
+   "eli": null,
+   "title": "Zakon o izmjenama i dopunama Zakona o reviziji NN 27/24"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HRV",
+   "celex": "72022L2464HRV_202403766",
+   "notified": "2024-08-23",
+   "official_journal": "Narodne Novine 127/2017",
+   "eli": null,
+   "title": "Zakon o reviziji NN 127/17"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HRV",
+   "celex": "72022L2464HRV_202403767",
+   "notified": "2024-08-23",
+   "official_journal": "Narodne Novine 85/2024",
+   "eli": null,
+   "title": "Zakon o izmjenama i dopunama Zakona o tržištu kapitala NN 85/24"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HRV",
+   "celex": "72022L2464HRV_202403769",
+   "notified": "2024-08-26",
+   "official_journal": "Narodne Novine 65/2018",
+   "eli": null,
+   "title": "Zakon o tržištu kapitala NN 65/18"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HRV",
+   "celex": "72022L2464HRV_202403770",
+   "notified": "2024-08-26",
+   "official_journal": "Narodne Novine 17/2020",
+   "eli": null,
+   "title": "Zakon o izmjenama i dopunama Zakona o tržištu kapitala NN 17/20"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HRV",
+   "celex": "72022L2464HRV_202403771",
+   "notified": "2024-08-26",
+   "official_journal": "Narodne Novine 83/2021",
+   "eli": null,
+   "title": "Zakon o izmjenama i dopunama Zakona o tržištu kapitala NN 83/21"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HRV",
+   "celex": "72022L2464HRV_202403772",
+   "notified": "2024-08-26",
+   "official_journal": "Narodne Novine 151/2022",
+   "eli": null,
+   "title": "Zakon o izmjenama i dopunama Zakona o tržištu kapitala NN 151/22"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_145759",
+   "notified": "2007-06-08",
+   "official_journal": "Magyar Közlöny 2001/154",
+   "eli": null,
+   "title": "2001. évi CXX. törvény a tőkepiacról"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_151731",
+   "notified": "2007-12-12",
+   "official_journal": "Magyar Közlöny 2007/162.",
+   "eli": null,
+   "title": "2007. évi CXXXVIII. törvény a befektetési vállalkozásokról és az árutőzsdei szolgáltatókról, valamint az általuk végezhető tevékenységek szabályairól"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_151853",
+   "notified": "2007-12-17",
+   "official_journal": "Magyar Közlöny 2007/80.",
+   "eli": null,
+   "title": "2007. évi LXXV. törvény a Magyar Könyvvizsgálói Kamaráról, a könyvvizsgálói tevékenységrõl, valamint a könyvvizsgálói közfelügyeletrõl"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_158566",
+   "notified": "2008-10-14",
+   "official_journal": "Magyar Közlöny 2008/120.",
+   "eli": null,
+   "title": "A pénzügyminiszter 24/2008. (VIII. 15.) PM rendelete a nyilvánosan forgalomba hozott értékpapírokkal kapcsolatos tájékoztatási kötelezettség részletes szabályairól"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_215848",
+   "notified": "2014-05-12",
+   "official_journal": "Magyar Közlöny",
+   "eli": null,
+   "title": "2013. évi CCXXXVII. törvény a hitelintézetekről és a pénzügyi vállalkozásokról"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_225355",
+   "notified": "2015-03-31",
+   "official_journal": "Magyar Közlöny",
+   "eli": null,
+   "title": "2014. évi LXXXVIII. törvény a biztosítási tevékenységről"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_267923",
+   "notified": "2019-01-17",
+   "official_journal": "Magyar Közlöny 95",
+   "eli": null,
+   "title": "2000. évi C. törvény a számvitelről"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_202402124",
+   "notified": "2024-05-09",
+   "official_journal": "Magyar Közlöny 45",
+   "eli": null,
+   "title": "2024. évi X. törvény a pénzügyi közvetítő rendszert érintő törvények jogharmonizációs célú módosításáról"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_202403335",
+   "notified": "2024-08-01",
+   "official_journal": "Magyar Közlöny 187",
+   "eli": null,
+   "title": "2023. évi CVIII. törvény a fenntartható finanszírozás és az egységes vállalati felelősségvállalás ösztönzését szolgáló környezettudatos, társadalmi és szociális szempontokat is figyelembe vevő, vállalati társadalmi felelősségvállalás szabályairól és azzal összefüggő egyéb törvények módosításáról"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_202403336",
+   "notified": "2024-08-01",
+   "official_journal": "Magyar Közlöny 119",
+   "eli": null,
+   "title": "2021. évi LXXXV. törvény egyes törvényeknek a kisgyermekkel otthon lévők szövetkezete létrehozásával összefüggő módosításáról"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_202403392",
+   "notified": "2024-08-01",
+   "official_journal": "Magyar Közlöny 78",
+   "eli": null,
+   "title": "A nemzetgazdasági miniszter 25/2024. (VII. 29.) NGM rendelete a nyilvánosan forgalomba hozott értékpapírokkal kapcsolatos tájékoztatási kötelezettség részletes szabályairól szóló 24/2008. (VIII. 15.) PM rendelet módosításáról"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_202405883",
+   "notified": "2024-12-20",
+   "official_journal": "Magyar Közlöny 119",
+   "eli": null,
+   "title": "2024. évi LV. törvény egyes adótörvények módosításáról"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_202503251",
+   "notified": "2025-06-06",
+   "official_journal": "Magyar Közlöny 55",
+   "eli": null,
+   "title": "2025. évi XXI. törvény a közpénzek szabályozásával összefüggő egyes törvények, valamint a számvitelről szóló törvény módosításáról"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "HUN",
+   "celex": "72022L2464HUN_202506140",
+   "notified": "2025-11-05",
+   "official_journal": "Magyar Közlöny 101",
+   "eli": null,
+   "title": "A nemzetgazdasági miniszter 29/2025. (IX. 3.) NGM rendelete a könyvvizsgálói közfelügyeleti feladatokat ellátó hatóság által lefolytatott minőségellenőrzésekkel összefüggő tevékenységek szabályozásáról"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "IRL",
+   "celex": "72022L2464IRL_202403055",
+   "notified": "2024-07-09",
+   "official_journal": "Iris Oifigiúl Number 55",
+   "eli": null,
+   "title": "EUROPEAN UNION (CORPORATE SUSTAINABILITY REPORTING) REGULATIONS 2024"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "IRL",
+   "celex": "72022L2464IRL_202505113",
+   "notified": "2025-09-18",
+   "official_journal": "Iris Oifigiúl 55",
+   "eli": "https://www.irishstatutebook.ie/eli/2025/si/309/made/en/print?q=309",
+   "title": "EUROPEAN UNION (CORPORATE SUSTAINABILITY REPORTING) REGULATIONS 2025"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ITA",
+   "celex": "72022L2464ITA_202403926",
+   "notified": "2024-09-11",
+   "official_journal": "Gazzetta Ufficiale della Repubblica Italiana 212",
+   "eli": null,
+   "title": "Decreto legislativo 6 settembre 2024 , n. 125 recante \"Attuazione della direttiva 2022/2464/UE del Parlamento europeo e del Consiglio del 14 dicembre 2022, recante modifica del regolamento 537/2014/UE, della direttiva 2004/109/ CE, della direttiva 2006/43/CE e della direttiva 2013/34/UE\" per quanto "
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LTU",
+   "celex": "72022L2464LTU_202403364",
+   "notified": "2024-08-28",
+   "official_journal": "Teisės aktų registras 2024-13260",
+   "eli": null,
+   "title": "Audito, apskaitos, turto vertinimo ir nemokumo valdymo tarnybos prie Lietuvos Respublikos finansų ministerijos direktoriaus 2024 m. liepos 18 d. įsakymas Nr. V3-14 „Dėl Audito, apskaitos, turto vertinimo ir nemokumo valdymo tarnybos prie Lietuvos Respublikos finansų ministerijos 2017 m. kovo 13 d. d"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LTU",
+   "celex": "72022L2464LTU_202403365",
+   "notified": "2024-08-28",
+   "official_journal": "Teisės aktų registras 2024-13663",
+   "eli": null,
+   "title": "Audito, apskaitos, turto vertinimo ir nemokumo valdymo tarnybos prie Lietuvos Respublikos finansų ministerijos direktoriaus 2024 m. liepos 25 d. įsakymas Nr. V3-16 „Dėl Audito, apskaitos, turto vertinimo ir nemokumo valdymo tarnybos prie Lietuvos Respublikos finansų ministerijos 2017 m. vasario 9 d."
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LTU",
+   "celex": "72022L2464LTU_202403366",
+   "notified": "2024-08-28",
+   "official_journal": "Teisės aktų registras 2024-13662",
+   "eli": null,
+   "title": "Audito, apskaitos, turto vertinimo ir nemokumo valdymo tarnybos prie Lietuvos Respublikos finansų ministerijos direktoriaus 2024 m. liepos 25 d. įsakymas Nr. V3-15 „Dėl Audito įmonių ir nepriklausomų tvarumo atskaitomybės užtikrinimo paslaugos teikėjų, atliekančių tvarumo atskaitomybės užtikrinimą, "
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LTU",
+   "celex": "72022L2464LTU_202403368",
+   "notified": "2024-08-28",
+   "official_journal": "Teisės aktų registras 2024-12146",
+   "eli": null,
+   "title": "Lietuvos Respublikos ūkinių bendrijų įstatymo Nr. IX-1804 11 ir 12 straipsnių pakeitimo įstatymas Nr. XIV-2824"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LTU",
+   "celex": "72022L2464LTU_202403369",
+   "notified": "2024-08-28",
+   "official_journal": "Teisės aktų registras 2024-12157",
+   "eli": null,
+   "title": "Lietuvos Respublikos akcinių bendrovių įstatymo Nr. VIII-1835 18, 20, 21, 24, 25, 30, 31, 32, 33, 34, 37, 37-2, 37-3, 55, 58, 60-1, 65, 74, 76 straipsnių ir priedo pakeitimo įstatymas Nr. XIV-2820"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LTU",
+   "celex": "72022L2464LTU_202403370",
+   "notified": "2024-08-28",
+   "official_journal": "Teisės aktų registras 2024-12136",
+   "eli": null,
+   "title": "Lietuvos Respublikos vertybinių popierių įstatymo Nr. X-1023 2, 12, 13, 14, 22, 27 ir 37 straipsnių, priedo pakeitimo ir įstatymo papildymo 15-1 straipsniu įstatymas Nr. XIV-2813"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LTU",
+   "celex": "72022L2464LTU_202403371",
+   "notified": "2024-08-28",
+   "official_journal": "Teisės aktų registras 2024-12135",
+   "eli": null,
+   "title": "Lietuvos Respublikos finansinių ataskaitų audito įstatymo Nr. VIII-1227 pakeitimo įstatymas Nr. XIV-2812"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LTU",
+   "celex": "72022L2464LTU_202403372",
+   "notified": "2024-08-28",
+   "official_journal": "Teisės aktų registras 2024-12134",
+   "eli": null,
+   "title": "Lietuvos Respublikos įmonių ir įmonių grupių atskaitomybės įstatymas Nr. XIV-2811"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LTU",
+   "celex": "72022L2464LTU_202403793",
+   "notified": "2024-08-28",
+   "official_journal": "Teisės aktų registras 2024-12147",
+   "eli": null,
+   "title": "Lietuvos Respublikos civilinio kodekso 2.66 straipsnio pakeitimo įstatymas Nr. XIV-2825"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LTU",
+   "celex": "72022L2464LTU_202403794",
+   "notified": "2024-08-28",
+   "official_journal": "Valstybės žinios 74-2262",
+   "eli": null,
+   "title": "Lietuvos Respublikos civilinio kodekso patvirtinimo, įsigaliojimo ir įgyvendinimo įstatymas Nr. VIII-1864"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LTU",
+   "celex": "72022L2464LTU_202403806",
+   "notified": "2024-08-28",
+   "official_journal": "Teisės aktų registras 2015-09647",
+   "eli": null,
+   "title": "Audito ir apskaitos tarnybos direktoriaus 2015 m. birželio 16 d. įsakymas Nr. VAS-39 „Dėl 10-ojo verslo apskaitos standarto „Pajamos“ tvirtinimo“"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LVA",
+   "celex": "72022L2464LVA_202404793",
+   "notified": "2024-11-11",
+   "official_journal": "Latvijas Vēstnesis 2024/193.1",
+   "eli": null,
+   "title": "Ilgtspējas informācijas atklāšanas likums"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LVA",
+   "celex": "72022L2464LVA_202404796",
+   "notified": "2024-11-11",
+   "official_journal": "2024/193.6",
+   "eli": null,
+   "title": "Grozījumi Grāmatvedības likumā"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LVA",
+   "celex": "72022L2464LVA_202404798",
+   "notified": "2024-11-11",
+   "official_journal": "Latvijas Vēstnesis 2024/193.5",
+   "eli": null,
+   "title": "Grozījumi Gada pārskatu un konsolidēto gada pārskatu likumā"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LVA",
+   "celex": "72022L2464LVA_202404800",
+   "notified": "2024-11-11",
+   "official_journal": "Latvijas Vēstnesis 2024/193.15",
+   "eli": null,
+   "title": "Grozījumi Revīzijas pakalpojumu likumā"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LVA",
+   "celex": "72022L2464LVA_202404802",
+   "notified": "2024-11-11",
+   "official_journal": "Latvijas Vēstnesis 2024/193.4",
+   "eli": null,
+   "title": "Grozījumi Finanšu instrumentu tirgus likumā"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LVA",
+   "celex": "72022L2464LVA_202404804",
+   "notified": "2024-11-11",
+   "official_journal": "Latvijas Vēstnesis 2024/193.10",
+   "eli": null,
+   "title": "Grozījumi Kredītiestāžu likumā"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LVA",
+   "celex": "72022L2464LVA_202404806",
+   "notified": "2024-11-11",
+   "official_journal": "Latvijas Vēstnesis 2024/193.3",
+   "eli": null,
+   "title": "Grozījumi Apdrošināšanas un pārapdrošināšanas likumā"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LVA",
+   "celex": "72022L2464LVA_202404808",
+   "notified": "2024-11-11",
+   "official_journal": "Latvijas Vēstnesis 2024/193.7",
+   "eli": null,
+   "title": "Grozījumi Ieguldījumu brokeru sabiedrību likumā"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LVA",
+   "celex": "72022L2464LVA_202404811",
+   "notified": "2024-11-11",
+   "official_journal": "Latvijas Vēstnesis 2024/193.8",
+   "eli": null,
+   "title": "Grozījumi Ieguldījumu pārvaldes sabiedrību likumā"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LVA",
+   "celex": "72022L2464LVA_202404814",
+   "notified": "2024-11-11",
+   "official_journal": "Latvijas Vēstnesis 2024/193.13",
+   "eli": null,
+   "title": "Grozījumi Privāto pensiju fondu likumā"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LVA",
+   "celex": "72022L2464LVA_202404816",
+   "notified": "2024-11-11",
+   "official_journal": "Latvijas Vēstnesis 2024/215.1",
+   "eli": null,
+   "title": "Ministru kabineta 2024. gada 29. oktobra noteikumi Nr. 668 “Zvērinātu revidentu un zvērinātu revidentu komercsabiedrību darba organizācijas noteikumi”"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "LVA",
+   "celex": "72022L2464LVA_202404819",
+   "notified": "2024-11-11",
+   "official_journal": "Latvijas Vēstnesis 2024/215.2",
+   "eli": null,
+   "title": "Ministru kabineta 2024. gada 29. oktobra noteikumi Nr. 669 “Noteikumi par zvērinātu revidentu pretendentu apmācībā”"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "MLT",
+   "celex": "72022L2464MLT_202601265",
+   "notified": "2026-02-18",
+   "official_journal": "The Malta government gazette 21,586",
+   "eli": "https://legislation.mt/eli/ln/2026/39/eng",
+   "title": "Corporate Sustainability Reporting Regulations, 2026"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "MLT",
+   "celex": "72022L2464MLT_202601480",
+   "notified": "2026-02-27",
+   "official_journal": "The Malta government gazette 21,592",
+   "eli": "https://legislation.mt/eli/act/2026/1/eng",
+   "title": "Various Laws relating to Corporate Sustainability Reporting (Amendment) Act, 2026"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "POL",
+   "celex": "72022L2464POL_202405766",
+   "notified": "2024-12-18",
+   "official_journal": "Dziennik Ustaw",
+   "eli": "https://eli.gov.pl/eli/DU/2024/1863/ogl",
+   "title": "Ustawa z dnia 6 grudnia 2024 r. o zmianie ustawy o rachunkowości, ustawy o biegłych rewidentach, firmach audytorskich oraz nadzorze publicznym oraz niektórych innych ustaw"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "POL",
+   "celex": "72022L2464POL_202503304",
+   "notified": "2025-06-10",
+   "official_journal": "Dziennik Ustaw",
+   "eli": "https://eli.gov.pl/eli/DU/2023/120/ogl",
+   "title": "Ustawa z dnia 29 września 1994 r.o rachunkowości"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "POL",
+   "celex": "72022L2464POL_202503305",
+   "notified": "2025-06-10",
+   "official_journal": "Dziennik Ustaw",
+   "eli": "https://eli.gov.pl/eli/DU/2024/1035/ogl",
+   "title": "Ustawa z dnia 11 maja 2017 r. o biegłych rewidentach, firmach audytorskich oraz nadzorze publicznym"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "POL",
+   "celex": "72022L2464POL_202503323",
+   "notified": "2025-06-10",
+   "official_journal": "Dziennik Ustaw",
+   "eli": "https://eli.gov.pl/eli/DU/2025/755/ogl",
+   "title": "rozporządzenie Ministra Finansów z dnia 6 czerwca 2025 r. w sprawie informacji bieżących i okresowych przekazywanych przez emitentów papierów wartościowych oraz warunków uznawania za równoważne informacji wymaganych przepisami prawa państwa niebędącego państwem członkowskim"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202400543",
+   "notified": "2024-01-29",
+   "official_journal": "Monitorul Oficial al României 75",
+   "eli": null,
+   "title": "Ordin al ministrului finanțelor nr. 85/2024 pentru reglementarea aspectelor referitoare la raportarea privind durabilitatea."
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202401822",
+   "notified": "2024-04-19",
+   "official_journal": "Monitorul Oficial al României 295",
+   "eli": null,
+   "title": "Norma 4/2024 privind modificarea și completarea Normei Autorității de Supraveghere Financiară nr. 39/2015 pentru aprobarea Reglementărilor contabile conforme cu standardele internaționale de raportare financiară, aplicabile entităților autorizate, reglementate și supravegheate de Autoritatea de Supr"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202402516",
+   "notified": "2024-06-19",
+   "official_journal": "Monitorul Oficial al României 499",
+   "eli": null,
+   "title": "Ordinul nr. 1/2024 privind modificarea și completarea Ordinului Băncii Naționale a României nr. 27/2010 pentru aprobarea Reglementărilor contabile conforme cu Standardele Internaționale de Raportare Financiară și modificarea și completarea Ordinului Băncii Naționale a României nr. 6/2015 pentru apro"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202402981",
+   "notified": "2024-07-04",
+   "official_journal": "Monitorul Oficial al României 619",
+   "eli": null,
+   "title": "Norma 14/2024 privind modificarea și completarea Normei Autorității de Supraveghere Financiară nr. 41/2015 pentru aprobarea Reglementărilor contabile privind situațiile financiare anuale individuale și situațiile financiare anuale consolidate ale entităților care desfășoară activitate de asigurare ș"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202402986",
+   "notified": "2024-07-04",
+   "official_journal": "Monitorul Oficial al României 706",
+   "eli": null,
+   "title": "Norma 14/2015 privind reglementările contabile conforme cu directivele europene aplicabile sistemului de pensii private"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202402988",
+   "notified": "2024-07-04",
+   "official_journal": "Monitorul Oficial al României 2",
+   "eli": null,
+   "title": "Norma 41/2015 pentru aprobarea Reglementărilor contabile privind situațiile financiare anuale individuale și situațiile financiare anuale consolidate ale entităților care desfășoară activitate de asigurare și/sau reasigurare"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202402989",
+   "notified": "2024-07-04",
+   "official_journal": "Monitorul Oficial al României 548",
+   "eli": null,
+   "title": "Legea nr.162/2017 privind auditul statutar al situațiilor financiare anuale și al situațiilor financiare anuale consolidate și de modificare a unor acte normative."
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202402997",
+   "notified": "2024-07-05",
+   "official_journal": "Monitorul Oficial al României 772",
+   "eli": null,
+   "title": "ORDIN nr.1/2022 privind modificarea si completarea Ordinului Băncii Nationale a României nr. 27/2010 pentru aprobarea Reglementărilor contabile conforme cu Standardele Internationale de Raportare Financiară, aplicabile institutiilor de credit"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202402998",
+   "notified": "2024-07-05",
+   "official_journal": "Monitorul Oficial al României 1279",
+   "eli": null,
+   "title": "Ordinul nr. 9/2022 privind modificarea şi completarea Ordinului Băncii Naţionale a României nr. 6/2015 pentru aprobarea Reglementărilor contabile conforme cu directivele europene"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202402999",
+   "notified": "2024-07-05",
+   "official_journal": "Monitorul Oficial al României 167",
+   "eli": null,
+   "title": "Ordinul nr. 1/2023 privind completarea Ordinului Băncii Naţionale a României nr. 27/2010 pentru aprobarea Reglementărilor contabile conforme cu Standardele Internaţionale de Raportare Financiară şi completarea Ordinului Băncii Naţionale a României nr. 6/2015 pentru aprobarea Reglementărilor contabil"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202403917",
+   "notified": "2024-09-10",
+   "official_journal": "Monitorul Oficial al României 861",
+   "eli": null,
+   "title": "Norma nr.16/2024 pentru modificarea și completarea anexei la Norma Autorității de Supraveghere Financiară nr. 36/2015 privind Reglementările contabile referitoare la situațiile financiare anuale individuale și situațiile financiare anuale consolidate aplicabile companiilor de brokeraj care desfășoar"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202403993",
+   "notified": "2024-09-18",
+   "official_journal": "Monitorul Oficial al României 934",
+   "eli": null,
+   "title": "Norma nr.17/2024 pentru modificarea și completarea Normei Autorității de Supraveghere Financiară nr. 14/2015 privind reglementările contabile conforme cu directivele europene aplicabile sistemului de pensii private"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202405372",
+   "notified": "2024-12-05",
+   "official_journal": "Monitorul Oficial al României 1215",
+   "eli": null,
+   "title": "Ordonanță de urgență nr.137/2024 pentru modificarea și completarea Legii nr. 162/2017 privind auditul statutar al situațiilor financiare anuale și al situațiilor financiare anuale consolidate și de modificare a unor acte normative, a Ordonanței de urgență a Guvernului nr.75/1999 privind activitatea "
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202500709",
+   "notified": "2025-01-28",
+   "official_journal": "Monitorul Oficial al României 56",
+   "eli": null,
+   "title": "Norma Autorității de Supraveghere Financiară nr. 2 din 17 ianuarie 2025 pentru modificarea anexei la Norma Autorităţii de Supraveghere Financiară nr. 41/2015 pentru aprobarea Reglementărilor contabile privind situaţiile financiare anuale individuale şi situaţiile financiare anuale consolidate ale en"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202501346",
+   "notified": "2025-03-06",
+   "official_journal": "Monitorul Oficial al României 193",
+   "eli": null,
+   "title": "Legea nr.11/2025 pentru modificarea și completarea Legii nr. 24/2017 privind emitenții de instrumente financiare și operațiuni de piață"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202502669",
+   "notified": "2025-05-16",
+   "official_journal": "Monitorul Oficial al României 412",
+   "eli": null,
+   "title": "Norma nr.8/2024 privind modificarea și completarea Normei Autorității de Supraveghere Financiară nr. 41/2015 pentru aprobarea Reglementărilor contabile privind situațiile financiare anuale individuale și situațiile financiare anuale consolidate ale entităților care desfășoară activitate de asigurare"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202502870",
+   "notified": "2025-05-21",
+   "official_journal": "Monitorul Oficial al României 1303",
+   "eli": null,
+   "title": "Ordin al ministrului finanțelor nr. 6670/13.12.2024 cu privire la reglementarea unor aspecte contabile"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "ROU",
+   "celex": "72022L2464ROU_202504684",
+   "notified": "2025-08-26",
+   "official_journal": "Monitorul Oficial al României 786",
+   "eli": null,
+   "title": "Ordinul ministrului finanțelor nr.1421/2025 referitor la datele de la care se aplică anumite cerințe de raportare privind durabilitatea."
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SVK",
+   "celex": "72022L2464SVK_21765",
+   "notified": "2003-12-29",
+   "official_journal": "Zbierka zákonov SR 98",
+   "eli": null,
+   "title": "Zákon č. 513/1991 Zb. Obchodný zákonník"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SVK",
+   "celex": "72022L2464SVK_21803",
+   "notified": "2003-12-31",
+   "official_journal": "Zbierka zákonov SR 168",
+   "eli": null,
+   "title": "Zákon č. 431/2002 Z. z. o účtovníctve"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SVK",
+   "celex": "72022L2464SVK_21906",
+   "notified": "2004-01-16",
+   "official_journal": "Zbierka zákonov SR 168",
+   "eli": null,
+   "title": "Zákon č. 429/2002 Z. z. o burze cenných papierov"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SVK",
+   "celex": "72022L2464SVK_21933",
+   "notified": "2004-01-20",
+   "official_journal": "Zbierka zákonov SR 219",
+   "eli": null,
+   "title": "Zákon č. 530/2003 Z. z. o obchodnom registri a o zmene a doplnení niektorých zákonov"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SVK",
+   "celex": "72022L2464SVK_234021",
+   "notified": "2016-01-25",
+   "official_journal": "Zbierka zákonov SR 113",
+   "eli": null,
+   "title": "Zákon č. 423/2015 Z. z. o štatutárnom audite a o zmene a doplnení zákona č. 431/2002 Z. z. o účtovníctve v znení neskorších predpisov"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SVK",
+   "celex": "72022L2464SVK_202403065",
+   "notified": "2024-07-10",
+   "official_journal": "Zbierka zákonov SR",
+   "eli": null,
+   "title": "Zákon č. 105/2024 Z.z., ktorým sa mení a dopĺňa zákon č. 431/2002 Z. z. o účtovníctve v znení neskorších predpisov a ktorým sa menia a dopĺňajú niektoré zákony"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SVK",
+   "celex": "72022L2464SVK_202403068",
+   "notified": "2024-07-10",
+   "official_journal": "Finančný spravodajca",
+   "eli": null,
+   "title": "Opatrenie Ministerstva financií Slovenskej republiky z 26. júna 2024 č. MF/009347/2024-74, ktorým sa ustanovuje skúšobný poriadok na vykonanie skúšky na výkon uistenia, skúšky spôsobilosti na výkon uistenia a preskúšania v oblasti vykazovania informácií o udržateľnosti"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SVN",
+   "celex": "72022L2464SVN_202402534",
+   "notified": "2024-06-07",
+   "official_journal": "Uradni list RS 45/2024",
+   "eli": null,
+   "title": "Zakon o spremembah in dopolnitvah Zakona o trgu finančnih instrumentov (ZTFI-1C)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SVN",
+   "celex": "72022L2464SVN_202404211",
+   "notified": "2024-10-07",
+   "official_journal": "Uradni list RS 85/2024",
+   "eli": null,
+   "title": "Zakon o spremembah in dopolnitvah Zakona o revidiranju (ZRev-2C)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SVN",
+   "celex": "72022L2464SVN_202405714",
+   "notified": "2024-12-13",
+   "official_journal": "Uradni list RS 102/2024",
+   "eli": null,
+   "title": "Zakon o spremembah in dopolnitvah Zakona o gospodarskih družbah (ZGD-1M)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402777",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2024:347",
+   "eli": null,
+   "title": "Lag om ändring i årsredovisningslagen (1995:1554)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402779",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2024:348",
+   "eli": null,
+   "title": "Lag om ändring i lagen (1995:1559) om årsredovisning i kreditinstitut och värdepappersbolag"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402780",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2024:349",
+   "eli": null,
+   "title": "Lag om ändring i lagen (1995:1560)om årsredovisning i försäkringsföretag"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402781",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2024:350",
+   "eli": null,
+   "title": "Lag om ändring i aktiebolagslagen (2005:350)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402782",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2024:351",
+   "eli": null,
+   "title": "Lag om ändring i sparbankslagen (1987:619)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402783",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2024:352",
+   "eli": null,
+   "title": "Lag om ändring i lagen (1992:160) om utländska filialer m.m."
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402784",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2024:354",
+   "eli": null,
+   "title": "Lag om ändring i revisionslagen (1999:1079)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402785",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2024:355",
+   "eli": null,
+   "title": "Lag om ändring i revisorslagen (2001:883)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402786",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2024:356",
+   "eli": null,
+   "title": "Lag om ändring i lagen (2004:297) om bank och finansieringsrörelse"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402787",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2024:357",
+   "eli": null,
+   "title": "Lag om ändring i lagen (2007:528) om värdepappersmarknaden"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402788",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2024:358",
+   "eli": null,
+   "title": "Lag om ändring i försäkringsrörelselagen (2010:2043)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402789",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2024:360",
+   "eli": null,
+   "title": "Förordning om ändring i förordningen (1995:665) om revisorer"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402797",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) 2018:640",
+   "eli": null,
+   "title": "Förordning om ändring i förordningen (1995:665) om revisorer"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402798",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2017:672",
+   "eli": null,
+   "title": "Förordning om ändring i förordningen (2007:1077) med instruktion för Revisorsinspektionen"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402799",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2016:430",
+   "eli": null,
+   "title": "Lag om ändring i revisorslagen (2001:883)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402800",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2016:1344",
+   "eli": null,
+   "title": "Förordning om ändring i förordningen (1995:665) om revisorer"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402801",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2013:223",
+   "eli": null,
+   "title": "Förordning om ändring i förordningen (2007:1077) med instruktion för Revisorsnämnden"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402802",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2016:447",
+   "eli": null,
+   "title": "Förordning om ändring i förordningen (2007:1077) med instruktion för Revisorsnämnden"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402803",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2016:1339",
+   "eli": null,
+   "title": "Lag om ändring i revisorslagen (2001:883)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402804",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2018:283",
+   "eli": null,
+   "title": "Lag om ändring i revisorslagen (2001:883)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402807",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) 2016:431",
+   "eli": null,
+   "title": "Lag om ändring i aktiebolagslagen (2005:551)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402808",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2009:565",
+   "eli": null,
+   "title": "Lag om ändring i aktiebolagslagen (2005:551)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402820",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2005:551",
+   "eli": null,
+   "title": "Aktiebolagslag (2005:551)"
+  },
+  {
+   "directive": "32022L2464",
+   "country": "SWE",
+   "celex": "72022L2464SWE_202402821",
+   "notified": "2024-06-26",
+   "official_journal": "Svensk författningssamling (SFS) 2016:431",
+   "eli": null,
+   "title": "Lag om ändring i aktiebolagslagen (2005:551)"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "AUT",
+   "celex": "72025L0794AUT_202601474",
+   "notified": "2026-02-27",
+   "official_journal": "Bundesgesetzblatt für die Republik Österreich ( BGBl. ) BGBl I Nr. 6/2026",
+   "eli": "https://www.ris.bka.gv.at/eli/bgbl/I/2026/6/20260218",
+   "title": "Bundesgesetz, mit dem das Drittlandunternehmen-Berichterstattungsgesetz erlassen und das Unternehmensgesetzbuch, das Aktiengesetz, das GmbH-Gesetz, das Genossenschaftsgesetz, das Genossenschaftsrevisionsgesetz 1997, das SE-Gesetz, das SCE-Gesetz, das Arbeitsverfassungsgesetz, das Strafgesetzbuch, da"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "BEL",
+   "celex": "72025L0794BEL_202507284",
+   "notified": "2025-12-23",
+   "official_journal": "Moniteur Belge [C − 2025/009725",
+   "eli": null,
+   "title": "Wet tot wijziging van artikel 116 van de wet van 2 december 2024 betreffende de openbaarmaking van duurzaamheidsinformatie door bepaalde vennootschappen en groepen en de assurance van duurzaamheidsinformatie en houdende diverse bepalingen, inzake de datums waarop de rapportageverplichtingen van toep"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "BGR",
+   "celex": "72025L0794BGR_202600095",
+   "notified": "2026-01-06",
+   "official_journal": "Държавен вестник 115",
+   "eli": null,
+   "title": "Закон за счетоводството"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "CYP",
+   "celex": "72025L0794CYP_202504451",
+   "notified": "2025-08-01",
+   "official_journal": "Cyprus Gazette 5051",
+   "eli": null,
+   "title": "Ο περί Εταιρειών (Τροποποιητικός) Νόμος του 2025"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "CYP",
+   "celex": "72025L0794CYP_202504453",
+   "notified": "2025-08-01",
+   "official_journal": "Cyprus Gazette 5051",
+   "eli": null,
+   "title": "Ο περί των Προϋποθέσεων Διαφάνειας (Κινητές Αξίες προς Διαπραγμάτευση σε Ρυθμιζόμενη Αγορά)(Τροποποιητικός) Νόμος του 2025."
+  },
+  {
+   "directive": "32025L0794",
+   "country": "DNK",
+   "celex": "72025L0794DNK_202600177",
+   "notified": "2026-01-13",
+   "official_journal": "Lovtidende A nr. 1636",
+   "eli": "https://www.retsinformation.dk/eli/lta/2025/1636",
+   "title": "Lov om ændring af årsregnskabsloven, lov om finansiel virksomhed, lov om forsikringsvirksomhed og lov om fondsmæglerselskaber og investeringsservice og -aktiviteter (Udskydelse af virksomheders pligt til rapportering om bæredygtighed og afregistrering af revisorer eller uafhængige erklæringsudbydere"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "DNK",
+   "celex": "72025L0794DNK_202600697",
+   "notified": "2026-01-28",
+   "official_journal": "Lovtidende A 1636",
+   "eli": "https://www.retsinformation.dk/eli/lta/2025/1636",
+   "title": "Lov nr. 1636 af 16. december 2025 om ændring af årsregnskabsloven, lov om finansiel virksomhed, lov om forsikringsvirksomhed og lov om fondsmæglerselskaber og investeringsservice og -aktiviteter"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "EST",
+   "celex": "72025L0794EST_202505397",
+   "notified": "2025-09-30",
+   "official_journal": "Elektrooniline Riigi Teataja RT I, 10.07.2025, 2",
+   "eli": null,
+   "title": "Raamatupidamise seaduse muutmise seadus"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "FIN",
+   "celex": "72025L0794FIN_202600683",
+   "notified": "2026-01-22",
+   "official_journal": "Suomen säädöskokoelma  (SK) 1336/1997",
+   "eli": null,
+   "title": "Kirjanpitolaki / Bokföringslag (1336/1997) 30.12.1997, viimeksi muutettuna / ändrad senast genom (1006/2025) 14.11.2025"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "FRA",
+   "celex": "72025L0794FRA_202505389",
+   "notified": "2025-09-29",
+   "official_journal": "Journal Officiel de la République Française  (JORF)",
+   "eli": "https://www.legifrance.gouv.fr/eli/loi/2025/4/30/ECOM2415026L/jo/texte",
+   "title": "LOI n° 2025-391 du 30 avril 2025 portant diverses dispositions d'adaptation au droit de l'Union européenne en matière économique, financière, environnementale, énergétique, de transport, de santé et de circulation des personnes"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "GRC",
+   "celex": "72025L0794GRC_202600047",
+   "notified": "2026-01-05",
+   "official_journal": "Εφημερίς της Κυβερνήσεως (ΦΕΚ) (Τεύχος Α) 219",
+   "eli": null,
+   "title": "Σύσταση και λειτουργία Ανεξάρτητης Αρχής Ελέγχου της Αγοράς και Προστασίας του Καταναλωτή, ρυθμίσεις για την Επιτροπή Ανταγωνισμού και λοιπές διατάξεις."
+  },
+  {
+   "directive": "32025L0794",
+   "country": "HRV",
+   "celex": "72025L0794HRV_202505491",
+   "notified": "2025-10-07",
+   "official_journal": "Narodne Novine 126/25",
+   "eli": null,
+   "title": "Zakon o izmjenama i dopunama Zakona o tržištu kapitala NN 126/25"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "HRV",
+   "celex": "72025L0794HRV_202507193",
+   "notified": "2025-12-22",
+   "official_journal": "Narodne Novine 151/2025",
+   "eli": null,
+   "title": "Zakon o izmjenama i dopunama Zakona o računovodstvu NN 151/2025"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "HUN",
+   "celex": "72025L0794HUN_158566",
+   "notified": "2008-10-14",
+   "official_journal": "Magyar Közlöny 2008/120.",
+   "eli": null,
+   "title": "A pénzügyminiszter 24/2008. (VIII. 15.) PM rendelete a nyilvánosan forgalomba hozott értékpapírokkal kapcsolatos tájékoztatási kötelezettség részletes szabályairól"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "HUN",
+   "celex": "72025L0794HUN_267923",
+   "notified": "2019-01-17",
+   "official_journal": "Magyar Közlöny 95",
+   "eli": null,
+   "title": "2000. évi C. törvény a számvitelről"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "HUN",
+   "celex": "72025L0794HUN_202403392",
+   "notified": "2024-08-01",
+   "official_journal": "Magyar Közlöny 78",
+   "eli": null,
+   "title": "A nemzetgazdasági miniszter 25/2024. (VII. 29.) NGM rendelete a nyilvánosan forgalomba hozott értékpapírokkal kapcsolatos tájékoztatási kötelezettség részletes szabályairól szóló 24/2008. (VIII. 15.) PM rendelet módosításáról"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "HUN",
+   "celex": "72025L0794HUN_202506970",
+   "notified": "2025-12-16",
+   "official_journal": "Magyar Közlöny 152",
+   "eli": null,
+   "title": "A nemzetgazdasági miniszter 37/2025. (XII. 11.) NGM rendelete a nyilvánosan forgalomba hozott értékpapírokkal kapcsolatos tájékoztatási kötelezettség részletes szabályairól szóló 24/2008. (VIII. 15.) PM rendelet módosításáról"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "HUN",
+   "celex": "72025L0794HUN_202506971",
+   "notified": "2025-12-16",
+   "official_journal": "Magyar Közlöny 73",
+   "eli": null,
+   "title": "2025. évi LIV. törvény egyes adókötelezettségekről és egyes adótörvények módosításáról"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "IRL",
+   "celex": "72025L0794IRL_202504424",
+   "notified": "2025-08-19",
+   "official_journal": "Iris Oifigiúl 55",
+   "eli": "https://www.irishstatutebook.ie/eli/2025/si/309/made/en/print?q=309",
+   "title": "THE EUROPEAN UNION (CORPORATE SUSTAINABILITY REPORTING) REGULATIONS 2025"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "IRL",
+   "celex": "72025L0794IRL_202505976",
+   "notified": "2025-10-24",
+   "official_journal": "Iris Oifigiúl 55",
+   "eli": "https://www.irishstatutebook.ie/eli/2025/si/309/made/en/print?q=309",
+   "title": "THE EUROPEAN UNION (CORPORATE SUSTAINABILITY REPORTING) REGULATIONS 2025"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "ITA",
+   "celex": "72025L0794ITA_202600704",
+   "notified": "2026-01-22",
+   "official_journal": "Gazzetta Ufficiale della Repubblica Italiana 184",
+   "eli": null,
+   "title": "Decreto legge 30 giugno 2025, n. 95"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "LTU",
+   "celex": "72025L0794LTU_202504186",
+   "notified": "2025-07-25",
+   "official_journal": "Teisės aktų registras 2025-11995",
+   "eli": null,
+   "title": "Lietuvos Respublikos įmonių ir įmonių grupių atskaitomybės įstatymo Nr. XIV-2811 1, 2, 3, 4, 16, 17, 19, 20, 23, 31, 32, 35, 36, 37, 40, 41 straipsnių ir priedo pakeitimo įstatymas Nr. XV-335"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "LTU",
+   "celex": "72025L0794LTU_202504187",
+   "notified": "2025-07-25",
+   "official_journal": "Teisės aktų registras 2025-11996",
+   "eli": null,
+   "title": "Lietuvos Respublikos vertybinių popierių įstatymo Nr. X-1023 priedo pakeitimo įstatymas Nr. XV-336"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "LTU",
+   "celex": "72025L0794LTU_202504188",
+   "notified": "2025-07-25",
+   "official_journal": "Teisės aktų registras 2025-11997",
+   "eli": null,
+   "title": "Lietuvos Respublikos vertybinių popierių įstatymo Nr. X-1023 2, 12, 13, 14, 22, 27, 37 straipsnių, priedo pakeitimo ir Įstatymo papildymo 15-1 straipsniu įstatymo Nr. XIV-2813 10 straipsnio pakeitimo įstatymas Nr. XV-337"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "LVA",
+   "celex": "72025L0794LVA_202505832",
+   "notified": "2025-10-17",
+   "official_journal": "Latvijas Vēstnesis 2025/196.2",
+   "eli": null,
+   "title": "Ilgtspējas informācijas atklāšanas likums"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "LVA",
+   "celex": "72025L0794LVA_202505833",
+   "notified": "2025-10-17",
+   "official_journal": "Latvijas Vēstnesis 2025/196.2",
+   "eli": null,
+   "title": "Grozījumi Ilgtspējas informācijas atklāšanas likumā"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "MLT",
+   "celex": "72025L0794MLT_202601256",
+   "notified": "2026-02-18",
+   "official_journal": "The Malta government gazette . 21,586",
+   "eli": "https://legislation.mt/eli/ln/2026/39/eng",
+   "title": "Corporate Sustainability Reporting Regulations, 2026"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "POL",
+   "celex": "72025L0794POL_202503323",
+   "notified": "2025-06-10",
+   "official_journal": "Dziennik Ustaw",
+   "eli": "https://eli.gov.pl/eli/DU/2025/755/ogl",
+   "title": "rozporządzenie Ministra Finansów z dnia 6 czerwca 2025 r. w sprawie informacji bieżących i okresowych przekazywanych przez emitentów papierów wartościowych oraz warunków uznawania za równoważne informacji wymaganych przepisami prawa państwa niebędącego państwem członkowskim"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "POL",
+   "celex": "72025L0794POL_202504533",
+   "notified": "2025-08-14",
+   "official_journal": "Dziennik Ustaw",
+   "eli": "https://eli.gov.pl/eli/DU/2025/1020/ogl",
+   "title": "Ustawa z dnia 9 lipca 2025 r. zmieniająca ustawę o zmianie ustawy o rachunkowości, ustawy o biegłych rewidentach, firmach audytorskich oraz nadzorze publicznym oraz niektórych innych ustaw"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "ROU",
+   "celex": "72025L0794ROU_202505012",
+   "notified": "2025-09-15",
+   "official_journal": "Monitorul Oficial al României 786",
+   "eli": null,
+   "title": "Ordin al ministrului finanțelor nr.1421/2025 referitor la datele de la care se aplică anumite cerințe de raportare privind durabilitatea"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "ROU",
+   "celex": "72025L0794ROU_202505410",
+   "notified": "2025-10-02",
+   "official_journal": "Monitorul Oficial al României 877",
+   "eli": null,
+   "title": "Norma nr/19/2025 pentru modificarea art. II din Norma Autorității de Supraveghere Financiară nr. 4/2024 privind modificarea și completarea Normei Autorității de Supraveghere Financiară nr. 39/2015 pentru aprobarea Reglementărilor contabile conforme cu Standardele internaționale de raportare financia"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "ROU",
+   "celex": "72025L0794ROU_202507163",
+   "notified": "2025-12-22",
+   "official_journal": "Monitorul Oficial al României 1171",
+   "eli": null,
+   "title": "Legea nr. 238/2025 privind implementarea unor aspecte vizând punctul unic de acces european care oferă acces centralizat la informațiile puse la dispoziția publicului relevante pentru serviciile financiare, pentru piețele de capital și pentru durabilitate, precum și pentru modificarea și completarea"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "ROU",
+   "celex": "72025L0794ROU_202600730",
+   "notified": "2026-01-23",
+   "official_journal": "Monitorul Oficial al României 1141",
+   "eli": null,
+   "title": "Norma 24/2025 pentru modificarea art. II din Norma Autorității de Supraveghere Financiară nr. 14/2024 privind modificarea și completarea Normei Autorității de Supraveghere Financiară nr. 41/2015 pentru aprobarea Reglementărilor contabile privind situațiile financiare anuale individuale și situațiile"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "ROU",
+   "celex": "72025L0794ROU_202601037",
+   "notified": "2026-02-10",
+   "official_journal": "Monitorul Oficial al României 107",
+   "eli": null,
+   "title": "Ordin nr. 2/2026 privind modificarea și completarea unor acte normative emise de Banca Națională a României"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "ROU",
+   "celex": "72025L0794ROU_202601355",
+   "notified": "2026-02-23",
+   "official_journal": "Monitorul Oficial al României 121",
+   "eli": null,
+   "title": "Norma nr 5/2026 privind modificarea art. II din Norma Autorității de Supraveghere Financiară nr. 16/2024 pentru modificarea și completarea anexei la Norma Autorității de Supraveghere Financiară nr. 36/2015 privind Reglementările contabile referitoare la situațiile financiare anuale individuale și si"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "ROU",
+   "celex": "72025L0794ROU_202601363",
+   "notified": "2026-02-24",
+   "official_journal": "Monitorul Oficial al României 136",
+   "eli": null,
+   "title": "Norma nr. 9/2026 pentru completarea art. 525 din Norma Autorității de Supraveghere Financiară nr. 14/2015 privind reglementările contabile conforme cu directivele europene aplicabile sistemului de pensii private, precum și pentru modificarea art. II alin. (1) lit. b) partea introductivă din Norma Au"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "SVK",
+   "celex": "72025L0794SVK_21803",
+   "notified": "2003-12-31",
+   "official_journal": "Zbierka zákonov SR 168",
+   "eli": null,
+   "title": "Zákon č. 431/2002 Z. z. o účtovníctve"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "SVK",
+   "celex": "72025L0794SVK_202504213",
+   "notified": "2025-07-22",
+   "official_journal": "Zbierka zákonov SR",
+   "eli": null,
+   "title": "Zákon č. 187/2025 Z. z., ktorým sa dopĺňa zákon č. 566/2001 Z. z. o cenných papieroch a investičných službách a o zmene a doplnení niektorých zákonov (zákon o cenných papieroch) v znení neskorších predpisov a ktorým sa menia a dopĺňajú niektoré zákony"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "SVN",
+   "celex": "72025L0794SVN_202506131",
+   "notified": "2025-11-04",
+   "official_journal": "Uradni list RS 77/2025",
+   "eli": null,
+   "title": "Zakon o spremembi Zakona o spremembah in dopolnitvah Zakona o gospodarskih družbah (ZGD-1N)"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "SWE",
+   "celex": "72025L0794SWE_202506906",
+   "notified": "2025-12-12",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2025:1297",
+   "eli": null,
+   "title": "Lag om ändring i årsredovisningslagen (1995:1554)"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "SWE",
+   "celex": "72025L0794SWE_202506907",
+   "notified": "2025-12-12",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2025:1439",
+   "eli": null,
+   "title": "Lag om ändring i lagen (1995:1559) om årsredovisning i kreditinstitut och värdepappersbolag"
+  },
+  {
+   "directive": "32025L0794",
+   "country": "SWE",
+   "celex": "72025L0794SWE_202506908",
+   "notified": "2025-12-12",
+   "official_journal": "Svensk författningssamling (SFS) SFS 2025:1440",
+   "eli": null,
+   "title": "Lag om ändring i lagen (1995:1560) om årsredovisning i försäkringsföretag"
+  },
+  {
+   "directive": "32026L0470",
+   "country": "BEL",
+   "celex": "72026L0470BEL_202606086",
+   "notified": "2026-07-31",
+   "official_journal": "Belgisch Staatsblad C − 2026/005819",
+   "eli": null,
+   "title": "FOD ECONOMIE- Wet tot wijziging van artikel 116 van de wet van 2 december 2024 betreffende de openbaarmaking van duurzaamheidsinformatie door bepaalde vennootschappen en groepen en de assurance van duurzaamheidsinformatie en houdende diverse bepalingen, inzake de datum van toepassing voor organisati"
+  },
+  {
+   "directive": "32026L0470",
+   "country": "FIN",
+   "celex": "72026L0470FIN_202604826",
+   "notified": "2026-06-30",
+   "official_journal": "Suomen säädöskokoelma  (SK) 1336/1997",
+   "eli": null,
+   "title": "Kirjanpitolaki / Bokföringslag (1336/1997) 30.12.1997, viimeksi muutettuna / ändrad senast genom (555/2026) 16.6.2026"
+  },
+  {
+   "directive": "32026L0470",
+   "country": "FIN",
+   "celex": "72026L0470FIN_202604828",
+   "notified": "2026-06-30",
+   "official_journal": "Suomen säädöskokoelma  (SK) 1141/2015",
+   "eli": null,
+   "title": "Tilintarkastuslaki / Revisionslag (1141/2015) 18.9.2015, viimeksi muutettuna / ändrad senast genom (556/2026) 16.6.2026"
+  },
+  {
+   "directive": "32026L0470",
+   "country": "HRV",
+   "celex": "72026L0470HRV_202602615",
+   "notified": "2026-05-04",
+   "official_journal": "Narodne Novine NN 45/2026",
+   "eli": null,
+   "title": "Zakon o dopunama Zakona o tržištu kapitala NN 45/2026"
+  },
+  {
+   "directive": "32026L0470",
+   "country": "HRV",
+   "celex": "72026L0470HRV_202604134",
+   "notified": "2026-06-11",
+   "official_journal": "Narodne Novine NN 59/2026",
+   "eli": null,
+   "title": "Zakon o izmjenama i dopunama Zakona o računovodstvu NN 59/2026"
+  },
+  {
+   "directive": "32026L0470",
+   "country": "POL",
+   "celex": "72026L0470POL_202602098",
+   "notified": "2026-03-30",
+   "official_journal": "Dziennik Ustaw",
+   "eli": "https://eli.gov.pl/eli/DU/2026/333/ogl",
+   "title": "Ustawa z dnia 27 lutego 2026 r. o zmianie ustawy o rachunkowości."
+  }
+ ]
+}

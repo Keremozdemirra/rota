@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.DS_Store
+build/
+dist/
+*.egg-info/
+.env
+.env.*
+# EFRAG's workbooks must never be committed: only the synthetic fixtures are.
+*.xlsx
+*.xls
+!tests/fixtures/*.xlsx

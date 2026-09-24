@@ -1,0 +1,11 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Keremozdemirra/xlsx-review",
+  "title": "xlsx-review",
+  "description": "Formula-level diff and review of Excel workbooks: what changed, and what breaks models",
+  "repository": {"url": "https://github.com/Keremozdemirra/xlsx-review", "source": "github"},
+  "version": "0.1.0",
+  "packages": [{"registryType": "pypi", "identifier": "xlsx-review", "version": "0.1.0",
+                "runtimeHint": "uvx", "transport": {"type": "stdio"},
+                "packageArguments": [{"type": "positional", "value": "mcp"}]}]
+}
