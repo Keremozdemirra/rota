@@ -3216,6 +3216,8 @@ def explain_text(res: dict) -> str:
                 line += "  " + cell_text(p["content"], 60)
             if p.get("refers_to"):
                 line += "  " + show_formula(p["refers_to"][1:], 80)
+                if p.get("targets"):
+                    line += " -> " + ", ".join(clip(visible(t), 60) for t in p["targets"][:3])
             if p.get("non_empty_cells") is not None:
                 line += f"  {p['non_empty_cells']} non-empty cell(s)"
             if p.get("link"):
