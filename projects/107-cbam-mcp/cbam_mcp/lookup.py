@@ -25,6 +25,9 @@ ELECTRICITY = "27160000"
 HYDROGEN = "28041000"
 MAX_LIST = 500
 BUNDLED_PREFIXES = ("25", "28", "31", "72", "73", "76", "2601", "2716")
+REQUIRED = {"annex_i.json": {"annex_i": list, "annex_ii": list},
+            "default_values.json": {"lines": list, "tables": dict, "annex_iv": dict, "other_table": str},
+            "cn_2026.json": {"concepts": dict}, "cn_2025.json": {"concepts": dict}}
 URL = re.compile(r"^https?://[A-Za-z0-9.-]+(?:/[A-Za-z0-9._~%/?=&:+()-]*)?$")
 VERSION = re.compile(r"^\d{1,3}$")
 
@@ -55,7 +58,8 @@ class Store:
                 raise DataError(f"{path} is missing; run `cbam-mcp refresh`") from None
             except (OSError, UnicodeDecodeError, ValueError) as e:
                 raise DataError(f"{path} cannot be read ({type(e).__name__}); run `cbam-mcp refresh`") from None
-            if not isinstance(doc, dict) or not isinstance(doc.get("meta"), dict):
+            if not isinstance(doc, dict) or not isinstance(doc.get("meta"), dict) or \
+                    any(not isinstance(doc.get(k), t) for k, t in REQUIRED.get(name, {}).items()):
                 raise DataError(f"{path} is not a cbam-mcp data file; run `cbam-mcp refresh`")
             self._docs[name] = doc
         return self._docs[name]
@@ -216,6 +220,8 @@ def _explain(r: dict, digits: str) -> str:
     if b == "excluded_by_exception":
         e, x = r["entry"], r["exception"]
         return f"The Annex I line {_entry_display(e)} covers {code}, but its exception {format_cn(x['code'])} excludes it."
+    if b == "lines_below" and not any(digits.startswith(p) for p in BUNDLED_PREFIXES):
+        return f"Annex I lists some codes under {code}, not all of them; see annex_i_lines_below."
     if b in ("exceptions_below", "lines_below", "cn_subcodes"):
         return f"Some codes under {code} are in scope and some are not; see subcodes."
     if b == "all_cn_subcodes_in_scope":
@@ -246,6 +252,7 @@ def cbam_scope(cn_code, limit: int = 50) -> dict:
     out: dict = {"query": clean(cn_code, 60), "cn_code": format_cn(digits)}
     status, basis = r["status"], r["basis"]
     subcodes = None
+    complete = any(digits.startswith(p) for p in BUNDLED_PREFIXES)
     if len(digits) < 8:
         buckets: dict = {"in_scope": [], "partially_in_scope": [], "not_in_scope": []}
         for code in s.cn_codes_under(2026, digits):
@@ -260,18 +267,32 @@ def cbam_scope(cn_code, limit: int = 50) -> dict:
         total = sum(len(v) for v in buckets.values())
         if total:
             n_in, n_part = len(buckets["in_scope"]), len(buckets["partially_in_scope"])
-            if n_in == total:
+            if not complete:
+                # Only part of this prefix is in the bundled CN subset (e.g. 2716 of chapter 27):
+                # the sub-codes cannot show that every code under it is covered.
+                if status == "in_scope":
+                    status, basis = "partially_in_scope", "lines_below"
+            elif n_in == total:
                 status, basis = "in_scope", ("listed" if basis == "listed" else "all_cn_subcodes_in_scope")
             elif n_in == 0 and n_part == 0:
                 status, basis = "not_in_scope", ("not_listed" if basis == "not_listed" else "no_cn_subcode_in_scope")
             elif status != "partially_in_scope":
                 status, basis = "partially_in_scope", "cn_subcodes"
             subcodes = {"cn_version": "CN 2026", "counts": {k: len(v) for k, v in buckets.items()},
-                        "limit_per_list": limit, "truncated": any(len(v) > limit for v in buckets.values())}
+                        "limit_per_list": limit, "truncated": any(len(v) > limit for v in buckets.values()),
+                        "complete": complete}
+            if not complete:
+                subcodes["note"] = ("only the sub-codes in the bundled CN chapters are listed (25, 28, 31, 72, 73, "
+                                    "76 and headings 2601, 2716); other codes under this prefix are not in scope "
+                                    "unless an Annex I line above lists them")
             subcodes.update({k: v[:limit] for k, v in buckets.items()})
     out["status"] = status
     out["basis"] = basis
     out["explanation"] = _explain({**r, "basis": basis}, digits)
+    if basis == "ex_code":
+        out["depends_on"] = "whether the goods are the ones the text of the 'ex' line describes (annex_i_line.text)"
+    elif status == "partially_in_scope":
+        out["depends_on"] = "the CN code of the goods at 8 digits (see subcodes and annex_i_lines_below)"
     entry = r.get("entry")
     if entry is None and status == "in_scope" and len(r.get("below") or []) == 1:
         entry = r["below"][0]
@@ -371,10 +392,11 @@ def _resolve(s: Store, country) -> dict:
     extra = _origin_extra(s)
     name, suggestions = resolve_country(country, tables, extra)
     if name is None:
-        if suggestions:
-            raise InputError(f"country {clean(country, 100)!r} not recognised; did you mean: "
-                             f"{', '.join(clean(x, 100) for x in suggestions)}?")
-        return {"name": clean(country, 100), "label": clean(country, 100), "kind": "unlisted"}
+        hint = f" Did you mean: {', '.join(clean(x, 100) for x in suggestions)}?" if suggestions else ""
+        raise InputError(
+            f"country {clean(country, 100)!r} is not a name in the default-value tables, an EU Member State or an "
+            f"Annex III origin.{hint} For a third country the tables do not list, ask for country 'Other countries "
+            f"and territories': {legal.RULE_NOT_LISTED['quote']}")
     if name in s.values["tables"]:
         kind = "other" if name == s.values["other_table"] else "table"
         return {"name": name, "label": _country(s, name), "kind": kind, "iso": ISO_BY_TABLE_NAME.get(name)}
@@ -402,10 +424,8 @@ def _values_for(s: Store, code: str, origin: dict) -> dict:
     shown = known(line[1], CODE)
     item = {"table_line": shown, "description": remote(line[2]), "goods_category": known(line[3], CATEGORIES)}
     fallback = None
-    row = _row(s, origin["name"], code) if origin["kind"] in ("table", "other") else None
-    if origin["kind"] == "unlisted":
-        fallback = {"reason": f"{origin['label']!r} is not one of the countries in the tables", "rule": legal.RULE_NOT_LISTED}
-    elif row is None:
+    row = _row(s, origin["name"], code)
+    if row is None:
         fallback = {"reason": f"the table for {origin['label']} has no line {shown}", "rule": legal.RULE_NO_VALUE}
     elif any(parse_value(x)[1] == "dash" for x in row[:3]):
         fallback = {"reason": f"the table for {origin['label']} shows '–' for {shown}", "rule": legal.RULE_NO_VALUE}
@@ -446,6 +466,13 @@ def _values_legal(s: Store) -> dict:
            "data_version_note": remote(m.get("version_note")),
            "attribution": _values_attribution(s),
            "not_legal_advice": legal.NOT_LEGAL_ADVICE}
+    cons = (m.get("consolidated") or {}).get("check")
+    if cons:
+        out["checked_against_consolidated_text"] = (
+            f"At the last refresh ({_date(m['consolidated'].get('retrieved'))}) this file was compared with the "
+            f"consolidated text {known(m['consolidated'].get('celex'), CELEX)}: {int(cons['rows_identical'])} of "
+            f"{int(cons['rows_compared'])} country lines and {int(cons['annex_iv_identical'])} of "
+            f"{int(cons['annex_iv_compared'])} Annex IV lines identical.")
     if check:
         out["checked_against_official_journal"] = (
             f"On {_date(check.get('checked'))} cbam-mcp compared this file with the Official Journal text of "
@@ -455,11 +482,32 @@ def _values_legal(s: Store) -> dict:
     return out
 
 
-def _value_notes(lines_found: bool) -> list:
+def _value_notes(s: Store, lines_found: bool) -> dict:
     if not lines_found:
-        return []
-    return [legal.MARKUP_POINTER, {"direct_and_indirect": legal.DIRECT_INDIRECT_FOR_INFORMATION},
-            {"no_production_route": legal.NO_ROUTE}]
+        return {"notes": []}
+    cons = s.values["meta"].get("consolidated") or {}
+    markup = (cons.get("markup") or {}).get("annex_i") or []
+    out = {"notes": [legal.MARKUP_NOTE if markup else legal.MARKUP_MISSING,
+                     {"direct_and_indirect": legal.DIRECT_INDIRECT_FOR_INFORMATION},
+                     {"no_production_route": legal.NO_ROUTE}, {"production_route_at_hs_level": legal.HS_GROUP_ROUTE}]}
+    if markup:
+        out["markup_rule"] = {
+            "quote": [remote(x) for x in markup],
+            "annex_iv": [remote(x) for x in (cons["markup"].get("annex_iv") or [])],
+            "source": f"Annex I (introductory part), consolidated text {known(cons.get('celex'), CELEX)} of "
+                      f"Implementing Regulation (EU) 2025/2621 (consolidation date {_date(cons.get('consolidation_date'))}), "
+                      f"retrieved {_date(cons.get('retrieved'))}",
+            "legal_status": remote(cons.get("disclaimer"))}
+    return out
+
+
+def _value_warnings(s: Store, digits: str, scope: dict, lines_found: bool, warnings: list) -> None:
+    """Warnings both value tools give: a code the CN does not have, and an 'ex' line."""
+    if lines_found:
+        _warn_not_cn(s, digits, warnings, "the table line shown is the one whose code it starts with")
+    if scope["status"] == "partially_in_scope" and scope["basis"] == "ex_code":
+        warnings.append(f"Annex I lists {format_cn(scope['entry']['code'])} as an 'ex' line: only part of this code "
+                        "is in scope (see cbam_scope)")
 
 
 def _origin_answer(s: Store, origin: dict) -> dict | None:
@@ -496,29 +544,31 @@ def default_value(cn_code, country) -> dict:
         out["rule"] = legal.ELECTRICITY
         out["licence_of_annex_iii"] = legal.IEA_NOTICE
         out["lines"] = []
+    elif scope["status"] == "not_in_scope":
+        out["status"] = "not_in_scope"
+        out["explanation"] = (f"{format_cn(digits)} is not in CBAM scope under Annex I ({scope['basis']}; see "
+                              "cbam_scope), so no default value applies to it.")
+        out["lines"] = []
     else:
         codes = _match_lines(s, digits)
-        if not codes:
+        heading = codes and len(codes) == 1 and _is_heading(s, codes[0]) and not codes[0].startswith(digits)
+        if not codes or heading:
             out["status"] = "no_line"
-            out["explanation"] = (f"The default-value tables have no line for {format_cn(digits)}"
-                                  + (" (not in CBAM scope under Annex I)." if scope["status"] == "not_in_scope" else "."))
+            out["explanation"] = f"The default-value tables have no line for {format_cn(digits)}."
+            if heading:
+                out["explanation"] += (f" They give values only for the sub-lines of {known(s.values['_lines'][codes[0]][1], CODE)}: "
+                                       + ", ".join(known(s.values['_lines'][c][1], CODE) for c in s.values["_order"]
+                                                   if c.startswith(codes[0]) and c != codes[0]))
             out["lines"] = []
         else:
             out["status"] = "found"
-            if origin["kind"] == "unlisted":
-                warnings.append(f"{origin['label']!r} is not a country name in the tables; if it is a third country "
-                                "that is not listed, the 'Other countries and territories' values apply as shown")
             out["lines"] = [_values_for(s, c, origin) for c in codes[:60]]
             if len(codes) > 60:
                 warnings.append(f"{len(codes)} table lines match; the first 60 are shown. Ask for a longer code.")
             if len(codes) > 1 and len(digits) >= 8:
                 warnings.append("several table lines (TARIC codes) match this CN code; the description decides which applies")
-    out["notes"] = _value_notes(bool(out["lines"]))
-    if out["lines"]:
-        _warn_not_cn(s, digits, warnings, "the table line shown is the one whose code it starts with")
-    if scope["status"] == "partially_in_scope" and scope["basis"] == "ex_code":
-        warnings.append(f"Annex I lists {format_cn(scope['entry']['code'])} as an 'ex' line: only part of this code "
-                        "is in scope (see cbam_scope)")
+    out.update(_value_notes(s, bool(out["lines"])))
+    _value_warnings(s, digits, scope, bool(out["lines"]), warnings)
     out["warnings"] = warnings
     out.update(_values_legal(s))
     return out
@@ -528,7 +578,8 @@ def compare_origins(cn_code, countries) -> dict:
     s = store()
     digits, warnings = normalize_cn(cn_code)
     if isinstance(countries, str):
-        countries = countries.split(",")
+        # One string is one country: table names contain commas ("Congo, Democratic Republic of").
+        countries = [countries]
     if not isinstance(countries, list) or not countries:
         raise InputError("countries must be a list of country names or ISO codes, e.g. ['India', 'TR']")
     if len(countries) > 30:
@@ -539,9 +590,13 @@ def compare_origins(cn_code, countries) -> dict:
             origins.append(_resolve(s, c))
         except InputError as e:
             problems.append(str(e))
-    out: dict = {"cn_code": format_cn(digits), "unit": UNIT, "scope_status": classify(s.annex["annex_i"], digits)["status"]}
+    scope = classify(s.annex["annex_i"], digits)
+    out: dict = {"cn_code": format_cn(digits), "unit": UNIT, "scope_status": scope["status"]}
     if digits.startswith(ELECTRICITY[:4]):
         out.update({"status": "not_in_this_data", "rule": legal.ELECTRICITY, "lines": []})
+    elif scope["status"] == "not_in_scope":
+        out.update({"status": "not_in_scope", "lines": [],
+                    "explanation": f"{format_cn(digits)} is not in CBAM scope under Annex I; see cbam_scope."})
     else:
         codes = _match_lines(s, digits)[:30]
         other = {"name": s.values["other_table"], "label": _country(s, s.values["other_table"]), "kind": "other"}
@@ -567,9 +622,8 @@ def compare_origins(cn_code, countries) -> dict:
         out["status"] = "found" if lines else "no_line"
         out["lines"] = lines
     out["countries_not_recognised"] = problems
-    out["notes"] = _value_notes(bool(out["lines"]))
-    if out["lines"]:
-        _warn_not_cn(s, digits, warnings, "the table line shown is the one whose code it starts with")
+    out.update(_value_notes(s, bool(out["lines"])))
+    _value_warnings(s, digits, scope, bool(out["lines"]), warnings)
     out["warnings"] = warnings
     out.update(_values_legal(s))
     return out
@@ -653,7 +707,7 @@ def _acts(doc) -> dict | None:
 
 def sources() -> dict:
     s = store()
-    out = {"datasets": []}
+    out = {"legally_binding": False, "datasets": []}
     a = s.annex["meta"]
     out["datasets"].append({
         "name": "CBAM scope: Annexes I, II and III of Regulation (EU) 2023/956",
@@ -677,6 +731,12 @@ def sources() -> dict:
             "checked": _date(check.get("checked")), "celex": known(check.get("celex"), CELEX),
             **{k: int(check[k]) for k in ("rows_compared", "rows_identical", "annex_iv_compared", "annex_iv_identical")},
             "quotes_found": {k: bool(x) for k, x in check.get("quotes_found", {}).items()}},
+        "consolidated_text": (v.get("consolidated") or None) and {
+            "celex": known(v["consolidated"].get("celex"), CELEX), "url": known(v["consolidated"].get("url"), URL),
+            "reference": remote(v["consolidated"].get("reference")), "retrieved": _date(v["consolidated"].get("retrieved")),
+            "sha256": v["consolidated"].get("sha256"),
+            **{k: int(v["consolidated"]["check"][k]) for k in ("rows_compared", "rows_identical", "annex_iv_compared",
+                                                               "annex_iv_identical")}},
         "not_included": "Annexes II and III to Implementing Regulation (EU) 2025/2621 (indirect-emission factors, "
                         "electricity); the Excel does not contain them",
         "licence": legal.LICENCES["commission"], "attribution": _values_attribution(s)})
@@ -693,6 +753,7 @@ def sources() -> dict:
         out["later_acts"] = _acts(json.loads((s.dir / "later_acts.json").read_text(encoding="utf-8")))
     except (OSError, ValueError):
         out["later_acts"] = None
-    out["data_directory"] = str(s.dir)
+    # A label, not the path: a path would show the user's home directory in shared output.
+    out["data_directory"] = "CBAM_MCP_DATA_DIR" if os.environ.get(DATA_ENV) else "bundled package data"
     out["not_legal_advice"] = legal.NOT_LEGAL_ADVICE
     return out

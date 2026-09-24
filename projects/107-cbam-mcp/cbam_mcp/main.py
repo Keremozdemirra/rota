@@ -39,7 +39,8 @@ def split_code(tokens: list[str]) -> tuple[str, list[str]]:
 def _wrap(label: str, text: str, width: int = 100) -> str:
     pad = " " * 20
     body = textwrap.fill(str(text), width=width, initial_indent=pad, subsequent_indent=pad)
-    return f"  {label:<18}" + body[20:]
+    head = f"  {label:<18}" if len(label) < 18 else f"  {label} "
+    return head + body[20:]
 
 
 def _num(v) -> str:
@@ -52,6 +53,8 @@ def _legal_lines(r: dict) -> list[str]:
     if isinstance(status, dict):
         lines.append(_wrap("Commission says", f"\"{status['quote']}\""))
     lines.append(_wrap("Data", r["data_version"] + (f" ({r['data_version_note']})" if r.get("data_version_note") else "")))
+    if r.get("checked_against_consolidated_text"):
+        lines.append(_wrap("Checked", r["checked_against_consolidated_text"]))
     if r.get("checked_against_official_journal"):
         lines.append(_wrap("Checked", r["checked_against_official_journal"]))
     for w in r.get("warnings") or []:
@@ -74,6 +77,8 @@ def render_scope(r: dict) -> str:
         out.append(_wrap("Annex I lines", "; ".join(f"{x['cn_code']} – {x['text']} ({x['goods_category']})"
                                                    for x in r["annex_i_lines_below"])))
     out.append(_wrap("Why", r["explanation"]))
+    if r.get("depends_on"):
+        out.append(_wrap("Depends on", r["depends_on"]))
     if r.get("annex_ii"):
         out.append(_wrap("Annex II", f"{r['annex_ii']['status']} in Annex II. Article 7(1): \"{r['annex_ii']['article_7_1']}\""))
     cn = r.get("cn") or {}
@@ -136,6 +141,9 @@ def render_value(r: dict) -> str:
     for n in r.get("notes") or []:
         if isinstance(n, str):
             out.append(_wrap("Note", n))
+    mr = r.get("markup_rule")
+    if mr:
+        out.append(_wrap("Mark-up rule", " ".join(f"\"{q}\"" for q in mr["quote"]) + f" ({mr['source']})"))
     out += _legal_lines(r)
     return "\n".join(out)
 
@@ -163,6 +171,9 @@ def render_compare(r: dict) -> str:
     for n in r.get("notes") or []:
         if isinstance(n, str):
             out.append(_wrap("Note", n))
+    mr = r.get("markup_rule")
+    if mr:
+        out.append(_wrap("Mark-up rule", " ".join(f"\"{q}\"" for q in mr["quote"]) + f" ({mr['source']})"))
     out += _legal_lines(r)
     return "\n".join(out)
 
@@ -201,6 +212,11 @@ def render_sources(r: dict) -> str:
         out.append(_wrap("Rows", ", ".join(f"{k} {v}" for k, v in d["rows"].items())))
         out.append(_wrap("Binding text", d["legally_binding_source"]))
         out.append(_wrap("Licence", f"{d['licence']['name']} ({d['licence']['terms']})"))
+        if d.get("consolidated_text"):
+            c = d["consolidated_text"]
+            out.append(_wrap("Consolidated", f"{c['celex']} ({c['reference']}), retrieved {c['retrieved']}: "
+                                             f"{c['rows_identical']}/{c['rows_compared']} lines, "
+                                             f"{c['annex_iv_identical']}/{c['annex_iv_compared']} Annex IV lines identical"))
         if d.get("official_journal_check"):
             c = d["official_journal_check"]
             out.append(_wrap("OJ check", f"{c['checked']}: {c['rows_identical']}/{c['rows_compared']} lines, "
@@ -209,9 +225,9 @@ def render_sources(r: dict) -> str:
         out.append("")
     later = r.get("later_acts")
     if later:
+        out.append(f"Acts amending or correcting, from CELLAR (checked {later['checked']}):")
         for base, acts in later["acts"].items():
-            out.append(_wrap(f"Acts on {base}", "; ".join(f"{a['celex']} {a['relation']} {a['date']}" for a in acts)
-                             + f" (checked {later['checked']})"))
+            out.append(_wrap(base, "; ".join(f"{a['celex']} {a['relation']} {a['date']}" for a in acts) or "none"))
     out.append(f"Data directory: {r['data_directory']}")
     return "\n".join(out)
 
@@ -272,7 +288,8 @@ def main(argv=None) -> int:
             result, render = lookup.default_value(code, " ".join(rest)), render_value
         elif args.command == "compare":
             code, rest = split_code(args.words)
-            countries = [x.strip() for w in rest for x in w.split(",") if x.strip()]
+            # One argument per country: table names contain commas ("Congo, Democratic Republic of").
+            countries = [w.strip() for w in rest if w.strip()]
             if not countries:
                 raise InputError("add countries after the code, e.g. 7601 10 00 India Türkiye")
             result, render = lookup.compare_origins(code, countries), render_compare
@@ -285,6 +302,10 @@ def main(argv=None) -> int:
         return 2
     except lookup.DataError as e:
         print(f"cbam-mcp: data unavailable: {e}", file=sys.stderr)
+        return 2
+    except (KeyError, IndexError, TypeError, AttributeError, ValueError) as e:
+        # A data file that parses as JSON but not as a snapshot of this tool.
+        print(f"cbam-mcp: data unreadable ({type(e).__name__}); run `cbam-mcp refresh`", file=sys.stderr)
         return 2
     # --json is what an MCP client gets (remote text marked); the text view is for a person.
     print(json.dumps(result, ensure_ascii=False, indent=1) if args.json else render(unwrap(result)))

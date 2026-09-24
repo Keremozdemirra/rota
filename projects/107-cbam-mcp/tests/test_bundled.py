@@ -72,7 +72,8 @@ class Packaging(unittest.TestCase):
 
     def test_data_ships_in_wheel_and_sdist(self):
         pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-        self.assertIn('cbam_mcp = ["data/*.json", "data/SOURCES.md"]', pyproject)
+        self.assertIn('packages = ["cbam_mcp", "cbam_mcp.data"]', pyproject)
+        self.assertIn('"cbam_mcp.data" = ["*.json", "SOURCES.md"]', pyproject)
         manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
         self.assertIn("recursive-include cbam_mcp/data", manifest)
         self.assertIn("recursive-include tests", manifest)

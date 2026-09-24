@@ -64,10 +64,9 @@ def q_consolidated(celex: str) -> str:
 
 def q_related(celex: str) -> str:
     cellar.check_celex(celex)
-    return _PREFIX + f"""SELECT DISTINCT ?rel ?celex ?date ?eif ?title WHERE {{
+    return _PREFIX + f"""SELECT DISTINCT ?rel ?celex ?date ?eif ?title ?adopted WHERE {{
   ?base cdm:resource_legal_id_celex "{celex}"^^xsd:string .
   {{ ?act cdm:resource_legal_amends_resource_legal ?base . BIND("amends" AS ?rel) }}
-  UNION {{ ?act cdm:resource_legal_corrects_resource_legal ?base . BIND("corrects" AS ?rel) }}
   UNION {{ ?act cdm:resource_legal_repeals_resource_legal ?base . BIND("repeals" AS ?rel) }}
   UNION {{ ?act cdm:resource_legal_implicitly_repeals_resource_legal ?base . BIND("repeals" AS ?rel) }}
   UNION {{ ?act cdm:resource_legal_proposes_to_amend_resource_legal ?base . BIND("proposes_to_amend" AS ?rel) }}
@@ -76,21 +75,25 @@ def q_related(celex: str) -> str:
   OPTIONAL {{ ?act cdm:resource_legal_date_entry-into-force ?eif }}
   OPTIONAL {{ ?e cdm:expression_belongs_to_work ?act ; cdm:expression_uses_language {_EN} ;
               cdm:expression_title ?title }}
+  OPTIONAL {{ ?adopting cdm:resource_legal_adopts_resource_legal ?act ;
+              cdm:resource_legal_id_celex ?adopted }}
 }}"""
 
 
-def q_languages(celexes: list) -> str:
+def q_corrigenda(celexes: list) -> str:
     values = " ".join(f'"{cellar.check_celex(c)}"^^xsd:string' for c in celexes)
-    return _PREFIX + f"""SELECT ?celex ?lang WHERE {{
-  VALUES ?celex {{ {values} }}
-  ?w cdm:resource_legal_id_celex ?celex .
-  ?e cdm:expression_belongs_to_work ?w ; cdm:expression_uses_language ?lang .
+    return _PREFIX + f"""SELECT DISTINCT ?target ?celex ?date ?lang WHERE {{
+  VALUES ?target {{ {values} }}
+  ?t cdm:resource_legal_id_celex ?target .
+  ?c cdm:resource_legal_corrects_resource_legal ?t ; cdm:resource_legal_id_celex ?celex .
+  OPTIONAL {{ ?c cdm:work_date_document ?date }}
+  OPTIONAL {{ ?e cdm:expression_belongs_to_work ?c ; cdm:expression_uses_language ?lang }}
 }}"""
 
 
 Q_NAL = """PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX euvoc: <http://publications.europa.eu/ontology/euvoc#>
-SELECT ?c ?a2 ?a3 ?pref ?status ?broader WHERE {
+SELECT ?c ?a2 ?a3 ?pref ?status ?broader ?territory WHERE {
   GRAPH <http://publications.europa.eu/resource/authority/country> {
     ?c skos:notation ?n2 .
     FILTER(datatype(?n2) = euvoc:ISO_3166_1_ALPHA_2)
@@ -98,6 +101,8 @@ SELECT ?c ?a2 ?a3 ?pref ?status ?broader WHERE {
     ?c skos:prefLabel ?pref . FILTER(lang(?pref) = "en")
     OPTIONAL { ?c euvoc:status ?status }
     OPTIONAL { ?c skos:broader ?broader }
+    OPTIONAL { ?c skos:topConceptOf ?territory .
+               FILTER(?territory = <http://publications.europa.eu/resource/authority/country/0003>) }
   }
   BIND(STR(?n2) AS ?a2) BIND(STR(?n3) AS ?a3)
 } ORDER BY ?a2"""
@@ -162,7 +167,10 @@ def related(celex: str) -> list:
         if not cellar.CELEX.match(c):
             continue
         key = (r["rel"], c)
-        item = out.setdefault(key, {"rel": r["rel"], "celex": c, "date": None, "entry_into_force": [], "title": None})
+        item = out.setdefault(key, {"rel": r["rel"], "celex": c, "date": None, "entry_into_force": [], "title": None,
+                                    "adopted_as": None})
+        if r.get("adopted") and cellar.CELEX.match(r["adopted"]):
+            item["adopted_as"] = r["adopted"]
         if r.get("date"):
             item["date"] = _date(r["date"])
         if r.get("eif"):
@@ -188,11 +196,19 @@ def consolidated(celex: str) -> list:
     return sorted(set(out), key=lambda x: x[1], reverse=True)
 
 
-def english_versions(celexes: list) -> set:
-    if not celexes:
-        return set()
-    rows = cellar.sparql(q_languages(celexes))
-    return {r["celex"] for r in rows if r.get("lang", "").endswith("/ENG")}
+def corrigenda(celexes: list) -> list:
+    """Corrigenda of the given acts, with the languages they exist in."""
+    out: dict = {}
+    for r in cellar.sparql(q_corrigenda(celexes)):
+        c = r.get("celex", "")
+        if not cellar.CELEX.match(c):
+            continue
+        item = out.setdefault(c, {"celex": c, "corrects": r.get("target"), "date": None, "english": False})
+        if r.get("date"):
+            item["date"] = _date(r["date"])
+        if r.get("lang", "").endswith("/ENG"):
+            item["english"] = True
+    return sorted(out.values(), key=lambda x: (x["date"] or "", x["celex"]))
 
 
 def _doc(celex: str, role: str, documents: list):
@@ -242,7 +258,10 @@ def build(today: str | None = None, log=lambda msg: None) -> dict:
 
     entries = []
     for i, e in enumerate(table["entries"], start=1):
-        entries.append({"id": f"B{i:02d}", **e, "valid_from": None, "valid_to": None,
+        # A later consolidation will carry "(This provision shall apply from ...)"
+        # inside the entry; that date, not the consolidation, is when it applies.
+        valid_from = e.pop("applies_from", None)
+        entries.append({"id": f"B{i:02d}", **e, "valid_from": valid_from, "valid_to": None,
                         "source": {"celex": cons_celex, "provision": "Annex I"}})
 
     log("SPARQL: acts that amend, correct or propose to amend 2023/1115")

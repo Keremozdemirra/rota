@@ -31,7 +31,7 @@ Issues = "https://github.com/Keremozdemirra/cbam-mcp/issues"
 cbam-mcp = "cbam_mcp.main:main"
 
 [tool.setuptools]
-packages = ["cbam_mcp"]
+packages = ["cbam_mcp", "cbam_mcp.data"]
 
 [tool.setuptools.package-data]
-cbam_mcp = ["data/*.json", "data/SOURCES.md"]
+"cbam_mcp.data" = ["*.json", "SOURCES.md"]
