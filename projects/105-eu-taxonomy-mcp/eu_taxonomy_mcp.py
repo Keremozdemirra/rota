@@ -301,8 +301,10 @@ def wrap(text: str) -> str:
     return REMOTE_OPEN + text + (" " if text.endswith(">") else "") + REMOTE_CLOSE
 
 
-_SUP = str.maketrans("0123456789+-=()", "\u2070\xb9\xb2\xb3\u2074\u2075\u2076\u2077\u2078\u2079\u207a\u207b\u207c\u207d\u207e")
-_SUB = str.maketrans("0123456789+-=()", "\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089\u208a\u208b\u208c\u208d\u208e")
+_SUP = str.maketrans("0123456789+-=()", "\u2070\xb9\xb2\xb3\u2074\u2075\u2076\u2077\u2078\u2079"
+                                        "\u207a\u207b\u207c\u207d\u207e")
+_SUB = str.maketrans("0123456789+-=()", "\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089"
+                                        "\u208a\u208b\u208c\u208d\u208e")
 _SCRIPTABLE = re.compile(r"^[0-9+\-=() ]+$")
 
 
@@ -585,8 +587,9 @@ def validate_nace(data) -> None:
     if not isinstance(revs, dict) or set(revs) != {"2", "2.1"}:
         raise SnapshotError("NACE table lacks NACE Rev. 2 or Rev. 2.1")
     for rev, r in revs.items():
-        if not isinstance(r, dict) or not all(isinstance(r.get(k), dict) and r.get(k)
-                                               for k in ("sections", "divisions", "titles")):
+        parts_ok = isinstance(r, dict) and all(isinstance(r.get(k), dict) and r.get(k)
+                                               for k in ("sections", "divisions", "titles"))
+        if not parts_ok:
             raise SnapshotError(f"NACE Rev. {rev} table is malformed")
         for division, letter in r["divisions"].items():
             if letter not in r["sections"] or division not in r["titles"]:

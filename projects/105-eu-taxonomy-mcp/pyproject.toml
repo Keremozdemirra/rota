@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "eu-taxonomy-mcp"
 version = "0.1.0"
-description = "EU Taxonomy activities, NACE codes and technical screening criteria for agents (MCP) and the shell, from a dated snapshot of the EU Taxonomy Navigator."
+description = "EU Taxonomy activities, NACE codes and technical screening criteria for agents (MCP) and the shell, from a dated snapshot of the EU Taxonomy Navigator and the NACE tables of the Official Journal."
 readme = "README.md"
 requires-python = ">=3.9"
 license = "MIT"
@@ -35,4 +35,4 @@ packages = ["eu_taxonomy_mcp_data"]
 package-dir = { "eu_taxonomy_mcp_data" = "data" }
 
 [tool.setuptools.package-data]
-eu_taxonomy_mcp_data = ["taxonomy.json", "SOURCES.md"]
+eu_taxonomy_mcp_data = ["taxonomy.json", "nace.json", "SOURCES.md"]

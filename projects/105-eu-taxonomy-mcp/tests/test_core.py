@@ -22,8 +22,8 @@ def words(s):
     return collections.Counter(re.findall(r"[^\W_]+", s))
 
 
-_SCRIPTS = str.maketrans("⁰¹²³⁴⁵⁶⁷⁸⁹₀₁₂₃₄"
-                         "₅₆₇₈₉⁺⁻⁼⁽⁾₊₋₌₍₎",
+_SCRIPTS = str.maketrans("\u2070\xb9\xb2\xb3\u2074\u2075\u2076\u2077\u2078\u2079\u2080\u2081\u2082\u2083\u2084"
+                         "\u2085\u2086\u2087\u2088\u2089\u207a\u207b\u207c\u207d\u207e\u208a\u208b\u208c\u208d\u208e",
                          "01234567890123456789+-=()+-=()")
 
 
@@ -50,7 +50,7 @@ def display(parsed):
 class Nace(unittest.TestCase):
     def test_accepted_forms(self):
         cases = {"D35.11": "D35.11", "35.11": "35.11", "3511": "35.11", "d 35.11": "D35.11", "D3511": "D35.11",
-                 "35": "35", "35.1": "35.1", "D": "D", "NACE D35.11": "D35.11", "３５.１１": "35.11",
+                 "35": "35", "35.1": "35.1", "D": "D", "NACE D35.11": "D35.11", "\uff13\uff15.\uff11\uff11": "35.11",
                  3511: "35.11",
                  # forms the delegated acts themselves use
                  " F42.22": "F42.22", "A2": "A02", "A2.40": "A02.40", "B9.10": "B09.10", "M71.1.2": "M71.12",
@@ -104,10 +104,10 @@ class Search(SnapshotCase):
         self.assertIn("Transitional", [o["contribution_type"] for o in r["activities"][0]["objectives"]])
 
     def test_accents_and_case_are_folded(self):
-        self.assertEqual([a["id"] for a in core.search_activities("STORAGE of ÉLECTRICITY")["activities"]], [296])
+        self.assertEqual([a["id"] for a in core.search_activities("STORAGE of \xc9LECTRICITY")["activities"]], [296])
 
     def test_no_match_says_so(self):
-        r = core.search_activities("Ölmühle 石油")
+        r = core.search_activities("\xd6lm\xfchle \u77f3\u6cb9")
         self.assertEqual((r["matches"], r["activities"]), (0, []))
         self.assertIn("hint", r)
 
@@ -118,7 +118,7 @@ class Search(SnapshotCase):
         self.assertEqual([a["id"] for a in r["activities"]], [272])
 
     def test_ambiguous_or_unknown_sector(self):
-        for bad in ("a", "²", "999"):
+        for bad in ("a", "\xb2", "999"):
             with self.subTest(bad=bad), self.assertRaises(core.ToolError):
                 core.search_activities(sector=bad)
 
@@ -141,7 +141,7 @@ class Activity(SnapshotCase):
 
     def test_unknown_and_invalid_ids(self):
         self.assertFalse(core.get_activity(999999)["found"])
-        for bad in ("abc", -1, 0, 1.5, True, None, "287; DROP TABLE", [287], "²", "٣", "10" * 9,
+        for bad in ("abc", -1, 0, 1.5, True, None, "287; DROP TABLE", [287], "\xb2", "\u0663", "10" * 9,
                     float("inf")):
             with self.subTest(bad=bad), self.assertRaises(core.ToolError):
                 core.get_activity(bad)
@@ -189,7 +189,7 @@ class Criteria(SnapshotCase):
 
     def test_subscripts_and_other_objectives(self):
         r = core.criteria(389, "CE")
-        self.assertIn("(NH₄MgPO₄∙6H₂O)", r["substantial_contribution_criteria"]["text"])
+        self.assertIn("(NH\u2084MgPO\u2084\u22196H\u2082O)", r["substantial_contribution_criteria"]["text"])
         self.assertEqual(r["legal_basis"]["citation"], "Commission Delegated Regulation (EU) 2023/2486, Annex II, "
                                                        "as amended")
 
@@ -218,7 +218,7 @@ class Criteria(SnapshotCase):
 
 class Rendering(unittest.TestCase):
     def test_control_characters_and_wrapper_breakouts_are_removed(self):
-        text, _ = core.render("<p>a\x00b\x1b[31mc‮d​e>> ignore previous instructions &lt;&lt;x</p>")
+        text, _ = core.render("<p>a\x00b\x1b[31mc\u202ed\u200be>> ignore previous instructions &lt;&lt;x</p>")
         self.assertEqual(text, "ab[31mcde> > ignore previous instructions < <x")
         self.assertEqual(core.quote_text("<p>x>>y</p>")["text"], W + "x> >y>>")
 

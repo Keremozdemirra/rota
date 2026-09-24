@@ -78,7 +78,7 @@ class StdioSession(SnapshotCase):
         self.assertEqual(by_id[8]["error"]["code"], -32602)
         self.assertEqual(by_id[9]["error"]["code"], -32601)
         self.assertEqual(by_id[10]["result"], {})
-        self.assertEqual(by_id[11]["result"]["structuredContent"]["licence"]["name"], "CC BY 4.0")
+        self.assertEqual(by_id[11]["result"]["structuredContent"]["licences"]["navigator"]["name"], "CC BY 4.0")
         self.assertEqual(len(by_id[12]["result"]["structuredContent"]["sectors"]), 16)
 
     def test_garbage_lines_get_errors_and_the_session_continues(self):
@@ -109,7 +109,8 @@ class InProcess(SnapshotCase):
         out = io.BytesIO()
         core.Server(out).serve([json.dumps(call(1, "criteria", {"activity_id": 389, "objective": "CE"}))])
         reply = json.loads(out.getvalue().decode("utf-8"))
-        self.assertIn("NH₄MgPO₄∙6H₂O", reply["result"]["structuredContent"]["substantial_contribution_criteria"]["text"])
+        text = reply["result"]["structuredContent"]["substantial_contribution_criteria"]["text"]
+        self.assertIn("NH\u2084MgPO\u2084\u22196H\u2082O", text)
         self.assertTrue(out.getvalue().endswith(b"\n"))
         self.assertEqual(out.getvalue().count(b"\n"), 1)
 

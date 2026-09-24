@@ -12,17 +12,20 @@ import tempfile
 import unittest
 import unittest.mock
 import urllib.error
+import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _support import (API, FakeOpener, core, fetcher, fixture_snapshot, http_error, load, raw,  # noqa: E402
-                      refresh)
+from _support import (API, EXCERPT_MINIMUM, FakeOpener, cellar_routes, core, fetcher, fixture_snapshot,  # noqa: E402
+                      http_error, load, raw, refresh)
 
 NOW = dt.datetime(2026, 9, 24, 9, 22, 42, tzinfo=dt.timezone.utc)
 ALLOWED_PATH = re.compile(r"^/(sectors|activities|activities/matches/all|activities/[1-9][0-9]{0,8}/matches)$")
 
 
-class Refresh(unittest.TestCase):
+class RefreshBase(unittest.TestCase):
+    """Helpers only; the tests are in the subclasses."""
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.out = Path(self.tmp.name) / "data"
@@ -39,6 +42,19 @@ class Refresh(unittest.TestCase):
             self.assertTrue(url.startswith(API))
             self.assertRegex(url[len(API):], ALLOWED_PATH)
 
+    # -- failure helper: nothing is written, the old snapshot stays
+    def assert_fails_and_keeps_old(self, opener, message, per_activity=False):
+        self.run_refresh(FakeOpener.healthy())
+        before = (self.out / "taxonomy.json").read_bytes(), (self.out / "SOURCES.md").read_bytes()
+        with self.assertRaises(refresh.RefreshError) as ctx:
+            self.run_refresh(opener, per_activity=per_activity)
+        self.assertIn(message, str(ctx.exception))
+        self.assertEqual(before, ((self.out / "taxonomy.json").read_bytes(), (self.out / "SOURCES.md").read_bytes()))
+        self.assertEqual(sorted(p.name for p in self.out.iterdir()), ["SOURCES.md", "taxonomy.json"])
+        return ctx.exception
+
+
+class Refresh(RefreshBase):
     # -- the paths that work
     def test_three_requests_build_the_snapshot_and_sources(self):
         opener = FakeOpener.healthy()
@@ -86,21 +102,11 @@ class Refresh(unittest.TestCase):
     def test_retry_after_is_capped(self):
         self.assertEqual(refresh._retry_after({"Retry-After": "86400"}), refresh.RETRY_AFTER_CAP)
         self.assertIsNone(refresh._retry_after({"Retry-After": "soon"}))
-        self.assertIsNone(refresh._retry_after({"Retry-After": "\u00b2"}))
+        self.assertIsNone(refresh._retry_after({"Retry-After": "\xb2"}))
         self.assertEqual(refresh._retry_after({"Retry-After": "Thu, 01 Jan 1970 00:00:00 GMT"}), 0.0)
         self.assertIsNone(refresh._retry_after({}))
 
-    # -- the paths that fail: nothing is written, the old snapshot stays
-    def assert_fails_and_keeps_old(self, opener, message, per_activity=False):
-        self.run_refresh(FakeOpener.healthy())
-        before = (self.out / "taxonomy.json").read_bytes(), (self.out / "SOURCES.md").read_bytes()
-        with self.assertRaises(refresh.RefreshError) as ctx:
-            self.run_refresh(opener, per_activity=per_activity)
-        self.assertIn(message, str(ctx.exception))
-        self.assertEqual(before, ((self.out / "taxonomy.json").read_bytes(), (self.out / "SOURCES.md").read_bytes()))
-        self.assertEqual(sorted(p.name for p in self.out.iterdir()), ["SOURCES.md", "taxonomy.json"])
-        return ctx.exception
-
+    # -- the paths that fail
     def test_backend_500_on_sectors(self):
         opener = FakeOpener.healthy(__sectors=http_error(API, 500, raw("error_500.json")))
         self.assert_fails_and_keeps_old(opener, "HTTP 500 (Internal Server Error, No message available)")
@@ -174,16 +180,17 @@ class Refresh(unittest.TestCase):
 
     # -- the command line
     def test_command_exits_2_on_failure_and_0_on_success(self):
-        args = argparse.Namespace(out=str(self.out), delay=0, timeout=5, per_activity=False)
+        args = argparse.Namespace(out=str(self.out), delay=0, timeout=5, per_activity=False, nace=False)
         err = io.StringIO()
-        with unittest.mock.patch.object(refresh.urllib.request, "urlopen", FakeOpener.healthy(
-                __sectors=urllib.error.URLError("offline"))), unittest.mock.patch.object(refresh.time, "sleep"), \
+        broken = FakeOpener.healthy(__sectors=urllib.error.URLError("offline"))
+        with unittest.mock.patch.object(refresh, "default_opener", lambda: broken), \
+                unittest.mock.patch.object(refresh.time, "sleep"), \
                 contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(refresh.main(args), 2)
         self.assertIn("offline", err.getvalue())
         self.assertFalse(self.out.exists())
         out = io.StringIO()
-        with unittest.mock.patch.object(refresh.urllib.request, "urlopen", FakeOpener.healthy()), \
+        with unittest.mock.patch.object(refresh, "default_opener", lambda: FakeOpener.healthy()), \
                 unittest.mock.patch.object(refresh.time, "sleep") as slept, \
                 contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(out):
             self.assertEqual(refresh.main(args), 0)
@@ -195,6 +202,112 @@ class Refresh(unittest.TestCase):
             with self.assertRaises(refresh.RefreshError):
                 refresh.resolve_out(None)
         self.assertEqual(refresh.resolve_out(str(self.out)), self.out)
+
+
+class Finding2EmptyOrShrunk(RefreshBase):
+    """Review finding 2: a 200 with an empty list wrote a snapshot with no criteria and exited 0."""
+
+    def empty_everywhere(self):
+        routes = {f"__activities__{aid}__matches": b"[]" for aid in (272, 287, 296, 346, 360, 361, 389)}
+        return FakeOpener.healthy(__activities__matches__all=b"[]", **routes)
+
+    def test_an_empty_bulk_answer_falls_back_to_per_activity(self):
+        bulk, _ = self.run_refresh(FakeOpener.healthy())
+        summary, _ = self.run_refresh(FakeOpener.healthy(__activities__matches__all=b"[]"))
+        self.assertEqual((summary["mode"], summary["sha256"]), ("per-activity", bulk["sha256"]))
+
+    def test_no_criteria_at_all_is_refused_and_the_old_snapshot_kept(self):
+        self.assert_fails_and_keeps_old(self.empty_everywhere(), "the source returned no criteria sets")
+
+    def test_no_criteria_is_refused_even_without_a_previous_snapshot(self):
+        with self.assertRaises(refresh.RefreshError):
+            self.run_refresh(self.empty_everywhere())
+        self.assertFalse((self.out / "taxonomy.json").exists())
+
+    def test_less_than_half_of_the_previous_criteria_is_refused(self):
+        few = [m for m in load("matches_all.json") if m["activity"]["id"] == 287]  # 2 of 9 criteria sets
+        opener = FakeOpener.healthy(__activities__matches__all=json.dumps(few).encode())
+        self.assert_fails_and_keeps_old(opener, "fewer than half of the 9 in the previous file")
+
+    def test_the_command_exits_2(self):
+        self.run_refresh(FakeOpener.healthy())
+        args = argparse.Namespace(out=str(self.out), delay=0, timeout=5, per_activity=False, nace=False)
+        err = io.StringIO()
+        with unittest.mock.patch.object(refresh, "default_opener", self.empty_everywhere), \
+                unittest.mock.patch.object(refresh.time, "sleep"), \
+                contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(refresh.main(args), 2)
+        self.assertIn("no criteria sets", err.getvalue())
+
+
+class NaceRefresh(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.out = Path(self.tmp.name) / "data"
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def run_nace(self, opener, minimum=EXCERPT_MINIMUM):
+        return refresh.run_nace(self.out, fetcher(opener), now=NOW, clock=lambda: 0.0, minimum=minimum)
+
+    def test_tables_come_from_the_annex_tables(self):
+        opener = FakeOpener(cellar_routes())
+        summary = self.run_nace(opener)
+        self.assertEqual(summary["requests"], 2)
+        self.assertEqual(opener.urls, [refresh.CELLAR + "32006R1893", refresh.CELLAR + "32023R0137"])
+        nace = core.Nace.load(self.out / "nace.json")
+        self.assertEqual((nace.section("2", "84"), nace.section("2.1", "84")), ("O", "P"))
+        self.assertEqual((nace.title("2", "35.12"), nace.title("2.1", "35.12")),
+                         ("Transmission of electricity", "Production of electricity from renewable sources"))
+        self.assertIsNone(nace.title("2", "35.16"))
+        notes = (self.out / "SOURCES.md").read_text(encoding="utf-8")
+        self.assertIn(summary["sha256"], notes)
+        self.assertIn("Not built here yet", notes)  # no taxonomy.json in this directory yet
+        self.assertIn("not labelled CC BY 4.0", notes)
+
+    def test_the_real_tables_must_be_complete(self):
+        with self.assertRaises(refresh.RefreshError) as ctx:
+            self.run_nace(FakeOpener(cellar_routes()), minimum=None)
+        self.assertIn("only 2 sections", str(ctx.exception))
+        self.assertFalse(self.out.exists())
+
+    def test_documents_without_the_annex_or_in_bad_shape_are_refused(self):
+        rev2 = raw("cellar_32006R1893_annex_i_excerpt.html").decode("utf-8")
+        cases = {
+            "no heading 'ANNEX I'": rev2.replace("ANNEX", "APPENDIX", 1),
+            "code 35.11 comes before its parent": re.sub(r"<tr class=\"oj-table\">(?:(?!</tr>).)*>35\.1<.*?</tr>", "",
+                                                         rev2, count=1, flags=re.S),
+            "not an Official Journal document": "<html><body>maintenance</body></html>",
+        }
+        for message, body in cases.items():
+            with self.subTest(message=message):
+                routes = dict(cellar_routes(), **{"cellar:32006R1893": body.encode("utf-8")})
+                with self.assertRaises(refresh.RefreshError) as ctx:
+                    self.run_nace(FakeOpener(routes))
+                self.assertIn(message, str(ctx.exception))
+
+    def test_the_taxonomy_block_of_sources_md_is_kept(self):
+        taxonomy_out = FakeOpener.healthy()
+        refresh.run(self.out, fetcher(taxonomy_out), now=NOW, clock=lambda: 0.0)
+        before = refresh._existing_block((self.out / "SOURCES.md").read_text(encoding="utf-8"), "taxonomy.json")
+        self.run_nace(FakeOpener(cellar_routes()))
+        after = (self.out / "SOURCES.md").read_text(encoding="utf-8")
+        self.assertEqual(refresh._existing_block(after, "taxonomy.json"), before)
+        self.assertIn("| NACE Rev. 2.1 | 2 | 2 | 2 | 5 |", after)
+
+    def test_only_celex_numbers_are_requested(self):
+        with self.assertRaises(refresh.RefreshError):
+            fetcher(FakeOpener({})).get_act("../../admin")
+
+    def test_redirects_stay_on_https(self):
+        handler = refresh._HttpsOnlyRedirects()
+        req = urllib.request.Request(refresh.CELLAR + "32006R1893")
+        upgraded = handler.redirect_request(req, None, 303, "See Other", {},
+                                            "http://publications.europa.eu/resource/cellar/x.0005.03/DOC_1")
+        self.assertEqual(upgraded.full_url, "https://publications.europa.eu/resource/cellar/x.0005.03/DOC_1")
+        with self.assertRaises(urllib.error.HTTPError):
+            handler.redirect_request(req, None, 302, "Found", {}, "http://example.org/")
 
 
 class SnapshotShape(unittest.TestCase):
