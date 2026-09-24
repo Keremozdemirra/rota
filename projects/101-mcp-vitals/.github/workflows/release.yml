@@ -1,0 +1,48 @@
+name: release
+
+# Publishes to PyPI when a GitHub release is published. Trusted publishing:
+# PyPI trusts this workflow by name, so no API token exists anywhere, not even
+# as a repository secret. One-time setup on pypi.org: add a trusted publisher
+# for this repository, workflow `release.yml`, environment `pypi`.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+      # A release tagged v0.2.0 over a pyproject still saying 0.1.0 would publish
+      # the old number under the new tag; refuse instead.
+      - name: Tag matches the package version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          test "$TAG" = "v$VERSION" || { echo "tag $TAG does not match version $VERSION"; exit 1; }
+      - run: python -m unittest discover -s tests
+      - run: python -m pip install build && python -m build
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
