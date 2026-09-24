@@ -60,7 +60,7 @@ NIM_DIRECTIVES = ("32022L2464", "32025L0794", "32026L0470")
 DOCUMENTS = (
     "02013L0034-20260318", "02022L2464-20260318", "32026L0470", "32025L0794",
     "32023L2775", "02013L0034-20230105", "02013L0034-20240528", "02004L0109-20240109",
-    "52024XC06792", "02019R2088-20260702",
+    "52024XC06792", "02019R2088-20260702", "02022L2464-20250417",
 )
 
 # (id, document, citation, first words, last words). The quote is the text from the
@@ -148,6 +148,9 @@ QUOTES = (
     ("AD-40a-1-7", "02013L0034-20260318", "Art. 40a(1) seventh subparagraph Directive 2013/34/EU",
      "By way of derogation from the first and third subparagraphs, where the third-country undertaking is a financial holding undertaking",
      "referred to in the first and third subparagraphs."),
+    ("AD-40d-1", "02013L0034-20260318", "Art. 40d(1) Directive 2013/34/EU",
+     "The subsidiary undertakings and branches referred to in Article 40a(1) of this Directive shall publish their sustainability report",
+     "within 12 months of the balance sheet date of the financial year for which the report is drawn up"),
     ("AD-48i-1", "02013L0034-20260318", "Art. 48i(1) first subparagraph Directive 2013/34/EU",
      "Until 6 January 2030, Member States shall permit a Union subsidiary undertaking which is subject to Article 19a or 29a",
      "that are subject to Article 19a or 29a."),
@@ -165,6 +168,14 @@ QUOTES = (
     ("CSRD-5-2-sub3-b", "02022L2464-20260318", "Art. 5(2) third subparagraph point (b) Directive (EU) 2022/2464",
      "(i) to issuers as defined in point (d) of Article 2(1) of Directive 2004/109/EC which are undertakings which, on their balance sheet dates, exceed",
      "on a consolidated basis, a net turnover of EUR 450 000 000 and an average number of 1 000 employees during the financial year."),
+    ("CSRD2025-5-2-b", "02022L2464-20250417",
+     "Art. 5(2) first subparagraph point (b) Directive (EU) 2022/2464 as amended by Directive (EU) 2025/794 (before Directive (EU) 2026/470)",
+     "for financial years starting on or after 1 January 2027: (i) to large undertakings within the meaning of Article 3(4) of Directive 2013/34/EU",
+     "other than those referred to in point (a)(ii) of this subparagraph;"),
+    ("CSRD2025-5-2-sub3-b", "02022L2464-20250417",
+     "Art. 5(2) third subparagraph point (b) Directive (EU) 2022/2464 as amended by Directive (EU) 2025/794 (before Directive (EU) 2026/470)",
+     "(i) to issuers as defined in point (d) of Article 2(1) of Directive 2004/109/EC which are large undertakings within the meaning of Article 3(4) of Directive 2013/34/EU other than those",
+     "other than those referred to in point (a) (ii) of this subparagraph;"),
     ("CSRD-5-2-derogation", "02022L2464-20260318", "Art. 5(2) fifth subparagraph Directive (EU) 2022/2464",
      "By way of derogation from point (a) of the first subparagraph and point (a) of the third subparagraph, Member States may exempt",
      "for the financial years starting between 1 January 2025 and 31 December 2026."),
@@ -180,7 +191,8 @@ QUOTES = (
      "Nevertheless, with a view to reducing burden as swiftly as possible, Member States should be able to exempt such undertakings",
      "between 1 January 2025 and 31 December 2026."),
     ("OMNI-5-1", "32026L0470", "Art. 5(1) Directive (EU) 2026/470",
-     "Member States shall bring into force the laws, regulations and administrative provisions necessary to comply with Articles 1, 2 and 3 by 19 March 2027.", None),
+     "Member States shall bring into force the laws, regulations and administrative provisions necessary to comply with Articles 1, 2 and 3 by 19 March 2027.",
+     "necessary to comply with Article 4 by 26 July 2028."),
     ("OMNI-6", "32026L0470", "Art. 6 Directive (EU) 2026/470",
      "This Directive shall enter into force on the twentieth day following that of its publication in the Official Journal of the European Union.", None),
     ("STC-oj", "32025L0794", "Directive (EU) 2025/794, Official Journal reference",
@@ -209,6 +221,8 @@ QUOTES = (
     ("TD-4-5", "02004L0109-20240109", "Art. 4(5) Directive 2004/109/EC",
      "The management report shall be drawn up in accordance with Articles 19, 19a and 20, and Article 29d(1) of Directive 2013/34/EU",
      "when drawn up by undertakings referred to in those provisions."),
+    ("TD-4-1", "02004L0109-20240109", "Art. 4(1) Directive 2004/109/EC",
+     "The issuer shall make public its annual financial report at the latest four months after the end of each financial year", None),
     ("TD-8-1-b", "02004L0109-20240109", "Art. 8(1)(b) Directive 2004/109/EC",
      "an issuer exclusively of debt securities admitted to trading on a regulated market, the denomination per unit of which is at least EUR 100 000",
      "equivalent to at least EUR 100 000."),
@@ -743,8 +757,14 @@ def write_snapshot(out_dir: Path, snap: dict) -> None:
 def verify(snapshot: dict, run=sparql, nim_snapshot: dict | None = None) -> dict:
     """Live metadata against the snapshot. Returns {status: unchanged|changed, findings: [...]}."""
     findings = []
+
+    def rows(query, what):
+        got = run(query)
+        if not got:
+            raise SourceError(f"CELLAR returned no rows for {what}; the snapshot has some, so nothing can be concluded")
+        return got
     live_cons: dict = {}
-    for r in run(Q_CONSOLIDATED):
+    for r in rows(Q_CONSOLIDATED, "the consolidated versions"):
         if r.get("base") in PINNED and r.get("celex", "").startswith("0"):
             live_cons.setdefault(r["base"], set()).add((r["celex"], r.get("date")))
     known = {b: {v["celex"] for v in vs} for b, vs in snapshot["consolidated_versions"].items()}
@@ -758,7 +778,10 @@ def verify(snapshot: dict, run=sparql, nim_snapshot: dict | None = None) -> dict
         if base not in live_cons:
             findings.append({"kind": "no consolidated versions returned", "act": base})
     known_rel = {(x["base"], x["rel"], x["celex"]) for x in snapshot.get("related_since_2024", [])}
-    for x in related_since_2024(run):
+    related = related_since_2024(run)
+    if not related and known_rel:
+        raise SourceError("CELLAR returned no amendments, corrigenda or consolidations; the snapshot has some")
+    for x in related:
         if (x["base"], x["rel"], x["celex"]) in known_rel:
             continue
         if x["rel"] == "corrects":
@@ -769,7 +792,7 @@ def verify(snapshot: dict, run=sparql, nim_snapshot: dict | None = None) -> dict
         else:
             kind = "new consolidated version"
         findings.append({"kind": kind, **x})
-    for r in run(acts_query()):
+    for r in rows(acts_query(), "the acts"):
         c = r.get("celex")
         if c in snapshot["acts"] and "inforce" in r:
             live = r["inforce"] in ("1", "true")
@@ -777,7 +800,8 @@ def verify(snapshot: dict, run=sparql, nim_snapshot: dict | None = None) -> dict
                 findings.append({"kind": "in-force flag changed", "act": c, "in_force": live})
     if nim_snapshot is not None:
         known_m = {m["celex"] for m in nim_snapshot.get("measures", [])}
-        new = sorted({r["c"] for r in run(Q_NIM) if r.get("dir") in NIM_DIRECTIVES and r.get("c") and r["c"] not in known_m})
+        new = sorted({r["c"] for r in rows(Q_NIM, "the national measures")
+                      if r.get("dir") in NIM_DIRECTIVES and r.get("c") and r["c"] not in known_m})
         if new:
             findings.append({"kind": "new national measures notified", "count": len(new), "celex": new[:20]})
     dedup, seen = [], set()

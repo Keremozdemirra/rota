@@ -121,6 +121,17 @@ class ExitCodes(Isolated):
             self.run_main(["--json", "--markdown"])
         self.assertEqual(e.exception.code, 2)
 
+    def test_relative_project_and_a_deleted_working_directory(self):
+        self.write(".env", "A_TOKEN=" + rand(20), base=self.project)
+        here = os.getcwd()
+        os.chdir(self.tmp)
+        self.addCleanup(os.chdir, here)
+        code, rep = self.report("--project", "project")
+        self.assertEqual(rep["project"], str(self.project))
+        with mock.patch("pathlib.Path.cwd", side_effect=FileNotFoundError):
+            code, rep = self.report()
+        self.assertEqual((code, rep["project"]), (0, None))
+
     def test_version(self):
         with self.assertRaises(SystemExit):
             self.run_main(["--version"])

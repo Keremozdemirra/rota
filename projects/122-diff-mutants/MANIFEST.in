@@ -1,0 +1,7 @@
+# The tests read the plugin files and the recorded diffs, so the sdist carries them.
+include README.md LICENSE diff_mutants.py
+include .claude-plugin/plugin.json .claude-plugin/marketplace.json
+include skills/diff-mutants/SKILL.md
+include .github/workflows/test.yml .github/workflows/release.yml
+recursive-include tests *.py *.diff *.txt
+global-exclude *.py[cod]

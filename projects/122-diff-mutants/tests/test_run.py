@@ -502,3 +502,39 @@ class Interpreter(Isolated):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EmptyRuns(Base):
+    PYTEST_STYLE = {"calc.py": "def add(a, b):\n    return a + b\n",
+                    "tests/test_calc.py": "from calc import add\n\n\ndef test_add():\n    assert add(2, 3) == 5\n"}
+
+    def test_a_baseline_that_runs_no_tests_stops_the_run(self):
+        # unittest finds no pytest-style tests: before 3.12 it prints "Ran 0 tests" and exits 0
+        repo = self.repo(self.PYTEST_STYLE)
+        self.commit(repo, {"calc.py": "def add(a, b):\n    return a + b + 0\n"})
+        code, data, _ = self.run_json(repo, "--base", "HEAD~1", "--test-cmd", UNITTEST, "--strict")
+        self.assertEqual(code, 2)
+        self.assertIn("the test command ran no tests", data["error"])
+        self.assertEqual(data["counts"]["run"], 0)
+
+    def test_the_hint_names_the_missing_pytest(self):
+        repo = self.repo(self.PYTEST_STYLE)
+        self.commit(repo, {"calc.py": "def add(a, b):\n    return a + b + 0\n"})
+        with mock.patch("diff_mutants.resolve_python", return_value=PY), \
+                mock.patch("diff_mutants.default_command", return_value=[PY, "-m", "unittest", "-f"]):
+            code, data, _ = self.run_json(repo, "--base", "HEAD~1")
+        self.assertEqual(code, 2)
+        self.assertIn("pytest is not importable by", data["error"])
+        self.assertIn("so unittest ran instead", data["error"])
+
+    def test_exit_5_is_an_empty_run(self):
+        repo = self.calc_repo()
+        code, data, _ = self.run_json(repo, "--base", "HEAD~1", "--test-cmd", f'"{PY}" -c "raise SystemExit(5)"')
+        self.assertEqual(code, 2)
+        self.assertIn("ran no tests (exit 5)", data["error"])
+
+    def test_when_every_mutant_survives_there_is_a_note(self):
+        repo = self.calc_repo()
+        code, data, _ = self.run_json(repo, "--base", "HEAD~1", "--test-cmd", f'"{PY}" -c "print(1)"')
+        self.assertEqual(data["counts"]["survived"], 7)
+        self.assertIn("every mutant survived", " ".join(data["notes"]))

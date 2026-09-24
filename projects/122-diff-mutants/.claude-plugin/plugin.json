@@ -1,0 +1,11 @@
+{
+  "name": "diff-mutants",
+  "displayName": "diff-mutants",
+  "version": "0.1.0",
+  "description": "Checks whether the tests that came with a change would catch a bug in it: mutation testing on the changed Python lines, and a list of changed tests that cannot fail.",
+  "author": { "name": "Kerem Özdemir", "url": "https://keremozdemir.de" },
+  "homepage": "https://github.com/Keremozdemirra/diff-mutants",
+  "repository": "https://github.com/Keremozdemirra/diff-mutants",
+  "license": "MIT",
+  "keywords": ["mutation-testing", "testing", "code-review", "python", "git", "diff"]
+}

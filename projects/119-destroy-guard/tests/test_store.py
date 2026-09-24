@@ -82,9 +82,7 @@ class Matching(Isolated):
         for i, body in enumerate(bodies):
             d = self.write_backup([self.target], name=f"20260924T10000{i}Z-{'a' * 12}")
             (d / "manifest.json").write_bytes(body)
-        d = self.write_backup([self.target], verified=False)
-        m = json.loads((d / "manifest.json").read_text())
-        m["verified"] = False
+        self.write_backup([self.target], verified=False)
         self.assertEqual(self.status()["status"], "missing")
         d = self.write_backup([self.target])
         m = json.loads((d / "manifest.json").read_text())
@@ -120,7 +118,7 @@ class Matching(Isolated):
         root = self.project / ".destroy-guard" / "backups"
         root.mkdir(parents=True)
         (root / "notes").mkdir()
-        (root / "20260924T100000Z-" ).mkdir()
+        (root / "20260924T100000Z-").mkdir()
         (root / "README").write_text("x")
         d = self.write_backup(["not a dict", 5, self.target])
         self.assertEqual(self.status()["backups"][0][0], d)

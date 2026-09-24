@@ -1,0 +1,15 @@
+{
+  "name": "diff-mutants",
+  "description": "The diff-mutants plugin: do the tests that came with a change actually test it?",
+  "owner": {
+    "name": "Kerem Özdemir",
+    "url": "https://github.com/Keremozdemirra"
+  },
+  "plugins": [
+    {
+      "name": "diff-mutants",
+      "source": "./",
+      "description": "Mutation testing on the Python lines a change touched, and a list of changed tests that cannot fail."
+    }
+  ]
+}

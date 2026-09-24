@@ -801,6 +801,8 @@ def _flow(s: str, i: int):
             item, i = _unquote(s[i:end]), end
         else:
             m = re.compile(r"[^,\]\}]*?(?=\s*(?:,|\]|\}|:\s|:$))" if opener == "{" else r"[^,\]\}]*").match(s, i)
+            if m is None:
+                raise YamlError("unterminated flow mapping")
             item, i = _scalar(m.group(0)), m.end()
         while i < len(s) and s[i] in " \t":
             i += 1
@@ -1117,7 +1119,7 @@ def npm_auth(pairs) -> dict:
 
 
 def _npm_target(reg: str) -> str:
-    return reg if reg == "default registry" else safe(mask_url("https:" + reg).split("://", 1)[1].rstrip("/"), 100)
+    return reg if reg == "default registry" else safe(mask_url("https:" + reg).split("://", 1)[-1].rstrip("/"), 100)
 
 
 def scan_npm(ctx: Context) -> Section:
@@ -1976,8 +1978,7 @@ def run_redact(ctx: Context, as_json: bool) -> int:
         print(json.dumps(result, indent=1))
     else:
         for d in done:
-            print(f"redacted {ctx.show(Path(d['file']))}: " + ", ".join(f"{k} {v}" for k, v in
-                                                                      sorted(d["replaced"].items())))
+            print(f"redacted {d['file']}: " + ", ".join(f"{k} {v}" for k, v in sorted(d["replaced"].items())))
         for f in failed:
             print(f"left unchanged {f['file']}: {f['error']}")
         print(f"backup: {ctx.show(backup_root)}")
@@ -2120,10 +2121,20 @@ SCANNERS = (scan_env, scan_aws, scan_gcloud, scan_azure, scan_kube, scan_docker,
             scan_git, scan_gh, scan_ssh, scan_terraform, scan_project)
 
 
+def _guarded(scan, ctx: Context) -> Section:
+    """One scanner's section; a bug in it becomes a reported error, never a traceback or a lost report."""
+    try:
+        return scan(ctx)
+    except Exception as e:  # noqa: BLE001 - the other sections still have to be reported
+        sec = Section(scan.__name__.replace("scan_", ""), scan.__name__.replace("scan_", "").capitalize())
+        sec.error("credential-reach", f"internal error ({type(e).__name__}); this part was not checked")
+        return sec
+
+
 def audit(ctx: Context, transcripts: bool = True) -> dict:
-    sections = [scan(ctx) for scan in SCANNERS]
+    sections = [_guarded(scan, ctx) for scan in SCANNERS]
     if transcripts:
-        sections.append(scan_transcripts(ctx)[0])
+        sections.append(_guarded(lambda c: scan_transcripts(c)[0], ctx))
     probe = probe_github(ctx) if ctx.probe else None
     blast = []
     order = {s: i for i, s in enumerate(SEVERITIES)}
@@ -2273,10 +2284,13 @@ def main(argv: list | None = None) -> int:
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):  # a Windows console that cannot print a character must not crash
         sys.stdout.reconfigure(errors="replace")
-    project = a.project if a.project is not None else Path.cwd()
     if a.project is not None and not a.project.is_dir():
         print(f"credential-reach: --project {safe(a.project, 200)}: not a directory", file=sys.stderr)
         return 2
+    try:
+        project = Path(os.path.abspath(a.project if a.project is not None else Path.cwd()))
+    except OSError:  # the current directory was deleted
+        project = None
     ctx = Context(Path.home(), os.environ, platform.system(), project, probe=a.probe)
     if a.redact:
         return run_redact(ctx, a.json)

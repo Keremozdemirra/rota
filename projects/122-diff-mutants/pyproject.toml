@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "diff-mutants"
+version = "0.1.0"
+description = "Mutation testing on the lines a git change touched: would the tests that came with the change catch a bug in it?"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["mutation-testing", "testing", "git", "diff", "code-review", "pytest", "unittest", "claude-code", "ai-agents"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Software Development :: Testing",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/diff-mutants"
+Issues = "https://github.com/Keremozdemirra/diff-mutants/issues"
+
+[project.scripts]
+diff-mutants = "diff_mutants:main"
+
+[tool.setuptools]
+py-modules = ["diff_mutants"]

@@ -116,6 +116,28 @@ class TerraformBackup(Base):
         self.assertIn("did not finish", err)
         self.assertEqual(self.backup_dirs(), [])
 
+    def test_disk_full(self):
+        self.fake_tool("terraform", [{"args": ["state", "pull"], "stdout": state_json()}])
+        with mock.patch.object(dg, "_write_private", side_effect=OSError(28, "No space left on device")):
+            code, _, err = self.backup("terraform destroy")
+        self.assertEqual(code, 1)
+        self.assertIn("No space left on device", err)
+        self.assertEqual(self.backup_dirs(), [])
+
+    def test_manifest_write_failure_leaves_nothing(self):
+        self.fake_tool("terraform", [{"args": ["state", "pull"], "stdout": state_json()}])
+        real = dg._write_private
+
+        def fail_on_manifest(path, data):
+            if path.name.startswith("manifest"):
+                raise OSError(5, "Input/output error")
+            return real(path, data)
+
+        with mock.patch.object(dg, "_write_private", side_effect=fail_on_manifest):
+            code, _, err = self.backup("terraform destroy")
+        self.assertEqual(code, 1)
+        self.assertEqual(self.backup_dirs(), [])  # the state file written before it is gone too
+
     def test_version_failure_is_not_a_backup_failure(self):
         self.fake_tool("terraform", [{"args": ["state", "pull"], "stdout": state_json()},
                                      {"args": ["version"], "stdout": "garbage"}])
@@ -158,6 +180,15 @@ class KubectlBackup(Base):
                 self.assertEqual(code, 1)
                 self.assertIn(message, err)
                 self.assertEqual(self.backup_dirs(), [])
+
+    def test_unicode_names_that_sanitise_alike(self):
+        self.fake_tool("kubectl", [
+            {"args": ["get", "configmap", "配置"], "stdout": k8s_object("ConfigMap", "配置", "prod")},
+            {"args": ["get", "configmap", "設定"], "stdout": k8s_object("ConfigMap", "設定", "prod")}])
+        code, out, err = self.backup("kubectl delete configmap 配置 設定 -n prod")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(len({e["file"] for e in self.manifest(self.backup_dirs()[0])["exports"]}), 2)
+        self.assertIsNone(self.hook("kubectl delete configmap 設定 -n prod"))
 
     def test_namespace_takes_its_contents(self):
         self.fake_tool("kubectl", [

@@ -39,9 +39,9 @@ directory (the long paths below are that directory). A teammate has pushed
 
 ```
 $ git log --oneline -1 origin/main  (what this clone last saw)
-9a9fa73 v1
+72a0030 v1
 $ git ls-remote origin main  (what the remote has now)
-ede93e2f3a1c09c6cfd110ced6d673d58b8ef79d	refs/heads/main
+d2254051c6316f1c592f892a6fc1f46a99aee297	refs/heads/main
 
 $ # the hook, as Claude Code calls it before: git push --force origin main
 {
@@ -55,10 +55,10 @@ $ # the hook, as Claude Code calls it before: git push --force origin main
 
 $ destroy-guard backup -- git push --force origin main
 git push --force overwrites refs/heads/main on origin (repository /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/live119/app); backing it up
-  refs/heads/main on origin was ede93e2f3a1c09c6cfd110ced6d673d58b8ef79d; kept as refs/destroy-guard/main-20260924T134448Z
-  git-main.txt: 117 bytes, sha256 2d19a6bc5d618a04...
-verified backup: /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/live119/app/.destroy-guard/backups/20260924T134448Z-b42adfce36a7
-  counts for this exact target until 14:14:48 UTC (30 min, destroy-guard's own window)
+  refs/heads/main on origin was d2254051c6316f1c592f892a6fc1f46a99aee297; kept as refs/destroy-guard/main-20260924T135026Z
+  git-main.txt: 117 bytes, sha256 55de4afe10d08080...
+verified backup: /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/live119/app/.destroy-guard/backups/20260924T135026Z-b42adfce36a7
+  counts for this exact target until 14:20:26 UTC (30 min, destroy-guard's own window)
   .destroy-guard/ is listed in /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/live119/app/.git/info/exclude
 Backups can hold secrets: Terraform state often contains passwords and keys, Kubernetes Secrets are only base64-encoded, Helm values often carry credentials. They stay on this machine, in a directory only you can read; destroy-guard never uploads or prints them.
 exit 0
@@ -68,9 +68,9 @@ $ # the hook again, same command
 
 $ git push --force origin main
   To /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/live119/origin.git
-   + ede93e2...9d2f7da main -> main (forced update)
+   + d225405...eae7327 main -> main (forced update)
 $ git log --oneline -1 refs/destroy-guard/main-*
-ede93e2 teammate: fix login
+d225405 teammate: fix login
 $ git status --porcelain  (the store is excluded)
 (empty)
 ```
@@ -206,7 +206,11 @@ another size, or if the manifest is malformed.
   and, from the repository's own `.git/config`, only `branch.<name>.remote`,
   `branch.<name>.pushRemote`, `branch.<name>.merge`, `remote.pushDefault` and
   `push.default`; from the kubeconfig, only the `current-context` line; and the manifest
-  files a `kubectl delete -f` names, to hash them. It reads `TF_WORKSPACE`, `TF_DATA_DIR`,
+  files a `kubectl delete -f` or `-k` names, to hash them (for a `-f` directory its `.json`,
+  `.yaml` and `.yml` files, the ones kubectl reads; for `-k`, every file). Names taken from
+  these files (workspace, context, branch, remote) are used only when they are plain names;
+  anything else leaves the target unresolved, so text a repository carries does not reach
+  the prompt or Claude's context. It reads `TF_WORKSPACE`, `TF_DATA_DIR`,
   `KUBECONFIG`, `HELM_NAMESPACE`, `HELM_KUBECONTEXT`, `DESTROY_GUARD_DIR` and
   `DESTROY_GUARD_MAX_AGE_MINUTES` from the environment, plus `HOME` for `~` and `PATH` to name
   the backup command. It runs no command, writes no file,

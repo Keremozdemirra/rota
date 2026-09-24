@@ -136,6 +136,12 @@ REDIRECTS = {"<", ">", ">>", "<<", "<<<", "<&", ">&", "&>", "&>>", "<>", ">|"}
 WINDOWS_PATH = re.compile(r"(?<![A-Za-z0-9])[A-Za-z]:\\")
 HEREDOC_OP = re.compile(r"<<(-?)[ \t]*(?:'([^'\n]*)'|\"([^\"\n]*)\"|((?:\\.|[^\s;&|()<>'\"])+))")
 DYNAMIC = re.compile(r"[$`*?]")
+# Names read from files a repository can carry (.terraform/environment, a kubeconfig, .git) end up
+# in the prompt and in Claude's context, so only plain names are taken. Terraform allows URL-safe
+# workspace names without path separators; kube contexts are often ARNs; git refs exclude these.
+PLAIN_WORKSPACE = re.compile(r"[A-Za-z0-9_.~-]{1,90}")
+PLAIN_CONTEXT = re.compile(r"[A-Za-z0-9_.:/@+-]{1,253}")
+PLAIN_REF = re.compile(r"[A-Za-z0-9_./@+-]{1,200}")
 
 
 def _prepass(text: str, shell: str = "bash", body: bool = False):
@@ -750,6 +756,8 @@ def _terraform(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
             ws = _read_small(Path(d) / data_dir / "environment", 4096).strip() or "default"
         if DYNAMIC.search(ws):
             problem = "its workspace comes from a shell expression, so destroy-guard cannot match a backup to it."
+        elif not PLAIN_WORKSPACE.fullmatch(ws):
+            problem, ws = "its workspace name is not a plain name, so destroy-guard does not repeat or match it.", None
     real = os.path.realpath(d) if d else ""
     scope = f"the {product} state of {real} (workspace {_q(ws)})" if not problem else f"what the {product} state tracks"
     what = f"removes entries from {scope}; the resources themselves stay" if action == "state rm" \
@@ -816,17 +824,22 @@ def kube_context(ctx: _Ctx, context_flag, kubeconfig_flag, env_context: str = ""
     if any(p is None for p in paths):
         return "", "", "its kubeconfig path comes from a shell expression or an unknown directory."
     kubeconfig = os.pathsep.join(os.path.realpath(p) for p in paths)
-    context = context_flag if context_flag is not None else env.get(env_context) if env_context else None
+    context = context_flag if context_flag is not None else (env.get(env_context) or None) if env_context else None
     if context is not None:
         if not context or DYNAMIC.search(context):
             return "", kubeconfig, "its context comes from a shell expression, so destroy-guard cannot match a backup."
+        if not PLAIN_CONTEXT.fullmatch(context):
+            return "", kubeconfig, "its context is not a plain name, so destroy-guard does not repeat or match it."
         return context, kubeconfig, None
     for p in paths:
         text = _read_small(p)
         m = re.search(r"(?m)^current-context:[ \t]*(.*?)[ \t]*$", text) or \
             re.search(r'"current-context"\s*:\s*"((?:[^"\\]|\\.)*)"', text)
         if m and m.group(1).strip("'\""):
-            return m.group(1).strip("'\""), kubeconfig, None
+            name = m.group(1).strip("'\"")
+            if not PLAIN_CONTEXT.fullmatch(name):
+                return "", kubeconfig, "the kubeconfig's current-context is not a plain name, so destroy-guard does not repeat or match it."
+            return name, kubeconfig, None
     return "", kubeconfig, None
 
 
@@ -1066,7 +1079,7 @@ def git_config(common: Path) -> dict:
 
 def current_branch(gitdir: Path):
     m = re.fullmatch(r"ref:\s*refs/heads/(.+)", _read_small(gitdir / "HEAD", 4096).strip())
-    return m.group(1) if m else None
+    return m.group(1) if m and PLAIN_REF.fullmatch(m.group(1)) else None
 
 
 def _full_ref(name: str) -> str:
@@ -1158,6 +1171,9 @@ def _git(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
             return [detached]
         remote = (cfg.get(f"branch.{branch}.pushremote") or cfg.get("remote.pushdefault")
                   or cfg.get(f"branch.{branch}.remote") or "origin")
+        if not PLAIN_REF.fullmatch(remote):
+            return [_op(ctx, tool, label, "rewrites a branch on a remote", problem="the repository's config names a"
+                        " remote that is not a plain name, so destroy-guard does not repeat or match it.")]
     if DYNAMIC.search(remote) or any(DYNAMIC.search(s) for s in specs):
         return [_op(ctx, tool, label, "rewrites a branch on a remote", problem="its remote or branch comes from a shell"
                     " expression, so destroy-guard cannot match a backup.")]
@@ -1176,7 +1192,8 @@ def _git(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
                             " pushes every branch that exists on both sides; destroy-guard makes backups of single"
                             " branches only.", auto=False)]
             merge = cfg.get(f"branch.{branch}.merge")
-            dst = merge if mode in ("upstream", "tracking") and merge else f"refs/heads/{branch}"
+            dst = merge if mode in ("upstream", "tracking") and merge and PLAIN_REF.fullmatch(merge) \
+                else f"refs/heads/{branch}"
         else:
             src, colon, dst = s.lstrip("+").partition(":")
             if not colon:
@@ -1364,8 +1381,10 @@ def find_backup(op: dict, now=None, window=None) -> dict:
             if not keys:
                 continue
             age = now - created
+            if age < -CLOCK_SKEW:
+                continue  # dated in the future: not a backup of now, and no age worth reporting
             newest = age if newest is None or age < newest else newest
-            if -CLOCK_SKEW <= age <= window and not keys <= covered:
+            if age <= window and not keys <= covered:
                 covered |= keys
                 used.append((d, age))
     ok = bool(wanted) and covered >= wanted
@@ -1623,6 +1642,10 @@ def _export_kubectl(op, exe, env, d: Path):
     exports, notes = [], []
 
     def save(fname, data, command, facts):
+        stem, n = fname[:-len(".json")], 1
+        while (d / fname).exists():  # two names that sanitise alike
+            n += 1
+            fname = f"{stem}-{n}.json"
         sha, size = _write_private(d / fname, data)
         exports.append(dict(file=fname, command=command, bytes=size, sha256=sha, facts=facts))
 
@@ -1819,22 +1842,27 @@ def backup_one(op: dict, out=sys.stdout, err=sys.stderr, now=None) -> int:
             exports, versions, facts = exporter(op, exe, env, d, now)
         else:
             exports, versions, facts = exporter(op, exe, env, d)
+        manifest = {
+            "destroy_guard": VERSION, "format": 1, "created_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "command": " ".join(mask_words(list(op["assign"]) + list(op["words"]), _basename(op["exe"]),
+                                           len(op["assign"]))),
+            "label": op["label"], "what": op["what"], "targets": op["targets"], "exports": exports,
+            "tool_versions": versions, "verified": True,
+        }
+        # written last, and renamed into place: a directory without a manifest never counts
+        _write_private(d / "manifest.json.tmp", json.dumps(manifest, indent=2, ensure_ascii=False).encode("utf-8"))
+        os.replace(d / "manifest.json.tmp", d / "manifest.json")
     except ExportError as e:
         shutil.rmtree(d, ignore_errors=True)
         print(f"{op['label']}: no backup written: {e}", file=err)
         return e.code
+    except OSError as e:  # disk full, permissions changed under us
+        shutil.rmtree(d, ignore_errors=True)
+        print(f"{op['label']}: no backup written: {e.strerror or e}", file=err)
+        return 1
     except BaseException:
         shutil.rmtree(d, ignore_errors=True)  # a half-written backup may hold secrets
         raise
-    manifest = {
-        "destroy_guard": VERSION, "format": 1, "created_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "command": " ".join(mask_words(list(op["assign"]) + list(op["words"]), _basename(op["exe"]),
-                                       len(op["assign"]))),
-        "label": op["label"], "what": op["what"], "targets": op["targets"], "exports": exports,
-        "tool_versions": versions, "verified": True,
-    }
-    _write_private(d / "manifest.json.tmp", json.dumps(manifest, indent=2, ensure_ascii=False).encode("utf-8"))
-    os.replace(d / "manifest.json.tmp", d / "manifest.json")
     until = (now + max_age()).strftime("%H:%M:%S UTC")
     for f in facts:
         print(f"  {f}", file=out)
@@ -1958,9 +1986,12 @@ def cmd_list(opts, out, err) -> int:
             status, bad = created, bad + 1
         else:
             for e in m["exports"]:
-                data = (d / e["file"]).read_bytes()
-                if hashlib.sha256(data).hexdigest() != e.get("sha256"):
-                    status, bad = f"{e['file']}: checksum differs", bad + 1
+                try:
+                    digest = hashlib.sha256((d / e["file"]).read_bytes()).hexdigest()
+                except OSError:
+                    digest = None
+                if digest != e.get("sha256"):
+                    status, bad = f"{e['file']}: " + ("checksum differs" if digest else "unreadable"), bad + 1
                     break
         rows.append({"dir": str(d), "created_utc": m["created_utc"] if m else None,
                      "age_seconds": int((now - created).total_seconds()) if m else None,

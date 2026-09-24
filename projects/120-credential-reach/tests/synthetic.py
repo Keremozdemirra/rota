@@ -101,7 +101,8 @@ def write(path: Path, content, mode: int | None = None) -> Path:
     if isinstance(content, bytes):
         path.write_bytes(content)
     else:
-        path.write_text(content, encoding="utf-8", newline="")
+        with open(path, "w", encoding="utf-8", newline="") as f:  # newline="": write exactly these bytes, on Windows too
+            f.write(content)
     if mode is not None:
         os.chmod(path, mode)
     return path

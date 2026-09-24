@@ -54,6 +54,10 @@ KILL_GRACE = 2.0              # seconds between SIGTERM and SIGKILL for a test r
 TAIL_BYTES = 8192             # output kept from each test run; the rest is read and dropped
 GIT_TIMEOUT = 120.0
 DEFAULT_BASES = ("origin/HEAD", "origin/main", "origin/master", "main", "master")
+# How unittest (all versions) and pytest say they found nothing to run. Before Python 3.12, unittest then
+# still exits 0; since 3.12 it exits 5, as pytest does for "No tests were collected"
+# (docs.python.org/3/library/unittest.html and docs.pytest.org/en/stable/reference/exit-codes.html, checked 2026-09-24).
+NO_TESTS = re.compile(r"(?m)^Ran 0 tests in |^NO TESTS RAN|\bno tests ran\b|\bcollected 0 items\b")
 
 # ---------------------------------------------------------------- cleaning and masking
 
@@ -141,11 +145,11 @@ def clean_block(raw: bytes, max_lines: int = 12, limit: int = 1500) -> str:
 
 
 def last_line(tail: str) -> str:
-    """What a test runner prints last ("3 passed in 0.02s", "OK"), with the line before it when that is short."""
+    """What a test runner prints last: "3 passed in 0.02s", or unittest's "Ran 3 tests in 0.001s / OK"."""
     lines = [ln.strip() for ln in tail.split("\n") if ln.strip()]
     if not lines:
         return ""
-    if len(lines[-1]) < 20 and len(lines) > 1:
+    if len(lines) > 1 and lines[-1].startswith(("OK", "FAILED", "NO TESTS RAN")):
         return clean(lines[-2] + " / " + lines[-1], 160)
     return clean(lines[-1], 160)
 
@@ -1185,6 +1189,20 @@ def resolve_python(repo: Path) -> str:
     return sys.executable
 
 
+def shown_python(python: str, repo: Path) -> str:
+    """The interpreter as printed: short, and without the user's home directory in a pull request comment."""
+    for var in ("VIRTUAL_ENV", "CONDA_PREFIX"):
+        root = os.environ.get(var)
+        if root and _within(os.path.abspath(python), os.path.abspath(root)):
+            return f"${var}/" + Path(os.path.relpath(python, root)).as_posix()
+    if _within(os.path.abspath(python), os.path.abspath(repo)):
+        return Path(os.path.relpath(python, repo)).as_posix()
+    name = os.path.basename(python)
+    if shutil.which(name) and os.path.abspath(shutil.which(name)) == os.path.abspath(python):
+        return name
+    return python
+
+
 def default_command(python: str, cwd: Path, env: dict) -> list[str]:
     try:
         p = subprocess.run([python, "-c", "import pytest"], cwd=str(cwd), env=env, stdout=subprocess.DEVNULL,
@@ -1405,7 +1423,7 @@ def execute(repo: Path, a, report: dict, selected: list[Candidate], p: dict) -> 
             shown = mask_command(cmd)
         else:
             cmd = default_command(python, copy, env)
-            shown = mask_command(shlex.join(cmd))
+            shown = mask_command(shlex.join([shown_python(python, repo)] + cmd[1:]))
         report["test_command"] = shown
 
         cap = a.timeout or BASELINE_TIMEOUT
@@ -1413,16 +1431,23 @@ def execute(repo: Path, a, report: dict, selected: list[Candidate], p: dict) -> 
         progress(f"diff-mutants: running {shown} on the unmutated code")
         base = run_command(cmd, copy, env, cap)
         report["baseline"] = {"exit_code": base.exit_code, "seconds": round(base.seconds, 2)}
-        if base.exit_code != 0:
+        empty = base.exit_code == 5 or (base.exit_code == 0 and NO_TESTS.search(base.tail))
+        if base.exit_code != 0 or empty:
             report["baseline"]["output_tail"] = base.tail
+        hint = ""
+        if a.test_cmd is None and "unittest" in cmd:
+            hint = f". pytest is not importable by {shown_python(python, repo)}, so unittest ran instead: " \
+                   "activate the environment your tests run in, or pass --test-cmd"
         if base.timed_out:
             raise Stop(f"the test command did not finish within {cap:.0f} s on the unmutated code"
                        + ("; raise --timeout" if a.timeout else ""))
+        if empty:
+            raise Stop(f"the test command ran no tests (exit {base.exit_code}), so every mutant would survive{hint}")
         if base.exit_code != 0:
-            why = {5: " (pytest collected no tests)", 127: " (command not found)"}.get(base.exit_code, "")
+            why = " (command not found)" if base.exit_code == 127 else ""
             tail = last_line(base.tail)
             raise Stop(f"the test command fails on the unmutated code: exit {base.exit_code}{why}, so a mutant "
-                       f"could not be told apart" + (f". Its output ends: {tail}" if tail else ""))
+                       f"could not be told apart" + (f". Its output ends: {tail}" if tail else "") + hint)
         timeout = a.timeout or round(TIMEOUT_FLOOR + TIMEOUT_FACTOR * base.seconds, 1)
         report["timeout_seconds"] = timeout
         outside = probe_imports(python, copy, env, module_names(copy, p["sources"]))
@@ -1467,6 +1492,9 @@ def finish(report: dict, selected: list[Candidate]) -> dict:
     for key in ("killed", "survived", "timeout"):
         counts[key] = sum(1 for m in report["mutants"] if m["status"] == key)
     counts["run"] = counts["killed"] + counts["survived"] + counts["timeout"]
+    if counts["run"] >= 3 and counts["survived"] == counts["run"]:
+        report["notes"].append("every mutant survived: check that the test command runs the tests that "
+                               "exercise this code")
     counts["not_run"] = max(0, counts["not_run"] - counts["run"])
     counts["tests_that_cannot_fail"] = len(report["tests_that_cannot_fail"])
     return report
@@ -1522,7 +1550,7 @@ def render_text(report: dict) -> str:
     out.append(head)
     if report["test_command"]:
         line = f"Test command: {report['test_command']}"
-        if report["baseline"] and report["baseline"]["exit_code"] == 0:
+        if report["baseline"] and report["timeout_seconds"]:  # the unmutated run passed and ran tests
             line += f" (passes unmutated in {report['baseline']['seconds']:.2f} s; " \
                     f"timeout per mutant {report['timeout_seconds']} s)"
         out.append(line)

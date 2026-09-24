@@ -115,8 +115,9 @@ Corrigenda that do not correct the English version (ENG) do not change the text 
 | 02004L0109-20240109 | 270670 | `6f97a4e64fc1c5e901dcc15446ba8d7581af0a520e5cb4af4469049d49354662` | 2026-09-24 |
 | 52024XC06792 | 1474894 | `364d7147140c026df914d784da5d2d0904a0e07e4e417b31b72f6ea52e42adf2` | 2026-09-24 |
 | 02019R2088-20260702 | 121157 | `5cb7fc10620a38ce3cad0fb96769c794e78f4b4bb8b4ca2d55d3fc9a51ecce20` | 2026-09-24 |
+| 02022L2464-20250417 | 296057 | `a2b916a3c6d5d9fab6ebc87b16e2417314b01d24e5a434e453a81d17f7dfb098` | 2026-09-24 |
 
-62 quotations are stored in `legal_basis.json` under `quotes`.
+66 quotations are stored in `legal_basis.json` under `quotes`.
 
 ## National measures
 
