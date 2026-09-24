@@ -1,0 +1,35 @@
+name: release
+
+# Publishes to PyPI when a GitHub release is published. Trusted publishing:
+# PyPI trusts this workflow by name, so no API token exists anywhere, not even
+# as a repository secret. One-time setup on pypi.org: add a (pending) trusted
+# publisher for this repository, workflow `release.yml`, environment `pypi`.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+      # A release tagged v0.2.0 over a pyproject still saying 0.1.0 would publish
+      # the old number under the new tag; refuse instead.
+      - name: Tag matches the package version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          test "$TAG" = "v$VERSION" || { echo "tag $TAG does not match version $VERSION"; exit 1; }
+      - run: python -m unittest discover -s tests
+      - run: python -m pip install build==1.6.1 && python -m build
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2

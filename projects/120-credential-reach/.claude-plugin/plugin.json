@@ -1,0 +1,11 @@
+{
+  "name": "credential-reach",
+  "displayName": "Credential Reach",
+  "version": "0.1.0",
+  "description": "Lists the credentials an agent running as you could use (environment, cloud CLIs, kubeconfig, registry tokens, SSH keys, .env files, transcripts) without printing a secret.",
+  "author": { "name": "Kerem Özdemir", "url": "https://keremozdemir.de" },
+  "homepage": "https://github.com/Keremozdemirra/credential-reach",
+  "repository": "https://github.com/Keremozdemirra/credential-reach",
+  "license": "MIT",
+  "keywords": ["credentials", "secrets", "audit", "blast-radius", "least-privilege", "ai-agents"]
+}

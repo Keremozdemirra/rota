@@ -1,0 +1,16 @@
+Recorded 2026-09-24 with git version 2.43.0, in throwaway repositories, with the
+flags diff_mutants.py uses:
+
+git -c core.quotepath=off -c diff.noprefix=false -c diff.mnemonicPrefix=false \
+    -c color.ui=never diff --no-color --no-ext-diff --no-textconv \
+    --src-prefix=a/ --dst-prefix=b/ --unified=0 HEAD~1...HEAD
+
+git-diff-change.diff: a rename with an edit, a binary file, a new file, a deleted
+file, a new symlink, two hunks in one file (one of them a pure deletion plus an
+addition), a file without a final newline, a .txt file, a non-ASCII file name, added
+lines that look like diff headers (`++y`, `+++ b/fake.py`, `@@`, `diff --git`), a file
+name with a double quote, one with a backslash, one with a space (git appends a TAB
+after it), and a mode-only change.
+
+git-diff-names.diff: a file name that is not valid UTF-8 (byte 0xE9, printed raw
+because of core.quotepath=off) and one with a real TAB (C-quoted).

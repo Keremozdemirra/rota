@@ -1,0 +1,15 @@
+{
+  "name": "destroy-guard",
+  "description": "The destroy-guard plugin: destructive infrastructure commands wait for a fresh, verified backup of what they remove.",
+  "owner": {
+    "name": "Kerem Özdemir",
+    "url": "https://github.com/Keremozdemirra"
+  },
+  "plugins": [
+    {
+      "name": "destroy-guard",
+      "source": "./",
+      "description": "Asks before terraform destroy, kubectl delete, helm uninstall or git push --force unless a fresh, verified backup of exactly that target exists, and names the command that makes one."
+    }
+  ]
+}

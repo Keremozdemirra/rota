@@ -114,12 +114,18 @@ def mask_command(cmd: str) -> str:
         else:
             out.append(mask_text(w, assignments=False))
         hide_next = bool(FLAG.fullmatch(w) and SECRET_WORD.search(w))
-    return clean(shlex.join(out) if os.name == "posix" else " ".join(out), 300)
+    return clean(" ".join(w if re.fullmatch(r"[^\s'\"]+", w) else shlex.quote(w) for w in out), 300)
 
 
 def clean(text, limit: int = 160) -> str:
     """One line, no control or bidi characters, bounded. Mask first: cutting can split a secret's delimiter."""
     t = re.sub(r"\s+", " ", CONTROL.sub(" ", ANSI.sub("", str(text)))).strip()
+    return t if len(t) <= limit else t[:limit - 3].rstrip() + "..."
+
+
+def clean_line(text, limit: int = 200) -> str:
+    """A line of source for display: masked, no control characters, its own spacing kept, bounded."""
+    t = CONTROL.sub(" ", ANSI.sub("", mask_text(str(text), assignments=False))).replace("\t", " ").strip()
     return t if len(t) <= limit else t[:limit - 3].rstrip() + "..."
 
 
@@ -209,8 +215,8 @@ class Candidate:
     def __init__(self, path, line, operator, description, edits, anchor):
         self.path, self.line, self.operator, self.description = path, line, operator, description
         self.edits = edits      # [(start, end, replacement)] on the original text
-        self.anchor = anchor    # index of the first edit, for the before/after line
-        self.text = None
+        self.anchor = anchor    # index of the edit that is the mutation, for the before/after line
+        self.text = self.data = None
         self.before = self.after = ""
         self.result = None
 
@@ -309,8 +315,8 @@ class Mutator:
         return (i, j) if j is not None else None
 
     def _add(self, line, operator, description, edits):
-        anchor = min(e[0] for e in edits)
-        self.found.append(Candidate(self.path, line, operator, description, edits, anchor))
+        # the first edit is the mutation; any others only add parentheses around it
+        self.found.append(Candidate(self.path, line, operator, description, edits, edits[0][0]))
 
     def _touched(self, node: ast.AST) -> int | None:
         """First changed line inside a statement, for statement-level mutations."""
@@ -321,7 +327,8 @@ class Mutator:
 
     def _short(self, node: ast.AST, limit: int = 40) -> str:
         a, b = self.src.span(node)
-        return clean(self.src.text[a:b], limit)
+        # descriptions go inside Markdown code spans, where a backtick would end the span
+        return clean(mask_text(self.src.text[a:b], False), limit).replace("`", "'")
 
     # -- traversal -------------------------------------------------------------
 
@@ -383,10 +390,11 @@ class Mutator:
             tokens = [self._op_between(a, b, old) for a, b in zip(node.values, node.values[1:])]
             if not tokens or any(t is None for t in tokens):
                 return
-            lines = [self.src.line_of(t[0]) for t in tokens if self.src.line_of(t[0]) in self.changed]
-            if not lines:
+            on_changed = [t for t in tokens if self.src.line_of(t[0]) in self.changed]
+            if not on_changed:
                 return
-            edits = [(a, b, new) for a, b in tokens]
+            edits = [(on_changed[0][0], on_changed[0][1], new)] + [(a, b, new) for a, b in tokens
+                                                                   if (a, b) != on_changed[0]]
             # `a or b and c` would read `a or b or c`, one flat BoolOp: parentheses keep the tree's shape
             if isinstance(self.parents.get(node), ast.BoolOp):
                 a, b = self.src.span(node)
@@ -396,7 +404,7 @@ class Mutator:
                 if isinstance(value, ast.BoolOp) and isinstance(value.op, new_op):
                     a, b = self.src.span(value)
                     edits += [(a, a, "("), (b, b, ")")]
-            self._add(lines[0], "boolean", f"`{old}` → `{new}`", edits)
+            self._add(self.src.line_of(on_changed[0][0]), "boolean", f"`{old}` → `{new}`", edits)
         elif isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Not):
             if node.lineno not in self.changed:
                 return
@@ -423,7 +431,8 @@ class Mutator:
                     return
             except (ValueError, SyntaxError):
                 return
-            self._add(node.lineno, "constant", f"`{clean(literal, 30)}` → `{new}`", [(a, b, new)])
+            self._add(node.lineno, "constant", f"`{clean(literal, 30).replace('`', chr(39))}` → `{new}`",
+                      [(a, b, new)])
         elif isinstance(node, ast.Return) and node.value is not None:
             if isinstance(node.value, ast.Constant) and node.value.value is None:
                 return
@@ -463,13 +472,14 @@ def node_differences(a, b, out: list, path: str = "") -> list:
     return out
 
 
-def valid_mutant(original: ast.AST, text: str) -> bool:
-    """Parses, and differs from the original in exactly one node."""
+def valid_mutant(original: ast.AST, text: str) -> bool | None:
+    """Parses, and differs from the original in exactly one node. None when the tree is too deep to tell."""
     try:
-        tree = ast.parse(text)
-    except (SyntaxError, ValueError, RecursionError):
+        return len(node_differences(original, ast.parse(text), [])) == 1
+    except (RecursionError, MemoryError):
+        return None
+    except (SyntaxError, ValueError):
         return False
-    return len(node_differences(original, tree, [])) == 1
 
 
 def describe_lines(src: Source, mutated: str, cand: Candidate) -> tuple[str, str]:
@@ -477,9 +487,9 @@ def describe_lines(src: Source, mutated: str, cand: Candidate) -> tuple[str, str
     line = src.line_of(cand.anchor)
     before = src.line(line)
     after = Source(mutated).line(line)
-    multi = any(src.line_of(e[1]) != line or "\n" in e[2] for e in cand.edits)
+    multi = any(src.line_of(e[0]) != line or src.line_of(e[1]) != line for e in cand.edits)
     suffix = " …" if multi else ""
-    return (clean(mask_text(before, False), 200) + suffix, clean(mask_text(after, False), 200) + suffix)
+    return clean_line(before) + suffix, clean_line(after) + suffix
 
 
 def select(files: dict, limit: int) -> tuple[list[Candidate], int, int]:
@@ -495,13 +505,19 @@ def select(files: dict, limit: int) -> tuple[list[Candidate], int, int]:
     while any(depth < len(q) for q in queues):
         order += [q[depth] for q in queues if depth < len(q)]
         depth += 1
-    selected, seen, skipped = [], set(), 0
+    selected, seen, skipped, too_deep = [], set(), 0, set()
     for c in order:
         if len(selected) >= limit:
             break
+        if c.path in too_deep:
+            skipped += 1
+            continue
         src, tree, _ = files[c.path]
         text = c.apply(src.text)
-        if (c.path, text) in seen or not valid_mutant(tree, text):
+        valid = (c.path, text) not in seen and valid_mutant(tree, text)
+        if valid is None:
+            too_deep.add(c.path)  # every other mutant of this file would hit the same depth
+        if not valid:
             skipped += 1
             continue
         seen.add((c.path, text))
@@ -517,7 +533,7 @@ ASSERT_PREFIX = re.compile(r"(?:[Aa]ssert|[Cc]heck|[Vv]erify|[Ee]xpect)(?![a-z])
 OUTCOME_CALLS = {"raises", "warns", "deprecated_call", "fail"}  # pytest's, which raise BaseException subclasses
 SKIP_DECORATORS = {"pytest.mark.skip", "mark.skip", "unittest.skip", "skip"}
 XFAIL_DECORATORS = {"pytest.mark.xfail", "mark.xfail", "unittest.expectedFailure", "expectedFailure"}
-SKIP_CALLS = {"pytest.skip", "self.skipTest", "skipTest", "skip"}
+SKIP_CALLS = {"pytest.skip", "self.skipTest"}
 TRUE_METHODS = {"assertTrue", "assert_", "failUnless"}
 FALSE_METHODS = {"assertFalse", "failIf"}
 EQUAL_METHODS = {"assertEqual", "assertEquals", "failUnlessEqual", "assertIs", "assertAlmostEqual",
@@ -593,10 +609,11 @@ def _why_true(node) -> str:
     if isinstance(node, ast.BoolOp):
         return "asserts an `or` with a part that is always true" if isinstance(node.op, ast.Or) \
             else "asserts an `and` of parts that are always true"
-    if isinstance(node, ast.Compare) and _same(node.left, node.comparators[0]):
-        return "compares an expression with itself"
     if isinstance(node, ast.Compare):
-        return "compares two constants"
+        if _literal(node.left)[0] and _literal(node.comparators[0])[0]:
+            return "compares two constants"
+        if _same(node.left, node.comparators[0]):
+            return "compares an expression with itself"
     return "asserts something that is always true"
 
 
@@ -664,14 +681,15 @@ class TestInspector:
 
     @staticmethod
     def _assertion_call_family(call: ast.Call) -> str | None:
-        name = _dotted(call.func)
-        parts = [p for p in name.split(".") if p]
+        """"assertion" for calls that raise AssertionError and the like, "outcome" for pytest.raises/fail,
+        whose exceptions derive from BaseException and pass through `except Exception`."""
+        parts = [p for p in _dotted(call.func).split(".") if p]
         if not parts:
             return None
-        if parts[-1] in OUTCOME_CALLS:
-            return "outcome"
         if any(ASSERT_PREFIX.match(p) for p in parts):
             return "assertion"
+        if parts[-1] in OUTCOME_CALLS:
+            return "assertion" if parts[0] in ("self", "cls") else "outcome"  # self.fail raises AssertionError
         return None
 
     def _constant_call(self, call: ast.Call) -> str | None:
@@ -682,11 +700,11 @@ class TestInspector:
         if method in FALSE_METHODS and args and _truth(args[0]) is False:
             return f"{method}() on something that is always false"
         if method in EQUAL_METHODS and len(args) >= 2:
-            if _same(args[0], args[1]):
-                return f"{method}() compares an expression with itself"
             (lk, lv), (rk, rv) = _literal(args[0]), _literal(args[1])
             if lk and rk and lv == rv:
                 return f"{method}() compares two equal constants"
+            if _same(args[0], args[1]):
+                return f"{method}() compares an expression with itself"
         if method in UNEQUAL_METHODS and len(args) >= 2:
             (lk, lv), (rk, rv) = _literal(args[0]), _literal(args[1])
             if lk and rk and lv != rv:
@@ -854,13 +872,23 @@ def git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProce
     except FileNotFoundError:
         raise Stop("git is not installed or not on PATH") from None
     except subprocess.TimeoutExpired:
-        raise Stop(f"git {args[0]} did not finish within {GIT_TIMEOUT:.0f} s") from None
+        raise Stop(f"git {_subcommand(args)} did not finish within {GIT_TIMEOUT:.0f} s") from None
     except OSError as e:
         raise Stop(f"git could not be started: {e.strerror or e}") from None
     if check and p.returncode != 0:
         msg = clean(mask_text(p.stderr.decode("utf-8", "replace")), 300) or f"exit {p.returncode}"
-        raise Stop(f"git {args[0]} failed: {msg}")
+        raise Stop(f"git {_subcommand(args)} failed: {msg}")
     return p
+
+
+def _subcommand(args) -> str:
+    it = iter(args)
+    for word in it:
+        if word == "-c":
+            next(it, None)
+        elif not word.startswith("-"):
+            return word
+    return "?"
 
 
 def toplevel(path: Path) -> Path:
@@ -868,7 +896,8 @@ def toplevel(path: Path) -> Path:
         raise Stop(f"{clean(str(path), 200)}: no such directory")
     p = git(path, "rev-parse", "--show-toplevel", check=False)
     if p.returncode != 0:
-        raise Stop(f"{clean(str(path), 200)} is not inside a git working tree")
+        why = clean(mask_text(p.stderr.decode("utf-8", "replace")), 200)
+        raise Stop(f"{clean(str(path), 200)} is not inside a git working tree" + (f" (git: {why})" if why else ""))
     return Path(os.fsdecode(p.stdout.strip()))
 
 
@@ -1023,10 +1052,11 @@ def copy_tree(src: Path, dst: Path, notes: list[str]) -> None:
 def write_inside(root: Path, rel: str, data: bytes) -> None:
     """Write a file of the copy, refusing any path that would lead out of it (through `..` or a symlink)."""
     target = root.joinpath(*PurePosixPath(rel).parts)
-    target.parent.mkdir(parents=True, exist_ok=True)
     real_root = os.path.realpath(root)
-    if not _within(os.path.realpath(target), real_root):
+    # realpath resolves the parts that exist, so a symlinked directory is caught before anything is created
+    if not safe_rel(rel) or not _within(os.path.realpath(target), real_root):
         raise Stop(f"{clean(rel, 120)} resolves outside the temporary copy; not written")
+    target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists():
         os.chmod(target, os.stat(target).st_mode | stat.S_IWUSR)
     tmp = target.with_name(target.name + ".diff-mutants-tmp")
@@ -1043,7 +1073,10 @@ def remove_tree(path: Path) -> str | None:
         except OSError:
             pass
     for _ in range(3):
-        shutil.rmtree(path, onerror=onerror)
+        if sys.version_info >= (3, 12):
+            shutil.rmtree(path, onexc=onerror)
+        else:
+            shutil.rmtree(path, onerror=onerror)
         if not os.path.lexists(path):
             return None
         time.sleep(0.2)
@@ -1246,10 +1279,8 @@ def _raise_terminate(signum, frame):
 
 def plan(repo: Path, a) -> dict:
     """What changed and what to do about it; no test runs yet."""
-    report = {"tool": "diff-mutants", "version": VERSION, "checked": dt.date.today().isoformat(),
-              "repository": str(repo), "compared": {}, "changed": [], "test_command": None, "baseline": None,
-              "timeout_seconds": None, "counts": {}, "mutants": [], "tests_that_cannot_fail": [],
-              "notes": [], "complete": False, "error": None}
+    report = _empty_report()
+    report["repository"] = str(repo)
     head = rev(repo, "HEAD")
     if a.staged:
         diff_args = ["diff", "--cached", *DIFF_OPTS, "--", "*.py"]
@@ -1294,7 +1325,7 @@ def plan(repo: Path, a) -> dict:
                 on_disk = fh.read()
         except OSError:
             on_disk = None
-        if on_disk != data.stdout:
+        if on_disk is None or on_disk.replace(b"\r\n", b"\n") != data.stdout.replace(b"\r\n", b"\n"):
             report["notes"].append(f"{clean(path, 120)}: the working tree differs from {what}; "
                                    f"the version in {what} was used")
         (tests if role == "test" else sources)[path] = (data.stdout, info["lines"])
@@ -1352,7 +1383,10 @@ def execute(repo: Path, a, report: dict, selected: list[Candidate], p: dict) -> 
         copy_tree(repo, copy, report["notes"])
         originals = {}
         for path, (data, _) in list(p["sources"].items()) + list(p["tests"].items()):
-            write_inside(copy, path, data)
+            try:
+                write_inside(copy, path, data)
+            except OSError as e:
+                raise Stop(f"could not write {clean(path, 120)} in the temporary copy: {e.strerror or e}") from None
             originals[path] = data
         env = dict(os.environ)
         env["PYTHONDONTWRITEBYTECODE"] = "1"
@@ -1362,7 +1396,10 @@ def execute(repo: Path, a, report: dict, selected: list[Candidate], p: dict) -> 
         python = resolve_python(repo)
         if a.test_cmd is not None:
             cmd = a.test_cmd
-            first = (shlex.split(cmd)[:1] or [""])[0] if cmd.strip() else ""
+            try:
+                first = (shlex.split(cmd)[:1] or [""])[0]
+            except ValueError:
+                first = ""
             if re.fullmatch(r"(?i)python[0-9.]*(?:\.exe)?", os.path.basename(first)):
                 python = shutil.which(first) or python
             shown = mask_command(cmd)
@@ -1376,6 +1413,8 @@ def execute(repo: Path, a, report: dict, selected: list[Candidate], p: dict) -> 
         progress(f"diff-mutants: running {shown} on the unmutated code")
         base = run_command(cmd, copy, env, cap)
         report["baseline"] = {"exit_code": base.exit_code, "seconds": round(base.seconds, 2)}
+        if base.exit_code != 0:
+            report["baseline"]["output_tail"] = base.tail
         if base.timed_out:
             raise Stop(f"the test command did not finish within {cap:.0f} s on the unmutated code"
                        + ("; raise --timeout" if a.timeout else ""))
@@ -1394,13 +1433,16 @@ def execute(repo: Path, a, report: dict, selected: list[Candidate], p: dict) -> 
                          "with `pip install -e .` or pass a --test-cmd that imports from the working directory")
 
         for n, c in enumerate(selected, 1):
-            write_inside(copy, c.path, c.data)
             try:
-                clear_caches(copy, c.path)
-                c.result = run_command(cmd, copy, env, timeout)
-            finally:
-                write_inside(copy, c.path, originals[c.path])
-                clear_caches(copy, c.path)
+                write_inside(copy, c.path, c.data)
+                try:
+                    clear_caches(copy, c.path)
+                    c.result = run_command(cmd, copy, env, timeout)
+                finally:
+                    write_inside(copy, c.path, originals[c.path])
+                    clear_caches(copy, c.path)
+            except OSError as e:
+                raise Stop(f"could not write {clean(c.path, 120)} in the temporary copy: {e.strerror or e}") from None
             progress(f"[{n}/{len(selected)}] {c.path}:{c.line} {c.description}: {mutant_record(c)['status']}")
     finally:
         old = None
@@ -1417,8 +1459,11 @@ def execute(repo: Path, a, report: dict, selected: list[Candidate], p: dict) -> 
 
 
 def finish(report: dict, selected: list[Candidate]) -> dict:
-    report["mutants"] = [mutant_record(c) for c in selected]
+    # run in round-robin order, reported in reading order
+    report["mutants"] = [mutant_record(c) for c in sorted(selected, key=lambda c: (c.path, c.line, c.anchor))]
     counts = report["counts"]
+    if not counts:
+        return report
     for key in ("killed", "survived", "timeout"):
         counts[key] = sum(1 for m in report["mutants"] if m["status"] == key)
     counts["run"] = counts["killed"] + counts["survived"] + counts["timeout"]
@@ -1483,11 +1528,14 @@ def render_text(report: dict) -> str:
         out.append(line)
     if report["error"]:
         out += ["", f"Could not complete: {report['error']}"]
+        tail = (report["baseline"] or {}).get("output_tail")
+        if tail:
+            out += ["", "Output of the unmutated run, last lines:"] + ["    " + ln for ln in tail.split("\n")]
     elif not files:
         out += ["", "No changed Python lines."]
     survived = [m for m in report["mutants"] if m["status"] == "survived"]
     timeouts = [m for m in report["mutants"] if m["status"] == "timeout"]
-    planned = [m for m in report["mutants"] if m["status"] == "not run"]
+    planned = [m for m in report["mutants"] if m["status"] == "not run"] if report.get("dry_run") else []
     if survived:
         out += ["", f"Survived: the tests still pass with each of these {len(survived)} changes to the code"]
         for m in survived:
@@ -1518,8 +1566,9 @@ def render_markdown(report: dict) -> str:
     c = report["counts"]
     title = "### diff-mutants"
     if c:
-        title += f": {c.get('survived', 0)} of {c.get('run', 0)} mutants survived, " \
-                 f"{c.get('tests_that_cannot_fail', 0)} tests cannot fail"
+        run, n = c.get("run", 0), c.get("tests_that_cannot_fail", 0)
+        title += f": {c.get('survived', 0)} of {run} mutant{'s' * (run != 1)} survived, " \
+                 f"{n} test{'s' * (n != 1)} cannot fail"
     out = [title, ""]
     if report["compared"]:
         out.append(f"Compared {_md(compared_words(report))}." +
@@ -1532,7 +1581,7 @@ def render_markdown(report: dict) -> str:
         for m in survived:
             result = "did not finish (timeout)" if m["status"] == "timeout" else \
                 f"exit {m['exit_code']}: {_md(last_line(m.get('output_tail', '')))}"
-            out.append(f"| `{_md(_where(m))}` | {_md(m['mutation']).replace(chr(39), '`')} | "
+            out.append(f"| `{_md(_where(m))}` | {m['mutation'].replace('|', chr(92) + '|')} | "
                        f"`{_md(m['after'])}` | {result} |")
     findings = report["tests_that_cannot_fail"]
     if findings:
@@ -1549,8 +1598,8 @@ def render_markdown(report: dict) -> str:
 
 def to_json(report: dict) -> str:
     data = json.loads(json.dumps(report))
-    for m in data["mutants"]:
-        if "output_tail" in m:  # the skill hands this to a model
+    for m in data["mutants"] + [data["baseline"] or {}]:
+        if m.get("output_tail") is not None:  # the skill hands this to a model
             m["output_tail"] = untrusted(m["output_tail"])
     return json.dumps(data, indent=1)
 
@@ -1558,10 +1607,11 @@ def to_json(report: dict) -> str:
 # ---------------------------------------------------------------- main
 
 def exit_code(report: dict, strict: bool) -> int:
+    """2 whenever the run could not complete, so an unfinished check never reads as a finished one."""
+    if not report["complete"]:
+        return 2
     serious = report["counts"].get("survived", 0) or report["tests_that_cannot_fail"]
-    if strict and serious:
-        return 1
-    return 0 if report["complete"] else 2
+    return 1 if strict and serious else 0
 
 
 def _positive(kind):
@@ -1581,9 +1631,9 @@ def main(argv: list[str] | None = None) -> int:
         prog="diff-mutants",
         description="Mutation testing on the Python lines a git change touched: would the tests that came with "
                     "the change catch a bug in it? Also lists changed tests that cannot fail.",
-        epilog="Exit codes: 0 when the run completed, whatever it found; with --strict, 1 when a mutant survived "
-               "or a changed test cannot fail. 2 when the run could not complete (not a git repository, no such "
-               "base, tests failing before any mutation, interrupted) or on a usage error.")
+        epilog="Exit codes: 2 when the run could not complete (not a git repository, no such base, tests failing "
+               "before any mutation, interrupted) or on a usage error. Otherwise 0, whatever was found; with "
+               "--strict, 1 when a mutant survived or a changed test cannot fail.")
     which = ap.add_mutually_exclusive_group()
     which.add_argument("--base", metavar="REF",
                        help="compare REF...HEAD, as `git diff REF...HEAD` does (default: the first of "
@@ -1626,6 +1676,7 @@ def main(argv: list[str] | None = None) -> int:
         repo = toplevel(Path(a.repo).expanduser())
         p = plan(repo, a)
         report, selected = prepare(p, a.max_mutants)
+        report["dry_run"] = a.dry_run
         if a.dry_run or not selected:
             report["complete"] = True
         else:
@@ -1649,7 +1700,7 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.write(render_markdown(report))
     else:
         sys.stdout.write(render_text(report))
-    if report["error"] and not a.json:
+    if report["error"] and (a.json or a.markdown):  # the text report already says it on stdout
         print(f"diff-mutants: {report['error']}", file=sys.stderr)
     return exit_code(report, a.strict)
 
@@ -1657,7 +1708,8 @@ def main(argv: list[str] | None = None) -> int:
 def _empty_report() -> dict:
     return {"tool": "diff-mutants", "version": VERSION, "checked": dt.date.today().isoformat(), "repository": None,
             "compared": {}, "changed": [], "test_command": None, "baseline": None, "timeout_seconds": None,
-            "counts": {}, "mutants": [], "tests_that_cannot_fail": [], "notes": [], "complete": False, "error": None}
+            "counts": {}, "mutants": [], "tests_that_cannot_fail": [], "notes": [], "dry_run": False,
+            "complete": False, "error": None}
 
 
 if __name__ == "__main__":

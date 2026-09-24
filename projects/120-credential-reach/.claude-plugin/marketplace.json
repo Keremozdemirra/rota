@@ -1,0 +1,15 @@
+{
+  "name": "credential-reach",
+  "description": "The credential-reach plugin: what credentials an agent session on this machine can reach, reported without values.",
+  "owner": {
+    "name": "Kerem Özdemir",
+    "url": "https://github.com/Keremozdemirra"
+  },
+  "plugins": [
+    {
+      "name": "credential-reach",
+      "source": "./",
+      "description": "Lists the credentials an agent running as you could use (environment, cloud CLIs, kubeconfig, registry tokens, SSH keys, .env files, transcripts) without printing a secret."
+    }
+  ]
+}

@@ -12,6 +12,7 @@ from __future__ import annotations
 import base64
 import json
 import os
+import platform
 import secrets
 import shutil
 import string
@@ -124,7 +125,8 @@ def transcript_lines(c: dict) -> list:
 def build(root: Path, git: bool = True) -> dict:
     """Build root/home and root/project. Returns home, project, the environment to run with, and the canaries."""
     c = canaries()
-    home, project = root / "home", root / "project"
+    home = root / "home"
+    project = home / "work" / "app"
     home.mkdir(parents=True, exist_ok=True)
     project.mkdir(parents=True, exist_ok=True)
 
@@ -142,7 +144,8 @@ def build(root: Path, git: bool = True) -> dict:
           json.dumps({"accessToken": c["sso_access"], "expiresAt": "2099-01-01T00:00:00Z",
                       "region": "eu-central-1", "startUrl": "https://corp-example.awsapps.com/start"}))
 
-    gcloud = home / ".config" / "gcloud"
+    # where gcloud looks on the platform the tests run on
+    gcloud = (home / "AppData" / "Roaming" / "gcloud") if platform.system() == "Windows" else home / ".config" / "gcloud"
     write(gcloud / "active_config", "default\n")
     write(gcloud / "configurations" / "config_default", "[core]\naccount = dev@example.com\nproject = demo-project\n")
     write(gcloud / "credentials.db", b"SQLite format 3\x00" + secrets.token_bytes(64))
@@ -251,7 +254,7 @@ ghe.corp.example.com:
     write(home / ".terraform.d" / "credentials.tfrc.json",
           json.dumps({"credentials": {"app.terraform.io": {"token": c["terraform"]}}}, indent=2))
 
-    sessions = home / ".claude" / "projects" / "-work-app"
+    sessions = home / ".claude" / "projects" / ("-" + str(project).strip("/\\").replace("/", "-").replace("\\", "-").replace(":", "-"))
     lines = transcript_lines(c)
     write(sessions / (secrets.token_hex(16) + ".jsonl"),
           "".join(json.dumps(x, ensure_ascii=False, separators=(",", ":")) + "\n" for x in lines))

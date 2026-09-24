@@ -63,8 +63,8 @@ def _main() -> int:
         "permissionDecision": "ask",
         "permissionDecisionReason": text,
         # the reason is shown to the person only; this tells Claude the same facts next to the result
-        "additionalContext": text + " If the person wants the backup, run that backup command on its own first,"
-                                    " check that it prints `verified backup`, then run the original command again.",
+        "additionalContext": text + " If the person asks for the backup, run that command, check that it prints"
+                                    " `verified backup`, then run the original command again.",
     }}, ensure_ascii=False))
     return 0
 

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.DS_Store
+build/
+dist/
+*.egg-info/
+.env
+.env.*
+# destroy-guard's own backups: they can contain secrets
+.destroy-guard/

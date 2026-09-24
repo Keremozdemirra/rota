@@ -1,0 +1,108 @@
+diff --git a/before_rename.py b/after_rename.py
+similarity index 78%
+rename from before_rename.py
+rename to after_rename.py
+index 78495b2..bb175f6 100644
+--- a/before_rename.py
++++ b/after_rename.py
+@@ -1 +1 @@
+-def old():
++def new():
+diff --git a/blob.bin b/blob.bin
+index 366fd40..df727c3 100644
+Binary files a/blob.bin and b/blob.bin differ
+diff --git a/fresh.py b/fresh.py
+new file mode 100644
+index 0000000..b876ec6
+--- /dev/null
++++ b/fresh.py
+@@ -0,0 +1,2 @@
++def fresh():
++    return True
+diff --git a/gone.py b/gone.py
+deleted file mode 100644
+index e3df5d0..0000000
+--- a/gone.py
++++ /dev/null
+@@ -1,3 +0,0 @@
+-import os
+-
+-VALUE = 1
+diff --git a/link.py b/link.py
+new file mode 120000
+index 0000000..a8b84df
+--- /dev/null
++++ b/link.py
+@@ -0,0 +1 @@
++mod.py
+\ No newline at end of file
+diff --git a/mod.py b/mod.py
+index bcaeff5..56ece3f 100644
+--- a/mod.py
++++ b/mod.py
+@@ -6,3 +6,2 @@ def b():
+-    x = 1
+-    y = 2
+-    return x + y
++    x = 10
++    return x + 1
+@@ -12,0 +12,4 @@ def c():
++
++
++def d(n):
++    return n * 2
+diff --git a/nonl.py b/nonl.py
+index 3d2b4b1..1ddfb7d 100644
+--- a/nonl.py
++++ b/nonl.py
+@@ -1 +1 @@
+-x = 1
+\ No newline at end of file
++x = 2
+\ No newline at end of file
+diff --git a/notes.txt b/notes.txt
+index e845566..a0d3d68 100644
+--- a/notes.txt
++++ b/notes.txt
+@@ -1,0 +2 @@ README
++more
+diff --git a/pakete/größe.py b/pakete/größe.py
+index 7d4290a..407de30 100644
+--- a/pakete/größe.py
++++ b/pakete/größe.py
+@@ -1 +1 @@
+-x = 1
++x = 2
+diff --git a/plus.py b/plus.py
+index 7d4290a..a1b06b5 100644
+--- a/plus.py
++++ b/plus.py
+@@ -1,0 +2,4 @@ x = 1
++++y
+++++ b/fake.py
++@@ -1 +1 @@
++diff --git a/x b/x
+diff --git "a/quo\"te.py" "b/quo\"te.py"
+index 7d4290a..407de30 100644
+--- "a/quo\"te.py"
++++ "b/quo\"te.py"
+@@ -1 +1 @@
+-x = 1
++x = 2
+diff --git a/script.py b/script.py
+old mode 100644
+new mode 100755
+diff --git "a/tab\\there.py" "b/tab\\there.py"
+index 7d4290a..407de30 100644
+--- "a/tab\\there.py"
++++ "b/tab\\there.py"
+@@ -1 +1 @@
+-x = 1
++x = 2
+diff --git a/with space.py b/with space.py
+index 7d4290a..407de30 100644
+--- a/with space.py	
++++ b/with space.py	
+@@ -1 +1 @@
+-x = 1
++x = 2

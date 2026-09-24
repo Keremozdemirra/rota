@@ -355,17 +355,19 @@ EVAL = {"eval", "iex", "invoke-expression"}
 class _Line:
     """What earlier commands on the same line changed: directory, exported variables, Terraform workspace."""
 
-    def __init__(self, cwd, env=None):
+    def __init__(self, cwd, env=None, moved=None):
         self.cwd = cwd
         self.env = dict(env or {})  # exported on this line; None = unset
         self.vars = {}  # assigned without export: a child process does not see them
         self.tf_ws = {}  # directory -> workspace selected on this line
         self.plans = set()  # plan files written by `plan -destroy -out=...` on this line
-        self.moved = False  # a `cd` happened
+        # Shared by every copy, subshells included: after any `cd` on the line, where a
+        # substitution runs is not certain.
+        self.moved = moved if moved is not None else [False]
 
     def copy(self) -> "_Line":
-        c = _Line(self.cwd, self.env)
-        c.vars, c.tf_ws, c.plans, c.moved = dict(self.vars), dict(self.tf_ws), set(self.plans), self.moved
+        c = _Line(self.cwd, self.env, self.moved)
+        c.vars, c.tf_ws, c.plans = dict(self.vars), dict(self.tf_ws), set(self.plans)
         return c
 
 
@@ -413,16 +415,12 @@ def analyse(command: str, shell: str = "bash", cwd=None, _line=None, _depth: int
         else:
             ops += _command(it, prev, line, bodies, shell, _depth)
             prev = it
-    for span in spans:
-        # A substitution runs where it appears; if a `cd` moved the line, where that is is not certain.
+    body_spans = [sp for body, expands in bodies.values() if expands for sp in _prepass(body, shell, body=True)[2]]
+    for span in spans + body_spans:
         sub = start.copy()
-        if line.moved:
+        if line.moved[0]:
             sub.cwd = None
         ops += analyse(span, shell, None, sub, _depth + 1)
-    for body, expands in bodies.values():
-        if expands:
-            for span in _prepass(body, shell, body=True)[2]:
-                ops += analyse(span, shell, None, start.copy(), _depth + 1)
     seen, out = set(), []
     for op in ops:
         key = (op["label"], json.dumps(op["targets"], sort_keys=True), op["problem"], op["cwd"])
@@ -510,14 +508,14 @@ def _command(it, prev, line: _Line, bodies, shell: str, depth: int) -> list[dict
     if tool in CD:
         target = _cd_target(tool, args)
         line.cwd = None if target is None else _join(line.cwd, target or "~")
-        line.moved = True
+        line.moved[0] = True
         return []
-    if tool in ("export", "set", "unset"):
+    if tool in ("export", "unset") or (tool == "set" and shell == "cmd"):  # cmd.exe's `set NAME=value` exports
         for a in args:
             m = ASSIGN.fullmatch(a)
             if tool == "unset" and not a.startswith("-"):
                 line.env[a] = None
-            elif m and tool == "export" or m and tool == "set":  # `set NAME=value` is cmd.exe's export
+            elif m and tool != "unset":
                 line.env[m.group(1)] = m.group(2)
             elif tool == "export" and a in line.vars:
                 line.env[a] = line.vars[a]
@@ -589,7 +587,7 @@ def _nested_scripts(tool: str, args: list[str], stdin: list[str], shell: str):
             return [(rest[0] if len(rest) == 1 else shlex.join(rest), "cmd")] if rest else []
         return []
     if tool in EVAL:
-        return [(args[0] if len(args) == 1 else shlex.join(args), shell)] if args else []
+        return [(" ".join(args), shell)] if args else []  # eval joins its words with spaces and parses again
     return None
 
 
@@ -1201,7 +1199,7 @@ def _git(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
 
 # ---------------------------------------------------------------- SQL
 
-SQL_NOISE = re.compile(r"--[^\n]*|/\*.*?\*/|'(?:[^']|'')*'|\$([A-Za-z_][A-Za-z0-9_]*)?\$.*?\$\1\$|\"(?:[^\"]|\"\")*\"|`[^`]*`",
+SQL_NOISE = re.compile(r"--[^\n]*|/\*.*?\*/|'(?:[^']|'')*'|\$([A-Za-z_][A-Za-z0-9_]*|)\$.*?\$\1\$|\"(?:[^\"]|\"\")*\"|`[^`]*`",
                        re.S)
 SQL_DESTRUCTIVE = re.compile(r"(?i)\b(?:DROP\s+(?:(?:MATERIALIZED|FOREIGN)\s+)?(TABLE|DATABASE|SCHEMA|VIEW|INDEX|"
                              r"SEQUENCE|COLUMN|PARTITION|USER|ROLE|OWNED|TYPE|FUNCTION|PROCEDURE|TRIGGER|EXTENSION)"
@@ -1419,27 +1417,29 @@ def reason(results: list[dict], session_cwd=None, window=None) -> str | None:
     """The text for the permission prompt, or None when every operation is covered."""
     window = window or max_age()
     w = fmt_age(window)
-    parts, data_note = [], False
+    parts, data_note, missing = [], False, False
     for r in results:
         op = r["op"]
         if r["status"] == "covered":
             continue
-        head = f"{op['label']} {op['what']}."
+        head = f"`{op['label']}` {op['what']}."
         if r["status"] == "missing":
+            missing = True
             data_note |= op["tool"] != "git"
             age = r.get("newest_age")
             have = f"No backup of it from the last {w}." if age is None else (
-                f"The newest backup of it is {fmt_age(age)} old; destroy-guard counts a backup for {w}.")
-            parts.append(f"{head} {have} To make one: {backup_command(op, session_cwd)}")
+                f"The newest backup of it is {fmt_age(age)} old.")
+            parts.append(f"{head} {have} To make one, run `{backup_command(op, session_cwd)}` on its own first.")
         else:
             parts.append(f"{head} {op['problem']}")
     if not parts:
         return None
     text = "destroy-guard: " + " | ".join(parts)
     if data_note:
-        text += (" A backup holds state and object definitions, not the data inside databases or volumes.")
-    text += (f" ({w} is destroy-guard's own window; {MAX_AGE_ENV} changes it.) Approving runs the command as it is.")
-    return clean(mask_text(text), MAX_REASON)
+        text += " A backup holds state and object definitions, not the data inside databases or volumes."
+    if missing:
+        text += f" The {w} window is destroy-guard's own choice ({MAX_AGE_ENV} changes it)."
+    return clean(mask_text(text + " Approving runs the command as it is."), MAX_REASON)
 
 
 # ---------------------------------------------------------------- the backup CLI
@@ -1512,8 +1512,9 @@ def prepare_store(store: Path) -> list[str]:
     return notes
 
 
-def _run(argv: list[str], cwd, env, timeout: int = EXPORT_TIMEOUT):
+def _run(argv: list[str], cwd, env, timeout=None):
     import subprocess
+    timeout = timeout or EXPORT_TIMEOUT
     shown = " ".join(mask_words([_basename(argv[0])] + argv[1:]))
     try:
         p = subprocess.run(argv, cwd=cwd, env=env, stdin=subprocess.DEVNULL, capture_output=True, timeout=timeout)
@@ -1526,7 +1527,7 @@ def _run(argv: list[str], cwd, env, timeout: int = EXPORT_TIMEOUT):
     return p.returncode, p.stdout, p.stderr.decode("utf-8", "replace"), shown
 
 
-def _ok(argv, cwd, env, what: str = "", timeout: int = EXPORT_TIMEOUT) -> bytes:
+def _ok(argv, cwd, env, timeout=None) -> bytes:
     rc, out, err, shown = _run(argv, cwd, env, timeout)
     if rc != 0:
         tail = clean(mask_text(" ".join(err.strip().splitlines()[-3:])), 240)

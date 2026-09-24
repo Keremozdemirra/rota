@@ -1,0 +1,8 @@
+# The tests read the plugin files, so the sdist carries them.
+include README.md LICENSE
+include .claude-plugin/plugin.json .claude-plugin/marketplace.json
+include hooks/hooks.json
+include skills/destroy-guard/SKILL.md
+include .github/workflows/test.yml .github/workflows/release.yml
+recursive-include tests *.py
+global-exclude *.py[cod]

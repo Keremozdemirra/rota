@@ -1,0 +1,11 @@
+{
+  "name": "destroy-guard",
+  "displayName": "destroy-guard",
+  "version": "0.1.0",
+  "description": "Asks before terraform destroy, kubectl delete, helm uninstall or git push --force unless a fresh, verified backup of exactly that target exists, and names the command that makes one.",
+  "author": { "name": "Kerem Özdemir", "url": "https://keremozdemir.de" },
+  "homepage": "https://github.com/Keremozdemirra/destroy-guard",
+  "repository": "https://github.com/Keremozdemirra/destroy-guard",
+  "license": "MIT",
+  "keywords": ["terraform", "opentofu", "kubernetes", "helm", "git", "backup", "hooks"]
+}

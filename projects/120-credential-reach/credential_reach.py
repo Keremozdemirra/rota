@@ -100,10 +100,29 @@ SECRET_LABELS = {
     "huggingface-token": "Hugging Face token", "jwt": "JSON Web Token",
     "url-password": "URL with an embedded password", "bearer-token": "bearer token",
 }
-# Cheap first test on a transcript line's raw bytes; only lines that pass are decoded and parsed.
-TRIGGER = re.compile(rb"(?<![A-Za-z0-9])(?:sk-|[sr]k_live_|gh[pousr]_|github_pat_|r8_|xox[abprse]-|glpat-|npm_|hf_)"
-                     rb"|AKIA|ASIA|(?i:aws_secret_access_key|secretaccesskey|bearer)|PRIVATE KEY|AIza|pypi-|eyJ"
-                     rb"|://[^/\s\"@]*@")
+# A cheap first look at a raw transcript line; only lines that pass are decoded, parsed and matched.
+# Substring tests run at C speed; one regex alternation over every line ran at about 15 MB/s.
+_ANYWHERE = (b"AKIA", b"ASIA", b"PRIVATE KEY", b"AIza", b"pypi-", b"eyJ")
+_ANYWHERE_LOWER = (b"bearer", b"secret_access_key", b"secretaccesskey")
+_AT_EDGE = (b"sk-", b"sk_live_", b"rk_live_", b"ghp_", b"gho_", b"ghu_", b"ghs_", b"ghr_", b"github_pat_", b"r8_",
+            b"xox", b"glpat-", b"npm_", b"hf_")
+_URL_USERINFO = re.compile(rb"://[^/\s\"@]*@")
+
+
+def triggered(body: bytes) -> bool:
+    """False only when no secret pattern can match anywhere in `body`."""
+    if any(x in body for x in _ANYWHERE):
+        return True
+    low = body.lower()
+    if any(x in low for x in _ANYWHERE_LOWER):
+        return True
+    for lit in _AT_EDGE:
+        i = body.find(lit)
+        while i != -1:
+            if i == 0 or not body[i - 1:i].isalnum():
+                return True
+            i = body.find(lit, i + 1)
+    return b"@" in body and _URL_USERINFO.search(body) is not None
 
 
 def redact_text(text: str) -> tuple[str, dict]:
@@ -326,6 +345,10 @@ class Section:
                 "notes": self.notes, "errors": self.errors, "not_visible": self.store_note}
 
 
+def _a(label: str) -> str:
+    return ("an " if label[:1].lower() in "aeio" else "a ") + label
+
+
 def _count(n: int, word: str, plural: str = "") -> str:
     return f"{n} {word if n == 1 else plural or word + 's'}"
 
@@ -402,7 +425,7 @@ def scan_env(ctx: Context) -> Section:
             if name.upper() == "AWS_ACCESS_KEY_ID":
                 detail += ", long-term" if value.startswith("AKIA") else ", temporary" if value.startswith("ASIA") else ""
             extra = github_reach(shape or "")
-            reach = f"Environment: {shown} holds a {label}" + (f"; {extra}" if extra else "")
+            reach = f"Environment: {shown} holds {_a(label)}" + (f"; {extra}" if extra else "")
             sec.add("high", shown, detail, reach=reach, **facts)
             if name.upper() in ("GITHUB_TOKEN", "GH_TOKEN"):
                 ctx.add_token(value, f"${shown}", strict_github=False)
@@ -470,31 +493,31 @@ def scan_aws(ctx: Context) -> Section:
             p = profiles.setdefault(name, {"where": [], "auth": []})
             p["where"].append(ctx.show(path))
             s = {k: (v or "").strip() for k, v in cp[section].items()}
+            here = ctx.show(path)
             if s.get("aws_secret_access_key"):
                 temporary = bool(s.get("aws_session_token")) or s.get("aws_access_key_id", "").startswith("ASIA")
-                p["auth"].append(("keys-temporary" if temporary else "keys", ""))
+                p["auth"].append(("keys-temporary" if temporary else "keys", "", here))
             elif s.get("aws_access_key_id"):
-                p["auth"].append(("keys-incomplete", ""))
+                p["auth"].append(("keys-incomplete", "", here))
             if s.get("sso_session") or s.get("sso_start_url"):
-                p["auth"].append(("sso", safe(s.get("sso_session", ""), 64)))
+                p["auth"].append(("sso", safe(s.get("sso_session", ""), 64), here))
             if s.get("role_arn"):
                 via = s.get("source_profile") or s.get("credential_source") or ""
-                p["auth"].append(("role", f"{_role(s['role_arn'])}" + (f", via {safe(via, 64)}" if via else "")))
+                p["auth"].append(("role", f"{_role(s['role_arn'])}" + (f", via {safe(via, 64)}" if via else ""), here))
             if s.get("credential_process"):
                 m = re.match(r"\s*(?:\"([^\"]*)\"|'([^']*)'|(\S+))", s["credential_process"])
                 prog = re.split(r"[\\/]", next((g for g in m.groups() if g), ""))[-1] if m else ""
-                p["auth"].append(("process", safe(prog, 40)))
+                p["auth"].append(("process", safe(prog, 40), here))
             if s.get("web_identity_token_file"):
-                p["auth"].append(("web-identity", ""))
+                p["auth"].append(("web-identity", "", here))
     active = ctx.get("AWS_PROFILE") or ctx.get("AWS_DEFAULT_PROFILE")
     for name in sorted(profiles):
         p = profiles[name]
         item = f"profile {safe(name, 64)}" + (" (active)" if name == active or (not active and name == "default")
                                                 else "")
-        where = ", ".join(dict.fromkeys(p["where"]))
         if not p["auth"]:
-            sec.add("info", item, "settings only, no credentials", where=where)
-        for kind, extra in dict.fromkeys(p["auth"]):
+            sec.add("info", item, "settings only, no credentials", where=", ".join(dict.fromkeys(p["where"])))
+        for kind, extra, where in dict.fromkeys(p["auth"]):
             if kind == "keys":
                 sec.add("high", item, "long-term access keys", where=where,
                         reach=f"AWS: long-term access keys for profile {safe(name, 64)} ({where})")
@@ -902,6 +925,8 @@ def _map(lines, i, indent):
         else:
             parts = [value]
             while i < len(lines) and lines[i][0] > indent:  # a plain scalar folded over several lines
+                if _entry(lines[i][1]) or _is_item(lines[i][1]):
+                    raise YamlError(f"a mapping inside a scalar on line {lines[i][2]}")
                 parts.append(lines[i][1])
                 i += 1
             out[key] = _scalar(" ".join(parts))
@@ -1092,7 +1117,7 @@ def npm_auth(pairs) -> dict:
 
 
 def _npm_target(reg: str) -> str:
-    return reg if reg == "default registry" else safe(mask_url("https:" + reg).split("://", 1)[1], 100)
+    return reg if reg == "default registry" else safe(mask_url("https:" + reg).split("://", 1)[1].rstrip("/"), 100)
 
 
 def scan_npm(ctx: Context) -> Section:
@@ -1490,8 +1515,8 @@ def scan_ssh(ctx: Context) -> Section:
         sev, detail = key_finding(info)
         sec.add(sev, ctx.show(p), detail, where=ctx.show(p), key_type=info.get("type"),
                 passphrase=info.get("passphrase"),
-                reach=f"SSH: {ctx.show(p)} ({info.get('type') or 'unknown type'}) has no passphrase: "
-                      "every host that trusts it" if sev == "high" else "")
+                reach=f"SSH: {ctx.show(p)} ({info.get('type') or 'unknown type'}) has no passphrase; it opens "
+                      "every host and repository that trusts its public key" if sev == "high" else "")
     cfg, _ = read_file(d / "config", 256 * 1024)
     if cfg and re.search(r"(?im)^\s*UseKeychain\s+yes", cfg):
         sec.add("medium", "UseKeychain yes", "~/.ssh/config lets macOS supply key passphrases from the Keychain",
@@ -1687,8 +1712,6 @@ def scan_project(ctx: Context) -> Section:
                 if creds else ("info", "no registry token stored")
         else:
             sev, detail = "medium", "a file named like a credential file (not opened further)"
-        if st in ("tracked", "not ignored") and sev != "info":
-            sev = "high"
         sec.add(sev, where, detail + (f"; {git_note}" if git_note else ""), git=st or None,
                 reach=f"Project: {where}: {detail}" + (f", {git_note}" if git_note else "") if sev != "info" else "")
     sec.found = True
@@ -1702,7 +1725,8 @@ def transcript_files(ctx: Context) -> tuple[Path, list]:
     for dirpath, _, filenames in os.walk(root, onerror=lambda e: None):
         for n in filenames:
             # set-aside transcripts are named <session>.jsonl.superseded-<timestamp> (Claude Code docs)
-            if n.endswith(".jsonl") or ".jsonl.superseded-" in n:
+            # a symlink is skipped: rewriting it would replace the link and leave its target as it was
+            if (n.endswith(".jsonl") or ".jsonl.superseded-" in n) and not os.path.islink(os.path.join(dirpath, n)):
                 out.append(Path(dirpath) / n)
     return root, sorted(out)
 
@@ -1749,7 +1773,7 @@ def _split_ending(raw: bytes) -> tuple[bytes, bytes]:
 
 def line_counts(body: bytes) -> dict:
     """Secret-shaped strings in one transcript line, counted inside its decoded JSON strings when it parses."""
-    if not TRIGGER.search(body):
+    if not triggered(body):
         return {}
     try:
         text = body.decode("utf-8")
@@ -1770,7 +1794,7 @@ def redact_line(body: bytes) -> tuple[bytes, dict]:
     """The line with every secret-shaped string replaced. A line that was valid JSON stays valid JSON:
     the in-place text replacement is kept only when it decodes to exactly the JSON-level replacement;
     otherwise the line is re-serialised from that."""
-    if not TRIGGER.search(body):
+    if not triggered(body):
         return body, {}
     try:
         text = body.decode("utf-8")
@@ -2060,6 +2084,17 @@ def probe_github(ctx: Context, timeout: float = 10.0) -> dict:
     return out
 
 
+def probe_detail(r: dict) -> str:
+    """One line per probed token, for the probe section: what GitHub said, without the token."""
+    head = r["token_type"] + (f" for {r['login']}" if r.get("login") else "")
+    if not r.get("valid"):
+        return f"{head}: {r['result']}"
+    if r.get("scopes") is None:
+        return f"{head}: valid; {r['scopes_note']}"
+    scopes = ", ".join(r["scopes"]) or "none (public read only)"
+    return f"{head}: valid; scopes {scopes}" + (f"; expires {r['expires']}" if r.get("expires") else "")
+
+
 def probe_reach(r: dict) -> tuple[str, str]:
     src = ", ".join(r["sources"])
     who = f" for {r['login']}" if r.get("login") else ""
@@ -2099,7 +2134,9 @@ def audit(ctx: Context, transcripts: bool = True) -> dict:
     if probe:
         for r in probe["results"]:
             sev, text = probe_reach(r)
-            blast.append({"severity": sev, "source": "probe", "text": text})
+            r["severity"] = sev
+            if sev != "info":
+                blast.append({"severity": sev, "source": "probe", "text": text})
     blast.sort(key=lambda b: order[b["severity"]])
     totals = {s: sum(1 for sec in sections for f in sec.findings if f["severity"] == s) for s in SEVERITIES}
     incomplete = any(sec.errors for sec in sections) or bool(
@@ -2123,7 +2160,7 @@ def audit(ctx: Context, transcripts: bool = True) -> dict:
 def _scrub(o):
     """Last guard on everything printed: any secret shape left in any string is replaced."""
     if isinstance(o, str):
-        return redact_text(o)[0] if TRIGGER.search(o.encode("utf-8", "surrogateescape")) else o
+        return redact_text(o)[0] if triggered(o.encode("utf-8", "surrogatepass")) else o
     if isinstance(o, dict):
         return {k: _scrub(v) for k, v in o.items()}
     if isinstance(o, list):
@@ -2142,7 +2179,7 @@ def render_text(rep: dict) -> str:
            f"checked {rep['checked']} on {rep['platform']} · home {rep['home']}"
            + (f" · project {rep['project']}" if rep.get("project") else ""),
            "No secret values are shown: names, locations, hosts, profiles, lengths and presence only.", "",
-           "BLAST RADIUS"]
+           "Blast radius"]
     if not rep["blast_radius"]:
         out.append("  nothing found that an agent could use")
     for b in rep["blast_radius"][:25]:
@@ -2150,7 +2187,7 @@ def render_text(rep: dict) -> str:
     if len(rep["blast_radius"]) > 25:
         out.append(f"  ... and {len(rep['blast_radius']) - 25} more below")
     for sec in rep["sections"]:
-        out += ["", sec["title"].upper() + (f"  ({', '.join(sec['paths'])})" if sec["paths"] else "")]
+        out += ["", sec["title"] + (f"  ({', '.join(sec['paths'])})" if sec["paths"] else "")]
         width = min(max([len(f["item"]) for f in sec["findings"]] + [4]), 40)
         for f in sec["findings"]:
             out.append(f"  {TAG[f['severity']]}  {f['item'].ljust(width)}  {f['detail']}")
@@ -2158,10 +2195,14 @@ def render_text(rep: dict) -> str:
         out += [f"  could not check: {e}" for e in sec["errors"]]
         if sec["not_visible"]:
             out.append(f"  not visible here: {sec['not_visible']}")
-    if rep.get("probe") and not rep["probe"]["results"]:
-        out += ["", "GITHUB PROBE", "  no GitHub token for github.com was found; nothing was sent"]
+    if rep.get("probe") is not None:
+        out += ["", f"GitHub probe  (GET {rep['probe']['endpoint']}, one request per token)"]
+        if not rep["probe"]["results"]:
+            out.append("  no GitHub token for github.com was found; nothing was sent")
+        for r in rep["probe"]["results"]:
+            out.append(f"  {TAG[r['severity']]}  {', '.join(r['sources'])}: {probe_detail(r)}")
     if rep["not_found"]:
-        out += ["", "NOT FOUND: " + "; ".join(f"{s['title']} ({', '.join(s['paths'])})" if s["paths"]
+        out += ["", "Not found: " + "; ".join(f"{s['title']} ({', '.join(s['paths'])})" if s["paths"]
                                               else s["title"] for s in rep["not_found"])]
     t = rep["totals"]
     out += ["", f"{t['high']} high · {t['medium']} medium · {t['info']} info"
@@ -2192,6 +2233,10 @@ def render_markdown(rep: dict) -> str:
         out += [f"- Could not check: {_md(e)}" for e in sec["errors"]]
         if sec["not_visible"]:
             out.append(f"- Not visible here: {_md(sec['not_visible'])}")
+    if rep.get("probe") is not None:
+        out += ["", "### GitHub probe", "", f"`GET {rep['probe']['endpoint']}`, one request per token.", ""]
+        out += [f"- **{r['severity']}** {_md(', '.join(r['sources']))}: {_md(probe_detail(r))}"
+                for r in rep["probe"]["results"]] or ["- No GitHub token for github.com was found; nothing was sent."]
     if rep["not_found"]:
         out += ["", "Not found: " + "; ".join(_md(s["title"]) for s in rep["not_found"])]
     t = rep["totals"]

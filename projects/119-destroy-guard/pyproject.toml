@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "destroy-guard"
+version = "0.1.0"
+description = "A Claude Code hook: terraform destroy, kubectl delete, helm uninstall and git push --force wait for a verified backup."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["claude-code", "hooks", "terraform", "opentofu", "kubernetes", "helm", "git", "backup", "ai-agents"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: System Administrators",
+  "Programming Language :: Python :: 3",
+  "Topic :: System :: Archiving :: Backup",
+  "Topic :: System :: Systems Administration",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/destroy-guard"
+Issues = "https://github.com/Keremozdemirra/destroy-guard/issues"
+
+[project.scripts]
+destroy-guard = "destroy_guard:main"
+destroy-guard-hook = "destroy_guard_hook:main"
+
+[tool.setuptools]
+py-modules = ["destroy_guard", "destroy_guard_hook"]

@@ -1,0 +1,17 @@
+{
+  "description": "destroy-guard: before terraform destroy, kubectl delete, helm uninstall or git push --force, ask unless a fresh, verified backup of that exact target exists.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/destroy_guard_hook.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

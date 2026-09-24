@@ -1,0 +1,31 @@
+name: test
+
+# Offline: every fixture, fake secret and synthetic home directory is made at run time. No network, no token.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # pinned to 24.04: newer Ubuntu images have no Python 3.9 build
+        os: [ubuntu-24.04]
+        python: ["3.9", "3.12"]
+        include:
+          - os: macos-latest
+            python: "3.12"
+          - os: windows-latest
+            python: "3.12"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests -v
+      # the installed command, then a run against a synthetic home (never the runner's own)
+      - run: pip install . && credential-reach --version && python tests/synthetic.py --run
