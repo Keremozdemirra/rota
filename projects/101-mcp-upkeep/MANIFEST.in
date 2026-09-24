@@ -2,7 +2,7 @@
 include README.md LICENSE
 include .claude-plugin/plugin.json .claude-plugin/marketplace.json
 include hooks/hooks.json
-include skills/mcp-vitals/SKILL.md
+include skills/mcp-upkeep/SKILL.md
 include .github/workflows/test.yml .github/workflows/release.yml
 recursive-include tests *.py *.json
 global-exclude *.py[cod]

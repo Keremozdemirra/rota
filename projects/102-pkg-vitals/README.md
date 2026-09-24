@@ -228,7 +228,7 @@ With `pkg-vitals` installed (`pipx install pkg-vitals`), `pkg-vitals-hook` is on
 
 Repository status uses the same thresholds as the
 [agent-vitals](https://github.com/Keremozdemirra/agent-vitals) census and
-[mcp-vitals](https://github.com/Keremozdemirra/mcp-vitals): `active` means a push within
+[mcp-upkeep](https://github.com/Keremozdemirra/mcp-upkeep): `active` means a push within
 30 days, `slowing` 31 to 90, `stale` 91 to 365, `abandoned` over a year. These
 thresholds are the census's own choice, not a standard.
 

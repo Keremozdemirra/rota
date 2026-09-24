@@ -1,5 +1,5 @@
 {
-  "description": "mcp-vitals: check an MCP server before Claude adds it, and after Claude edits an MCP config.",
+  "description": "mcp-upkeep: check an MCP server before Claude adds it, and after Claude edits an MCP config.",
   "hooks": {
     "PreToolUse": [
       {
@@ -8,13 +8,13 @@
           {
             "type": "command",
             "if": "Bash(claude mcp add*)",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_upkeep_hook.py\"",
             "timeout": 20
           },
           {
             "type": "command",
             "if": "PowerShell(claude mcp add*)",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_upkeep_hook.py\"",
             "timeout": 20
           }
         ]
@@ -27,25 +27,25 @@
           {
             "type": "command",
             "if": "Write(//**/*mcp*.json)",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_upkeep_hook.py\"",
             "timeout": 20
           },
           {
             "type": "command",
             "if": "Write(//**/claude_desktop_config.json)",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_upkeep_hook.py\"",
             "timeout": 20
           },
           {
             "type": "command",
             "if": "Edit(//**/*mcp*.json)",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_upkeep_hook.py\"",
             "timeout": 20
           },
           {
             "type": "command",
             "if": "Edit(//**/claude_desktop_config.json)",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_upkeep_hook.py\"",
             "timeout": 20
           }
         ]

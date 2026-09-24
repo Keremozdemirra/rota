@@ -1,4 +1,4 @@
-# mcp-vitals
+# mcp-upkeep
 
 **Before Claude adds an MCP server, find out whether anyone still maintains it.**
 
@@ -8,7 +8,7 @@ the client starts it, from a repository nobody on your side has looked at since.
 Some of those repositories are archived. Some packages, or the exact versions people
 pinned, are deprecated on npm or yanked from PyPI. Some never had a licence.
 
-`mcp-vitals` checks. It reads the MCP configs on your machine, works out which
+`mcp-upkeep` checks. It reads the MCP configs on your machine, works out which
 package or repository each server starts, and reports what the registries and
 GitHub say about it. As a Claude Code plugin it does the same thing at the moment
 a server is added, and asks you before it goes in.
@@ -30,7 +30,7 @@ magic: npm marks @21st-dev/magic@0.1.0 deprecated: "Magic MCP is now the 21st MC
 GitHub API unavailable or rate-limited; repository facts came from the agent-vitals census of 2026-09-23. Set GITHUB_TOKEN for live ones.
 ```
 
-Real output of `mcp-vitals --config example.json`, 2026-09-24, for four real servers:
+Real output of `mcp-upkeep --config example.json`, 2026-09-24, for four real servers:
 `npx -y @modelcontextprotocol/server-github`, whatsapp-mcp started with
 `uv tool run --from git+https://github.com/lharries/whatsapp-mcp whatsapp`, GitHub's
 own container `ghcr.io/github/github-mcp-server`, and `npx -y @21st-dev/magic@0.1.0`.
@@ -43,8 +43,8 @@ package is deprecated as a whole; `@21st-dev/magic` only in the pinned version 0
 ### Claude Code plugin
 
 ```
-/plugin marketplace add Keremozdemirra/mcp-vitals
-/plugin install mcp-vitals@mcp-vitals
+/plugin marketplace add Keremozdemirra/mcp-upkeep
+/plugin install mcp-upkeep@mcp-upkeep
 ```
 
 That adds:
@@ -85,28 +85,28 @@ No install, standard library only:
 
 ```bash
 # the newest code on main
-curl -sL https://raw.githubusercontent.com/Keremozdemirra/mcp-vitals/main/mcp_vitals.py | python3 -
+curl -sL https://raw.githubusercontent.com/Keremozdemirra/mcp-upkeep/main/mcp_upkeep.py | python3 -
 # or a fixed release
-curl -sL https://raw.githubusercontent.com/Keremozdemirra/mcp-vitals/v0.1.0/mcp_vitals.py | python3 -
+curl -sL https://raw.githubusercontent.com/Keremozdemirra/mcp-upkeep/v0.1.0/mcp_upkeep.py | python3 -
 ```
 
 Or from PyPI, pinned to a release:
 
 ```bash
-uvx mcp-vitals@0.1.0                              # every server in every config found
-uvx mcp-vitals@0.1.0 npx -y @scope/some-server    # one server, before you add it
-uvx mcp-vitals@0.1.0 owner/repo                   # or a repository
-uvx mcp-vitals@0.1.0 --markdown                   # a table to paste into an issue
-pipx run --spec mcp-vitals==0.1.0 mcp-vitals      # the same with pipx
+uvx mcp-upkeep@0.1.0                              # every server in every config found
+uvx mcp-upkeep@0.1.0 npx -y @scope/some-server    # one server, before you add it
+uvx mcp-upkeep@0.1.0 owner/repo                   # or a repository
+uvx mcp-upkeep@0.1.0 --markdown                   # a table to paste into an issue
+pipx run --spec mcp-upkeep==0.1.0 mcp-upkeep      # the same with pipx
 ```
 
-`uvx mcp-vitals` without a version installs the newest release the first time and
-reuses uv's cached copy after that; `uvx mcp-vitals@latest` refreshes it.
+`uvx mcp-upkeep` without a version installs the newest release the first time and
+reuses uv's cached copy after that; `uvx mcp-upkeep@latest` refreshes it.
 
-Options go before a command line to check: `mcp-vitals --json npx -y pkg`, or end them
+Options go before a command line to check: `mcp-upkeep --json npx -y pkg`, or end them
 with `--`. After a single package or repository they may also follow it:
-`mcp-vitals owner/repo --json`. Anything after a command line belongs to that command
-line, since servers take options of their own; mcp-vitals says so on stderr when one of
+`mcp-upkeep owner/repo --json`. Anything after a command line belongs to that command
+line, since servers take options of their own; mcp-upkeep says so on stderr when one of
 its own options ends up there.
 
 | Option | What it does |
@@ -122,7 +122,7 @@ usage errors and a bad `--config` path, which exit 2. With `--strict`, 1 when a 
 is archived, abandoned, deprecated, has no licence file, or its repository, package or
 pinned version is missing; else 2 when a registry, or GitHub and the census, could not
 be reached. 2 also for `--strict` written after a command line
-(`mcp-vitals npx -y pkg --strict`): options go before the command, because everything
+(`mcp-upkeep npx -y pkg --strict`): options go before the command, because everything
 after it belongs to the server.
 
 ### In CI
@@ -130,7 +130,7 @@ after it belongs to the server.
 Guard a shared `.mcp.json` so an abandoned server does not slip into the repository:
 
 ```yaml
-- run: pipx run --spec mcp-vitals==0.1.0 mcp-vitals --strict --config .mcp.json
+- run: pipx run --spec mcp-upkeep==0.1.0 mcp-upkeep --strict --config .mcp.json
 ```
 
 With `--strict` the step also fails, with exit 2, when a registry or GitHub cannot be
@@ -142,14 +142,14 @@ reached, instead of passing without having checked.
 {
   "hooks": {
     "PreToolUse": [{ "matcher": "Bash|PowerShell", "hooks": [
-      { "type": "command", "if": "Bash(claude mcp add*)", "command": "uvx --from mcp-vitals==0.1.0 mcp-vitals-hook", "timeout": 20 },
-      { "type": "command", "if": "PowerShell(claude mcp add*)", "command": "uvx --from mcp-vitals==0.1.0 mcp-vitals-hook", "timeout": 20 }
+      { "type": "command", "if": "Bash(claude mcp add*)", "command": "uvx --from mcp-upkeep==0.1.0 mcp-upkeep-hook", "timeout": 20 },
+      { "type": "command", "if": "PowerShell(claude mcp add*)", "command": "uvx --from mcp-upkeep==0.1.0 mcp-upkeep-hook", "timeout": 20 }
     ] }],
     "PostToolUse": [{ "matcher": "Write|Edit|MultiEdit", "hooks": [
-      { "type": "command", "if": "Write(//**/*mcp*.json)", "command": "uvx --from mcp-vitals==0.1.0 mcp-vitals-hook", "timeout": 20 },
-      { "type": "command", "if": "Write(//**/claude_desktop_config.json)", "command": "uvx --from mcp-vitals==0.1.0 mcp-vitals-hook", "timeout": 20 },
-      { "type": "command", "if": "Edit(//**/*mcp*.json)", "command": "uvx --from mcp-vitals==0.1.0 mcp-vitals-hook", "timeout": 20 },
-      { "type": "command", "if": "Edit(//**/claude_desktop_config.json)", "command": "uvx --from mcp-vitals==0.1.0 mcp-vitals-hook", "timeout": 20 }
+      { "type": "command", "if": "Write(//**/*mcp*.json)", "command": "uvx --from mcp-upkeep==0.1.0 mcp-upkeep-hook", "timeout": 20 },
+      { "type": "command", "if": "Write(//**/claude_desktop_config.json)", "command": "uvx --from mcp-upkeep==0.1.0 mcp-upkeep-hook", "timeout": 20 },
+      { "type": "command", "if": "Edit(//**/*mcp*.json)", "command": "uvx --from mcp-upkeep==0.1.0 mcp-upkeep-hook", "timeout": 20 },
+      { "type": "command", "if": "Edit(//**/claude_desktop_config.json)", "command": "uvx --from mcp-upkeep==0.1.0 mcp-upkeep-hook", "timeout": 20 }
     ] }]
   }
 }
@@ -164,7 +164,7 @@ the hook runs once per call. `//**/` matches the file anywhere on disk,
 `~/.cursor/mcp.json` included
 ([permissions](https://code.claude.com/docs/en/permissions#read-and-edit), checked 2026-09-24).
 Without the `if` rules, every Write and Edit would start Python. The hook gives itself
-15 seconds in all, 6 per request (`MCP_VITALS_HOOK_TIMEOUT`), and stays silent about
+15 seconds in all, 6 per request (`MCP_UPKEEP_HOOK_TIMEOUT`), and stays silent about
 whatever it has not checked by then.
 
 ## What it reads, what it sends
@@ -233,7 +233,7 @@ The first seven are serious: they make the hook ask and `--strict` exit 1.
 | `custom registry, not checked` | The entry installs from a registry or index other than npm's or PyPI's, so the name is not looked up on the public one. |
 | `source not checked` | A tarball or git URL on a host other than GitHub. |
 | `no source repository linked` | The package names no repository, so the rest cannot be checked. |
-| `could not tell what this starts` | The command is not a runner mcp-vitals knows (npx, bunx, pnpx, npm exec, pnpm/yarn dlx, bun x, uvx, uv, pipx, docker, podman, a local checkout). |
+| `could not tell what this starts` | The command is not a runner mcp-upkeep knows (npx, bunx, pnpx, npm exec, pnpm/yarn dlx, bun x, uvx, uv, pipx, docker, podman, a local checkout). |
 | `registry unreachable`, `repository unknown` | A registry, or GitHub and the census, could not be reached or gave no usable answer. |
 
 Sources for the `unpinned` row, checked 2026-09-24: npm's `libnpmexec` 9.0.4 (bundled
@@ -254,7 +254,7 @@ a standard: `active` means a push within 30 days, `slowing` 31 to 90, `stale` 91
 These are dates, flags and licence fields from public metadata. They are not a
 security audit and not a verdict on anyone's code. A finished, correct tool can go
 a year without a push and still work, and an active repository can still ship a bad
-release. `mcp-vitals` tells you what is known, so you decide with the facts in front
+release. `mcp-upkeep` tells you what is known, so you decide with the facts in front
 of you.
 
 ## Licence

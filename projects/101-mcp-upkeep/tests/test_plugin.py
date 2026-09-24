@@ -9,10 +9,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from support import ROOT, Isolated  # noqa: E402
 
-import mcp_vitals  # noqa: E402
-import mcp_vitals_hook  # noqa: E402
+import mcp_upkeep  # noqa: E402
+import mcp_upkeep_hook  # noqa: E402
 
-HOOK_FILE = "mcp_vitals_hook.py"
+HOOK_FILE = "mcp_upkeep_hook.py"
 
 
 def handlers(event):
@@ -35,7 +35,7 @@ class Plugin(Isolated):
         plugin = self.load(".claude-plugin/plugin.json")
         pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
         self.assertIn(f'version = "{plugin["version"]}"', pyproject)
-        self.assertEqual(mcp_vitals.VERSION, plugin["version"])
+        self.assertEqual(mcp_upkeep.VERSION, plugin["version"])
 
     def test_hook_commands_point_at_files_that_exist(self):
         commands = [h["command"] for event in ("PreToolUse", "PostToolUse") for _, h in handlers(event)]
@@ -64,54 +64,54 @@ class Plugin(Isolated):
                                  "Write(//**/*mcp*.json)", "Write(//**/claude_desktop_config.json)"])
         for tool in ("Write", "Edit"):
             patterns = [re.fullmatch(rf"{tool}\(//\*\*/(.+)\)", r).group(1) for r in rules if r.startswith(tool)]
-            for name in mcp_vitals_hook.CONFIG_NAMES:
+            for name in mcp_upkeep_hook.CONFIG_NAMES:
                 matching = [p for p in patterns if fnmatch.fnmatchcase(name, p)]
                 self.assertEqual(len(matching), 1, (tool, name, matching))  # exactly one: never twice per call
 
     def test_skill_front_matter_and_commands(self):
-        text = (ROOT / "skills" / "mcp-vitals" / "SKILL.md").read_text(encoding="utf-8")
-        self.assertTrue(text.startswith("---\nname: mcp-vitals\ndescription: "))
+        text = (ROOT / "skills" / "mcp-upkeep" / "SKILL.md").read_text(encoding="utf-8")
+        self.assertTrue(text.startswith("---\nname: mcp-upkeep\ndescription: "))
         rels = re.findall(r"\$\{CLAUDE_PLUGIN_ROOT\}/([\w./-]+)", text)
         self.assertTrue(rels)
         for rel in rels:
-            self.assertEqual(rel, "mcp_vitals.py")
+            self.assertEqual(rel, "mcp_upkeep.py")
             self.assertTrue((ROOT / rel).is_file(), rel)
 
 
 class Packaging(Isolated):
     def test_module_names_do_not_collide(self):
         pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-        self.assertIn('py-modules = ["mcp_vitals", "mcp_vitals_hook"]', pyproject)
-        self.assertIn('mcp-vitals = "mcp_vitals:main"', pyproject)
-        self.assertIn('mcp-vitals-hook = "mcp_vitals_hook:main"', pyproject)
+        self.assertIn('py-modules = ["mcp_upkeep", "mcp_upkeep_hook"]', pyproject)
+        self.assertIn('mcp-upkeep = "mcp_upkeep:main"', pyproject)
+        self.assertIn('mcp-upkeep-hook = "mcp_upkeep_hook:main"', pyproject)
         for old in ("doctor.py", "hook.py"):
             self.assertFalse((ROOT / old).exists(), old)
 
     def test_sdist_carries_what_the_tests_read(self):
         manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
         for needed in (".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", "hooks/hooks.json",
-                       "skills/mcp-vitals/SKILL.md", ".github/workflows/test.yml", ".github/workflows/release.yml",
+                       "skills/mcp-upkeep/SKILL.md", ".github/workflows/test.yml", ".github/workflows/release.yml",
                        "recursive-include tests *.py *.json"):
             self.assertIn(needed, manifest)
 
     def test_no_file_names_the_old_modules(self):
         texts = {p: p.read_text(encoding="utf-8") for p in [ROOT / "README.md", ROOT / "hooks" / "hooks.json",
-                                                             ROOT / "skills" / "mcp-vitals" / "SKILL.md",
-                                                             ROOT / "mcp_vitals.py", ROOT / "mcp_vitals_hook.py"]}
+                                                             ROOT / "skills" / "mcp-upkeep" / "SKILL.md",
+                                                             ROOT / "mcp_upkeep.py", ROOT / "mcp_upkeep_hook.py"]}
         for p, text in texts.items():
             self.assertNotRegex(text, r"\bdoctor\.py\b|\bhook\.py\b|import doctor|import hook\b", p.name)
 
     def test_readme_install_lines_have_pinned_forms(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        version = mcp_vitals.VERSION
-        self.assertIn("https://raw.githubusercontent.com/Keremozdemirra/mcp-vitals/main/mcp_vitals.py", readme)
-        self.assertIn(f"https://raw.githubusercontent.com/Keremozdemirra/mcp-vitals/v{version}/mcp_vitals.py", readme)
-        self.assertIn(f"uvx mcp-vitals@{version}", readme)
+        version = mcp_upkeep.VERSION
+        self.assertIn("https://raw.githubusercontent.com/Keremozdemirra/mcp-upkeep/main/mcp_upkeep.py", readme)
+        self.assertIn(f"https://raw.githubusercontent.com/Keremozdemirra/mcp-upkeep/v{version}/mcp_upkeep.py", readme)
+        self.assertIn(f"uvx mcp-upkeep@{version}", readme)
 
 
 class Target(Isolated):
     def resolved(self, words):
-        return mcp_vitals.resolve(mcp_vitals.target_entry(words))
+        return mcp_upkeep.resolve(mcp_upkeep.target_entry(words))
 
     def test_command_line(self):
         r = self.resolved(["npx", "-y", "@s/p@1.0.0"])

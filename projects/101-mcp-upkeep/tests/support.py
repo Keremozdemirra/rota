@@ -25,7 +25,7 @@ for _p in (str(ROOT), str(HERE)):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-import mcp_vitals  # noqa: E402
+import mcp_upkeep  # noqa: E402
 
 
 def fixture(name: str):
@@ -70,7 +70,7 @@ class Web:
         return [u for u, _ in self.requests]
 
 
-class FakeNet(mcp_vitals.Net):
+class FakeNet(mcp_upkeep.Net):
     """A Net that answers from a dict keyed by URL, through the real Net.get."""
 
     def __init__(self, answers, census=True):
@@ -104,11 +104,11 @@ class Isolated(unittest.TestCase):
                    mock.patch("pathlib.Path.cwd", return_value=self.cwd),
                    mock.patch("urllib.request.urlopen", self._urlopen),
                    # a fixed day, so ages computed from recorded dates do not change as time passes
-                   mock.patch("mcp_vitals._today", return_value=TODAY, create=True)]
+                   mock.patch("mcp_upkeep._today", return_value=TODAY, create=True)]
         for p in patches:
             p.start()
             self.addCleanup(p.stop)
-        for var in ("GITHUB_TOKEN", "GH_TOKEN", "MCP_VITALS_HOOK_TIMEOUT"):
+        for var in ("GITHUB_TOKEN", "GH_TOKEN", "MCP_UPKEEP_HOOK_TIMEOUT"):
             os.environ.pop(var, None)  # restored with the rest of the environment by patch.dict
         self.web = None
 
@@ -121,18 +121,18 @@ class Isolated(unittest.TestCase):
         return self.web
 
     def run_main(self, argv):
-        """mcp_vitals.main(argv) -> (exit code, stdout, stderr)."""
+        """mcp_upkeep.main(argv) -> (exit code, stdout, stderr)."""
         with mock.patch("sys.stdout", new_callable=io.StringIO) as out, \
                 mock.patch("sys.stderr", new_callable=io.StringIO) as err:
-            code = mcp_vitals.main(argv)
+            code = mcp_upkeep.main(argv)
         return code, out.getvalue(), err.getvalue()
 
     def run_hook(self, payload):
         """The hook's main() on a payload -> its parsed JSON answer, or None when it stays silent."""
-        import mcp_vitals_hook
+        import mcp_upkeep_hook
         with mock.patch("sys.stdin", io.StringIO(json.dumps(payload))), \
                 mock.patch("sys.stdout", new_callable=io.StringIO) as out:
-            self.assertEqual(mcp_vitals_hook.main(), 0)
+            self.assertEqual(mcp_upkeep_hook.main(), 0)
         text = out.getvalue().strip()
         return json.loads(text) if text else None
 

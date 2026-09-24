@@ -20,19 +20,19 @@ from unittest import mock
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from support import ROOT, FakeNet, Isolated, bash, entry, fixture  # noqa: E402
 
-import mcp_vitals  # noqa: E402
-import mcp_vitals_hook as hook  # noqa: E402
+import mcp_upkeep  # noqa: E402
+import mcp_upkeep_hook as hook  # noqa: E402
 
 TODAY = dt.date(2026, 9, 24)
 # Key-shaped strings are built at run time, so no file holds anything a secret scanner could mistake for a key.
 TOKEN = "ghp_" + "FAKE" * 9
 GH_CRED = "ghp_" + "GITCREDSECRET" + "0" * 10
-# Every request mcp-vitals may make, in full. Anything else is a leak.
+# Every request mcp-upkeep may make, in full. Anything else is a leak.
 ALLOWED = [re.compile(p) for p in (
     r"https://registry\.npmjs\.org/(?:@[a-z0-9\-~][a-z0-9\-._~]*%2F)?[a-z0-9\-~][a-z0-9\-._~]*",
     r"https://pypi\.org/pypi/[A-Za-z0-9._-]+(?:/[0-9][0-9A-Za-z.!_%-]*)?/json",
     r"https://api\.github\.com/repos/[A-Za-z0-9-]+/[A-Za-z0-9._-]+",
-    re.escape(mcp_vitals.CENSUS))]
+    re.escape(mcp_upkeep.CENSUS))]
 LEAKS = ["s3cr3t", "user:", "user%3A", "glpat", "SECRET", "oauth2", "corp.example", "/home/", "%2Fhome", "secret-project",
          "https%3A", "git%2B", "git+", "%40", "tgz", "./", "%2E", TOKEN]
 
@@ -110,7 +110,7 @@ class F1_UnvalidatedStringsAreNeverSent(Isolated):
         self.assertNotEqual(code, 1)
 
     def test_kinds_are_reported_locally(self):
-        kinds = {name: mcp_vitals.resolve(entry(spec["command"], spec["args"]))["kind"]
+        kinds = {name: mcp_upkeep.resolve(entry(spec["command"], spec["args"]))["kind"]
                  for name, spec in CRITICAL_CONFIG.items()}
         self.assertEqual(kinds, {"internal": "pypi", "corp": "url", "local": "local", "from": "local", "fetch": "git",
                                  "reg": "npm", "fromeq": "local", "pkgeq": "local"})
@@ -123,7 +123,7 @@ class F1_UnvalidatedStringsAreNeverSent(Isolated):
                  ("uvx", ("-f", "/wheels", "--default-index", "https://d.example", "--project", "/w", "tool")): "tool",
                  ("pipx", ("run", "--python", "3.12", "--spec", "tool==1.0", "cmd")): "tool"}
         for (cmd, args), pkg in cases.items():
-            self.assertEqual(mcp_vitals.resolve(entry(cmd, args))["package"], pkg, args)
+            self.assertEqual(mcp_upkeep.resolve(entry(cmd, args))["package"], pkg, args)
 
 
 SECRET_CONFIG = {
@@ -210,7 +210,7 @@ class F3_PinnedVersionsAreCheckedThemselves(Isolated):
                 "https://pypi.org/pypi/mcp-server-fetch/json": fixture("pypi-mcp-server-fetch.json")}
 
     def flags(self, command, args):
-        return mcp_vitals.examine(entry(command, args), FakeNet(self.answers(), census=False), TODAY)
+        return mcp_upkeep.examine(entry(command, args), FakeNet(self.answers(), census=False), TODAY)
 
     def test_deprecated_pinned_npm_versions(self):
         for spec in ("@21st-dev/magic@0.1.0", "firecrawl-mcp@1.7.3"):
@@ -229,7 +229,7 @@ class F3_PinnedVersionsAreCheckedThemselves(Isolated):
     def test_cli_shows_the_message(self):
         cfg = self.write_config({"mcpServers": {"magic": {"command": "npx", "args": ["-y", "@21st-dev/magic@0.1.0"]}}})
         self.serve(self.answers() | {"https://api.github.com/repos/21st-dev/magic-mcp": 403,
-                                     mcp_vitals.CENSUS: fixture("census-sample.json")})
+                                     mcp_upkeep.CENSUS: fixture("census-sample.json")})
         code, out, _ = self.run_main(["--strict", "--config", str(cfg)])
         self.assertEqual(code, 1)
         self.assertIn('npm marks @21st-dev/magic@0.1.0 deprecated: "Magic MCP is now the 21st MCP.', out)
@@ -250,7 +250,7 @@ class F4_UvDirectoryRunIsALocalCheckout(Isolated):
         d = str(self.checkout())
         for args in (["--directory", d, "run", "main.py"], ["run", "--directory", d, "main.py"],
                      ["--project", d, "run", "main.py"], ["run", "python", str(Path(d) / "main.py")]):
-            r = mcp_vitals.resolve(entry("uv", args))
+            r = mcp_upkeep.resolve(entry("uv", args))
             self.assertEqual((r["kind"], r["repo"]), ("local", "lharries/whatsapp-mcp"), args)
 
 
@@ -284,23 +284,23 @@ class F6_FalseSeriousFlags(Isolated):
         self.assertEqual(web.urls[0], "https://registry.npmjs.org/@upstash%2Fcontext7-mcp")
 
     def test_github_url_with_ref(self):
-        r = mcp_vitals.examine(entry("uvx", ["--from", "git+https://github.com/o/n@v1.0.0", "srv"]), FakeNet({}), TODAY)
+        r = mcp_upkeep.examine(entry("uvx", ["--from", "git+https://github.com/o/n@v1.0.0", "srv"]), FakeNet({}), TODAY)
         self.assertEqual((r["kind"], r["repo"]), ("git", "o/n"))
         self.assertNotIn("package not found", r["flags"])
         self.assertNotIn("unpinned", r["flags"])
         sha = "0123456789abcdef0123456789abcdef01234567"
-        self.assertTrue(mcp_vitals.resolve(entry("uvx", ["--from", f"git+https://github.com/o/n@{sha}", "srv"]))["pinned"])
+        self.assertTrue(mcp_upkeep.resolve(entry("uvx", ["--from", f"git+https://github.com/o/n@{sha}", "srv"]))["pinned"])
 
     def test_uv_pin_syntax(self):
-        r = mcp_vitals.resolve(entry("uvx", ["mcp-server-fetch@2025.4.7"]))
+        r = mcp_upkeep.resolve(entry("uvx", ["mcp-server-fetch@2025.4.7"]))
         self.assertEqual((r["package"], r["version"], r["pinned"]), ("mcp-server-fetch", "2025.4.7", True))
-        self.assertFalse(mcp_vitals.resolve(entry("uvx", ["mcp-server-fetch@latest"]))["pinned"])
+        self.assertFalse(mcp_upkeep.resolve(entry("uvx", ["mcp-server-fetch@latest"]))["pinned"])
 
     def test_licence_declared_on_the_registry(self):
         self.serve({"https://registry.npmjs.org/@aashari%2Fmcp-server-atlassian-jira":
                     fixture("npm-aashari-mcp-server-atlassian-jira.json"),
                     "https://api.github.com/repos/aashari/mcp-server-atlassian-jira": 403,
-                    mcp_vitals.CENSUS: fixture("census-sample.json")})
+                    mcp_upkeep.CENSUS: fixture("census-sample.json")})
         code, out, _ = self.run_main(["--strict", "--json", "npx", "-y", "@aashari/mcp-server-atlassian-jira"])
         flags = json.loads(out)["servers"][0]["flags"]
         self.assertIn("licence only in npm metadata (ISC)", flags)
@@ -312,9 +312,9 @@ class F6_FalseSeriousFlags(Isolated):
         (d / ".git").mkdir(parents=True)
         (d / ".git" / "config").write_text('[remote "origin"]\n\turl = git@github.com:me/private-server.git\n')
         (d / "server.js").write_text("")
-        r = mcp_vitals.examine(entry("node", [str(d / "server.js")]), FakeNet({}), TODAY)
+        r = mcp_upkeep.examine(entry("node", [str(d / "server.js")]), FakeNet({}), TODAY)
         self.assertIn("not visible (private or deleted)", r["flags"])
-        self.assertFalse(mcp_vitals.SERIOUS & set(r["flags"]))
+        self.assertFalse(mcp_upkeep.SERIOUS & set(r["flags"]))
 
 
 class F7_StrictDoesNotPassSilently(Isolated):
@@ -337,14 +337,14 @@ class F7_StrictDoesNotPassSilently(Isolated):
     def test_options_after_a_command_line_are_the_servers_and_say_so(self):
         self.serve({})
         code, out, err = self.run_main(["--offline", "npx", "-y", "pkg", "--json"])
-        self.assertIn("put mcp-vitals options before it", err)
+        self.assertIn("put mcp-upkeep options before it", err)
 
     def test_strict_after_a_command_line_fails_instead_of_passing(self):
-        # A CI job written as `mcp-vitals npx -y pkg --strict` must not go green unchecked.
+        # A CI job written as `mcp-upkeep npx -y pkg --strict` must not go green unchecked.
         self.serve({})
         code, _, err = self.run_main(["--offline", "npx", "-y", "pkg", "--strict"])
         self.assertEqual(code, 2)
-        self.assertIn("put mcp-vitals options before it", err)
+        self.assertIn("put mcp-upkeep options before it", err)
 
     def test_strict_exit_codes(self):
         answers = {"https://registry.npmjs.org/pkg": urllib.error.URLError("down")}
@@ -391,7 +391,7 @@ class L1_NoTracebacks(Isolated):
                  "list": b"[1,2]", "null": b"null", "empty": b""}
         for name, answer in cases.items():
             net = FakeNet({"https://registry.npmjs.org/pkg": answer}, census=False)
-            r = mcp_vitals.examine(entry("npx", ["-y", "pkg"]), net, TODAY)
+            r = mcp_upkeep.examine(entry("npx", ["-y", "pkg"]), net, TODAY)
             self.assertIn("registry unreachable", r["flags"], name)
 
 
@@ -429,7 +429,7 @@ class L3_PinSemantics(Isolated):
                                     ("npx", ["-y", "pkg@beta"], "unpinned"), ("npx", ["-y", "github:o/n#main"], "ref (mutable)"),
                                     ("docker", ["run", "-i", "ghcr.io/o/n:main"], "tag (mutable)"),
                                     ("docker", ["run", "img:latest"], "unpinned"), ("uvx", ["pkg>=1.0"], "unpinned")]:
-            r = mcp_vitals.examine(entry(command, args), None, TODAY)
+            r = mcp_upkeep.examine(entry(command, args), None, TODAY)
             self.assertFalse(r["pinned"], args)
             self.assertIn(flag, r["flags"], args)
 
@@ -437,7 +437,7 @@ class L3_PinSemantics(Isolated):
         for command, args in [("npx", ["-y", "pkg@1.2.3"]), ("npx", ["-y", "pkg@1.2.3-beta.1"]), ("uvx", ["pkg==1.0"]),
                               ("docker", ["run", "img@sha256:" + "0" * 64]),
                               ("npx", ["-y", "github:o/n#0123456789abcdef0123456789abcdef01234567"])]:
-            self.assertTrue(mcp_vitals.resolve(entry(command, args))["pinned"], args)
+            self.assertTrue(mcp_upkeep.resolve(entry(command, args))["pinned"], args)
 
 
 class L4_Docs(Isolated):
@@ -452,12 +452,12 @@ class L4_Docs(Isolated):
         self.assertIn("dontAsk", readme)
 
     def test_skill_reads_the_source_field(self):
-        skill = (ROOT / "skills" / "mcp-vitals" / "SKILL.md").read_text(encoding="utf-8")
+        skill = (ROOT / "skills" / "mcp-upkeep" / "SKILL.md").read_text(encoding="utf-8")
         self.assertIn("facts.repository.source", skill)
 
     def test_census_fallback_is_in_every_format(self):
         self.serve({"https://registry.npmjs.org/@21st-dev%2Fmagic": fixture("npm-21st-dev-magic.json"),
-                    "https://api.github.com/repos/21st-dev/magic-mcp": 403, mcp_vitals.CENSUS: fixture("census-sample.json")})
+                    "https://api.github.com/repos/21st-dev/magic-mcp": 403, mcp_upkeep.CENSUS: fixture("census-sample.json")})
         doc = json.loads(self.run_main(["--json", "npm:@21st-dev/magic"])[1])
         self.assertEqual(doc["census"], {"used": True, "date": "2026-09-23"})
         self.assertEqual(doc["servers"][0]["facts"]["repository"]["source"], "census 2026-09-23")
@@ -506,7 +506,7 @@ class L6_ParsingGaps(Isolated):
                  (("cmd", ["/c", "npx", "-y", "@modelcontextprotocol/server-filesystem"]), "@modelcontextprotocol/server-filesystem"),
                  (("cmd.exe", ["/C", "npx -y pkg"]), "pkg")]
         for (command, args), package in cases:
-            self.assertEqual(mcp_vitals.resolve(entry(command, args))["package"], package, args)
+            self.assertEqual(mcp_upkeep.resolve(entry(command, args))["package"], package, args)
 
     def test_windows_backslashes(self):
         got = hook.parse_add(r"claude mcp add fs -- node C:\Users\me\srv\index.js", "powershell")
@@ -519,10 +519,10 @@ class L7_Coverage(Isolated):
     """[low] VS Code's user-level mcp.json was not read; TOML on Python < 3.11 said only "unreadable"."""
 
     def test_vscode_user_config(self):
-        path = next(p for client, p, _ in mcp_vitals.config_locations(self.home, self.cwd) if client == "VS Code")
+        path = next(p for client, p, _ in mcp_upkeep.config_locations(self.home, self.cwd) if client == "VS Code")
         path.parent.mkdir(parents=True)
         path.write_text(json.dumps({"servers": {"pw": {"command": "npx", "args": ["-y", "@playwright/mcp"]}}}))
-        servers, _ = mcp_vitals.discover(self.home, self.cwd, [])
+        servers, _ = mcp_upkeep.discover(self.home, self.cwd, [])
         self.assertEqual([(s["client"], s["name"]) for s in servers], [("VS Code", "pw")])
 
     def test_toml_needs_python_311(self):
@@ -535,7 +535,7 @@ class L7_Coverage(Isolated):
                 raise ImportError(name)
             return real_import(name, *a, **k)
         with mock.patch("builtins.__import__", no_tomllib):
-            _, searched = mcp_vitals.discover(self.home, self.cwd, [])
+            _, searched = mcp_upkeep.discover(self.home, self.cwd, [])
         self.assertTrue(searched[0].endswith("(needs Python 3.11+ to read TOML)"), searched)
 
 

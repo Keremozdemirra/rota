@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""mcp-vitals hook: the same checks, at the moment an MCP server is added.
+"""mcp-upkeep hook: the same checks, at the moment an MCP server is added.
 
-mcp_vitals.py reports on what is already configured. This runs the same checks
+mcp_upkeep.py reports on what is already configured. This runs the same checks
 inside Claude Code, before the server lands in a config:
 
   PreToolUse on Bash    `claude mcp add ...` / `claude mcp add-json ...`:
@@ -21,7 +21,7 @@ is slow is a hook people uninstall. It never denies; the person decides.
 `claude -p` or the dontAsk mode.)
 
 Reads the hook payload on stdin, writes a hook response on stdout, and
-like mcp_vitals.py never reads `env` or `headers`.
+like mcp_upkeep.py never reads `env` or `headers`.
 """
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import mcp_vitals  # noqa: E402
+import mcp_upkeep  # noqa: E402
 
 # Short: this runs while someone waits for a command to start. Per request, and for the whole
 # run, which must end inside hooks.json's 20-second timeout or Claude Code discards the answer.
@@ -101,7 +101,7 @@ def _claude_at(words: list[str]) -> int | None:
     i = 0
     while i < len(words):
         w = words[i]
-        name = mcp_vitals._basename(w)
+        name = mcp_upkeep._basename(w)
         if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*=.*", w, re.S):
             i += 1
         elif name in WRAPPERS:
@@ -190,11 +190,11 @@ def _parse_add_json(rest: list[str]) -> dict | None:
         return None
     if not isinstance(spec, dict):
         return None
-    return mcp_vitals.server_entry("Claude Code", "claude mcp add", positional[0], spec)
+    return mcp_upkeep.server_entry("Claude Code", "claude mcp add", positional[0], spec)
 
 
 def entry(name: str, command: str = "", args: list[str] | None = None, url: str = "") -> dict:
-    command, args = mcp_vitals.command_line(command, list(args or []))  # `claude mcp add x "npx -y pkg KEY"`
+    command, args = mcp_upkeep.command_line(command, list(args or []))  # `claude mcp add x "npx -y pkg KEY"`
     return {"client": "Claude Code", "config": "claude mcp add", "name": name,
             "command": command, "args": args, "url": url}
 
@@ -202,8 +202,8 @@ def entry(name: str, command: str = "", args: list[str] | None = None, url: str 
 def _servers(data: dict, path: Path) -> dict[str, dict]:
     found = {}
     for key in ("mcpServers", "servers"):
-        for name, spec in mcp_vitals.entries_in(data, key):
-            found[name] = mcp_vitals.server_entry("Claude Code", str(path), name, spec)
+        for name, spec in mcp_upkeep.entries_in(data, key):
+            found[name] = mcp_upkeep.server_entry("Claude Code", str(path), name, spec)
     return found
 
 
@@ -234,7 +234,7 @@ def added_by_edit(tool_input: dict, tool: str = "Edit") -> list[dict]:
     path = Path(str(tool_input.get("file_path") or ""))
     if path.name not in CONFIG_NAMES:
         return []
-    data, _ = mcp_vitals.read_config(path)
+    data, _ = mcp_upkeep.read_config(path)
     if data is None:
         return []
     now = _servers(data, path)
@@ -261,15 +261,15 @@ def added_by_edit(tool_input: dict, tool: str = "Edit") -> list[dict]:
 
 # ---------------------------------------------------------------- checking
 
-def findings(servers: list[dict], net: mcp_vitals.Net) -> list[dict]:
-    results = [mcp_vitals.examine(s, net, mcp_vitals._today()) for s in servers]
-    return [r for r in results if mcp_vitals.SERIOUS & set(r["flags"])]
+def findings(servers: list[dict], net: mcp_upkeep.Net) -> list[dict]:
+    results = [mcp_upkeep.examine(s, net, mcp_upkeep._today()) for s in servers]
+    return [r for r in results if mcp_upkeep.SERIOUS & set(r["flags"])]
 
 
 def explain(r: dict) -> str:
     facts = r["facts"].get("repository") or {}
     reg = r["facts"].get("registry") or {}
-    parts = [f"MCP server '{r['name']}' ({mcp_vitals.what(r)})"]
+    parts = [f"MCP server '{r['name']}' ({mcp_upkeep.what(r)})"]
     if r["repo"]:
         parts.append(f"repository {r['repo']}")
     if r["days_since_push"] is not None:
@@ -280,13 +280,13 @@ def explain(r: dict) -> str:
         parts.append(f"{reg['registry']} has no version {r['version']}")
     if reg.get("deprecated"):
         # the registry's words are data from a third party: cut short, cleaned, and marked as such
-        parts.append(f"{reg['registry']} marks {reg.get('version') or 'it'} deprecated: {mcp_vitals.remote_text(reg['deprecated'])}")
+        parts.append(f"{reg['registry']} marks {reg.get('version') or 'it'} deprecated: {mcp_upkeep.remote_text(reg['deprecated'])}")
     return f"{', '.join(parts)}. Flags: {', '.join(r['flags'])}."
 
 
 def request_timeout() -> float:
     try:
-        t = float(os.environ.get("MCP_VITALS_HOOK_TIMEOUT", DEFAULT_TIMEOUT))
+        t = float(os.environ.get("MCP_UPKEEP_HOOK_TIMEOUT", DEFAULT_TIMEOUT))
     except ValueError:  # `6s`, say: fall back rather than fail
         return DEFAULT_TIMEOUT
     return t if 0 < t <= BUDGET else DEFAULT_TIMEOUT
@@ -319,13 +319,13 @@ def _main() -> int:
     if not servers:
         return 0
 
-    net = mcp_vitals.Net(False, os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN"), timeout=request_timeout(),
+    net = mcp_upkeep.Net(False, os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN"), timeout=request_timeout(),
                          census=False, budget=BUDGET)
     found = findings(servers, net)
     if not found:
         return 0
     text = " ".join(explain(r) for r in found) + (
-        " These are dates and registry flags from mcp-vitals, not a verdict on the code; a finished tool can go"
+        " These are dates and registry flags from mcp-upkeep, not a verdict on the code; a finished tool can go"
         " a year without a push and still work.")
     print(json.dumps(respond(event, text)))
     return 0

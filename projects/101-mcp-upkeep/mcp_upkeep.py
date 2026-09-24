@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""mcp-vitals: check the MCP servers you actually run.
+"""mcp-upkeep: check the MCP servers you actually run.
 
 agent-vitals (github.com/Keremozdemirra/agent-vitals) takes a daily census of
 the agent tooling ecosystem. This measures the part of it on your machine. It
@@ -12,7 +12,7 @@ yanked, and whether the entry names an exact version at all.
 
 Standard library only, one file, so it runs without installing anything:
 
-  curl -sL https://raw.githubusercontent.com/Keremozdemirra/mcp-vitals/main/mcp_vitals.py | python3 -
+  curl -sL https://raw.githubusercontent.com/Keremozdemirra/mcp-upkeep/main/mcp_upkeep.py | python3 -
 
 What it reads and what it sends:
 
@@ -48,7 +48,7 @@ import urllib.request
 from pathlib import Path
 
 VERSION = "0.1.0"
-UA = "mcp-vitals (+https://github.com/Keremozdemirra/mcp-vitals)"
+UA = "mcp-upkeep (+https://github.com/Keremozdemirra/mcp-upkeep)"
 CENSUS = "https://raw.githubusercontent.com/Keremozdemirra/agent-vitals/main/data/servers.json"
 NPM_REGISTRY = "https://registry.npmjs.org/"
 PYPI_API = "https://pypi.org/pypi/"
@@ -1111,7 +1111,7 @@ def render_markdown(results: list[dict], today: dt.date, extra: list[str] = ()) 
     if extra:
         # registry text goes inside code spans, so it cannot become a link or markup in an issue
         out += [""] + [f"- `{esc(n)}`" for n in extra]
-    out += ["", "_Checked with [mcp-vitals](https://github.com/Keremozdemirra/mcp-vitals). "
+    out += ["", "_Checked with [mcp-upkeep](https://github.com/Keremozdemirra/mcp-upkeep). "
             "Dates and licence fields from public metadata, not a verdict on anyone's code._"]
     return "\n".join(out) + "\n"
 
@@ -1157,11 +1157,11 @@ OWN_FLAGS = ("--json", "--markdown", "--strict", "--offline")
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
-        prog="mcp-vitals",
+        prog="mcp-upkeep",
         description="Check the MCP servers configured on this machine: is the repository behind each one "
                     "still maintained, licensed, pinned?",
-        epilog="Options go before a command line to check (mcp-vitals --json npx -y pkg), or use -- to end them. "
-               "A single package or repository may be followed by options (mcp-vitals owner/repo --json). "
+        epilog="Options go before a command line to check (mcp-upkeep --json npx -y pkg), or use -- to end them. "
+               "A single package or repository may be followed by options (mcp-upkeep owner/repo --json). "
                "Exit codes: 0 no serious finding. With --strict, 1 when a server has a serious finding, "
                "else 2 when a check could not complete. 2 also for a --config file that is missing or unreadable.")
     ap.add_argument("--config", action="append", type=Path, default=[], metavar="PATH",
@@ -1184,15 +1184,15 @@ def main(argv: list[str] | None = None) -> int:
     if target[:1] == ["--"]:
         target, ended = target[1:], True
     if len(target) > 1 and not ended and all(t in OWN_FLAGS for t in target[1:]):
-        # `mcp-vitals owner/repo --json`: after a single package or repository, these are ours
+        # `mcp-upkeep owner/repo --json`: after a single package or repository, these are ours
         for t in target[1:]:
             setattr(a, t[2:], True)
         target = target[:1]
     elif len(target) > 1 and any(t in OWN_FLAGS for t in target[1:]):
         late = ", ".join(t for t in target[1:] if t in OWN_FLAGS)
-        print(f"mcp-vitals: {late} after the command is read as part of the server's command line; "
-              "put mcp-vitals options before it.", file=sys.stderr)
-        # A CI job that wrote `mcp-vitals npx -y pkg --strict` believes it is guarded;
+        print(f"mcp-upkeep: {late} after the command is read as part of the server's command line; "
+              "put mcp-upkeep options before it.", file=sys.stderr)
+        # A CI job that wrote `mcp-upkeep npx -y pkg --strict` believes it is guarded;
         # passing with exit 0 would be the silent failure --strict exists to prevent.
         if "--strict" in target[1:]:
             return 2
@@ -1201,7 +1201,7 @@ def main(argv: list[str] | None = None) -> int:
         p = p.expanduser()
         why = "no such file" if not p.is_file() else read_config(p)[1]
         if why:
-            print(f"mcp-vitals: --config {p}: {why}", file=sys.stderr)
+            print(f"mcp-upkeep: --config {p}: {why}", file=sys.stderr)
             return 2
 
     today = _today()

@@ -1,11 +1,11 @@
 {
-  "name": "mcp-vitals",
-  "displayName": "MCP Vitals",
+  "name": "mcp-upkeep",
+  "displayName": "MCP Upkeep",
   "version": "0.1.0",
   "description": "Asks before Claude adds an MCP server whose repository is archived, abandoned, deprecated, gone or unlicensed, and checks the servers you already run.",
   "author": { "name": "Kerem Özdemir", "url": "https://keremozdemir.de" },
-  "homepage": "https://github.com/Keremozdemirra/mcp-vitals",
-  "repository": "https://github.com/Keremozdemirra/mcp-vitals",
+  "homepage": "https://github.com/Keremozdemirra/mcp-upkeep",
+  "repository": "https://github.com/Keremozdemirra/mcp-upkeep",
   "license": "MIT",
   "keywords": ["mcp", "mcp-server", "hooks", "supply-chain", "licence", "maintenance"]
 }

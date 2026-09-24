@@ -27,4 +27,4 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: python -m unittest discover -s tests -v
-      - run: pip install . && mcp-vitals --offline npx -y @modelcontextprotocol/server-filesystem
+      - run: pip install . && mcp-upkeep --offline npx -y @modelcontextprotocol/server-filesystem

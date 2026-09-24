@@ -1272,7 +1272,7 @@ def days_since(iso, today: dt.date) -> int | None:
     return (today - d).days if d else None
 
 
-# Same thresholds as the agent-vitals census (collect.py bucket()) and mcp-vitals,
+# Same thresholds as the agent-vitals census (collect.py bucket()) and mcp-upkeep,
 # so a repository reads the same in all three.
 def bucket(days: int | None, archived: bool) -> str:
     if archived:

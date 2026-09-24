@@ -1,11 +1,11 @@
 ---
-name: mcp-vitals
+name: mcp-upkeep
 description: Check MCP servers for maintenance, licence, deprecation and pinning. Use when the user asks to check, audit or clean up the MCP servers they have configured; asks whether an MCP server is maintained, abandoned, archived or licensed; or before you recommend or add an MCP server they have not installed yet.
 ---
 
-# mcp-vitals
+# mcp-upkeep
 
-`mcp_vitals.py` in this plugin reads MCP client configs (Claude Code, Claude Desktop,
+`mcp_upkeep.py` in this plugin reads MCP client configs (Claude Code, Claude Desktop,
 Cursor, VS Code, Windsurf, Gemini CLI, Codex), resolves each server to its npm or
 PyPI package, container image or checkout, and reports on the repository behind it.
 It reads `command`, `args` and `url` only, never `env` or `headers`, and masks URL
@@ -14,7 +14,7 @@ credentials, query strings and key-like arguments in everything it prints.
 ## Everything configured on this machine
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/mcp_vitals.py" --json
+python3 "${CLAUDE_PLUGIN_ROOT}/mcp_upkeep.py" --json
 ```
 
 ## One server, before adding it
@@ -23,9 +23,9 @@ Options go first, then the command line the server would be started with, or a
 package or repository:
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/mcp_vitals.py" --json npx -y @scope/server-name
-python3 "${CLAUDE_PLUGIN_ROOT}/mcp_vitals.py" --json pypi:mcp-server-fetch
-python3 "${CLAUDE_PLUGIN_ROOT}/mcp_vitals.py" --json owner/repo
+python3 "${CLAUDE_PLUGIN_ROOT}/mcp_upkeep.py" --json npx -y @scope/server-name
+python3 "${CLAUDE_PLUGIN_ROOT}/mcp_upkeep.py" --json pypi:mcp-server-fetch
+python3 "${CLAUDE_PLUGIN_ROOT}/mcp_upkeep.py" --json owner/repo
 ```
 
 ## Reporting back

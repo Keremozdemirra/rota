@@ -3,7 +3,7 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mcp-vitals"
+name = "mcp-upkeep"
 version = "0.1.0"
 description = "Check the MCP servers you run: is the repository behind each one still maintained, licensed, pinned?"
 readme = "README.md"
@@ -20,13 +20,13 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Repository = "https://github.com/Keremozdemirra/mcp-vitals"
-Issues = "https://github.com/Keremozdemirra/mcp-vitals/issues"
+Repository = "https://github.com/Keremozdemirra/mcp-upkeep"
+Issues = "https://github.com/Keremozdemirra/mcp-upkeep/issues"
 Census = "https://github.com/Keremozdemirra/agent-vitals"
 
 [project.scripts]
-mcp-vitals = "mcp_vitals:main"
-mcp-vitals-hook = "mcp_vitals_hook:main"
+mcp-upkeep = "mcp_upkeep:main"
+mcp-upkeep-hook = "mcp_upkeep_hook:main"
 
 [tool.setuptools]
-py-modules = ["mcp_vitals", "mcp_vitals_hook"]
+py-modules = ["mcp_upkeep", "mcp_upkeep_hook"]

@@ -13,8 +13,8 @@ from unittest import mock
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from support import ROOT, Isolated, Web, bash  # noqa: E402
 
-import mcp_vitals  # noqa: E402
-import mcp_vitals_hook as hook  # noqa: E402
+import mcp_upkeep  # noqa: E402
+import mcp_upkeep_hook as hook  # noqa: E402
 
 # built at run time: no file holds anything shaped like a real key
 NOTION = "ntn_" + "4" * 46
@@ -108,15 +108,15 @@ class R4_DocumentedWrappers(Isolated):
 
 
 class R5_TimeoutSetting(Isolated):
-    """[low] MCP_VITALS_HOOK_TIMEOUT=6s raised at import: a hook error on every call."""
+    """[low] MCP_UPKEEP_HOOK_TIMEOUT=6s raised at import: a hook error on every call."""
 
     def test_bad_value_falls_back(self):
         for value in ("6s", "", "nan", "-1", "1e9"):
-            with mock.patch.dict(os.environ, {"MCP_VITALS_HOOK_TIMEOUT": value}):
+            with mock.patch.dict(os.environ, {"MCP_UPKEEP_HOOK_TIMEOUT": value}):
                 importlib.reload(hook)
                 self.assertEqual(hook.request_timeout(), 6.0, value)
                 self.assertIsNone(self.run_hook(bash("ls")))
-        with mock.patch.dict(os.environ, {"MCP_VITALS_HOOK_TIMEOUT": "3"}):
+        with mock.patch.dict(os.environ, {"MCP_UPKEEP_HOOK_TIMEOUT": "3"}):
             self.assertEqual(hook.request_timeout(), 3.0)
         importlib.reload(hook)
 
@@ -138,7 +138,7 @@ class R6_TimeBudget(Isolated):
         self.web = Slow({f"https://registry.npmjs.org/pkg{i}": npm for i in range(1, 6)})
         p = self.tmp / ".mcp.json"
         p.write_text(json.dumps({"mcpServers": {f"s{i}": {"command": "npx", "args": ["-y", f"pkg{i}"]} for i in range(1, 6)}}))
-        with mock.patch.object(mcp_vitals.time, "monotonic", lambda: clock["t"]):
+        with mock.patch.object(mcp_upkeep.time, "monotonic", lambda: clock["t"]):
             out = self.run_hook({"hook_event_name": "PostToolUse", "tool_name": "Write",
                                  "tool_input": {"file_path": str(p), "content": p.read_text()}})
         self.assertEqual(len(self.web.requests), 3)  # at 0, 6 and 12 s; nothing started after 15

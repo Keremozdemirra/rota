@@ -1,4 +1,4 @@
-"""mcp_vitals_hook.py: parsing `claude mcp add`, config edits, and the hook responses. No network."""
+"""mcp_upkeep_hook.py: parsing `claude mcp add`, config edits, and the hook responses. No network."""
 import io
 import json
 import sys
@@ -9,7 +9,7 @@ from unittest import mock
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from support import Isolated, bash, fixture  # noqa: E402
 
-import mcp_vitals_hook as hook  # noqa: E402
+import mcp_upkeep_hook as hook  # noqa: E402
 
 GH = "https://api.github.com/repos/o/n"
 NPM = "https://registry.npmjs.org/@o%2Fserver"
