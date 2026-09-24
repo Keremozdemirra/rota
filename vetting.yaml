@@ -27,7 +27,7 @@ covered:
   worktrees:           [worktree, git-worktree]                                   # worktrunk, Claude Code worktrees (2026-09-21)
   calendar:            [calendar, caldav, ics]                                    # Google Calendar connector on claude.ai (2026-09-21)
   linkedin:            [linkedin, linkedin-post, linkedin-profile]               # linkedin-skills plugin (sergebulaev), installed (2026-09-21)
-  local models:        [ollama, local-llm, local-inference, self-hosted-llm]      # Ollama 0.34 with qwen3:30b, qwen3-coder:30b, qwen3:8b, bge-m3; tools/local-ask.sh and local-claude.sh; skill local-model (2026-09-22)
+  local models:        [ollama, local-llm, local-inference, self-hosted-llm]      # Ollama 0.34 with qwen3.6:35b-a3b-nvfp4 (fast), qwen3.8:27b-nvfp4 (careful), qwen3-coder:30b (code), qwen3:8b (small), bge-m3; roles and measurements in tools/local-models.sh; qwen3:30b and gemma4:26b measured and removed 2026-09-24; skill local-model (2026-09-22, re-measured 2026-09-24)
   design generation:   [design-tool, prototype-generator, landing-page-generator, mockup-generator]  # open-design 0.23.0 desktop app + MCP, installed 2026-09-21 (sha256 verified, notarized Developer ID; ships PostHog and Langfuse telemetry on by default, no toggle found)
 
 # 2. Categories decided against, with the reason. A new arrival matching one
@@ -63,7 +63,7 @@ declined_repos:
   usestrix/strix:                  "runs its agents on paid model APIs; no spending (Kerem 2026-09-11); revisit if a free provider route appears (2026-09-21)"
   amaancoderx/npxskillui:          "no description, no licence, last push 2026-05-07 (2026-09-21)"
   Paidax01/math-curve-loaders:     "CSS loader gallery, last push 2026-04-04, no fit with the site's own design (2026-09-21)"
-  multica-ai/andrej-karpathy-skills: "the karpathy-guidelines skill already carries it (2026-09-21)"
+  multica-ai/andrej-karpathy-skills: "COVERED, re-read 2026-09-24 at 2c60614 (last push 2026-04-20): agent-kit/skills/karpathy-guidelines is the upstream SKILL.md plus seven local rules (inherited inputs, one name one meaning, mutation-checked tests); upstream adds nothing ours lacks. EXAMPLES.md (522 lines) left out: context cost with no new rule. Licence MIT as declared in README and plugin.json, no LICENSE file; our copy carries the source line (2026-09-21)"
   chaitanyagiri/munder-difflin:    "clean architecture, but N parallel sessions on one subscription and a supervisor agent with standing authority (2026-09-04)"
   affaan-m/ECC:                    "DECLINE. Earlier (2026-09-21): a second harness (hooks, memory and instincts for twenty agent CLIs) beside the one built here; skills can be cherry-picked on request. Measured the same day: 292 skill frontmatter blocks carry 88,660 characters, about 22,165 always-on tokens on a 97.700%-cache-read machine, and hooks.json materialises 24 hooks over 7 events, 9 of them PreToolUse, 2 landing on rtk Bash matcher (2026-09-21)"
   NousResearch/hermes-agent:       "a separate agent runtime on API keys with unattended gateways; money and standing authority (2026-09-21)"

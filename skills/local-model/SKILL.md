@@ -1,6 +1,6 @@
 ---
 name: local-model
-description: Runs footwork on a local Ollama model (Qwen3 30B) instead of the Max subscription, nothing leaves the machine. Use for bulk or mechanical text jobs: summarising many files, classifying, tagging, translation drafts, data generation, first-pass rewrites, census notes. "yerel modelle yap", "qwen ile", "kotayi harcama", "run this locally", "offload to the local model". Not for decisions, anything touching money, credentials or legal text, or a final answer Kerem will publish; those stay on Claude.
+description: Runs footwork on local Ollama models (Qwen3.6, Qwen3.8, Qwen3-Coder) instead of the Max subscription, nothing leaves the machine. Use for bulk or mechanical text jobs: summarising many files, classifying, tagging, translation drafts, data generation, first-pass rewrites, census notes. "yerel modelle yap", "qwen ile", "kotayi harcama", "run this locally", "offload to the local model". Not for decisions, anything touching money, credentials or legal text, or a final answer Kerem will publish; those stay on Claude.
 ---
 
 # Local model
@@ -14,7 +14,7 @@ One question about text you already have. No agent loop, thinking off.
 
 ```bash
 cat file.md | ~/agents/rota/tools/local-ask.sh "Summarise in three lines."
-tail -200 log.md | ~/agents/rota/tools/local-ask.sh -m qwen3:8b "List the dates mentioned."
+tail -200 log.md | ~/agents/rota/tools/local-ask.sh -m careful "List the dates mentioned."
 ```
 
 Stdin is the text, the argument is the instruction, stdout is the answer, stderr
@@ -25,21 +25,30 @@ model stays loaded between calls.
 
 A Claude Code run whose model is local. Same tools as a sub-agent (Read, Grep,
 Glob by default; add Write or Bash with `-t`), so it can find and read files on
-its own. Measured 2026-09-22: on qwen3:8b it hit its turn limit after four
-minutes, and on qwen3:30b it had not finished after twenty while another job
-held the GPU. Treat it as experimental; reach for it only when the GPU is idle
-and the job truly needs to look things up. local-ask.sh is the default.
+its own. Measured 2026-09-24 on the fast role, idle GPU: a one-file lookup
+answered correctly in 5 min 50 s, because every turn re-reads Claude Code's own
+system prompt. Treat it as experimental; reach for it only when the job truly
+needs to look things up. local-ask.sh is the default.
 
 ```bash
 ~/agents/rota/tools/local-claude.sh -n 8 "Read every SKILL.md under ~/.claude/skills and list the ones that mention Make.com."
-~/agents/rota/tools/local-claude.sh -m qwen3-coder:30b -t Read,Grep,Glob,Write "Write tests for rota/tools/scout.py into rota/tests/test_scout.py."
+~/agents/rota/tools/local-claude.sh -m code -t Read,Grep,Glob,Write "Write tests for rota/tools/scout.py into rota/tests/test_scout.py."
 ```
 
 ## Which model
 
-`qwen3:30b` for prose and classification, `qwen3-coder:30b` for code, `qwen3:8b`
-when speed matters more than quality. `ollama list` shows what is pulled; a
-model that is not pulled falls back to qwen3:8b.
+Pass a role with `-m`; the scripts resolve it through `tools/local-models.sh`,
+which also holds the measurements (2026-09-24, idle M5 Pro 64 GB):
+
+| Role | Model | Use for | Inbound class /60 | All fields /60 | Code /11 | tok/s |
+|---|---|---|---|---|---|---|
+| `fast` (default) | qwen3.6:35b-a3b-nvfp4 | summaries, classification, extraction, bulk | 60 | 59 | 10 | 47.6 |
+| `careful` | qwen3.8:27b-nvfp4 | small batches where every field must be right | 60 | 60 | 10 | 18.2 |
+| `code` | qwen3-coder:30b | code and tests | | | 11 | |
+| `small` | qwen3:8b | reproducing the studio kits' published figures | 58 | 53 | 7 | 35.1 |
+
+A full model name also works. A model that is not pulled falls back to qwen3:8b.
+Embeddings stay on bge-m3 (`ltm.py`).
 
 ## Rules
 

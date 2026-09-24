@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # One question to a local Ollama model, no agent loop, thinking off. The fast path for
 # footwork on text you already have: pipe the text in, ask one thing, get one answer.
-#   local-ask.sh [-m model] "<instruction>" < file      or     cmd | local-ask.sh "<instruction>"
-# Default model qwen3:30b, falls back to qwen3:8b. Nothing leaves the machine.
+#   local-ask.sh [-m fast|careful|code|small|<model>] "<instruction>" < file   or   cmd | local-ask.sh "<instruction>"
+# Roles and the measurements behind them are in local-models.sh; default fast. Nothing leaves the machine.
 set -euo pipefail
-MODEL="qwen3:30b"
+source "$(dirname "$0")/local-models.sh"
+MODEL=fast
 while getopts "m:" o; do case $o in m) MODEL=$OPTARG;; *) exit 2;; esac; done
 shift $((OPTIND-1))
 INSTR="${1:?instruction}"; INPUT="$(cat)"
-ollama show "$MODEL" >/dev/null 2>&1 || MODEL="qwen3:8b"
+MODEL=$(use_model "$MODEL")
 python3 - "$MODEL" "$INSTR" "$INPUT" <<'PY'
 import json, sys, urllib.request
 model, instr, text = sys.argv[1], sys.argv[2], sys.argv[3]
