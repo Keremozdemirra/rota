@@ -157,9 +157,12 @@ class Lint(Isolated):
         return path
 
 
-class RealHooks(Lint):
+class RealHooks(Isolated):
     """The hooks this project was built against. Lessons: fan-out (pkg-vitals before review), Edit rules that never
     matched Write calls (mcp-vitals before its second review)."""
+
+    assertFinds = Lint.assertFinds
+    _fixture_plugin = Lint._fixture_plugin
 
     def findings(self, name, script_name):
         return hh.lint(hh.load_source(self._fixture_plugin(name, script_name)))
