@@ -1,0 +1,17 @@
+{
+  "description": "pkg-vitals: registry facts about each npm or PyPI package before Claude installs it; asks when a package is missing, new, deprecated, yanked or archived. One handler for both shells: the script itself picks out install commands and takes one lock per tool call.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/pkg_vitals_hook.py\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

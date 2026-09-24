@@ -779,8 +779,8 @@ class _BashParser:
                     targets.append(self.word())
                 continue
             words.append(self.word())
-        if heredoc and targets:
-            self.every("a here-document together with another redirection")
+        if heredoc and (targets or self.s.startswith("|", self.i)):
+            self.every("a here-document together with another redirection or a pipe")
         if heredoc:
             targets.append(_Word())  # counts as a redirection for the checks in finish()
         return words, targets
@@ -1832,6 +1832,14 @@ def load_suite(path: Path) -> Suite:
             raise CaseFileError(f"{name}: unknown event {event!r}")
         if event in TOOL_EVENTS and not isinstance(case.get("tool_name"), str):
             raise CaseFileError(f"{name}: a {event} case needs tool_name")
+        tool = case.get("tool_name")
+        if isinstance(tool, str) and tool not in KNOWN_TOOLS | LEGACY_TOOLS and not tool.startswith("mcp__"):
+            near = [t for t in KNOWN_TOOLS if t.lower() == tool.lower()]
+            raise CaseFileError(f"{name}: unknown tool_name {tool!r}" + (f" (tool names are case-sensitive: {near[0]})"
+                                if near else " (not in the tools reference; MCP tools are named mcp__server__tool)"))
+        fld = MATCHER_FIELD.get(event)
+        if fld and event not in TOOL_EVENTS and not isinstance((case.get("payload") or {}).get(fld), str):
+            raise CaseFileError(f"{name}: a {event} case needs payload.{fld}, the value its matchers are compared with")
         for key in ("tool_input", "payload", "tool_response"):
             if key in case and not isinstance(case[key], dict) and not (key == "tool_response"):
                 raise CaseFileError(f"{name}: {key} must be an object")
@@ -2082,11 +2090,6 @@ def _first_word(command: str) -> str:
     while words and _ASSIGN.match(words[0]):
         words = words[1:]
     return words[0] if words else ""
-
-
-def _group_tools(matcher, event):
-    mode, arg = matcher_mode(matcher, event)
-    return mode, arg
 
 
 def _matcher_can_match(matcher, event, tool) -> bool:

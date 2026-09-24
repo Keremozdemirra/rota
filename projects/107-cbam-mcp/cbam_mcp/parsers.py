@@ -217,8 +217,29 @@ def _annex_iii_point_1(div) -> dict:
     return {"countries": countries, "territories": territories}
 
 
+def _doc_header(root) -> dict:
+    """Reference line, disclaimer and amending acts (M1 = CELEX) of a consolidated text."""
+    ref = [text_of(p) for p in root.iter(X + "p") if (p.get("class") or "") == "reference"]
+    disc = [text_of(p) for p in root.iter(X + "p") if (p.get("class") or "") == "disclaimer"]
+    amendments = {}
+    for a in root.iter(X + "a"):
+        t = "".join(a.itertext()).strip()
+        m = re.match(r"^►(M\d+)$", t)
+        href = a.get("href") or ""
+        if m and "/celex/" in href and m.group(1) not in amendments:
+            amendments[m.group(1)] = href.rsplit("/", 1)[-1]
+    return {"reference": ref[0] if ref else None, "disclaimer": disc[0] if disc else None, "amendments": amendments}
+
+
 def parse_regulation_xhtml(raw: bytes) -> dict:
     """Annexes I, II, III (point 1) and the de minimis texts of the consolidated CBAM Regulation."""
+    try:
+        return _parse_regulation(raw)
+    except RecursionError:
+        raise ParseError("consolidated regulation: elements nested too deeply, refused") from None
+
+
+def _parse_regulation(raw: bytes) -> dict:
     root = _xml(raw, "consolidated regulation")
     annex_i = _find_div(root, "anx_I")
     annex_ii = _find_div(root, "anx_II")
@@ -233,10 +254,8 @@ def parse_regulation_xhtml(raw: bytes) -> dict:
                          f"in {len(cats)} categories; the layout changed")
     intro = [text_of(p) for p in annex_i.iter(X + "p") if re.match(r"^\d\.", text_of(p))]
     out["annex_i_intro"] = intro[:2]
-    ref = [text_of(p) for p in root.iter(X + "p") if (p.get("class") or "") == "reference"]
-    out["reference"] = ref[0] if ref else None
-    disc = [text_of(p) for p in root.iter(X + "p") if (p.get("class") or "") == "disclaimer"]
-    out["disclaimer"] = disc[0] if disc else None
+    header = _doc_header(root)
+    out["reference"], out["disclaimer"] = header["reference"], header["disclaimer"]
     quotes = {}
     for art, key, para in (("art_2", "article_2_1", "1"), ("art_2", "article_2_4", "4"),
                            ("art_2a", "article_2a_1", "1"), ("art_2a", "article_2a_4", "4"),
@@ -254,14 +273,7 @@ def parse_regulation_xhtml(raw: bytes) -> dict:
     out["quotes"] = quotes
     annex_iii = _find_div(root, "anx_III")
     out["annex_iii_point_1"] = _annex_iii_point_1(annex_iii) if annex_iii is not None else None
-    amendments = {}
-    for a in root.iter(X + "a"):
-        t = (a.text or "").strip()
-        m = re.match(r"^►(M\d+)$", t)
-        href = a.get("href") or ""
-        if m and "/celex/" in href and m.group(1) not in amendments:
-            amendments[m.group(1)] = href.rsplit("/", 1)[-1]
-    out["amendments"] = amendments
+    out["amendments"] = header["amendments"]
     return out
 
 
@@ -491,7 +503,14 @@ def parse_cn_rows(rows: list[dict]) -> dict:
 # ------------------------------------------------------ Official Journal tables
 
 def parse_oj_default_values(raw: bytes) -> dict:
-    """Country tables and Annex IV as printed in the Official Journal XHTML, for the cross-check."""
+    """Country tables, Annex IV and paragraphs of the default-value act (OJ or consolidated XHTML)."""
+    try:
+        return _parse_oj(raw)
+    except RecursionError:
+        raise ParseError("Official Journal text: elements nested too deeply, refused") from None
+
+
+def _parse_oj(raw: bytes) -> dict:
     root = _xml(raw, "Official Journal text")
     tables: dict = {}
     annex_iv: dict = {}
@@ -521,4 +540,8 @@ def parse_oj_default_values(raw: bytes) -> dict:
                 annex_iv[code] = cells[:2]
     if not tables:
         raise ParseError("Official Journal text: no default-value tables found")
-    return {"tables": tables, "annex_iv": annex_iv, "text": _clean("".join(root.itertext()))}
+    # Long paragraphs only: the rules sit in the annexes' introductory paragraphs, and
+    # skipping short table cells keeps the list small.
+    paragraphs = [t for t in (text_of(p) for p in root.iter(X + "p")) if len(t) >= 40]
+    return {"tables": tables, "annex_iv": annex_iv, "text": _clean("".join(root.itertext())),
+            "paragraphs": paragraphs, **_doc_header(root)}
