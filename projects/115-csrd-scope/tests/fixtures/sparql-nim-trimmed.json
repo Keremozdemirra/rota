@@ -1,0 +1,463 @@
+{
+"head": {
+"link": [],
+"vars": [
+"dir",
+"c",
+"country",
+"notif",
+"ojn",
+"ojno",
+"e",
+"t"
+]
+},
+"results": {
+"distinct": false,
+"ordered": true,
+"bindings": [
+{
+"dir": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"c": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72022L2464AUT_202601283"
+},
+"country": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/authority/country/AUT"
+},
+"notif": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-02-19"
+},
+"ojn": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Bundesgesetzblatt für die Republik Österreich ( BGBl. )"
+},
+"ojno": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "BGBl. I Nr. 6/2026"
+},
+"e": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+"value": "https://www.ris.bka.gv.at/eli/bgbl/I/2026/6/20260218"
+},
+"t": {
+"type": "literal",
+"xml:lang": "de",
+"value": "Bundesgesetz, mit dem ein Drittlandunternehmen-Berichterstattungsgesetz erlassen wird und das Unternehmensgesetzbuch, das Aktiengesetz, das GmbH-Gesetz, das Genossenschaftsgesetz, das Genossenschaftsrevisionsgesetz 1997, das SE-Gesetz, das SCE-Gesetz, das Arbeitsverfassungsgesetz, das Wirtschaftstreuhandberufsgesetz 2017, das Rechtspflegergesetz, das Gerichtsgebührengesetz, das CBCR-Veröffentlichungsgesetz, das Abschlussprüfer-Aufsichtsgesetz, das Alternative Investmentfonds Manager-Gesetz, das Bankwesengesetz, das Börsegesetz 2018, das Investmentfondsgesetz 2011, das Nationalbankgesetz 1984, das Sparkassengesetz, und das Versicherungsaufsichtsgesetz 2016 geändert werden (Nachhaltigkeitsberichtsgesetz – NaBeG)"
+}
+},
+{
+"dir": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32025L0794"
+},
+"c": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72025L0794POL_202504533"
+},
+"country": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/authority/country/POL"
+},
+"notif": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-08-14"
+},
+"ojn": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Dziennik Ustaw"
+},
+"e": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+"value": "https://eli.gov.pl/eli/DU/2025/1020/ogl"
+},
+"t": {
+"type": "literal",
+"xml:lang": "pl",
+"value": "Ustawa z dnia 9 lipca 2025 r. zmieniająca ustawę o zmianie ustawy o rachunkowości, ustawy o biegłych rewidentach, firmach audytorskich oraz nadzorze publicznym oraz niektórych innych ustaw"
+}
+},
+{
+"dir": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32025L0794"
+},
+"c": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72025L0794AUT_202601474"
+},
+"country": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/authority/country/AUT"
+},
+"notif": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-02-27"
+},
+"ojn": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Bundesgesetzblatt für die Republik Österreich ( BGBl. )"
+},
+"ojno": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "BGBl I Nr. 6/2026"
+},
+"e": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+"value": "https://www.ris.bka.gv.at/eli/bgbl/I/2026/6/20260218"
+},
+"t": {
+"type": "literal",
+"xml:lang": "de",
+"value": "Bundesgesetz, mit dem das Drittlandunternehmen-Berichterstattungsgesetz erlassen und das Unternehmensgesetzbuch, das Aktiengesetz, das GmbH-Gesetz, das Genossenschaftsgesetz, das Genossenschaftsrevisionsgesetz 1997, das SE-Gesetz, das SCE-Gesetz, das Arbeitsverfassungsgesetz, das Strafgesetzbuch, das Rechtspflegergesetz, das Gerichtsgebührengesetz und das CBCR-Veröffentlichungsgesetz geändert werden (Nachhaltigkeitsberichtsgesetz – NaBeG)"
+}
+},
+{
+"dir": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"c": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72022L2464POL_202405766"
+},
+"country": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/authority/country/POL"
+},
+"notif": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-12-18"
+},
+"ojn": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Dziennik Ustaw"
+},
+"e": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+"value": "https://eli.gov.pl/eli/DU/2024/1863/ogl"
+},
+"t": {
+"type": "literal",
+"xml:lang": "pl",
+"value": "Ustawa z dnia 6 grudnia 2024 r. o zmianie ustawy o rachunkowości, ustawy o biegłych rewidentach, firmach audytorskich oraz nadzorze publicznym oraz niektórych innych ustaw"
+}
+},
+{
+"dir": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"c": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72022L2464POL_202503305"
+},
+"country": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/authority/country/POL"
+},
+"notif": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-06-10"
+},
+"ojn": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Dziennik Ustaw"
+},
+"e": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+"value": "https://eli.gov.pl/eli/DU/2024/1035/ogl"
+},
+"t": {
+"type": "literal",
+"xml:lang": "pl",
+"value": "Ustawa z dnia 11 maja 2017 r. o biegłych rewidentach, firmach audytorskich oraz nadzorze publicznym"
+}
+},
+{
+"dir": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32025L0794"
+},
+"c": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72025L0794POL_202503323"
+},
+"country": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/authority/country/POL"
+},
+"notif": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-06-10"
+},
+"ojn": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Dziennik Ustaw"
+},
+"e": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+"value": "https://eli.gov.pl/eli/DU/2025/755/ogl"
+},
+"t": {
+"type": "literal",
+"xml:lang": "pl",
+"value": "rozporządzenie Ministra Finansów z dnia 6 czerwca 2025 r. w sprawie informacji bieżących i okresowych przekazywanych przez emitentów papierów wartościowych oraz warunków uznawania za równoważne informacji wymaganych przepisami prawa państwa niebędącego państwem członkowskim"
+}
+},
+{
+"dir": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"c": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72022L2464POL_202503323"
+},
+"country": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/authority/country/POL"
+},
+"notif": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-06-10"
+},
+"ojn": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Dziennik Ustaw"
+},
+"e": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+"value": "https://eli.gov.pl/eli/DU/2025/755/ogl"
+},
+"t": {
+"type": "literal",
+"xml:lang": "pl",
+"value": "rozporządzenie Ministra Finansów z dnia 6 czerwca 2025 r. w sprawie informacji bieżących i okresowych przekazywanych przez emitentów papierów wartościowych oraz warunków uznawania za równoważne informacji wymaganych przepisami prawa państwa niebędącego państwem członkowskim"
+}
+},
+{
+"dir": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"c": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72022L2464POL_202503304"
+},
+"country": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/authority/country/POL"
+},
+"notif": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-06-10"
+},
+"ojn": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Dziennik Ustaw"
+},
+"e": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+"value": "https://eli.gov.pl/eli/DU/2023/120/ogl"
+},
+"t": {
+"type": "literal",
+"xml:lang": "pl",
+"value": "Ustawa z dnia 29 września 1994 r.o rachunkowości"
+}
+},
+{
+"dir": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470"
+},
+"c": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72026L0470POL_202602098"
+},
+"country": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/authority/country/POL"
+},
+"notif": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-03-30"
+},
+"ojn": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Dziennik Ustaw"
+},
+"e": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#anyURI",
+"value": "https://eli.gov.pl/eli/DU/2026/333/ogl"
+},
+"t": {
+"type": "literal",
+"xml:lang": "pl",
+"value": "Ustawa z dnia 27 lutego 2026 r. o zmianie ustawy o rachunkowości."
+}
+},
+{
+"dir": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"c": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72022L2464BEL_202405899"
+},
+"country": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/authority/country/BEL"
+},
+"notif": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-12-20"
+},
+"ojn": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Moniteur Belge"
+},
+"ojno": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "C − 2024/011683"
+},
+"t": {
+"type": "literal",
+"xml:lang": "nl",
+"value": "FOD ECONOMIE- Wet betreffende de openbaarmaking van\nduurzaamheidsinformatie door bepaalde vennootschappen en\ngroepen en de assurance van duurzaamheidsinformatie en houdende\ndiverse bepalingen"
+}
+},
+{
+"dir": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"c": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72022L2464BEL_202501748"
+},
+"country": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/authority/country/BEL"
+},
+"notif": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-03-27"
+},
+"ojn": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Moniteur Belge"
+},
+"ojno": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72"
+},
+"t": {
+"type": "literal",
+"xml:lang": "fr",
+"value": "Arrêté royal du 16 mars 2025 visant à transposer certaines dispositions de la directive (UE) 2022/2464 du parlement européen et du conseil du 14 décembre 2022 modifiant le règlement (UE) n° 537/2014 et les directives 2004/109/CE, 2006/43/CE et 2013/34/UE en ce qui concerne la publication d'informations en matière de durabilité par les entreprises, et portant dispositions diverses"
+}
+},
+{
+"dir": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32025L0794"
+},
+"c": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "72025L0794BEL_202507284"
+},
+"country": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/authority/country/BEL"
+},
+"notif": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-12-23"
+},
+"ojn": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Moniteur Belge"
+},
+"ojno": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "[C − 2025/009725"
+},
+"t": {
+"type": "literal",
+"xml:lang": "nl",
+"value": "Wet tot wijziging van artikel 116 van de wet van 2 december 2024 betreffende de openbaarmaking van duurzaamheidsinformatie door bepaalde vennootschappen en groepen en de assurance van duurzaamheidsinformatie en houdende diverse bepalingen, inzake de datums waarop de rapportageverplichtingen van toepassing worden"
+}
+}
+]
+}
+}

@@ -1,0 +1,710 @@
+{
+"head": {
+"link": [],
+"vars": [
+"base",
+"rel",
+"celex",
+"date"
+]
+},
+"results": {
+"distinct": false,
+"ordered": true,
+"bindings": [
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"rel": {
+"type": "literal",
+"value": "amends"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32025L0794"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-04-14"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"rel": {
+"type": "literal",
+"value": "amends"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32025L0002"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-11-27"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32019R2088"
+},
+"rel": {
+"type": "literal",
+"value": "amends"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32024R3005"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-11-27"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"rel": {
+"type": "literal",
+"value": "amends"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32024L1306"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-04-29"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"rel": {
+"type": "literal",
+"value": "amends"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-02-24"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"rel": {
+"type": "literal",
+"value": "amends"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-02-24"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"rel": {
+"type": "literal",
+"value": "corrects"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(05)"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-11-20"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"rel": {
+"type": "literal",
+"value": "corrects"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(04)"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-08-16"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"rel": {
+"type": "literal",
+"value": "corrects"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(07)"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-09-11"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"rel": {
+"type": "literal",
+"value": "corrects"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-10-08"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"rel": {
+"type": "literal",
+"value": "corrects"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034R(07)"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-07-24"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"rel": {
+"type": "literal",
+"value": "corrects"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034R(08)"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-10-08"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"rel": {
+"type": "literal",
+"value": "corrects"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(06)"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-05-07"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470"
+},
+"rel": {
+"type": "literal",
+"value": "corrects"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470R(01)"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-04-22"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"rel": {
+"type": "literal",
+"value": "corrects"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(09)"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-07-01"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02006L0043-20260318"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-03-18"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32019R2088"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02019R2088-20240109"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-01-09"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32004L0109"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02004L0109-20240109"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-01-09"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02014R0537-20240109"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-01-09"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02013L0034-20240109"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-01-09"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32023L2775"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02013L0034-20240109"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-01-09"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02013L0034-20240528"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-05-28"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02022L2464-20250417"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-04-17"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32025L0794"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02022L2464-20250417"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-04-17"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32025L0794"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02024L1760-20250417"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-04-17"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02022L2464-20260318"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-03-18"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02022L2464-20260318"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-03-18"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02013L0034-20260318"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-03-18"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02013L0034-20260318"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-03-18"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02024L1760-20260318"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-03-18"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32019R2088"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02019R2088-20260702"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-07-02"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02013L0034-20270130"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2027-01-30"
+}
+},
+{
+"base": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470"
+},
+"rel": {
+"type": "literal",
+"value": "consolidates"
+},
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "02013L0034-20270130"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2027-01-30"
+}
+}
+]
+}
+}

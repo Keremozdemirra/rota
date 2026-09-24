@@ -1,0 +1,287 @@
+{
+"head": {
+"link": [],
+"vars": [
+"celex",
+"work",
+"inforce",
+"date",
+"endvalid",
+"title"
+]
+},
+"results": {
+"distinct": false,
+"ordered": true,
+"bindings": [
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32004L0109"
+},
+"work": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/cellar/222f03e7-c991-408f-a0f1-f9b680b6433f"
+},
+"inforce": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+"value": "1"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2004-12-15"
+},
+"endvalid": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-12-04"
+},
+"title": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Directive 2004/109/EC of the European Parliament and of the Council of 15 December 2004 on the harmonisation of transparency requirements in relation to information about issuers whose securities are admitted to trading on a regulated market and amending Directive 2001/34/EC"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32004L0109"
+},
+"work": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/cellar/222f03e7-c991-408f-a0f1-f9b680b6433f"
+},
+"inforce": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+"value": "1"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2004-12-15"
+},
+"endvalid": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "9999-12-31"
+},
+"title": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "Directive 2004/109/EC of the European Parliament and of the Council of 15 December 2004 on the harmonisation of transparency requirements in relation to information about issuers whose securities are admitted to trading on a regulated market and amending Directive 2001/34/EC"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034"
+},
+"work": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/cellar/aef88894-e08d-11e2-9165-01aa75ed71a1"
+},
+"inforce": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+"value": "1"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2013-06-26"
+},
+"endvalid": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "9999-12-31"
+},
+"title": {
+"type": "literal",
+"value": "Directive 2013/34/EU of the European Parliament and of the Council of 26 June 2013 on the annual financial statements, consolidated financial statements and related reports of certain types of undertakings, amending Directive 2006/43/EC of the European Parliament and of the Council and repealing Council Directives 78/660/EEC and 83/349/EEC  Text with EEA relevance"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464"
+},
+"work": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/cellar/59e70288-7ce5-11ed-9887-01aa75ed71a1"
+},
+"inforce": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+"value": "1"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2022-12-14"
+},
+"endvalid": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "9999-12-31"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Directive (EU) 2022/2464 of the European Parliament and of the Council of 14 December 2022 amending Regulation (EU) No 537/2014, Directive 2004/109/EC, Directive 2006/43/EC and Directive 2013/34/EU, as regards corporate sustainability reporting (Text with EEA relevance)"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32025L0794"
+},
+"work": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/cellar/8a789948-1a5f-11f0-b1a3-01aa75ed71a1"
+},
+"inforce": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+"value": "1"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2025-04-14"
+},
+"endvalid": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "9999-12-31"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Directive (EU) 2025/794 of the European Parliament and of the Council of 14 April 2025 amending Directives (EU) 2022/2464 and (EU) 2024/1760 as regards the dates from which Member States are to apply certain corporate sustainability reporting and due diligence requirements (Text with EEA relevance)"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32023L2775"
+},
+"work": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/cellar/6dc9213a-9fa2-11ee-b164-01aa75ed71a1"
+},
+"inforce": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+"value": "1"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2023-10-17"
+},
+"endvalid": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "9999-12-31"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Commission Delegated Directive (EU) 2023/2775 of 17 October 2023 amending Directive 2013/34/EU of the European Parliament and of the Council as regards the adjustments of the size criteria for micro, small, medium-sized and large undertakings or groups"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32019R2088"
+},
+"work": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/cellar/4f50e277-1a53-11ea-8c1f-01aa75ed71a1"
+},
+"inforce": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+"value": "1"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2019-11-27"
+},
+"endvalid": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "9999-12-31"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Regulation (EU) 2019/2088 of the European Parliament and of the Council of 27 November 2019 on sustainability‐related disclosures in the financial services sector (Text with EEA relevance)"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470"
+},
+"work": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/cellar/2f337274-12b4-11f1-8870-01aa75ed71a1"
+},
+"inforce": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+"value": "1"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2026-02-24"
+},
+"endvalid": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "9999-12-31"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Directive (EU) 2026/470 of the European Parliament and of the Council of 24 February 2026 amending Directives 2006/43/EC, 2013/34/EU, (EU) 2022/2464 and (EU) 2024/1760 as regards certain corporate sustainability reporting requirements and certain corporate sustainability due diligence requirements (Text with EEA relevance)"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "52024XC06792"
+},
+"work": {
+"type": "uri",
+"value": "http://publications.europa.eu/resource/cellar/edc4d6e7-a15f-11ef-85f0-01aa75ed71a1"
+},
+"date": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#date",
+"value": "2024-11-13"
+},
+"title": {
+"type": "literal",
+"xml:lang": "en",
+"value": "Commission Notice on the interpretation of certain legal provisions in Directive 2013/34/EU (Accounting Directive), Directive 2006/43/EC (Audit Directive), Regulation (EU) No 537/2014 (Audit Regulation), Directive 2004/109/EC (Transparency Directive), Delegated Regulation (EU) 2023/2772 (first set of European Sustainability Reporting Standards, first ESRS delegated act), and Regulation (EU) 2019/2088 (Sustainable Finance Disclosures Regulation, SFDR) as regards sustainability reporting"
+}
+}
+]
+}
+}

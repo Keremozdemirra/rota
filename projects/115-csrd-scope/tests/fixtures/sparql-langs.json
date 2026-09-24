@@ -1,0 +1,290 @@
+{
+"head": {
+"link": [],
+"vars": [
+"celex",
+"lang"
+]
+},
+"results": {
+"distinct": false,
+"ordered": true,
+"bindings": [
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(04)"
+},
+"lang": {
+"type": "literal",
+"value": "LIT"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034R(07)"
+},
+"lang": {
+"type": "literal",
+"value": "SPA"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(05)"
+},
+"lang": {
+"type": "literal",
+"value": "FRA"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(06)"
+},
+"lang": {
+"type": "literal",
+"value": "DEU"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "BUL"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "CES"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "DEU"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "ELL"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "EST"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "FIN"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "HRV"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "HUN"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "ITA"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "LAV"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "MLT"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "NLD"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "POL"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "POR"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "RON"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "SLK"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "SPA"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32013L0034R(08)"
+},
+"lang": {
+"type": "literal",
+"value": "MLT"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(07)"
+},
+"lang": {
+"type": "literal",
+"value": "GLE"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32026L0470R(01)"
+},
+"lang": {
+"type": "literal",
+"value": "LIT"
+}
+},
+{
+"celex": {
+"type": "literal",
+"datatype": "http://www.w3.org/2001/XMLSchema#string",
+"value": "32022L2464R(09)"
+},
+"lang": {
+"type": "literal",
+"value": "CES"
+}
+}
+]
+}
+}

@@ -50,8 +50,11 @@ def render_disclosure(res: dict, fmt: str) -> str:
     parts = [f"{'### ' if fmt == 'markdown' else ''}{res['code']} – {res['title']}  ({res['standard']}, {res['oj']})"]
     for p in res["paragraphs"]:
         parts.append(q + f"{p['n']}. " + p["text"].replace("\n", "\n" + q))
+    heading = None
     for p in res["related_paragraphs"]:
-        parts.append(f"Related, under \"{p['heading']}\":\n" + q + f"{p['n']}. " + p["text"].replace("\n", "\n" + q))
+        text = q + f"{p['n']}. " + p["text"].replace("\n", "\n" + q)
+        parts.append((f"Related, under \"{p['heading']}\":\n" if p["heading"] != heading else "") + text)
+        heading = p["heading"]
     if res.get("value_chain_cap") is not None:
         cap = res["value_chain_cap"]
         if cap:
