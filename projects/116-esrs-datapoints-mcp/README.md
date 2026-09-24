@@ -61,8 +61,9 @@ removed: E1.MDR-P_01-02  Placeholder reference row to the minimum disclosure req
 removed: E1-7_01  Placeholder datapoint 9 that is dropped later
 added: ESRS26_E1-2_01  Placeholder datapoint 20 that is new in this version
 >>
-(source lines as above)
 ```
+
+(The six source lines under the diff are the same as under the search and are left out here.)
 
 ## Install
 
@@ -242,6 +243,10 @@ program would not produce (damaged zips, DTDs, inline strings) are written by
 `tests/xlsxmake.py` at test time. `.gitignore` ignores every other `.xlsx` so an EFRAG
 workbook cannot be committed by accident.
 
+## Licence
+
+MIT for the code in this repository. It contains no EFRAG material.
+
 ## What this is not
 
 Not EFRAG's product and not endorsed by EFRAG. Not the ESRS: datapoint names are EFRAG's
@@ -249,7 +254,3 @@ short labels, and the binding requirements are the text of the delegated acts. N
 materiality assessment or a checklist of what an undertaking must report, and not legal
 advice. It does not download, validate or convert XBRL, and it cannot tell you anything
 about a list you have not downloaded.
-
-## Licence
-
-MIT for the code in this repository. It contains no EFRAG material.

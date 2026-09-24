@@ -547,8 +547,8 @@ class Assessor:
             return None
         if prev is None:
             self.ask("two-dates")
-            self.need(f"FY{year - 1} figures ({what}): with them the tool can tell whether a two-balance-sheet-date "
-                      "rule in national law would change the answer for FY{year}".replace("{year}", str(year)))
+            self.need(f"FY{year - 1} figures ({what}): they show whether a two-balance-sheet-date rule in national "
+                      f"law would change the answer for FY{year}")
             return cur
         if prev == cur:
             return cur
@@ -616,6 +616,10 @@ class Assessor:
         if y <= LAST_WAVE1_FY:
             cites = ["CSRD-5-2-a", "AD-2-1", "AD-3-4", "AD-3-10"]
             pie = self.pie()
+            if pie is False or self.coverage() is False:
+                why = "not a public-interest entity (Art. 2(1))" if pie is False else "legal form not in Annex I or II (Art. 1(1))"
+                return {**r, "status": NO, "because": "Not in the set reporting for financial years starting in 2024-2026 "
+                        f"(Art. 5(2) first subparagraph point (a)(i) Directive (EU) 2022/2464): {why}.", "cites": cites}
             large = self.large_status(y, False)
             e500 = self.with_prior_year(y, lambda z: gt(self.get(z, "average_employees"), WAVE1_EMPLOYEES), "average employees")
             if pie is True and large is False and e500 is True:
@@ -637,11 +641,11 @@ class Assessor:
                 cites = cites + ["CSRD-5-2-derogation"]
                 if new is True:
                     res = {**r, "status": YES, "because": f"Reports under point (a)(i) ({detail}); the Member State option for "
-                           f"2025-2026 does not reach it because it exceeds {eur(NET_TURNOVER_EUR)} and {EMPLOYEES} employees.", "cites": cites}
+                           f"2025-2026 does not reach it because it exceeds {eur(NET_TURNOVER_EUR)} and {num(EMPLOYEES)} employees.", "cites": cites}
                 else:
                     self.ask("derogation")
                     res = {**r, "status": DEPENDS, "because": f"In the 2024-2026 set ({detail}), but the Member State may exempt it for "
-                           f"FY{y} because it does not exceed both {eur(NET_TURNOVER_EUR)} and {EMPLOYEES} employees "
+                           f"FY{y} because it does not exceed both {eur(NET_TURNOVER_EUR)} and {num(EMPLOYEES)} employees "
                            f"(net turnover {eur(to)}, {num(emp)} employees): check national law.", "cites": cites}
             return self.exemption(res, y, individual=True)
         cites = ["AD-19a-1", "CSRD-5-2-b"]
@@ -649,7 +653,7 @@ class Assessor:
             cites.append("AD-1-3")
         t = self.with_prior_year(y, lambda z: self.new_test(z, False), "net turnover and average employees")
         v = AND(self.coverage(), t)
-        numbers = f"net turnover {eur(to)} > {eur(NET_TURNOVER_EUR)} and average employees {num(emp)} > {num(EMPLOYEES)}"
+        numbers = f"net turnover {eur(to)} (threshold {eur(NET_TURNOVER_EUR)}), average employees {num(emp)} (threshold {num(EMPLOYEES)})"
         if v is True:
             res = {**r, "status": YES, "because": f"{numbers}: both exceeded (Art. 19a(1); applies from financial years starting "
                    "on or after 1 January 2027, Art. 5(2) first subparagraph point (b)(i)).", "cites": cites}
@@ -675,6 +679,10 @@ class Assessor:
         if y <= LAST_WAVE1_FY:
             cites = ["CSRD-5-2-a", "AD-2-1", "AD-3-7", "AD-3-10"]
             pie = self.pie()
+            if pie is False or self.coverage() is False:
+                why = "not a public-interest entity (Art. 2(1))" if pie is False else "legal form not in Annex I or II (Art. 1(1))"
+                return {**r, "status": NO, "because": "Not in the set reporting for financial years starting in 2024-2026 "
+                        f"(Art. 5(2) first subparagraph point (a)(ii)): {why}.", "cites": cites}
             large = self.large_status(y, True)
             e500 = self.with_prior_year(y, lambda z: gt(self.get(z, "group_average_employees"), WAVE1_EMPLOYEES),
                                         "consolidated average employees")
@@ -715,8 +723,8 @@ class Assessor:
             else:
                 cov = ind
         v = AND(cov, t)
-        numbers = (f"consolidated net turnover {eur(gto)} > {eur(NET_TURNOVER_EUR)} and consolidated average employees "
-                   f"{num(gemp)} > {num(EMPLOYEES)}")
+        numbers = (f"consolidated net turnover {eur(gto)} (threshold {eur(NET_TURNOVER_EUR)}), consolidated average employees "
+                   f"{num(gemp)} (threshold {num(EMPLOYEES)})")
         if v is True:
             res = {**r, "status": YES, "because": f"{numbers}: both exceeded (Art. 29a(1); from financial years starting on or "
                    "after 1 January 2027, Art. 5(2) first subparagraph point (b)(ii)).", "cites": cites}
@@ -904,7 +912,7 @@ class Assessor:
 
         if x["eu"]:
             self.ask("national-law")
-        if any(f["in_scope"] != NO for f in by_fy) or x["eu"]:
+        if x["eu"] or x["listed"]:
             self.ask("employees")
         if x["entity_type"] == "credit_institution":
             self.ask("crd-excluded")
@@ -928,8 +936,9 @@ class Assessor:
                          "branches under Art. 40a.")
             self.cites.add("NOTICE-fn18")
         if x["project"] and self.last < end:
-            notes.append(f"Figures for FY{self.last + 1} to FY{end} are the FY{self.last} figures repeated "
-                         "(assume_latest_figures_continue=true); a change in the figures changes the answer.")
+            span = f"FY{end}" if self.last + 1 == end else f"FY{self.last + 1} to FY{end}"
+            notes.append(f"Figures for {span} repeat the FY{self.last} figures (assume_latest_figures_continue=true); "
+                         "other figures can give another answer.")
 
         summary = self.summary(by_fy, overall, frfy, earliest_dep)
         out = {
