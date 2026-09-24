@@ -26,15 +26,21 @@ an express surcharge, with two new tests. `test_heavy_parcel` asserts a price; `
 calls the function and asserts nothing.
 
 ```python
+# shipping.py
 def shipping_cost(weight_kg, express=False):
     """4.90 up to 2 kg, 7.90 above; express adds 5.00."""
     cost = 4.90 if weight_kg <= 2 else 7.90
     if express:
         cost += 5.00
     return cost
+```
+
+```python
+# tests/test_shipping.py
+from shipping import shipping_cost
 
 
-def test_light_parcel():                  # already there before the change
+def test_light_parcel():          # from before the change
     assert shipping_cost(1) == 4.90
 
 
@@ -46,7 +52,39 @@ def test_express():
     shipping_cost(1, express=True)
 ```
 
-EXAMPLE_OUTPUT
+```
+$ diff-mutants --base HEAD~1
+diff-mutants 0.1.0: HEAD~1...HEAD (merge base 2161d36703); 1 source file, 1 test file, 14 changed lines
+Test command: $VIRTUAL_ENV/bin/python -m pytest -x -q (passes unmutated in 0.22 s; timeout per mutant 10.7 s)
+
+Survived: the tests still pass with each of these 2 changes to the code
+  shipping.py:3  `<=` → `<`
+      - cost = 4.90 if weight_kg <= 2 else 7.90
+      + cost = 4.90 if weight_kg < 2 else 7.90
+      tests: exit 0 in 0.22 s: 3 passed in 0.01s
+  shipping.py:5  `+=` → `-=`
+      - cost += 5.00
+      + cost -= 5.00
+      tests: exit 0 in 0.22 s: 3 passed in 0.01s
+
+Tests that cannot fail
+  tests/test_shipping.py:12  test_express: no assertion; it fails only if the code it calls raises
+
+5 mutants run: 3 killed, 2 survived, 0 timed out. 1 test cannot fail.
+```
+
+Real output, 2026-09-24: `diff-mutants` 0.1.0 built from this repository and run with
+`uvx --from <the wheel> diff-mutants --base HEAD~1` in the sample project, with the project's
+virtualenv active (Python 3.11.15, pytest 9.1.1, git 2.43.0). The three other mutants were killed:
+`express=False` → `True`, the weight limit `2` → `3`, and `return cost` → `return None`. The two
+survivors are the gaps: no test weighs a parcel of exactly 2 kg, and the surcharge can be
+subtracted instead of added without any test failing, because the only test that uses it asserts
+nothing. With `--strict` this run exits 1.
+
+After a third commit that adds a test at exactly 2 kg and an assertion to `test_express`,
+`diff-mutants --base HEAD~2 --strict` (the whole change, both commits) prints
+`5 mutants run: 5 killed, 0 survived, 0 timed out. 0 tests cannot fail.` and exits 0. The
+sample's working tree was unchanged after every run, and no temporary copy was left behind.
 
 ## Install
 
@@ -256,7 +294,3 @@ There is no data source: nothing is downloaded, so no licence or attribution app
 - Not a verdict. A surviving mutant is a change to the code that no test detected; a test listed
   here may still be useful as a smoke test. The report says what the tests check, not who wrote
   them or how well.
-
-## Licence
-
-MIT.
