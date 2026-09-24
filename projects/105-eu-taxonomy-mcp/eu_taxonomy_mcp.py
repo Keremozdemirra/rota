@@ -168,9 +168,10 @@ KNOWN_DIFFERENCES = (
 
 APPENDIX_C_NOTE = (
     "These criteria refer to Appendix C (generic DNSH criteria on the use and presence of chemicals). Delegated "
-    "Regulation (EU) 2026/73 replaced Appendix C in each annex, applicable from 1 January 2026. On 2026-09-24 the "
-    "Navigator's 'CCM Appendix C.pdf' still had the earlier text; the other appendix files were not checked. Read "
-    "Appendix C in the Official Journal (sources() lists the acts).")
+    "Regulation (EU) 2026/73 replaced Appendix C of Annexes I and II to Delegated Regulation (EU) 2021/2139 and of "
+    "Annexes I, II and IV to Delegated Regulation (EU) 2023/2486, applicable from 1 January 2026 (Articles 2 to 4). "
+    "On 2026-09-24 the Navigator's 'CCM Appendix C.pdf' still had the earlier text; the other appendix files were "
+    "not checked. Read Appendix C in the Official Journal (sources() lists the acts).")
 
 NACE_NOTES = (
     "The delegated acts give NACE codes as examples ('could be associated with several NACE codes, in particular "
@@ -194,7 +195,7 @@ class ToolError(ValueError):
 
 # C0/C1 controls (tab and newline kept), zero-width and bidirectional overrides:
 # none belongs in legal text, and all of them can hide or reorder what a reader sees.
-_CONTROL = re.compile("[\x00-\x08\x0b-\x1f\x7f-\x9f​-‏‪-‮⁠-⁤⁦-⁩﻿]")
+_CONTROL = re.compile("[\x00-\x08\x0b-\x1f\x7f-\x9f\u200b-\u200f\u202a-\u202e\u2060-\u2064\u2066-\u2069\ufeff]")
 _WS = re.compile(r"[ \t\r\n\f\v ]+")
 
 
@@ -290,7 +291,7 @@ class _Renderer(html.parser.HTMLParser):
         if prefix:
             self.parts.append(prefix)
         self.at_line_start = True
-        self.just_marked = bool(prefix)
+        self.just_marked = bool(prefix.strip())  # an indent alone is not a marker
 
     def handle_data(self, data: str) -> None:
         text = _WS.sub(" ", clean(data))
@@ -671,7 +672,7 @@ def _activity_id(value) -> int:
         raise ToolError("activity_id must be a whole number, e.g. 287")
     if isinstance(value, float) and value.is_integer():
         value = int(value)
-    if isinstance(value, str) and value.strip().isdigit():
+    if isinstance(value, str) and re.fullmatch(r"[0-9]{1,9}", value.strip()):
         value = int(value.strip())
     if not _is_id(value):
         raise ToolError("activity_id must be a positive whole number (the Navigator's activity id), e.g. 287")
@@ -796,7 +797,7 @@ def search_activities(text=None, nace=None, objective=None, sector=None, limit=2
     sector_id = None
     if sector not in (None, ""):
         s = str(sector).strip()
-        if s.isdigit() and int(s) in tax.sectors:
+        if re.fullmatch(r"[0-9]{1,9}", s) and int(s) in tax.sectors:
             sector_id = int(s)
         else:
             found = [x for x in tax.sectors.values() if fold(s) in fold(x["name"])]
@@ -960,8 +961,8 @@ def nace_lookup(code) -> dict:
                    "same_section": sum(1 for r in rows if r[0] == 3)},
         "activities_without_nace_codes": no_code,
         "notes": list(NACE_NOTES) + ([
-            "No activity lists this code or a code above or below it. The Taxonomy does not cover every economic "
-            "activity; activities without NACE codes (activities_without_nace_codes) can still apply."]
+            "No activity in the snapshot lists this code or a code above or below it. Activities that list no NACE "
+            "code (activities_without_nace_codes) can still apply; search_activities(text=...) finds them by name."]
             if not rows else []),
     }
     if warnings:
@@ -1029,8 +1030,8 @@ def tool_definitions() -> list[dict]:
          "inputSchema": {"type": "object", "additionalProperties": False, "properties": {
              "text": {"type": "string", "description": "Words to find, e.g. 'manufacture of cement'."},
              "nace": {"type": "string", "description": "NACE Rev. 2 code, e.g. 'D35.11' or '3511'."},
-             "objective": {"type": "string", "description": "Only activities with criteria for this objective; "
-                                                             + objectives},
+             "objective": {"type": "string",
+                           "description": "Only activities with criteria for this objective; " + objectives},
              "sector": {"type": "string", "description": "Sector id or a unique part of its name."},
              "limit": {"type": "integer", "minimum": 1, "maximum": 200}}}},
         {"name": "get_activity", "title": "One EU Taxonomy activity",
@@ -1172,8 +1173,8 @@ class Server:
                 self.reply(None, error={"code": -32700, "message": "parse error"})
                 continue
             if not isinstance(req, dict):
-                self.reply(None, error={"code": -32600, "message": "invalid request: one JSON-RPC object per line "
-                                                                    "(batches are not part of protocol 2025-06-18)"})
+                self.reply(None, error={"code": -32600, "message": (
+                    "invalid request: one JSON-RPC object per line (batches are not part of protocol 2025-06-18)")})
                 continue
             self.handle(req)
         return 0
@@ -1189,7 +1190,21 @@ def serve_stdio() -> int:
               "`eu-taxonomy-mcp --help`.", file=sys.stderr)
     # Undecodable bytes must not end the session: replace them and let JSON parsing fail on that one line.
     stdin = io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8", errors="replace")
-    return Server().serve(stdin)
+    try:
+        return Server().serve(stdin)
+    except BrokenPipeError:  # the client went away
+        _silence_stdout()
+        return 0
+
+
+def _silence_stdout() -> None:
+    # After EPIPE, Python would print a traceback when it flushes stdout at exit
+    # (https://docs.python.org/3/library/signal.html#note-on-sigpipe).
+    try:
+        devnull = os.open(os.devnull, os.O_WRONLY)
+        os.dup2(devnull, sys.stdout.fileno())
+    except (OSError, ValueError, AttributeError):
+        pass
 
 
 # ------------------------------------------------------------------ command line
@@ -1392,10 +1407,15 @@ def main(argv=None) -> int:
     except (ToolError, SnapshotError) as e:
         print(f"eu-taxonomy-mcp: {e}", file=sys.stderr)
         return 2
-    if args.json:
-        print(json.dumps(result, ensure_ascii=False, indent=1))
-    else:
-        _print_result(args.command, result)
+    try:
+        if args.json:
+            print(json.dumps(result, ensure_ascii=False, indent=1))
+        else:
+            _print_result(args.command, result)
+        sys.stdout.flush()
+    except BrokenPipeError:  # `| head` closed the pipe; the answer was delivered as far as it was wanted
+        _silence_stdout()
+        return 0
     empty = (result.get("found") is False or (args.command == "search" and not result["matches"])
              or (args.command == "nace" and not result["activities"]))
     return 1 if empty else 0

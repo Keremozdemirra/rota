@@ -19,6 +19,7 @@ import hashlib
 import http.client
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -62,7 +63,7 @@ def _retry_after(headers) -> float | None:
     if not value:
         return None
     value = str(value).strip()
-    if value.isdigit():
+    if re.fullmatch(r"[0-9]{1,10}", value):
         return min(float(value), RETRY_AFTER_CAP)
     try:
         when = email.utils.parsedate_to_datetime(value)

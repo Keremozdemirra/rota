@@ -6,6 +6,7 @@ XDG_CONFIG_HOME pointing at a temporary directory, `Path.home()` and
 environment, and `urllib.request.urlopen` replaced: a request nobody
 prepared an answer for fails the test instead of reaching the network.
 """
+import datetime as dt
 import io
 import json
 import os
@@ -19,6 +20,7 @@ from unittest import mock
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 FIXTURES = HERE / "fixtures"
+TODAY = dt.date(2026, 9, 24)
 for _p in (str(ROOT), str(HERE)):
     if _p not in sys.path:
         sys.path.insert(0, _p)
@@ -98,7 +100,9 @@ class Isolated(unittest.TestCase):
         patches = [mock.patch.dict(os.environ, env),
                    mock.patch("pathlib.Path.home", return_value=self.home),
                    mock.patch("pathlib.Path.cwd", return_value=self.cwd),
-                   mock.patch("urllib.request.urlopen", self._urlopen)]
+                   mock.patch("urllib.request.urlopen", self._urlopen),
+                   # a fixed day, so ages computed from recorded dates do not change as time passes
+                   mock.patch("mcp_vitals._today", return_value=TODAY, create=True)]
         for p in patches:
             p.start()
             self.addCleanup(p.stop)

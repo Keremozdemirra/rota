@@ -102,5 +102,45 @@ class OnlyLines(unittest.TestCase):
         self.assertEqual(ignored, {av.PROFILE: 2, av.SITE_PAGE: 2})  # line 28: two profiles; 29: topics, sponsors
 
 
+class Review(unittest.TestCase):
+    """Regressions from the review of 2026-09-24; the number is the finding's."""
+
+    def test_3a_quoted_path_with_a_space_is_followed_by_a_tab(self):
+        # As git writes them: a name with a space gets a tab after it on the ---/+++ lines,
+        # and after the closing quote when the name is also quoted.
+        text = ('diff --git "a/sp ace/my \\"q\\".md" "b/sp ace/my \\"q\\".md"\n'
+                '--- "a/sp ace/my \\"q\\".md"\t\n'
+                '+++ "b/sp ace/my \\"q\\".md"\t\n'
+                "@@ -1,0 +2 @@\n+[x](https://github.com/o/r)\n"
+                "diff --git a/plain space.md b/plain space.md\n--- a/plain space.md\t\n+++ b/plain space.md\t\n"
+                "@@ -3,0 +4 @@\n+y\n")
+        self.assertEqual(av.parse_diff(text), {'sp ace/my "q".md': {2}, "plain space.md": {4}})
+
+    def test_3b_a_file_outside_the_working_directory_is_an_error_not_nothing_added(self):
+        import io
+        import os
+        import tempfile
+        from contextlib import redirect_stderr, redirect_stdout
+        from unittest import mock
+        calls = []
+
+        def run(cmd, **kw):
+            calls.append(cmd)
+            return subprocess.CompletedProcess(cmd, 0, b"", b"")
+
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "docs").mkdir()
+            (Path(d) / "README.md").write_text("[x](https://github.com/o/r)\n", encoding="utf-8")
+            cwd, err = os.getcwd(), io.StringIO()
+            try:
+                os.chdir(Path(d) / "docs")
+                with mock.patch("awesome_vitals.subprocess.run", run), redirect_stderr(err), redirect_stdout(io.StringIO()):
+                    code = av.main(["../README.md", "--diff", "main...HEAD", "--strict"])
+            finally:
+                os.chdir(cwd)
+        self.assertEqual((code, calls), (2, []))
+        self.assertIn("outside the working directory", err.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main()

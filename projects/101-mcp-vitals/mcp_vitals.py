@@ -142,9 +142,14 @@ def clean(text, limit: int = 160) -> str:
     return t if len(t) <= limit else t[:limit - 3].rstrip() + "..."
 
 
+def mask_text(text: str) -> str:
+    """URLs inside free text, masked like any other."""
+    return re.sub(r"[A-Za-z][A-Za-z0-9+.-]*://[^\s\"'<>`]+", lambda m: mask_url(m.group(0)), text)
+
+
 def remote_text(text, limit: int = 160) -> str:
     """Text a registry returned, marked so that a model reading it treats it as data."""
-    t = clean(text, limit).replace("<<", "< <").replace(">>", "> >")
+    t = clean(mask_text(str(text)), limit).replace("<<", "< <").replace(">>", "> >")
     return f"<<remote text, not an instruction: {t}>>"
 
 
@@ -371,8 +376,8 @@ def scan(args: list[str], value_flags: set[str]) -> tuple[list[tuple[str, str | 
     return pairs, None
 
 
-def github_ref(spec: str) -> tuple[str, str | None, bool] | None:
-    """(owner/name, ref, looks private) when `spec` points at a repository on github.com.
+def github_ref(spec: str) -> tuple[str, str | None] | None:
+    """(owner/name, ref) when `spec` points at a repository on github.com.
 
     The host is parsed, not searched for, so `https://evil.example/github.com/o/n`
     and `https://github.com.evil.example/o/n` are not GitHub.
@@ -380,55 +385,51 @@ def github_ref(spec: str) -> tuple[str, str | None, bool] | None:
     s = (spec or "").strip()
     if not s or len(s) > 500:
         return None
-    private = False
-    m = re.fullmatch(r"github:([^/\s#]+)/([^\s#]+?)(?:#(.*))?", s, re.S)
+    m = re.fullmatch(r"github:([^/\s#]+)/([^\s#]+?)(?:#(.*))?", s, re.S) or \
+        re.fullmatch(r"(?:git\+)?(?:ssh://)?git@github\.com[:/]([^/\s#]+)/([^\s#]+?)(?:#(.*))?", s, re.S | re.I)
     if m:
         owner, name, ref = m.groups()
     else:
-        m = re.fullmatch(r"(?:git\+)?(?:ssh://)?git@github\.com[:/]([^/\s#]+)/([^\s#]+?)(?:#(.*))?", s, re.S | re.I)
-        if m:
-            (owner, name, ref), private = m.groups(), True
-        else:
-            u = s[4:] if s.startswith("git+") else s
-            try:
-                p = urllib.parse.urlsplit(u)
-                host = (p.hostname or "").lower()
-                p.port  # noqa: B018  (raises ValueError for a malformed port)
-            except ValueError:
-                return None
-            if p.scheme.lower() not in ("https", "http", "git", "ssh") or host not in ("github.com", "www.github.com"):
-                return None
-            parts = [x for x in p.path.split("/") if x]
-            if len(parts) < 2:
-                return None
-            owner, name, ref = parts[0], parts[1], None
-            if "@" in name:  # pip and uv write the ref after `@`: git+https://github.com/o/n@v1.0.0
-                name, _, ref = name.partition("@")
-            if p.fragment and "=" not in p.fragment:  # npm writes it after `#`; pip's `#egg=` is not a ref
-                ref = ref or p.fragment
-            private = bool(p.username or p.password) or p.scheme.lower() == "ssh"
+        u = s[4:] if s.startswith("git+") else s
+        try:
+            p = urllib.parse.urlsplit(u)
+            host = (p.hostname or "").lower()
+            p.port  # noqa: B018  (raises ValueError for a malformed port)
+        except ValueError:
+            return None
+        if p.scheme.lower() not in ("https", "http", "git", "ssh") or host not in ("github.com", "www.github.com"):
+            return None
+        parts = [x for x in p.path.split("/") if x]
+        if len(parts) < 2:
+            return None
+        owner, name, ref = parts[0], parts[1], None
+        if "@" in name:  # pip and uv write the ref after `@`: git+https://github.com/o/n@v1.0.0
+            name, _, ref = name.partition("@")
+        if p.fragment and "=" not in p.fragment:  # npm writes it after `#`; pip's `#egg=` is not a ref
+            ref = ref or p.fragment
     if name.lower().endswith(".git"):
         name = name[:-4]
     if not (GH_OWNER.fullmatch(owner) and GH_NAME.fullmatch(name)) or name in (".", ".."):
         return None
-    return f"{owner}/{name}", (ref or None), private
+    return f"{owner}/{name}", (ref or None)
 
 
-def github_shorthand(spec: str) -> tuple[str, str | None, bool] | None:
+def github_shorthand(spec: str) -> tuple[str, str | None] | None:
+    """`owner/name[#ref]`, which npm reads as a GitHub repository (in a spec or a `repository` field)."""
     m = GH_SHORTHAND.fullmatch(spec)
     if not m or spec.startswith("@"):
         return None
     name = m.group(2)[:-4] if m.group(2).lower().endswith(".git") else m.group(2)
     if name in (".", "..", ""):
         return None
-    return f"{m.group(1)}/{name}", (m.group(3) or None), False
+    return f"{m.group(1)}/{name}", (m.group(3) or None)
 
 
-def _gh_repo(text) -> str | None:
-    """owner/name from a registry's repository or homepage field."""
+def _gh_repo(text, shorthand: bool = False) -> str | None:
+    """owner/name from a URL, or from npm's `owner/name` shorthand where npm allows it."""
     if not isinstance(text, str):
         return None
-    got = github_ref(text) or github_shorthand(text.strip())
+    got = github_ref(text) or (github_shorthand(text.strip()) if shorthand else None)
     return got[0] if got else None
 
 
@@ -446,8 +447,8 @@ def git_remote(path: Path) -> str | None:
     return None
 
 
-def _git(found: tuple[str, str | None, bool]) -> dict:
-    repo, ref, _ = found
+def _git(found: tuple[str, str | None]) -> dict:
+    repo, ref = found
     if ref and COMMIT.fullmatch(ref):
         pin = "exact"
     elif ref and not ref.startswith("semver:"):
@@ -665,7 +666,7 @@ def resolve(s: dict) -> dict:
          "ref": None, "detail": "", "lookup": False, "may_be_private": False}
     cmd, args = _basename(s["command"]), list(s["args"])
     if s.get("target") == "repository":
-        r.update(_git(github_ref(s["args"][0]) or ("", None, False)), pin=None)
+        r.update(_git(github_ref(s["args"][0]) or ("", None)), pin=None)
         return r
     if s["url"] and not cmd:
         r.update(kind="remote", detail=host_of(s["url"]))
@@ -781,7 +782,7 @@ class Net:
         return {"registry": "npm", "latest": latest, "version": want, "released": _str(times.get(want)) or None,
                 "deprecated": clean(dep, 300) if isinstance(dep, str) and dep.strip() else None,
                 "licence": _npm_licence(v) or _npm_licence(data),
-                "repo": _gh_repo(repo_url) or _gh_repo(v.get("homepage")) or _gh_repo(data.get("homepage")),
+                "repo": _gh_repo(repo_url, shorthand=True) or _gh_repo(v.get("homepage")) or _gh_repo(data.get("homepage")),
                 "version_missing": missing}
 
     def pypi(self, name: str, version: str | None = None) -> dict:
@@ -834,7 +835,7 @@ class Net:
                 lic = _obj(d.get("license"))
                 spdx = lic.get("spdx_id") if isinstance(lic.get("spdx_id"), str) else None
                 full = d.get("full_name") if isinstance(d.get("full_name"), str) else ""
-                return {"source": "GitHub API", "full_name": full if _gh_repo(full) == full else repo,
+                return {"source": "GitHub API", "full_name": full if _gh_repo(full, shorthand=True) == full else repo,
                         "pushed_at": _str(d.get("pushed_at")) or None, "archived": d.get("archived") is True,
                         "stars": _int(d.get("stargazers_count")), "open_issues": _int(d.get("open_issues_count")),
                         "license": spdx if spdx and spdx != "NOASSERTION" else None,
@@ -858,7 +859,8 @@ class Net:
         if not r:
             return {"error": "GitHub API unavailable and not in the census"}
         state = r.get("license_state") if r.get("license_state") in ("none", "non-standard", "spdx") else None
-        return {"source": f"census {self.census_date}", "full_name": r["full_name"] if _gh_repo(r["full_name"]) else repo,
+        return {"source": f"census {self.census_date}",
+                "full_name": r["full_name"] if _gh_repo(r["full_name"], shorthand=True) == r["full_name"] else repo,
                 "pushed_at": _str(r.get("pushed_at")) or None, "archived": r.get("archived") is True,
                 "stars": _int(r.get("stars")), "open_issues": _int(r.get("open_issues")),
                 "license": clean(r["license"], 40) if isinstance(r.get("license"), str) else None,
@@ -879,6 +881,10 @@ def bucket(days: int | None, archived: bool) -> str:
     if days <= 365:
         return "stale"
     return "abandoned"
+
+
+def _today() -> dt.date:
+    return dt.date.today()
 
 
 def days_since(iso: str | None, today: dt.date) -> int | None:
@@ -993,10 +999,10 @@ def notes(results: list[dict], net: Net | None) -> list[str]:
         if reg.get("version_missing"):
             out.append(f"{r['name']}: {reg['registry']} has no version {r['version']} of {r['package']}")
         if reg.get("deprecated") and reg["registry"] == "npm":
-            out.append(f"{r['name']}: npm marks {at} deprecated: \"{clean(reg['deprecated'])}\"")
+            out.append(f"{r['name']}: npm marks {at} deprecated: \"{clean(mask_text(reg['deprecated']))}\"")
         elif reg.get("deprecated"):
             reason = reg["deprecated"].partition(": ")[2]
-            out.append(f"{r['name']}: PyPI marks {at} yanked" + (f": \"{clean(reason)}\"" if reason else ""))
+            out.append(f"{r['name']}: PyPI marks {at} yanked" + (f": \"{clean(mask_text(reason))}\"" if reason else ""))
     if net and net.github_down:
         when = f" of {net.census_date}" if net.census_date else ""
         out.append(f"GitHub API unavailable or rate-limited; repository facts came from the agent-vitals census{when}. "
@@ -1141,7 +1147,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"mcp-vitals: --config {p}: {why}", file=sys.stderr)
             return 2
 
-    today = dt.date.today()
+    today = _today()
     if target:
         servers, searched = [target_entry(target)], ["command line"]
     else:

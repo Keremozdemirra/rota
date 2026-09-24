@@ -120,5 +120,91 @@ class Unicode(unittest.TestCase):
         self.assertIn('"line": 3', out.getvalue())
 
 
+class Review(unittest.TestCase):
+    """Regressions from the review of 2026-09-24; the number is the finding's."""
+
+    def test_1_github_site_sections_and_the_mcp_registry(self):
+        text = ("[server](https://github.com/mcp/github/github-mcp-server)\n"
+                "https://github.com/mcp and https://github.com/mcp/github\n"
+                "Sign up: https://github.com/github-copilot/signup\n"
+                "https://github.com/models https://github.com/solutions/ci-cd https://github.com/why-github/x\n"
+                "https://github.com/marketplace/models/azure-openai/gpt-4o https://github.com/premium-support/x\n"
+                "https://github.com/c/x https://github.com/partners/x https://github.com/readme/stories/x\n"
+                "[course](https://github.com/skills/introduction-to-github)\n")  # skills is an organisation
+        self.assertEqual(repos(text), {"github/github-mcp-server": [1], "skills/introduction-to-github": [7]})
+
+    def test_5_hostile_lines_scan_in_linear_time(self):
+        import time
+        for line in ("<img " * 20000, "![" * 20000, 'src="' * 20000, "<source srcset='" * 8000, "[" * 20000 + "]",
+                     "![a][" * 20000, "` " * 20000, "<!--" * 20000, "github.com/" * 20000, "_https://github.com/" * 5000):
+            start = time.perf_counter()
+            av.scan(line)
+            self.assertLess(time.perf_counter() - start, 2.0, line[:16])
+
+    def test_6_unclosed_fence_in_a_list_item_ends_with_the_item(self):
+        text = ("- [one](https://github.com/o/one)\n"
+                "  ```bash\n"
+                "  git clone https://github.com/o/in-code\n"
+                "- [two](https://github.com/o/two)\n"
+                "```\n"
+                "https://github.com/o/top-level-code\n")
+        warnings = []
+        entries, _ = av.collect([("list.md", text)], None, warnings)
+        self.assertEqual([e["repository"] for e in entries], ["o/one", "o/two"])
+        self.assertEqual(warnings, [{"file": "list.md", "line": 5,
+                                     "message": "a code fence opened here is never closed; nothing after it was read"}])
+
+    def test_6_comments_end_at_the_first_close_even_inside_backticks(self):
+        text = ("<!-- note: `-->`\n"
+                "[a](https://github.com/o/a)\n"
+                "<!-->\n"
+                "[b](https://github.com/o/b)\n"
+                "<!--->\n"
+                "[c](https://github.com/o/c)\n"
+                "`<!--` starts a comment; [d](https://github.com/o/d)\n"
+                "<!-- never closed\n"
+                "[e](https://github.com/o/e)\n")
+        warnings = []
+        entries, _ = av.collect([("list.md", text)], None, warnings)
+        self.assertEqual([e["repository"] for e in entries], ["o/a", "o/b", "o/c", "o/d"])
+        self.assertEqual(warnings, [{"file": "list.md", "line": 8,
+                                     "message": "an HTML comment opened here is never closed; nothing after it was read"}])
+
+    def test_6_reference_style_badges_are_images(self):
+        text = ("[![CI][ci-badge]][ci-runs] [![Stars][stars]][repo]\n"
+                "\n"
+                "[ci-badge]: https://github.com/o/r/actions/workflows/ci.yml/badge.svg\n"
+                "[ci-runs]: https://github.com/o/r/actions\n"
+                "[stars]: https://img.shields.io/github/stars/o/r\n"
+                "[repo]: https://github.com/o/r\n"
+                "![logo][Logo  Ref]\n"
+                "[logo ref]: <https://github.com/o/logo-only/raw/main/logo.png>\n")
+        entries, ignored = av.collect([("list.md", text)])
+        self.assertEqual({e["repository"]: [loc["line"] for loc in e["locations"]] for e in entries}, {"o/r": [4, 6]})
+        self.assertEqual(ignored, {av.IMAGE_LINK: 2})
+
+    def test_6_every_src_and_srcset_value_is_an_image_even_across_lines(self):
+        text = ('<source srcset="https://github.com/o/a/raw/x.png 1x, https://github.com/o/b/raw/y.png 2x">\n'
+                "<img\n"
+                '  src="https://github.com/o/c/raw/main/logo.png"\n'
+                '  alt="">\n'
+                "<img src=https://github.com/o/d/raw/main/x.png>\n")
+        entries, ignored = av.collect([("list.md", text)])
+        self.assertEqual((entries, ignored), ([], {av.IMAGE_LINK: 4}))
+
+    def test_6_emphasised_bare_urls(self):
+        text = "_https://github.com/o/r_ and *https://github.com/o/s* and [t](https://github.com/o/t_)\n"
+        self.assertEqual(repos(text), {"o/r": [1], "o/s": [1], "o/t_": [1]})
+
+    def test_10_only_single_items_are_conversations(self):
+        text = ("https://github.com/o/a/issues https://github.com/o/b/issues/42\n"
+                "https://github.com/o/c/security https://github.com/o/d/security/advisories/GHSA-1234-5678-9abc\n"
+                "https://github.com/o/e/pulls https://github.com/o/f/pull/7/files\n"
+                "https://github.com/o/g/discussions https://github.com/o/h/discussions/5\n"
+                "https://github.com/o/i/commits/main https://github.com/o/j/commit/1a2b3c4\n"
+                "https://github.com/o/k/compare/v1...v2\n")
+        self.assertEqual(sorted(repos(text)), ["o/a", "o/c", "o/e", "o/g", "o/i"])
+
+
 if __name__ == "__main__":
     unittest.main()

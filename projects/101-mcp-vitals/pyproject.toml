@@ -25,8 +25,8 @@ Issues = "https://github.com/Keremozdemirra/mcp-vitals/issues"
 Census = "https://github.com/Keremozdemirra/agent-vitals"
 
 [project.scripts]
-mcp-vitals = "doctor:main"
-mcp-vitals-hook = "hook:main"
+mcp-vitals = "mcp_vitals:main"
+mcp-vitals-hook = "mcp_vitals_hook:main"
 
 [tool.setuptools]
-py-modules = ["doctor", "hook"]
+py-modules = ["mcp_vitals", "mcp_vitals_hook"]

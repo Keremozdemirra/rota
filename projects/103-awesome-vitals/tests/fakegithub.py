@@ -51,7 +51,8 @@ class _Server(ThreadingHTTPServer):
 
 class FakeGitHub:
     """`routes` maps a path (any case, as GitHub's) to a fixture file name, a fixture dict,
-    or {"raw": text} written to the socket as it is."""
+    {"raw": text} written to the socket as it is, or a list of those answered in turn
+    (the last one repeats). A fixture dict may carry "delay" in seconds."""
 
     def __init__(self, routes=None, default="sandbox.403.json", delay=0.0):
         self.routes = {k.lower(): v for k, v in (routes if routes is not None else SAMPLE_ROUTES).items()}
@@ -65,7 +66,11 @@ class FakeGitHub:
                 if outer.delay:
                     time.sleep(outer.delay)
                 fx = outer.routes.get(self.path.lower(), outer.default)
+                if isinstance(fx, list):
+                    fx = fx.pop(0) if len(fx) > 1 else fx[0]
                 fx = fixture(fx) if isinstance(fx, str) else fx
+                if fx.get("delay"):
+                    time.sleep(fx["delay"])
                 if "raw" in fx:
                     # bytes as they go on the wire, for broken responses send_response cannot produce
                     self.wfile.write(fx["raw"].encode("latin-1"))

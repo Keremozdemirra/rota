@@ -211,6 +211,8 @@ INSTRUMENTS = {
                    "corporate-bond collateral: shall, disclosed separately"),
         "scopes_cite": "5.8, p. 119", "scope3_shall": False,
         "removals": None, "undrawn": False, "cap": None, "dq_decimal": True,
+        "above_1": ("collateral attribution factors are capped at 1 (5.8, p. 122) inside the pool emissions you "
+                    "supply; for the investment factor the standard gives no rule: used as computed and flagged"),
     },
     "sovereign_debt": {
         "label": "Sovereign debt", "pcaf": "sovereign_debt", "instrument": "debt",
@@ -318,7 +320,7 @@ class AttributionError(ValueError):
 
 # ----------------------------------------------------------------- numbers
 _PLAIN = re.compile(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d{1,3})?")
-_SEP = "[   ']"  # spaces and apostrophes group thousands in several locales; never decimals
+_SEP = "[ \u00a0\u202f']"  # spaces and apostrophes group thousands in several locales; never decimals
 _GROUP_POINT = re.compile(r"[+-]?\d{1,3}(?:" + _SEP + r"\d{3})+(?:\.\d+)?")
 _US_MULTI = re.compile(r"[+-]?\d{1,3}(?:,\d{3}){2,}(?:\.\d+)?")
 _US_DEC = re.compile(r"[+-]?\d{1,3}(?:,\d{3})+\.\d+")
@@ -363,7 +365,7 @@ def clean_text(value, limit=120):
     """Cell text shown back to the user or an agent: no control characters, bounded length."""
     if value is None:
         return None
-    s = re.sub(r"[\x00-\x1f\x7f-\x9f  ‪-‮⁦-⁩]", " ", str(value)).strip()
+    s = re.sub(r"[\x00-\x1f\x7f-\x9f\u2028\u2029\u202a-\u202e\u2066-\u2069]", " ", str(value)).strip()
     s = re.sub(r"\s{2,}", " ", s)
     if len(s) > limit:
         s = s[:limit - 3] + "..."
@@ -458,7 +460,7 @@ def decode_bytes(data: bytes, encoding=None):
                 text = data.decode(enc)
             except UnicodeDecodeError as e:
                 raise InputError(f"the file starts with a {enc} byte order mark but is not valid {enc} (byte {e.start})") from None
-            return text.lstrip("﻿"), enc, notes
+            return text.lstrip("\ufeff"), enc, notes
     if b"\x00" in data:
         # UTF-16 without a byte order mark: in ASCII-range text every other byte is zero.
         even, odd = data[0::2], data[1::2]
@@ -511,7 +513,7 @@ def sniff_delimiter(text):
 
 
 def normalise_key(value) -> str:
-    s = str(value or "").strip().lstrip("﻿").strip().lower()
+    s = str(value or "").strip().lstrip("\ufeff").strip().lower()
     return re.sub(r"[\s\-/]+", "_", s)
 
 
@@ -974,7 +976,10 @@ def evaluate_row(line, row, env):
                      f"= {fmt_t(_mul(outstanding, alloc_frac))} [5.7, pp. 102-103]")
     undrawn = None
     if v["undrawn_commitment"] is not None and spec["undrawn"]:
-        undrawn = _undrawn(inst, att, v, is_equity, rate, lines)
+        try:
+            undrawn = _undrawn(inst, att, v, is_equity, rate, lines)
+        except AttributionError as e:
+            warnings.append("undrawn commitment not computed: " + str(e))
     if rate != ONE:
         lines.append(f"outstanding in {env.reporting_currency} = {fmt_amount(outstanding)} {currency} x fx_rate "
                      f"{fmt_amount(rate)} = {fmt_t(base['outstanding_reporting'])} (rate supplied by the user)")
@@ -1069,7 +1074,8 @@ def compute(data: bytes, source_name="(stdin)", reporting_currency=None, decimal
             reporting_currency = found[0]
         elif len(found) > 1:
             raise InputError(f"the file has several currencies ({', '.join(clean_text(c, 12) for c in found)}); "
-                             "name the reporting currency with --currency and give fx_rate for the other rows")
+                             "name the reporting currency (--currency, or reporting_currency in the MCP tool) and give "
+                             "fx_rate for the other rows")
     if not reporting_currency:
         notes.append("no currency stated: amounts are summed as one unnamed currency, and sovereign rows cannot be "
                      "computed (they need USD)")
@@ -1264,9 +1270,11 @@ def to_json(result, max_positions=None, explain=True):
         if explain:
             item["arithmetic"] = p["arithmetic"]
         positions.append(item)
+    totals = group(result["totals"])
+    totals["not_computed_out_of_scope"] = result["totals"]["not_computed_out_of_scope"]
     doc = {
         "tool": result["tool"], "version": result["version"], "method": result["method"], "input": result["input"],
-        "totals": group(result["totals"]),
+        "totals": totals,
         "by_asset_class": [group(g, ("name", "section")) for g in result["by_asset_class"]],
         "by_sector": [group(g, ("name",)) for g in result["by_sector"]],
         "not_computed": [{"line": f["line"], "position_id": f["position_id"], "counterparty": f["counterparty"],
@@ -1473,7 +1481,7 @@ def methods_catalogue():
             "negative_total_equity": ("set to 0, so emissions go to debt only and none to equity ("
                                       + spec["negative_equity"] + ")") if spec["negative_equity"] else None,
             "attribution_factor_above_1": ("capped at 1 (" + spec["cap"] + ")") if spec["cap"] else
-            "no rule in the standard: used as computed and flagged by this tool",
+            spec.get("above_1", "no rule in the standard: used as computed and flagged by this tool"),
             "special": _special(key),
             "dq_scores": "decimal 1-5 allowed (weighted average of the underlying assets)" if spec["dq_decimal"]
             else "whole number 1-5",
@@ -1525,14 +1533,15 @@ def render_methods(markdown=False):
                                                                           len(c["denominators"]) > 1 else "")
                          for d in c["denominators"])
         rows.append([c["asset_class"], f"{c['pcaf_asset_class']} ({c['section']})", dens,
-                     f"{c['scopes']} [{c['scopes_cite']}]", c["attribution_factor_above_1"]])
+                     f"{c['scopes']} [{c['scopes_cite']}]", c["attribution_factor_above_1"], c["special"] or ""])
     head = (f"Methods implemented: {SHORT_SOURCE}, {SOURCE['url']} (checked {SOURCE['checked']}). "
             f"Financed emissions = attribution factor x emissions in every class.")
-    body = _table(["asset_class", "PCAF asset class", "attribution factor", "scopes", "factor above 1"], rows,
-                  "lllll", markdown)
+    body = _table(["asset_class", "PCAF asset class", "attribution factor", "scopes", "factor above 1", "also"], rows,
+                  "llllll", markdown)
     if not markdown:
         body = "\n\n".join(
-            "\n".join([f"{r[0]}  ->  {r[1]}", f"  attribution: {r[2]}", f"  scopes: {r[3]}", f"  above 1: {r[4]}"])
+            "\n".join([f"{r[0]}  ->  {r[1]}", f"  attribution: {r[2]}", f"  scopes: {r[3]}", f"  above 1: {r[4]}"]
+                      + ([f"  also: {r[5]}"] if r[5] else []))
             for r in rows)
     tail = f"Data quality: {DQ_RULE['rule']} [{DQ_RULE['cite']}]."
     return f"{head}\n\n{body}\n\n{tail}\n{cat['not_bundled']}\n"

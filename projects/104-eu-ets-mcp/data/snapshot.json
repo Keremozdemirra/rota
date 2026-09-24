@@ -1,0 +1,114 @@
+{
+ "format": 1,
+ "snapshot_date": "2026-09-24",
+ "retrieved_at": "2026-09-24T09:39:12Z",
+ "listing_url": "https://union-registry-data.ec.europa.eu/api/data-download",
+ "licence": "CC BY 4.0",
+ "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+ "terms_url": "https://commission.europa.eu/legal-notice_en",
+ "sources": [
+  {
+   "file": "operators_daily.csv.gz",
+   "url": "https://dlsclimabi.blob.core.windows.net/public-data/eutlpublic_prod/extracts/_all_extracts/operator/operators_daily.csv.gz",
+   "bytes": 1831335,
+   "sha256": "9b0da34a142fe6939fc262744b47d5776ba6279aff0cb7c24d94259e28f84fb9",
+   "kind": "operators",
+   "seconds": 1.22,
+   "rows_read": 23322,
+   "rows_kept": 23322,
+   "malformed_rows": 0,
+   "names_withheld": 83
+  },
+  {
+   "file": "operators_yearly_activity_daily.csv.gz",
+   "url": "https://dlsclimabi.blob.core.windows.net/public-data/eutlpublic_prod/extracts/_all_extracts/operators_yearly_activity/operators_yearly_activity_daily.csv.gz",
+   "bytes": 5610802,
+   "sha256": "76ed621b131bc613b0c4643d77e6bb37b08e0640aa9de482ce5501cf60f349e9",
+   "kind": "yearly",
+   "seconds": 1.81,
+   "rows_read": 606372,
+   "rows_kept": 276637,
+   "malformed_rows": 0,
+   "rows_without_values": 329735
+  },
+  {
+   "file": "compliance_2021_code_en.xlsx",
+   "url": "https://climate.ec.europa.eu/document/download/86a31a71-dff3-4729-86d0-943685c20dc1_en?filename=compliance_2021_code_en.xlsx",
+   "bytes": 947438,
+   "sha256": "26969b3486bf478574d1caefdd1e736f592e28a3fd83175b2063e9fe27c1f1e5",
+   "kind": "compliance",
+   "year": 2021,
+   "seconds": 1.15,
+   "rows_read": 10316,
+   "rows_kept": 10316,
+   "malformed_rows": 0
+  },
+  {
+   "file": "compliance_2022_code_en.xlsx",
+   "url": "https://climate.ec.europa.eu/document/download/7e7268a1-fa21-4f73-b368-6e9571262e2f_en?filename=compliance_2022_code_en.xlsx",
+   "bytes": 956911,
+   "sha256": "d472efb7fc4fa4dfdb61b7a7526a7940979400aacf82c579bf5bf246984d30ab",
+   "kind": "compliance",
+   "year": 2022,
+   "seconds": 1.01,
+   "rows_read": 10445,
+   "rows_kept": 10445,
+   "malformed_rows": 0
+  },
+  {
+   "file": "compliance_2023_code_en.xlsx",
+   "url": "https://climate.ec.europa.eu/document/download/42495a32-cb4c-4772-9a2a-d08781c8ed61_en?filename=compliance_2023_code_en.xlsx",
+   "bytes": 977653,
+   "sha256": "b81e1c4e17b1d682b25a77bd6c31f4165a8705335c25d22699d2fb5d19ff10f0",
+   "kind": "compliance",
+   "year": 2023,
+   "seconds": 0.84,
+   "rows_read": 10651,
+   "rows_kept": 10651,
+   "malformed_rows": 0
+  },
+  {
+   "file": "compliance_2024_code_en.xlsx",
+   "url": "https://climate.ec.europa.eu/document/download/b80300cf-7608-405d-969e-8b016687640e_en?filename=compliance_2024_code_en.xlsx",
+   "bytes": 1369471,
+   "sha256": "a8b2191b56fa576b7d9e0ae000ddab24b5aa90e8511e4287203461ca4684dd7a",
+   "kind": "compliance",
+   "year": 2024,
+   "seconds": 5.46,
+   "rows_read": 14573,
+   "rows_kept": 14573,
+   "malformed_rows": 0
+  }
+ ],
+ "errors": [],
+ "files": {
+  "installations.csv.gz": {
+   "sha256": "4f155537e17f0dba6f520d91dd1516539f0d17fb44f1daa8bf345794f9989a34",
+   "rows": 23322
+  },
+  "yearly.csv.gz": {
+   "sha256": "31a2c1c442e9e9668994db5e7c7fc41d5caffd981f6fc29075f80462a98a435e",
+   "rows": 276637
+  },
+  "compliance.csv.gz": {
+   "sha256": "026049f089da4799c48ec37c1bdc9325291d5e837c2143fc720cfeac441e49d4",
+   "rows": 44717
+  }
+ },
+ "counts": {
+  "installations": 23322,
+  "yearly_rows": 276637,
+  "compliance_rows": 44717,
+  "installations_with_lei": 5234,
+  "names_withheld": 83,
+  "compliance_rows_without_installation": 3
+ },
+ "compliance_years": [
+  2021,
+  2022,
+  2023,
+  2024
+ ],
+ "latest_reported_year": 2025,
+ "tool_version": "0.1.0"
+}

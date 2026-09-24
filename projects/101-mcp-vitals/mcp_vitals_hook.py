@@ -25,7 +25,6 @@ like mcp_vitals.py never reads `env` or `headers`.
 """
 from __future__ import annotations
 
-import datetime as dt
 import json
 import os
 import re
@@ -251,8 +250,7 @@ def added_by_edit(tool_input: dict, tool: str = "Edit") -> list[dict]:
 # ---------------------------------------------------------------- checking
 
 def findings(servers: list[dict], net: mcp_vitals.Net) -> list[dict]:
-    today = dt.date.today()
-    results = [mcp_vitals.examine(s, net, today) for s in servers]
+    results = [mcp_vitals.examine(s, net, mcp_vitals._today()) for s in servers]
     return [r for r in results if mcp_vitals.SERIOUS & set(r["flags"])]
 
 

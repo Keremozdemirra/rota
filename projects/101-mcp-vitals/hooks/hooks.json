@@ -3,12 +3,18 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash|PowerShell",
         "hooks": [
           {
             "type": "command",
             "if": "Bash(claude mcp add*)",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hook.py\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
+            "timeout": 20
+          },
+          {
+            "type": "command",
+            "if": "PowerShell(claude mcp add*)",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
             "timeout": 20
           }
         ]
@@ -20,7 +26,14 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hook.py\"",
+            "if": "Edit(//**/*mcp*.json)",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
+            "timeout": 20
+          },
+          {
+            "type": "command",
+            "if": "Edit(//**/claude_desktop_config.json)",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/mcp_vitals_hook.py\"",
             "timeout": 20
           }
         ]

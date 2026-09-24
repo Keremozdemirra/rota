@@ -121,8 +121,10 @@ DROPPED_COLUMNS = (
 # note 3) splits free allocation into allowances "free of charge to existing installations
 # (Article 10a(1))", "for modernisation of electricity generation (Article 10c)" and "from the new
 # entrant reserve (Article 10a(7))", in columns ALLOCATION_YYYY, ALLOCATION_TRANSITIONAL_YYYY and
-# ALLOCATION_RESERVE_YYYY. The daily file's ALLOCATION, ALLOCATION_TRA and ALLOCATION_RES hold the
-# same numbers (2013 and 2024 compared value by value on 2026-09-24); free_allocation is their sum.
+# ALLOCATION_RESERVE_YYYY. Compared value by value on 2026-09-24, the daily file's ALLOCATION,
+# ALLOCATION_TRA and ALLOCATION_RES match them: for 2013 in all but 1 of 10,987 installations, for 2024
+# in all 8,164 for the reserve and Art. 10c columns and in 7,923 for ALLOCATION (the XLSX is an
+# extract of 1 April 2026, the daily file of 24 September 2026). free_allocation is their sum.
 UNITS = {
     "verified_emissions": "t CO2e, tonnes of carbon dioxide equivalent (Directive 2003/87/EC Art. 3(j))",
     "free_allocation": "allowances, one allowance = one tonne of CO2e (Directive 2003/87/EC Art. 3(a)); "
@@ -689,10 +691,11 @@ def _xlsx_shared_strings(z: zipfile.ZipFile) -> list:
     if "xl/sharedStrings.xml" not in z.namelist():
         return []
     out = []
-    for _, el in ET.iterparse(z.open("xl/sharedStrings.xml")):
-        if el.tag == _NS + "si":
-            out.append("".join(t.text or "" for t in el.iter(_NS + "t")))
-            el.clear()
+    with z.open("xl/sharedStrings.xml") as fh:
+        for _, el in ET.iterparse(fh):
+            if el.tag == _NS + "si":
+                out.append("".join(t.text or "" for t in el.iter(_NS + "t")))
+                el.clear()
     return out
 
 
@@ -709,7 +712,12 @@ def _xlsx_sheets(z: zipfile.ZipFile) -> list:
 
 
 def _xlsx_rows(z: zipfile.ZipFile, path: str, shared: list):
-    for _, el in ET.iterparse(z.open(path)):
+    with z.open(path) as fh:
+        yield from _xlsx_row_cells(ET.iterparse(fh), shared)
+
+
+def _xlsx_row_cells(events, shared: list):
+    for _, el in events:
         if el.tag != _NS + "row":
             continue
         cells = {}
@@ -753,28 +761,32 @@ def read_compliance_xlsx(path: Path, source_year: int, stats: Stats):
                 if sheet not in z.namelist() or z.getinfo(sheet).file_size > 400 * 2**20:
                     continue
                 header = None
-                for n, cells in enumerate(_xlsx_rows(z, sheet, shared)):
-                    if header is None:
-                        names = {clean_text(v).upper(): k for k, v in cells.items() if v}
-                        if {"REGISTRY_CODE", "INSTALLATION_IDENTIFIER", "COMPLIANCE_CODE"} <= set(names):
-                            header = names
-                        elif n > 30:
-                            break
-                        continue
-                    if not any((v or "").strip() for v in cells.values()):
-                        continue  # the 2021-2023 files have a blank row under the header
-                    stats.read += 1
-                    reg = clean_text(cells.get(header["REGISTRY_CODE"], "")).upper()
-                    iid = _xlsx_int(cells.get(header["INSTALLATION_IDENTIFIER"], ""))
-                    code = clean_text(cells.get(header["COMPLIANCE_CODE"], ""), 40).upper()
-                    year = _xlsx_int(cells.get(header.get("COMPLIANCE_STATUS_LATEST_YEAR", ""), ""))
-                    if not _REG.match(reg) or iid is None or iid < 0 or not code:
-                        stats.bad(n + 1, "registry code, installation id or compliance code missing")
-                        continue
-                    if year is None or not 1990 <= year <= 2100:
-                        year = source_year
-                    stats.kept += 1
-                    yield (reg, iid, year, code, source_year)
+                rows = _xlsx_rows(z, sheet, shared)
+                try:
+                    for n, cells in enumerate(rows):
+                        if header is None:
+                            names = {clean_text(v).upper(): k for k, v in cells.items() if v}
+                            if {"REGISTRY_CODE", "INSTALLATION_IDENTIFIER", "COMPLIANCE_CODE"} <= set(names):
+                                header = names
+                            elif n > 30:
+                                break
+                            continue
+                        if not any((v or "").strip() for v in cells.values()):
+                            continue  # the 2021-2023 files have a blank row under the header
+                        stats.read += 1
+                        reg = clean_text(cells.get(header["REGISTRY_CODE"], "")).upper()
+                        iid = _xlsx_int(cells.get(header["INSTALLATION_IDENTIFIER"], ""))
+                        code = clean_text(cells.get(header["COMPLIANCE_CODE"], ""), 40).upper()
+                        year = _xlsx_int(cells.get(header.get("COMPLIANCE_STATUS_LATEST_YEAR", ""), ""))
+                        if not _REG.match(reg) or iid is None or iid < 0 or not code:
+                            stats.bad(n + 1, "registry code, installation id or compliance code missing")
+                            continue
+                        if year is None or not 1990 <= year <= 2100:
+                            year = source_year
+                        stats.kept += 1
+                        yield (reg, iid, year, code, source_year)
+                finally:
+                    rows.close()
                 if header is not None:
                     return
     except (ET.ParseError, KeyError, zipfile.BadZipFile, zlib.error, EOFError, OSError) as e:
@@ -874,11 +886,14 @@ def build_database(db_path: Path, operators, yearly_fn, compliance, meta: dict, 
                 "installations_with_lei": con.execute("SELECT COUNT(*) FROM installations WHERE lei IS NOT NULL").fetchone()[0],
                 "names_withheld": con.execute("SELECT COUNT(*) FROM installations WHERE name_withheld = 1").fetchone()[0],
             }
-            if len(kept) < len(compliance):
-                counts["compliance_rows_without_installation"] = len(compliance) - len(kept)
             meta = dict(meta, schema_version=SCHEMA_VERSION, built_at=_utcnow(), tool_version=VERSION,
                         latest_reported_year=latest, first_year=years[0], last_year=years[1],
                         compliance_years=comp_years, counts=counts)
+            # What the raw files held that the cache does not; a rebuild from the snapshot keeps the
+            # figures of the original build, so that the snapshot manifest reproduces.
+            meta["dropped"] = dict(meta.get("dropped") or {})
+            if len(kept) < len(compliance):
+                meta["dropped"]["compliance_rows_without_installation"] = len(compliance) - len(kept)
             if finalize:
                 meta = finalize(meta)
             if not counts["installations"] or not counts["yearly_rows"]:
@@ -1058,6 +1073,7 @@ def export_snapshot(db: Path, out: Path) -> dict:
         "errors": meta.get("errors") or [],
         "files": {name: {"sha256": sha256_file(out / name), "rows": n} for name, n in rows.items()},
         "counts": meta.get("counts"),
+        "dropped": meta.get("dropped") or {},
         "compliance_years": meta.get("compliance_years"),
         "latest_reported_year": meta.get("latest_reported_year"),
         "tool_version": VERSION,
@@ -1091,6 +1107,9 @@ def sources_markdown(m: dict) -> str:
                      f"{s.get('rows_kept', '')} | {s.get('malformed_rows', '')} |")
     for e in m.get("errors") or []:
         lines.append(f"| {e['file']} | not loaded: {e['error']} | | | | |")
+    lines += ["", "Rows read but not kept: rows with no value at all (the yearly file is a full 2005-2030 grid), "
+              "malformed rows, and rows for installations missing from operators_daily.csv.gz"
+              + "".join(f"; {k.replace('_', ' ')}: {v}" for k, v in (m.get("dropped") or {}).items()) + "."]
     lines += ["", "## Files in this directory", "", "| File | SHA-256 | Rows |", "| --- | --- | ---: |"]
     for name, f in (m.get("files") or {}).items():
         lines.append(f"| {name} | `{f['sha256']}` | {f['rows']} |")
@@ -1104,7 +1123,8 @@ def build_from_snapshot(snap_dir: Path, db: Path) -> dict:
         if (snap_dir / "compliance.csv.gz").is_file() else []
     meta = {"origin": "bundled", "listing_url": manifest.get("listing_url"), "retrieved_at": manifest.get("retrieved_at"),
             "snapshot_date": manifest.get("snapshot_date"), "sources": manifest.get("sources") or [],
-            "errors": manifest.get("errors") or [], "snapshot_dir": str(snap_dir)}
+            "errors": manifest.get("errors") or [], "dropped": manifest.get("dropped") or {},
+            "snapshot_dir": str(snap_dir)}
     return build_database(db, read_operators(snap_dir / "installations.csv.gz", op_stats),
                           lambda known: read_yearly(snap_dir / "yearly.csv.gz", yr_stats, known), comp, meta)
 
@@ -1259,7 +1279,7 @@ class Dataset:
     def _notes_for(meta: dict, years, activity_codes, withheld: bool, snapshot_date: str) -> list:
         latest = meta.get("latest_reported_year")
         notes = []
-        if latest and latest in years and snapshot_date and snapshot_date < f"{latest + 1}-09-30":
+        if latest and latest in years and snapshot_date and snapshot_date <= f"{latest + 1}-09-30":
             notes.append(f"Surrenders for {latest} are due by 30 September {latest + 1} (Directive 2003/87/EC "
                          f"Art. 12(3)); this snapshot of {snapshot_date} may not hold them all yet.")
         if latest and any(y > latest for y in years):
@@ -1535,6 +1555,7 @@ class Dataset:
                                                   "malformed_rows") if s.get(k) is not None} for s in meta.get("sources") or []],
                 "file_errors": meta.get("errors") or None,
                 "counts": meta.get("counts"),
+                "dropped_while_reading": meta.get("dropped") or None,
                 "years": {"first": meta.get("first_year"), "last": meta.get("last_year"),
                           "latest_verified_emissions_year": meta.get("latest_reported_year")},
                 "compliance_years": meta.get("compliance_years"),

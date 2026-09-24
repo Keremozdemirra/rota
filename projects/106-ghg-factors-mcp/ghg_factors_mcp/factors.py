@@ -13,13 +13,14 @@ import json
 import os
 import re
 import unicodedata
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from pathlib import Path
 
 from . import provenance as P
-from .refresh import MANIFEST, plain as _plain
+from .refresh import DESNZ_COLUMNS, EMBER_COLUMNS, MANIFEST, plain as _plain
 
 MAX_LIMIT = 50
+_DECIMAL = re.compile(r"^-?\d+(?:\.\d+)?$")
 
 
 class SnapshotError(RuntimeError):
@@ -126,20 +127,32 @@ class Snapshot:
         self.index: list[tuple] = []
         self.vocabulary: dict[int, set[str]] = {}
         self.activity: dict[tuple, list[tuple[str, str]]] = {}
-        for year in self.years:
-            self._load_desnz(year)
-        self._load_ember()
-        self._load_uba()
+        try:
+            for year in self.years:
+                self._load_desnz(year)
+            self._load_ember()
+            self._load_uba()
+        except (KeyError, TypeError, ValueError) as e:
+            raise SnapshotError(f"snapshot in {directory} is inconsistent ({type(e).__name__}: {e}): "
+                                "run `ghg-factors-mcp refresh`") from None
 
-    def _csv(self, name: str) -> list[dict]:
+    def _csv(self, name: str, columns: list[str]) -> list[dict]:
         try:
             with open(self.dir / name, encoding="utf-8", newline="") as f:
-                return list(csv.DictReader(f))
+                reader = csv.DictReader(f)
+                rows = list(reader)
+                missing = [c for c in columns if c not in (reader.fieldnames or [])]
         except (OSError, UnicodeDecodeError, csv.Error) as e:
             raise SnapshotError(f"snapshot file {name} is unreadable ({type(e).__name__}): run `refresh`") from None
+        if missing:
+            raise SnapshotError(f"snapshot file {name} lacks the columns {missing}: run `refresh`")
+        return rows
 
     def _load_desnz(self, year: int) -> None:
-        for order, row in enumerate(self._csv(self.sources[f"desnz-{year}"]["file"])):
+        for order, row in enumerate(self._csv(self.sources[f"desnz-{year}"]["file"], DESNZ_COLUMNS)):
+            # A value the arithmetic cannot read must stop here, not in the middle of an answer.
+            if row["value"] and not _DECIMAL.match(row["value"]):
+                raise ValueError(f"DESNZ {year} factor {row['id']} has the value {row['value'][:20]!r}")
             prefix = row["id"].rsplit("_", 1)[0]
             self.rows[(year, row["id"])] = row
             group = self.groups.setdefault((year, prefix), [])
@@ -158,7 +171,10 @@ class Snapshot:
         self.area_names: dict[str, str] = {}
         if "ember" not in self.sources:
             return
-        for r in self._csv(self.sources["ember"]["file"]):
+        for r in self._csv(self.sources["ember"]["file"], EMBER_COLUMNS):
+            if r["intensity_gco2e_per_kwh"] and not _DECIMAL.match(r["intensity_gco2e_per_kwh"]):
+                raise ValueError(f"Ember {r['area']} {r['year']} has the intensity "
+                                 f"{r['intensity_gco2e_per_kwh'][:20]!r}")
             key = r["iso3"] or r["area"].replace(" ", "-")
             area = self.ember.setdefault(key, {"area": r["area"], "iso3": r["iso3"], "area_type": r["area_type"],
                                                "years": {}})
@@ -236,7 +252,8 @@ def _row_notes(year: int, row: dict) -> list[str]:
     if row["scope"].lower() == "outside of scopes":
         notes.append("Listed by DESNZ as 'Outside of Scopes': CO2 reported separately from Scope 1, 2 and 3 totals.")
     if row["ghg_unit"].lower().startswith("kwh"):
-        notes.append("This factor converts activity to energy (kWh) for SECR energy reporting; it is not an emission factor.")
+        notes.append("This factor converts activity to energy (kWh) for SECR energy reporting; "
+                     "it is not an emission factor.")
     return notes
 
 
@@ -404,8 +421,8 @@ def get_factor(factor_id: str) -> dict:
                 change = (Decimal(row["value"]) - Decimal(r["value"])) / Decimal(r["value"]) * 100
                 item["change_to_this_year_pct"] = float(round(change, 2))
             if (r["level_2"], r["level_3"], r["column_text"]) != (row["level_2"], row["level_3"], row["column_text"]):
-                item["published_name"] = " > ".join(r[k] for k in ("level_1", "level_2", "level_3", "level_4",
-                                                                    "column_text") if r[k])
+                levels = ("level_1", "level_2", "level_3", "level_4", "column_text")
+                item["published_name"] = " > ".join(r[k] for k in levels if r[k])
             other.append(item)
     if other:
         out["same_id_other_years"] = other
@@ -448,7 +465,8 @@ def _alternatives(year: int, row: dict) -> list[dict]:
     key = (year, row["scope"], row["level_1"], row["level_2"], row["level_3"], row["level_4"], row["column_text"],
            row["ghg_unit"])
     snap = snapshot()
-    return [{"factor_id": f"desnz-{year}:{fid}", "activity_unit": uom, "value": _number(snap.rows[(year, fid)]["value"])}
+    return [{"factor_id": f"desnz-{year}:{fid}", "activity_unit": uom,
+             "value": _number(snap.rows[(year, fid)]["value"])}
             for uom, fid in snap.activity.get(key, []) if fid != row["id"]]
 
 
@@ -463,7 +481,8 @@ def convert(amount, unit: str, factor_id: str) -> dict:
     fid = f"desnz-{year}:{row['id']}"
     if not row["value"]:
         raise Refused(f"{fid} is published blank by DESNZ (no data available); there is nothing to multiply.",
-                      {"factor_id": fid, "alternatives": _alternatives(year, row)})
+                      {"factor_id": fid, "alternatives": _alternatives(year, row),
+                       "attribution": [attribution(f"desnz-{year}")]})
     scale = _scale(unit, row["uom"])
     if scale is None:
         alts = _alternatives(year, row)
@@ -471,10 +490,12 @@ def convert(amount, unit: str, factor_id: str) -> dict:
         basis = ""
         if unit_key(unit)[0] == unit_key(row["uom"])[0]:
             basis = f" If the amount is on the factor's basis, pass unit={row['uom']!r}."
+        elsewhere = (f"DESNZ {year} publishes the same activity per {listed}." if alts
+                     else "DESNZ publishes this activity in no other unit.")
         raise Refused(f"unit mismatch: {fid} is a factor per {row['uom']!r} and the amount is in {unit!r}. "
-                      "Not converted." + basis + " " + (f"DESNZ {year} publishes the same activity per {listed}."
-                                                         if alts else "DESNZ publishes this activity in no other unit."),
-                      {"factor_id": fid, "factor_unit": row["uom"], "given_unit": unit, "alternatives": alts})
+                      f"Not converted.{basis} {elsewhere}",
+                      {"factor_id": fid, "factor_unit": row["uom"], "given_unit": unit, "alternatives": alts,
+                       "attribution": [attribution(f"desnz-{year}")]})
     value = Decimal(row["value"])
     steps, base = [], qty
     if scale != 1:
@@ -584,7 +605,7 @@ def _ember_answer(key: str, year: int | None) -> dict:
                   + (f" (generation {r['generation_twh']} TWh)." if r and r["generation_twh"] else ".")
                   if r is not None else f"Ember has no {year} row for {area['area']}.")
         return {"found": False, **base, "year": year, "reason": reason + " No other year is substituted.",
-                "nearest_years_with_value": nearest}
+                "nearest_years_with_value": nearest, "scope2": P.LOCATION_BASED, "attribution": [attribution("ember")]}
     return {"found": True, "factor_id": f"ember:{key}:{year}", **base, "year": year,
             "value": float(r["intensity_gco2e_per_kwh"]), "value_text": r["intensity_gco2e_per_kwh"],
             "unit": "g CO2e/kWh", "kg_per_kwh": float(Decimal(r["intensity_gco2e_per_kwh"]) / 1000),
@@ -611,9 +632,11 @@ def _uba_answer(year: int | None) -> dict:
         notes.append(f"No year given: {year} is the latest year with a value.")
     if year not in snap.uba:
         return {"found": False, **base, "year": year,
-                "reason": f"The bundled UBA figures cover {base['available_years']} only. No other year is substituted.",
+                "reason": (f"The bundled UBA figures cover {base['available_years']} only. "
+                           "No other year is substituted."),
                 "nearest_years_with_value": [{"year": y, "factor_id": f"uba:DEU:{y}", "value": snap.uba[y]}
-                                             for y in have[-1:]]}
+                                             for y in have[-1:]],
+                "scope2": P.LOCATION_BASED, "attribution": [attribution("uba")]}
     v = snap.uba[year]
     return {"found": True, "factor_id": f"uba:DEU:{year}", **base, "year": year, "value": float(v),
             "value_text": str(v), "unit": "g CO2/kWh", "kg_per_kwh": v / 1000,
@@ -673,14 +696,16 @@ def grid_intensity(country: str, year: int | None = None, source: str = "ember")
 def sources() -> dict:
     snap = snapshot()
     items = []
-    order = sorted(snap.sources, key=lambda k: (not k.startswith("desnz-"), -int(k[6:]) if k.startswith("desnz-") else 0, k))
+    desnz = sorted((k for k in snap.sources if k.startswith("desnz-")), reverse=True)
+    order = desnz + sorted(k for k in snap.sources if k not in desnz)
     for key in order:
         m = snap.sources[key]
         if key.startswith("desnz-"):
             meta = {"name": f"{P.DESNZ['title']} {m.get('year')}", "publisher": P.DESNZ["publisher"],
                     "licence": P.DESNZ["licence"], "licence_url": P.DESNZ["licence_url"],
                     "terms_quote": P.DESNZ["terms_quote"], "version": m.get("version"), "region": "UK",
-                    "page": m.get("page")}
+                    "coverage": P.DESNZ["coverage_quote"], "use": P.DESNZ["use_quote"], "page": m.get("page"),
+                    "methodology_2026": P.DESNZ_METHODOLOGY_2026}
         elif key == "ember":
             meta = {"name": f"Ember {P.EMBER['title']}", "publisher": "Ember", "licence": P.EMBER["licence"],
                     "licence_url": P.EMBER["licence_url"], "terms_url": P.EMBER["terms_url"],

@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from support import SnapshotTestCase, IsolatedTestCase  # noqa: E402
+from support import IsolatedTestCase, SnapshotTestCase, build_snapshot  # noqa: E402
 
 from ghg_factors_mcp import __main__ as cli  # noqa: E402
 from ghg_factors_mcp import factors as F  # noqa: E402
@@ -142,6 +142,7 @@ class Convert(SnapshotTestCase):
         self.assertIn("unit='kWh (Gross CV)'", msg)
         self.assertEqual({a["activity_unit"] for a in details["alternatives"]},
                          {"cubic metres", "kWh (Net CV)", "tonnes"})
+        self.assertTrue(details["attribution"][0].endswith(OGL))
 
     def test_other_units_are_refused_not_guessed(self):
         for unit in ("gallons", "km", "kg", "GJ", "MWh (Net CV)"):
@@ -210,6 +211,8 @@ class Grid(SnapshotTestCase):
         self.assertFalse(r["found"])
         self.assertIn("No other year is substituted", r["reason"])
         self.assertEqual([n["year"] for n in r["nearest_years_with_value"]], [2022])
+        self.assertIn("CC BY 4.0", r["attribution"][0])  # the nearest values are Ember data too
+        self.assertTrue(r["scope2"].startswith("Location-based"))
 
     def test_no_year_means_latest_with_a_value(self):
         r = F.grid_intensity("lesotho")
@@ -259,6 +262,21 @@ class MissingSnapshot(IsolatedTestCase):
             with mock.patch("sys.stderr", new_callable=io.StringIO) as err:
                 self.assertEqual(cli.main(["get", DIESEL_L]), 2)
             self.assertIn("no readable snapshot", err.getvalue())
+        F._cache.clear()
+
+    def test_snapshot_with_a_value_arithmetic_cannot_read(self):
+        with tempfile.TemporaryDirectory() as d, mock.patch.dict(os.environ, {"GHG_FACTORS_DATA": d}):
+            build_snapshot(Path(d))
+            path = Path(d, "desnz_2026.csv")
+            path.write_text(path.read_text(encoding="utf-8").replace(",2.58354\n", ",n/a\n"), encoding="utf-8")
+            F._cache.clear()
+            with self.assertRaisesRegex(F.SnapshotError, "1_101_1011_8_1"):
+                F.get_factor("desnz-2026:1_101_1011_8_1")
+            Path(d, "ember_yearly_intensity.csv").write_text("area,year\nX,2025\n", encoding="utf-8")
+            path.write_text(path.read_text(encoding="utf-8").replace(",n/a\n", ",2.58354\n"), encoding="utf-8")
+            F._cache.clear()
+            with self.assertRaisesRegex(F.SnapshotError, "lacks the columns"):
+                F.sources()
         F._cache.clear()
 
     def test_corrupt_manifest(self):

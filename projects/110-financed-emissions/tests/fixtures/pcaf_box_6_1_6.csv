@@ -1,0 +1,7 @@
+position_id,counterparty,asset_class,sector,currency,outstanding,denominator,scope1_tco2e,scope2_tco2e,dq_score
+A,Company A (PCAF example),business_loan,Oil & Gas,EUR,522425,522425,15000,0,3
+B,Company B (PCAF example),business_loan,Oil & Gas,EUR,187449,187449,7000,0,5
+C,Company C (PCAF example),business_loan,Cattle farming,EUR,82778,82778,8000,0,1
+D,Company D (PCAF example),business_loan,Cattle farming,EUR,108997,108997,11000,0,1
+E,Company E (PCAF example),business_loan,Cattle farming,EUR,67556,67556,7000,0,2
+F,Company F (PCAF example),business_loan,Cattle farming,EUR,54762,54762,5000,0,5

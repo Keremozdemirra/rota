@@ -22,10 +22,11 @@ SAMPLE = str(FIXTURES / "sample.md")
 
 def run(args, server=None, env=None):
     out, err = io.StringIO(), io.StringIO()
-    with mock.patch.dict(os.environ, env or {}, clear=False), redirect_stdout(out), redirect_stderr(err):
-        if env is None:
-            os.environ.pop("GITHUB_TOKEN", None)
-            os.environ.pop("GH_TOKEN", None)
+    with mock.patch.dict(os.environ, {}, clear=False), redirect_stdout(out), redirect_stderr(err):
+        # whatever tokens the machine running the tests has, only the test's own are seen
+        os.environ.pop("GITHUB_TOKEN", None)
+        os.environ.pop("GH_TOKEN", None)
+        os.environ.update(env or {})
         if "--census" not in args:
             args = args + ["--census", CENSUS]
         code = av.main(args, today=TODAY,
@@ -220,6 +221,51 @@ class PullRequestMode(unittest.TestCase):
             code, out, _ = run([SAMPLE, "--only-lines", f"{SAMPLE}:16-18", "--json"], server)
         self.assertEqual([r["repository"] for r in json.loads(out)["repositories"]],
                          ["TransformerOptimus/SuperAGI", "lharries/whatsapp-mcp", "punkpeye/awesome-mcp-servers"])
+
+
+class Review(unittest.TestCase):
+    """Regressions from the review of 2026-09-24; the number is the finding's."""
+
+    def test_1_mcp_registry_and_copilot_pages_are_not_gone(self):
+        not_found = {"status": 404, "headers": {}, "body": {"message": "Not Found"}}
+        server_page = {"status": 200, "headers": {}, "body": {
+            "full_name": "github/github-mcp-server", "archived": False, "pushed_at": "2026-09-20T08:00:00Z",
+            "license": {"key": "mit", "spdx_id": "MIT"}, "stargazers_count": 1}}
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "registry.md"
+            p.write_text("- [GitHub MCP Server](https://github.com/mcp/github/github-mcp-server)\n"
+                         "- Sign up: https://github.com/github-copilot/signup\n", encoding="utf-8")
+            routes = {"/repos/mcp/github": not_found, "/repos/github-copilot/signup": not_found,
+                      "/repos/github/github-mcp-server": server_page}
+            with FakeGitHub(routes) as server:
+                code, out, _ = run([str(p), "--markdown", "--fail-on", "archived,gone"], server)
+                asked = server.paths()
+        self.assertEqual((code, asked), (0, ["/repos/github/github-mcp-server"]))
+        self.assertIn("1 link to 1 repository", out)
+
+    def test_2_names_and_lines_are_never_cut(self):
+        long_name = "Allenpandas/Awesome-Autonomous-Driving-Security-Resources"
+        with tempfile.TemporaryDirectory() as d:
+            files = []
+            for i in range(3):
+                p = Path(d) / f"documentation-section-{i}.md"
+                p.write_text(f"- [a](https://github.com/{long_name})\n- [b](https://github.com/{long_name}/tree/main)\n"
+                             f"- [c](https://github.com/{long_name}#readme)\n", encoding="utf-8")
+                files.append(str(p))
+            with FakeGitHub() as server:
+                code, out, _ = run(files, server)
+        rows = [line for line in out.split("\n") if long_name in line]
+        self.assertEqual(len(rows), 1, out)
+        self.assertIn(f"{files[0]}:1, {files[0]}:2, {files[0]}:3, {files[1]}:1, {files[1]}:2, {files[1]}:3 +3", rows[0])
+
+    def test_4_a_token_that_cannot_be_a_header_is_neither_sent_nor_printed(self):
+        for token in ("ghp_SECRETpart1\nghp_SECRETpart2", "ghp_SECRET\u2019quote", "ghp_SECRET part"):
+            with FakeGitHub() as server:
+                code, out, _ = run([SAMPLE, "--only-lines", "24", "--json"], server, env={"GITHUB_TOKEN": token})
+                sent = [h.get("authorization") for _, h in server.requests]
+            self.assertNotIn("SECRET", out, repr(token))
+            self.assertEqual(sent, [None], repr(token))
+            self.assertIn("GITHUB_TOKEN is set but is not a token", " ".join(json.loads(out)["notes"]))
 
 
 if __name__ == "__main__":

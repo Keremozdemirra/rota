@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ghg-factors-mcp"
+version = "0.1.0"
+description = "Greenhouse-gas conversion factors with their provenance (UK DESNZ, Ember, UBA), over MCP and on the command line."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["mcp", "model-context-protocol", "mcp-server", "ghg", "emission-factors", "conversion-factors",
+            "carbon-accounting", "desnz", "scope-2", "grid-intensity"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/ghg-factors-mcp"
+Issues = "https://github.com/Keremozdemirra/ghg-factors-mcp/issues"
+
+[project.scripts]
+ghg-factors-mcp = "ghg_factors_mcp.__main__:main"
+
+# The snapshot lives in data/ at the repository root and ships inside the
+# wheel as ghg_factors_mcp/data, so `uvx ghg-factors-mcp` answers offline.
+[tool.setuptools]
+packages = ["ghg_factors_mcp", "ghg_factors_mcp.data"]
+package-dir = { "ghg_factors_mcp.data" = "data" }
+
+[tool.setuptools.package-data]
+"ghg_factors_mcp.data" = ["*.csv", "*.json", "*.md"]

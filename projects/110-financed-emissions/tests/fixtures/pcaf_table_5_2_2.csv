@@ -1,0 +1,4 @@
+position_id,counterparty,asset_class,outstanding,denominator,scope1_tco2e,scope2_tco2e,scope3_tco2e,removals_tco2e,dq_score,dq_score_scope3
+F,Forestry company (PCAF example),business_loan,10,100,1000,100,5000,20000,1,2
+I,Industrial company (PCAF example),business_loan,25,100,20000,5000,30000,0,2,3
+E,Energy company (PCAF example),business_loan,20,100,5000,0,10000,1000,3,4

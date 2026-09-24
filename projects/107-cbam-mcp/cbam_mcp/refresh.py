@@ -17,6 +17,7 @@ import hashlib
 import http.client
 import json
 import os
+import re
 import socket
 import ssl
 import tempfile
@@ -46,6 +47,10 @@ MAX_XHTML = 8 * 1024 * 1024
 MAX_XLSX = 16 * 1024 * 1024
 MAX_SPARQL = 16 * 1024 * 1024
 MAX_OJ = 64 * 1024 * 1024
+
+# Floor chosen by this tool: the 2025 and 2026 answers have about 1,600 concepts,
+# so far fewer means a truncated answer, which must not replace a good snapshot.
+MIN_CN_CONCEPTS = 500
 
 FILES = {"annex": "annex_i.json", "values": "default_values.json", "cn2026": "cn_2026.json", "cn2025": "cn_2025.json"}
 
@@ -124,14 +129,19 @@ SELECT ?celex ?date WHERE {
 
 Q_LATER_ACTS = """PREFIX cdm: <http://publications.europa.eu/ontology/cdm#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-SELECT DISTINCT ?base ?celex ?date ?rel WHERE {
+SELECT ?base ?celex ?date ?rel (GROUP_CONCAT(DISTINCT STRAFTER(STR(?lang), "language/"); separator=",") AS ?langs) WHERE {
   VALUES ?base { "32023R0956"^^xsd:string "32025R2621"^^xsd:string }
   ?b cdm:resource_legal_id_celex ?base .
   { ?act cdm:resource_legal_amends_resource_legal ?b . BIND("amends" AS ?rel) }
   UNION { ?act cdm:resource_legal_corrects_resource_legal ?b . BIND("corrects" AS ?rel) }
   ?act cdm:resource_legal_id_celex ?celex .
   OPTIONAL { ?act cdm:work_date_document ?date }
-} ORDER BY DESC(?date)"""
+  OPTIONAL { ?e cdm:expression_belongs_to_work ?act ; cdm:expression_uses_language ?lang }
+} GROUP BY ?base ?celex ?date ?rel ORDER BY DESC(?date)"""
+
+# What the data in this package rests on: an act on these bases dated after
+# these dates is news the snapshot does not reflect yet.
+LEGAL_BASIS_DATES = {"32023R0956": ("02023R0956-20251020", "2025-10-20"), "32025R2621": ("32026R1740", "2026-07-20")}
 
 
 def q_cn(year: int) -> str:
@@ -180,6 +190,8 @@ def write_atomic(path: Path, text: str) -> None:
     try:
         with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
             f.write(text)
+        # mkstemp creates 0600; data files are meant to be readable like any other.
+        os.chmod(tmp, 0o644)
         os.replace(tmp, path)
     except BaseException:
         try:
@@ -226,8 +238,25 @@ def later_acts(fetcher=fetch) -> dict:
     for r in rows:
         base = r.get("base")
         if base in out and r.get("celex"):
-            out[base].append({"celex": r["celex"], "date": r.get("date"), "relation": r.get("rel")})
+            langs = [x for x in (r.get("langs") or "").split(",") if x]
+            out[base].append({"celex": r["celex"], "date": r.get("date"), "relation": r.get("rel"),
+                              "english_version": "ENG" in langs, "languages": len(langs)})
     return out
+
+
+def page_links(fetcher=fetch) -> list[str]:
+    """Default-value downloads listed on the Commission's CBAM page (informational)."""
+    got = fetcher(EXCEL_PAGE, accept="text/html", max_bytes=MAX_XHTML)
+    try:
+        text = got.body.decode("utf-8")
+    except UnicodeDecodeError:
+        raise parsers.ParseError("Commission page is not UTF-8") from None
+    links = []
+    for href in re.findall(r'href="([^"]*/document/download/[^"]+)"', text):
+        name = urllib.parse.unquote(href.split("filename=", 1)[-1]) if "filename=" in href else ""
+        if name.lower().endswith(".xlsx") and ("dv" in name.lower() or "default" in name.lower()):
+            links.append(urllib.parse.urljoin(EXCEL_PAGE, href.replace("&amp;", "&")))
+    return links
 
 
 def refresh_annex(today: str, fetcher=fetch) -> dict:
@@ -309,6 +338,15 @@ def refresh_values(data_dir: Path, today: str, fetcher=fetch, check_oj: bool = F
         "sheets": parsed["sheet_count"], "tables": len(tables), "rows": sum(len(t) for t in tables.values()),
         "lines": len(parsed["order"]), "annex_iv_rows": len(annex_iv), "oj_check": None,
     }
+    try:
+        listed = page_links(fetcher)
+        uuid = excel_url.rsplit("/", 1)[-1].split("?")[0].replace("_en", "")
+        meta["page_check"] = {"checked": today, "downloads_listed": listed,
+                              "this_file_listed": any(uuid in link for link in listed)}
+        if not meta["page_check"]["this_file_listed"]:
+            log(f"note: the Commission page lists other default-value downloads: {listed}")
+    except (FetchError, parsers.ParseError) as e:
+        meta["page_check"] = {"checked": today, "error": str(e)}
     found_difference = False
     if check_oj:
         oj_got = fetcher(CELLAR + OJ_VALUES_CELEX, accept="application/xhtml+xml", max_bytes=MAX_OJ, timeout=180)
@@ -342,8 +380,7 @@ def refresh_cn(year: int, today: str, fetcher=fetch) -> dict:
         more, got = sparql(q_cn_ids(year, missing), fetcher, f"CN {year} ancestors query")
         hashes.append(sha256(got.body))
         concepts.update(parsers.parse_cn_rows(more))
-    # Floor chosen by this tool: the 2025 and 2026 answers have about 1,600 concepts.
-    if len(concepts) < 500:
+    if len(concepts) < MIN_CN_CONCEPTS:
         raise parsers.ParseError(f"CN {year}: only {len(concepts)} concepts returned; refusing to replace the snapshot")
     meta = {
         "source": f"Combined Nomenclature {year}, EU Vocabularies (Publications Office of the European Union)",
@@ -418,9 +455,20 @@ def render_sources(annex: dict | None, values: dict | None, cn: dict, acts: dict
     if acts and isinstance(acts.get("acts"), dict):
         out += [f"## Later acts (CELLAR SPARQL, checked {acts.get('checked')})", ""]
         for base, rows in acts["acts"].items():
-            listed = "; ".join(f"{r['celex']} {r.get('relation')} {r.get('date')}" for r in rows) or "none"
+            listed = "; ".join(f"{r['celex']} {r.get('relation')} {r.get('date')}"
+                               + ("" if r.get("english_version", True) else " (no English version in CELLAR)")
+                               for r in rows) or "none"
             out.append(f"- Acts amending or correcting {base}: {listed}")
+            ref, date = LEGAL_BASIS_DATES.get(base, (None, None))
+            if ref:
+                later = [r["celex"] for r in rows if (r.get("date") or "") > date and r["celex"] != ref]
+                out.append(f"  - Dated after {ref} ({date}): {', '.join(later) if later else 'none'}")
         out.append("")
+    if values and (values["meta"].get("page_check") or {}).get("downloads_listed") is not None:
+        pc = values["meta"]["page_check"]
+        out += [f"- Commission page {EXCEL_PAGE} ({pc['checked']}) lists these default-value downloads: "
+                f"{', '.join(pc['downloads_listed']) or 'none'}; the bundled file is "
+                f"{'among them' if pc['this_file_listed'] else 'NOT among them'}.", ""]
     out += ["## Not bundled", "",
             "- Annexes II and III to Implementing Regulation (EU) 2025/2621 (emission factors for indirect "
             "emissions and default values for electricity). The Excel does not contain them, and the regulation "

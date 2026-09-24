@@ -1,0 +1,1048 @@
+{
+ "about": "Snapshot of the Climate TRACE API definitions (sectors, subsectors and their data leads), Climate TRACE, CC BY 4.0. Rebuilt by: climate-trace-mcp refresh",
+ "api_version": "7.2.0",
+ "retrieved": "2026-09-24",
+ "sectors": [
+  "mineral-extraction",
+  "fossil-fuel-operations",
+  "agriculture",
+  "transportation",
+  "power",
+  "fluorinated-gases",
+  "manufacturing",
+  "waste",
+  "forestry-and-land-use",
+  "buildings"
+ ],
+ "source": "https://api.climatetrace.org/v7/definitions/subsectors",
+ "subsectors": [
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "TransitionZero",
+     "url": "https://www.transitionzero.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "aluminum",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Aluminum"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Hypervine",
+     "url": "https://www.hypervine.io/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "bauxite-mining",
+   "sector": "mineral-extraction",
+   "sectorDisplay": "Mineral Extraction",
+   "subsectorDisplay": "Bauxite Mining"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "biological-treatment-of-solid-waste-and-biogenic",
+   "sector": "waste",
+   "sectorDisplay": "Waste",
+   "subsectorDisplay": "Biological Treatment Of Solid Waste"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "TransitionZero",
+     "url": "https://www.transitionzero.org/"
+    },
+    {
+     "name": "Global Energy Monitor",
+     "url": "https://globalenergymonitor.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "cement",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Cement"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "TransitionZero",
+     "url": "https://www.transitionzero.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "chemicals",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Chemicals"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Global Energy Monitor",
+     "url": "https://globalenergymonitor.org/"
+    },
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "coal-mining",
+   "sector": "fossil-fuel-operations",
+   "sectorDisplay": "Fossil Fuel Operations",
+   "subsectorDisplay": "Coal Mining"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Hypervine",
+     "url": "https://www.hypervine.io/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "copper-mining",
+   "sector": "mineral-extraction",
+   "sectorDisplay": "Mineral Extraction",
+   "subsectorDisplay": "Copper Mining"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Michigan State University",
+     "url": "https://msu.edu/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "crop-residues",
+   "sector": "agriculture",
+   "sectorDisplay": "Agriculture",
+   "subsectorDisplay": "Crop Residues"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "EDGAR",
+     "url": "https://edgar.jrc.ec.europa.eu/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "cropland-fires",
+   "sector": "agriculture",
+   "sectorDisplay": "Agriculture",
+   "subsectorDisplay": "Cropland Fires"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "domestic-aviation",
+   "sector": "transportation",
+   "sectorDisplay": "Transportation",
+   "subsectorDisplay": "Domestic Aviation"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "OceanMind",
+     "url": "https://www.oceanmind.global/"
+    },
+    {
+     "name": "Global Fishing Watch",
+     "url": "https://globalfishingwatch.org/"
+    },
+    {
+     "name": "emLab UCSB",
+     "url": "https://emlab.ucsb.edu/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "domestic-shipping",
+   "sector": "transportation",
+   "sectorDisplay": "Transportation",
+   "subsectorDisplay": "Domestic Shipping"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Johns Hopkins University Applied Physics Laboratory",
+     "url": "https://www.jhuapl.edu/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "domestic-wastewater-treatment-and-discharge",
+   "sector": "waste",
+   "sectorDisplay": "Waste",
+   "subsectorDisplay": "Domestic Wastewater Treatment And Discharge"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    },
+    {
+     "name": "TransitionZero",
+     "url": "https://www.transitionzero.org/"
+    },
+    {
+     "name": "Global Energy Monitor",
+     "url": "https://globalenergymonitor.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "electricity-generation",
+   "sector": "power",
+   "sectorDisplay": "Power",
+   "subsectorDisplay": "Electricity Generation"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    },
+    {
+     "name": "Earth Index",
+     "url": "https://www.earthgenome.org/earth-index"
+    },
+    {
+     "name": "RS Lab Saint Louis University",
+     "url": "http://www.remotesensinglab.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "enteric-fermentation-cattle-operation",
+   "sector": "agriculture",
+   "sectorDisplay": "Agriculture",
+   "subsectorDisplay": "Enteric Fermentation Cattle Feedlot"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "RS Lab Saint Louis University",
+     "url": "http://www.remotesensinglab.org/"
+    },
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "enteric-fermentation-cattle-pasture",
+   "sector": "agriculture",
+   "sectorDisplay": "Agriculture",
+   "subsectorDisplay": "Enteric Fermentation Cattle Pasture"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "enteric-fermentation-other",
+   "sector": "agriculture",
+   "sectorDisplay": "Agriculture",
+   "subsectorDisplay": "Enteric Fermentation Other"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "fluorinated-gases",
+   "sector": "fluorinated-gases",
+   "sectorDisplay": "Fluorinated Gases",
+   "subsectorDisplay": "Fluorinated Gases"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    },
+    {
+     "name": "Open Supply Hub",
+     "url": "https://opensupplyhub.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "food-beverage-tobacco",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Food Beverages And Tobacco"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "CTrees",
+     "url": "https://ctrees.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "forest-land-clearing",
+   "sector": "forestry-and-land-use",
+   "sectorDisplay": "Forestry And Land Use",
+   "subsectorDisplay": "Forest Land Clearing"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "CTrees",
+     "url": "https://ctrees.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "forest-land-degradation",
+   "sector": "forestry-and-land-use",
+   "sectorDisplay": "Forestry And Land Use",
+   "subsectorDisplay": "Forest Land Degradation"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "CTrees",
+     "url": "https://ctrees.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "forest-land-fires",
+   "sector": "forestry-and-land-use",
+   "sectorDisplay": "Forestry And Land Use",
+   "subsectorDisplay": "Forest Fires"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "glass",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Glass"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "heat-plants",
+   "sector": "power",
+   "sectorDisplay": "Power",
+   "subsectorDisplay": "Heat Plants"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "incineration-and-open-burning-of-waste",
+   "sector": "waste",
+   "sectorDisplay": "Waste",
+   "subsectorDisplay": "Incineration And Open Burning Of Waste"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Johns Hopkins University Applied Physics Laboratory",
+     "url": "https://www.jhuapl.edu/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "industrial-wastewater-treatment-and-discharge",
+   "sector": "waste",
+   "sectorDisplay": "Waste",
+   "subsectorDisplay": "Industrial Wastewater Treatment And Discharge"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "international-aviation",
+   "sector": "transportation",
+   "sectorDisplay": "Transportation",
+   "subsectorDisplay": "International Aviation"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "OceanMind",
+     "url": "https://www.oceanmind.global/"
+    },
+    {
+     "name": "Global Fishing Watch",
+     "url": "https://globalfishingwatch.org/"
+    },
+    {
+     "name": "emLab UCSB",
+     "url": "https://emlab.ucsb.edu/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "international-shipping",
+   "sector": "transportation",
+   "sectorDisplay": "Transportation",
+   "subsectorDisplay": "International Shipping"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "TransitionZero",
+     "url": "https://www.transitionzero.org/"
+    },
+    {
+     "name": "Global Energy Monitor",
+     "url": "https://globalenergymonitor.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "iron-and-steel",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Iron And Steel"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Hypervine",
+     "url": "https://www.hypervine.io/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "iron-mining",
+   "sector": "mineral-extraction",
+   "sectorDisplay": "Mineral Extraction",
+   "subsectorDisplay": "Iron Mining"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "lime",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Lime"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Michigan State University",
+     "url": "https://msu.edu/"
+    },
+    {
+     "name": "Carbon Yield",
+     "url": "https://carbon-yield.com/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "manure-applied-to-soils",
+   "sector": "agriculture",
+   "sectorDisplay": "Agriculture",
+   "subsectorDisplay": "Manure Applied To Soils"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "RS Lab Saint Louis University",
+     "url": "http://www.remotesensinglab.org/"
+    },
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "manure-left-on-pasture-cattle",
+   "sector": "agriculture",
+   "sectorDisplay": "Agriculture",
+   "subsectorDisplay": "Manure Left On Pasture Cattle"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    },
+    {
+     "name": "Earth Index",
+     "url": "https://www.earthgenome.org/earth-index"
+    },
+    {
+     "name": "RS Lab Saint Louis University",
+     "url": "http://www.remotesensinglab.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "manure-management-cattle-operation",
+   "sector": "agriculture",
+   "sectorDisplay": "Agriculture",
+   "subsectorDisplay": "Manure Management Cattle Feedlot"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "manure-management-other",
+   "sector": "agriculture",
+   "sectorDisplay": "Agriculture",
+   "subsectorDisplay": "Manure Management Other"
+  },
+  {
+   "asset": false,
+   "country": false,
+   "dataLeads": [
+    {
+     "name": "CTrees",
+     "url": "https://ctrees.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "net-forest-land",
+   "sector": "forestry-and-land-use",
+   "sectorDisplay": "Forestry And Land Use",
+   "subsectorDisplay": "Net Forest & Mangrove Carbon Stock Change - Living Biomass"
+  },
+  {
+   "asset": false,
+   "country": false,
+   "dataLeads": [
+    {
+     "name": "CTrees",
+     "url": "https://ctrees.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "net-shrubgrass",
+   "sector": "forestry-and-land-use",
+   "sectorDisplay": "Forestry And Land Use",
+   "subsectorDisplay": "Net Grassland Carbon Stock Change - Living Biomass"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Michigan State University",
+     "url": "https://msu.edu/"
+    },
+    {
+     "name": "Carbon Yield",
+     "url": "https://carbon-yield.com/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "net-soil-organic-carbon",
+   "sector": "forestry-and-land-use",
+   "sectorDisplay": "Forestry And Land Use",
+   "subsectorDisplay": "Net Soil Organic Carbon"
+  },
+  {
+   "asset": false,
+   "country": false,
+   "dataLeads": [
+    {
+     "name": "CTrees",
+     "url": "https://ctrees.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "net-wetland",
+   "sector": "forestry-and-land-use",
+   "sectorDisplay": "Forestry And Land Use",
+   "subsectorDisplay": "Net Wetland Carbon Stock Change - Living Biomass"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "non-broadcasting-vessels",
+   "sector": "transportation",
+   "sectorDisplay": "Transportation",
+   "subsectorDisplay": "Non-Broadcasting Vessels"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Duke University",
+     "url": "https://nicholas.duke.edu/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "non-residential-onsite-fuel-usage",
+   "sector": "buildings",
+   "sectorDisplay": "Buildings",
+   "subsectorDisplay": "Residential Onsite Fuel Usage"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "RMI",
+     "url": "https://rmi.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "oil-and-gas-production",
+   "sector": "fossil-fuel-operations",
+   "sectorDisplay": "Fossil Fuel Operations",
+   "subsectorDisplay": "Oil And Gas Production"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "RMI",
+     "url": "https://rmi.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "oil-and-gas-refining",
+   "sector": "fossil-fuel-operations",
+   "sectorDisplay": "Fossil Fuel Operations",
+   "subsectorDisplay": "Oil And Gas Refining"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "RMI",
+     "url": "https://rmi.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "oil-and-gas-transport",
+   "sector": "fossil-fuel-operations",
+   "sectorDisplay": "Fossil Fuel Operations",
+   "subsectorDisplay": "Oil And Gas Transport"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "other-agricultural-soil-emissions",
+   "sector": "agriculture",
+   "sectorDisplay": "Agriculture",
+   "subsectorDisplay": "Other Agricultural Soil Emissions"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "other-chemicals",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Other Chemicals"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "other-energy-use",
+   "sector": "power",
+   "sectorDisplay": "Power",
+   "subsectorDisplay": "Other Energy Use"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "other-fossil-fuel-operations",
+   "sector": "fossil-fuel-operations",
+   "sectorDisplay": "Fossil Fuel Operations",
+   "subsectorDisplay": "Other Fossil Fuel Operations"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Various"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "other-manufacturing",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Other Manufacturing"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "other-metals",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Other Metals"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "other-mining-quarrying",
+   "sector": "mineral-extraction",
+   "sectorDisplay": "Mineral Extraction",
+   "subsectorDisplay": "Other Mining And Quarrying"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "other-onsite-fuel-usage",
+   "sector": "buildings",
+   "sectorDisplay": "Buildings",
+   "subsectorDisplay": "Other Onsite Fuel Usage"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "other-solid-fuels",
+   "sector": "fossil-fuel-operations",
+   "sectorDisplay": "Fossil Fuel Operations",
+   "subsectorDisplay": "Other Solid Fuels"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "other-transport",
+   "sector": "transportation",
+   "sectorDisplay": "Transportation",
+   "subsectorDisplay": "Other Transport"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "RMI",
+     "url": "https://rmi.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "petrochemical-steam-cracking",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Petrochemicals Steam Cracking"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "TransitionZero",
+     "url": "https://www.transitionzero.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "pulp-and-paper",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Pulp And Paper"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "railways",
+   "sector": "transportation",
+   "sectorDisplay": "Transportation",
+   "subsectorDisplay": "Railways"
+  },
+  {
+   "asset": false,
+   "country": false,
+   "dataLeads": [
+    {
+     "name": "CTrees",
+     "url": "https://ctrees.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "removals",
+   "sector": "forestry-and-land-use",
+   "sectorDisplay": "N/A",
+   "subsectorDisplay": "N/A"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Duke University",
+     "url": "https://nicholas.duke.edu/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "residential-onsite-fuel-usage",
+   "sector": "buildings",
+   "sectorDisplay": "Buildings",
+   "subsectorDisplay": "Non-Residential Onsite Fuel Usage"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "University Malaysia Terengganu",
+     "url": "https://www.umt.edu.my/"
+    },
+    {
+     "name": "Carbon Yield",
+     "url": "https://carbon-yield.com/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "rice-cultivation",
+   "sector": "agriculture",
+   "sectorDisplay": "Agriculture",
+   "subsectorDisplay": "Rice Cultivation"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Johns Hopkins University Applied Physics Laboratory",
+     "url": "https://www.jhuapl.edu/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "road-transportation",
+   "sector": "transportation",
+   "sectorDisplay": "Transportation",
+   "subsectorDisplay": "Road Transportation"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "rock-quarrying",
+   "sector": "mineral-extraction",
+   "sectorDisplay": "Mineral Extraction",
+   "subsectorDisplay": "Rock Quarrying"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "sand-quarrying",
+   "sector": "mineral-extraction",
+   "sectorDisplay": "Mineral Extraction",
+   "subsectorDisplay": "Sand Quarrying"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "CTrees",
+     "url": "https://ctrees.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "shrubgrass-fires",
+   "sector": "forestry-and-land-use",
+   "sectorDisplay": "Forestry And Land Use",
+   "subsectorDisplay": "Shrubgrass Fires"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "RMI",
+     "url": "https://rmi.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "solid-waste-disposal",
+   "sector": "waste",
+   "sectorDisplay": "Waste",
+   "subsectorDisplay": "Solid Waste Disposal"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Michigan State University",
+     "url": "https://msu.edu/"
+    },
+    {
+     "name": "Carbon Yield",
+     "url": "https://carbon-yield.com/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "synthetic-fertilizer-application",
+   "sector": "agriculture",
+   "sectorDisplay": "Agriculture",
+   "subsectorDisplay": "Synthetic Fertilizer Application"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "WattTime",
+     "url": "https://www.watttime.org/"
+    },
+    {
+     "name": "Open Supply Hub",
+     "url": "https://opensupplyhub.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "textiles-leather-apparel",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Textiles Leather And Apparel"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "Johns Hopkins University Applied Physics Laboratory",
+     "url": "https://www.jhuapl.edu/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "water-reservoirs",
+   "sector": "forestry-and-land-use",
+   "sectorDisplay": "Forestry And Land Use",
+   "subsectorDisplay": "Water Reservoirs"
+  },
+  {
+   "asset": true,
+   "country": true,
+   "dataLeads": [
+    {
+     "name": "CTrees",
+     "url": "https://ctrees.org/"
+    }
+   ],
+   "locationDisplay": true,
+   "name": "wetland-fires",
+   "sector": "forestry-and-land-use",
+   "sectorDisplay": "Forestry And Land Use",
+   "subsectorDisplay": "Wetland Fires"
+  },
+  {
+   "asset": false,
+   "country": true,
+   "dataLeads": [],
+   "locationDisplay": false,
+   "name": "wood-and-wood-products",
+   "sector": "manufacturing",
+   "sectorDisplay": "Manufacturing",
+   "subsectorDisplay": "Wood And Wood Products"
+  }
+ ]
+}

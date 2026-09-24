@@ -97,6 +97,8 @@ class FakeOpener:
             answer = answer.pop(0) if len(answer) > 1 else answer[0]
         if answer is None:
             raise http_error(url, 404, raw("error_404.json"))
+        if isinstance(answer, urllib.error.HTTPError) and hasattr(answer.fp, "seek"):
+            answer.fp.seek(0)  # the same error object may be served twice; a real one is fresh
         if isinstance(answer, BaseException):
             raise answer
         if isinstance(answer, tuple):  # (status, body) for a non-200 success code

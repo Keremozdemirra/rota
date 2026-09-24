@@ -1,0 +1,4 @@
+include README.md LICENSE server.json
+recursive-include cbam_mcp/data *.json *.md
+recursive-include tests *.py *.json *.xhtml *.xlsx *.html
+global-exclude __pycache__ *.py[cod]

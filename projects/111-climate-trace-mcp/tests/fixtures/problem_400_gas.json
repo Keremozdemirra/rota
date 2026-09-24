@@ -1,0 +1,5 @@
+{
+  "detail": "nonsense is not a valid gas",
+  "status": 400,
+  "title": "Bad Request"
+}

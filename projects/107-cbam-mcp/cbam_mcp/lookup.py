@@ -275,13 +275,17 @@ def cbam_scope(cn_code, limit: int = 50) -> dict:
         }
         out["de_minimis"] = _de_minimis(s, digits, entry)
     out["cn"] = _cn_brief(s, digits)
-    if not out["cn"]["found"] and s.cn_bundled(digits) and len(digits) >= 4:
-        warnings.append(f"{format_cn(digits)} is not a CN 2026 code; the answer only applies Annex I by prefix")
+    _warn_not_cn(s, digits, warnings, "the answer only applies Annex I by prefix")
     if len(digits) == 10:
         warnings.append("10 digits is a TARIC code; Annex I is written in CN codes (8 digits and fewer)")
     out["warnings"] = warnings
     out.update(_scope_legal(s))
     return out
+
+
+def _warn_not_cn(s: Store, digits: str, warnings: list, consequence: str) -> None:
+    if len(digits) >= 4 and s.cn_bundled(digits) and s.cn_lookup(2026, digits[:8])[1] is None:
+        warnings.append(f"{format_cn(digits[:8])} is not a CN 2026 code; {consequence}")
 
 
 def _de_minimis(s: Store, digits: str, entry: dict | None) -> dict | None:
@@ -488,6 +492,8 @@ def default_value(cn_code, country) -> dict:
             if len(codes) > 1 and len(digits) >= 8:
                 warnings.append("several table lines (TARIC codes) match this CN code; the description decides which applies")
     out["notes"] = _value_notes(s, bool(out["lines"]))
+    if out["lines"]:
+        _warn_not_cn(s, digits, warnings, "the table line shown is the one whose code it starts with")
     if scope["status"] == "partially_in_scope" and scope["basis"] == "ex_code":
         warnings.append(f"Annex I lists only part of this code as in scope ('{_entry_display(scope['entry'])} – "
                         f"{scope['entry']['description']}')")
@@ -539,6 +545,8 @@ def compare_origins(cn_code, countries) -> dict:
         out["lines"] = lines
     out["countries_not_recognised"] = problems
     out["notes"] = _value_notes(s, bool(out["lines"]))
+    if out["lines"]:
+        _warn_not_cn(s, digits, warnings, "the table line shown is the one whose code it starts with")
     out["warnings"] = warnings
     out.update(_values_legal(s))
     return out

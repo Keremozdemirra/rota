@@ -1,0 +1,5 @@
+include LICENSE README.md server.json
+recursive-include data *.csv *.json *.md
+recursive-include tests *.py *.json *.csv *.xlsx *.html
+recursive-include .github *.yml
+global-exclude __pycache__ *.py[cod]

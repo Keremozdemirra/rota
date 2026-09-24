@@ -1,0 +1,10 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Keremozdemirra/ghg-factors-mcp",
+  "title": "GHG conversion factors",
+  "description": "GHG conversion factors (UK DESNZ) and grid intensities (Ember, UBA) with provenance.",
+  "repository": {"url": "https://github.com/Keremozdemirra/ghg-factors-mcp", "source": "github"},
+  "version": "0.1.0",
+  "packages": [{"registryType": "pypi", "identifier": "ghg-factors-mcp", "version": "0.1.0",
+                "runtimeHint": "uvx", "transport": {"type": "stdio"}}]
+}

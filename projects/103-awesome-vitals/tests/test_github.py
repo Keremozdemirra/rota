@@ -224,6 +224,60 @@ class Untrusted(unittest.TestCase):
         self.assertEqual(server.paths()[-1], "/repos/o/cut")  # nothing asked after that
 
 
+class Review(unittest.TestCase):
+    """Regressions from the review of 2026-09-24; the number is the finding's."""
+
+    def test_4_exception_text_that_may_carry_the_token_is_never_echoed(self):
+        gh = av.GitHub(api="http://127.0.0.1:9", proxies={}, census_url=CENSUS, sleep=lambda s: None)
+
+        def refuse(*args, **kwargs):
+            raise ValueError("Invalid header value b'Bearer ghp_SECRETpart1\\nghp_SECRETpart2'")
+
+        gh.opener.open = refuse
+        f = gh.facts("n8n-io/n8n")
+        self.assertNotIn("SECRET", gh.stop_reason + f["github"] + f["note"])
+        self.assertEqual(f["source"], "census")
+
+    def test_7_one_retry_after_a_short_wait(self):
+        waits = []
+        limited = {"status": 429, "headers": {"Retry-After": "1"},
+                   "body": {"message": "You have exceeded a secondary rate limit."}}
+        routes = {"/repos/Keremozdemirra/agent-vitals": [limited, "agent-vitals.200.json"],
+                  "/repos/octocat/Hello-World": [{"status": 502, "headers": {}, "body": "<html>bad gateway</html>"},
+                                                 "hello-world.200.json"],
+                  "/repos/octocat/archived-example": [dict(fixture("archived.200.json"), delay=1.5), "archived.200.json"]}
+        with FakeGitHub(routes) as server:
+            gh = av.GitHub(api=server.url, proxies={}, census_url=CENSUS, timeout=0.5, sleep=waits.append)
+            r = av.examine(entries("Keremozdemirra/agent-vitals", "octocat/Hello-World", "octocat/archived-example"),
+                           gh, TODAY)
+        self.assertEqual([x["source"] for x in r], ["github", "github", "github"])
+        self.assertEqual((gh.state, len(server.requests)), ("ok", 6))
+        self.assertEqual(waits[0], 1)  # as long as retry-after asked
+
+    def test_7_gives_up_after_one_retry_and_never_waits_long(self):
+        waits = []
+        again = {"status": 429, "headers": {"Retry-After": "2"}, "body": {"message": "secondary rate limit"}}
+        with FakeGitHub({"/repos/n8n-io/n8n": [again, again, "agent-vitals.200.json"]}) as server:
+            gh = av.GitHub(api=server.url, proxies={}, census_url=CENSUS, sleep=waits.append)
+            r = av.examine(entries("n8n-io/n8n", "anthropics/skills"), gh, TODAY)
+        self.assertEqual((gh.state, len(server.requests), waits), ("rate-limited", 2, [2]))
+        self.assertEqual([x["source"] for x in r], ["census", "census"])
+        waits.clear()
+        hour = {"status": 429, "headers": {"Retry-After": "3600"}, "body": {}}
+        with FakeGitHub({"/repos/n8n-io/n8n": hour}) as server:
+            gh = av.GitHub(api=server.url, proxies={}, census_url=CENSUS, sleep=waits.append)
+            av.examine(entries("n8n-io/n8n"), gh, TODAY)
+        self.assertEqual((gh.state, len(server.requests), waits), ("rate-limited", 1, []))
+
+    def test_10_a_301_without_location_is_asked_once(self):
+        moved = {"status": 301, "headers": {}, "body": {"message": "Moved Permanently"}}
+        with FakeGitHub({"/repos/o/noloc": moved}) as server:
+            gh = av.GitHub(api=server.url, proxies={}, census_url=CENSUS, sleep=lambda s: None)
+            r = av.examine(entries("o/noloc"), gh, TODAY)
+        self.assertEqual(server.paths(), ["/repos/o/noloc"])
+        self.assertEqual(r[0]["github"], "GitHub API answered 301 without a Location")
+
+
 class Buckets(unittest.TestCase):
     def test_boundaries_match_the_census(self):
         cases = [(0, "active"), (30, "active"), (31, "slowing"), (90, "slowing"), (91, "stale"),

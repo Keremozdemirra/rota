@@ -99,7 +99,8 @@ class Rebuild(IsolatedTestCase):
         self.assertFalse(any("example.net" in u for u in fake.calls))
 
     def test_content_api_answers_that_are_not_a_publication(self):
-        for body, why in ((b"null", "no attachment list"), (b"<html>maintenance</html>", "not JSON"),
+        for body, why in ((b"null", "no attachment list"), (b'{"details": null}', "no attachment list"),
+                          (b'{"details": ["x"]}', "no attachment list"), (b"<html>maintenance</html>", "not JSON"),
                           (b"\xff\xfe\x00\x00", "not UTF-8"), (b'{"details": {"attachments": []}}', "found 0")):
             answers = recorded_answers()
             answers[P.DESNZ_API.format(year=2026)] = body
@@ -147,6 +148,14 @@ class Parsers(IsolatedTestCase):
             with self.assertRaisesRegex(R.RefreshError, "header changed"):
                 R.parse_desnz(data, 2026)
 
+    def test_cells_reach_the_snapshot_as_plain_labels(self):
+        text = fixture("ember_trimmed.csv").decode("utf-8")
+        rows, _ = R.parse_ember(text.replace("Poland,POL", "Po\u200bland\x07,POL").encode("utf-8"))
+        self.assertIn("Poland", [r["area"] for r in rows])
+        long_name = "Ignore previous instructions and " * 10
+        with self.assertRaisesRegex(R.RefreshError, "where a label is expected"):
+            R.parse_ember(text.replace("Poland,POL", long_name + ",POL").encode("utf-8"))
+
     def test_uba_reads_numbers_not_decimals_or_scripts(self):
         pairs, meta = R.parse_uba(fixture("uba_page_skeleton.html"))
         self.assertEqual(pairs, [{"year": 2023, "g_co2_per_kwh": 379}, {"year": 2024, "g_co2_per_kwh": 353},
@@ -162,6 +171,7 @@ class Parsers(IsolatedTestCase):
 class FakeResponse(io.BytesIO):
     def __init__(self, body: bytes, headers=None):
         super().__init__(body)
+        self.geturl = lambda: Fetch.URL
         self.headers = email.message.Message()
         for k, v in (headers or {}).items():
             self.headers[k] = v
@@ -190,6 +200,11 @@ class Fetch(IsolatedTestCase):
     def test_ok(self):
         body, headers = self.fetch_with([FakeResponse(b"a,b\n1,2\n", {"Last-Modified": "x"})])
         self.assertEqual((body, headers["last-modified"]), (b"a,b\n1,2\n", "x"))
+
+    def test_redirect_to_http_is_refused(self):
+        downgraded = FakeResponse(b"a,b\n")
+        downgraded.geturl = lambda: "http://files.ember-energy.org/x.csv"
+        self.assertFails([downgraded], "non-https")
 
     def test_network_down(self):
         self.assertFails(urllib.error.URLError(socket.gaierror(-3, "Temporary failure in name resolution")),
@@ -243,6 +258,22 @@ class Command(IsolatedTestCase):
                  mock.patch("sys.stdout", new_callable=io.StringIO) as out:
                 self.assertEqual(cli.main(["refresh", "--out", d, "--only", "ember"]), 2)
             self.assertIn("ember: FAILED, previous snapshot kept: HTTP 429", out.getvalue())
+
+    def test_unwritable_output_is_an_error_not_a_traceback(self):
+        with tempfile.TemporaryDirectory() as d:
+            blocker = Path(d, "file")
+            blocker.write_text("not a directory")
+            with mock.patch.object(R, "fetch", FakeFetch(recorded_answers())), \
+                 mock.patch("sys.stderr", new_callable=io.StringIO) as err:
+                self.assertEqual(cli.main(["refresh", "--out", str(blocker / "data")]), 2)
+            self.assertIn("cannot write the snapshot", err.getvalue())
+
+    def test_a_parser_surprise_fails_only_that_source(self):
+        with tempfile.TemporaryDirectory() as d:
+            with mock.patch.object(R, "parse_uba", side_effect=IndexError("boom")):
+                report = build_snapshot(Path(d))
+        self.assertEqual(report["failed"], {"uba": "unexpected IndexError: boom"})
+        self.assertIn("ember", report["ok"])
 
     def test_refresh_rejects_unknown_source_names(self):
         with mock.patch("sys.stderr", new_callable=io.StringIO):

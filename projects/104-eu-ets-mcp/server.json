@@ -1,0 +1,10 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Keremozdemirra/eu-ets-mcp",
+  "title": "EU ETS installations",
+  "description": "EU ETS Union Registry data: verified emissions, free allocation, surrenders by installation or LEI",
+  "repository": {"url": "https://github.com/Keremozdemirra/eu-ets-mcp", "source": "github"},
+  "version": "0.1.0",
+  "packages": [{"registryType": "pypi", "identifier": "eu-ets-mcp", "version": "0.1.0",
+                "runtimeHint": "uvx", "transport": {"type": "stdio"}}]
+}

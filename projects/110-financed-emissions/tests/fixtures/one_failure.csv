@@ -1,0 +1,3 @@
+position_id,counterparty,asset_class,currency,outstanding,denominator,scope1_tco2e,scope2_tco2e,dq_score
+P1,Alpha Steel (fictional),listed_equity,EUR,10000000,500000000,200000,10000,1
+P2,Gamma Tools (fictional),business_loan,EUR,2000000,,5000,300,3

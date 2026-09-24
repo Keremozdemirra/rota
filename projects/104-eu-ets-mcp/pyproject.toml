@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eu-ets-mcp"
+version = "0.1.0"
+description = "EU ETS installations from the Union Registry: verified emissions, free allocation and surrendered units by installation, LEI, country or sector. MCP server and CLI."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["mcp", "model-context-protocol", "mcp-server", "eu-ets", "emissions-trading", "union-registry",
+            "verified-emissions", "free-allocation", "climate", "lei"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/eu-ets-mcp"
+Issues = "https://github.com/Keremozdemirra/eu-ets-mcp/issues"
+"Data source" = "https://union-registry-data.ec.europa.eu/"
+
+[project.scripts]
+eu-ets = "eu_ets:main"
+eu-ets-mcp = "eu_ets_mcp:main"
+
+[tool.setuptools]
+py-modules = ["eu_ets", "eu_ets_mcp"]
+# The dated snapshot in data/ ships inside the wheel as the package eu_ets_data.
+packages = ["eu_ets_data"]
+package-dir = { "eu_ets_data" = "data" }
+
+[tool.setuptools.package-data]
+eu_ets_data = ["*.csv.gz", "snapshot.json", "SOURCES.md"]

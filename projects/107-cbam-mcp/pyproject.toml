@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cbam-mcp"
+version = "0.1.0"
+description = "EU CBAM scope, default values and CN descriptions from dated official sources, as an MCP server and command line."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["mcp", "model-context-protocol", "mcp-server", "cbam", "carbon-border-adjustment-mechanism",
+            "combined-nomenclature", "customs", "emissions", "climate"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Other Audience",
+  "Programming Language :: Python :: 3",
+  "Topic :: Office/Business",
+  "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/cbam-mcp"
+Issues = "https://github.com/Keremozdemirra/cbam-mcp/issues"
+
+[project.scripts]
+cbam-mcp = "cbam_mcp.main:main"
+
+[tool.setuptools]
+packages = ["cbam_mcp"]
+
+[tool.setuptools.package-data]
+cbam_mcp = ["data/*.json", "data/SOURCES.md"]

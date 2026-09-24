@@ -22,38 +22,35 @@ from . import VERSION
 from . import factors as F
 from . import protocol
 from . import provenance as P
-
-
-def _print(text: str = "") -> None:
-    print(text)
+from .refresh import plain
 
 
 def _value(v) -> str:
-    return "blank (not published)" if v is None else F._plain(Decimal(repr(v)))
+    return "blank (not published)" if v is None else plain(Decimal(repr(v)))
 
 
 def _attribution(result: dict) -> None:
     for line in result.get("attribution") or []:
-        _print(line)
+        print(line)
 
 
 def render_search(r: dict) -> None:
     q = r["query"]
     filters = ", ".join(f"{k} {q[k]}" for k in ("scope", "unit") if q.get(k))
-    _print(f"DESNZ {q['year']} (UK): {r['returned']} of {r['matches']} matches for {q['text']!r}"
-           + (f" ({filters})" if filters else ""))
+    print(f"DESNZ {q['year']} (UK): {r['returned']} of {r['matches']} matches for {q['text']!r}"
+          + (f" ({filters})" if filters else ""))
     for x in r["results"]:
-        _print("")
-        _print(f"{x['factor_id']}  {x['scope']}  {x['name']}")
+        print("")
+        print(f"{x['factor_id']}  {x['scope']}  {x['name']}")
         line = f"    {_value(x['value'])} {x['unit'] if x['value'] is not None else ''}".rstrip()
         gases = x.get("gases") or {}
         if gases:
             line += "   " + ", ".join(f"{g} {_value(v['value'])}" for g, v in gases.items())
-        _print(line)
+        print(line)
         for n in x.get("notes", []):
-            _print(f"    note: {n}")
-    _print("")
-    _print(r["note"])
+            print(f"    note: {n}")
+    print("")
+    print(r["note"])
     _attribution(r)
 
 
@@ -62,77 +59,79 @@ def render_factor(r: dict) -> None:
         render_grid(r)
         return
     if not r.get("found"):
-        _print(r.get("reason", "not found"))
+        print(r.get("reason", "not found"))
         return
-    _print(f"{r['factor_id']}  {r['scope']}  {r['name']}")
-    _print(f"value: {_value(r['value'])} {r['unit'] if r['value'] is not None else ''}".rstrip())
+    print(f"{r['factor_id']}  {r['scope']}  {r['name']}")
+    print(f"value: {_value(r['value'])} {r['unit'] if r['value'] is not None else ''}".rstrip())
     for g, v in (r.get("gases") or {}).items():
-        _print(f"  {g}: {_value(v['value'])} {v['unit']}  ({v['factor_id']})")
+        print(f"  {g}: {_value(v['value'])} {v['unit']}  ({v['factor_id']})")
     if r.get("total"):
-        _print(f"  total: {_value(r['total']['value'])} {r['total']['unit']}  ({r['total']['factor_id']})")
+        print(f"  total: {_value(r['total']['value'])} {r['total']['unit']}  ({r['total']['factor_id']})")
     for o in r.get("same_id_other_years", []):
         change = f", {o['change_to_this_year_pct']:+.2f}% to {r['year']}" if "change_to_this_year_pct" in o else ""
-        _print(f"  {o['factor_id']}: {_value(o['value'])} {o['unit']}{change}")
+        print(f"  {o['factor_id']}: {_value(o['value'])} {o['unit']}{change}")
     for n in r.get("notes", []):
-        _print(f"note: {n}")
+        print(f"note: {n}")
     _attribution(r)
 
 
 def render_convert(r: dict) -> None:
-    _print(f"{r['result']['value_text']} {r['result']['unit']}")
-    _print(f"  {r['arithmetic']}")
+    print(f"{r['result']['value_text']} {r['result']['unit']}")
+    print(f"  {r['arithmetic']}")
     for g, v in (r.get("gases") or {}).items():
-        _print(f"  {g}: {v['arithmetic']}")
+        print(f"  {g}: {v['arithmetic']}")
     if r.get("gases_note"):
-        _print(f"  {r['gases_note']}")
-    _print(f"factor: {r['factor']['factor_id']}  {r['factor'].get('name') or r['factor'].get('area')}")
-    _print(r["derived"])
+        print(f"  {r['gases_note']}")
+    print(f"factor: {r['factor']['factor_id']}  {r['factor'].get('name') or r['factor'].get('area')}")
+    print(r["derived"])
     for n in r.get("notes", []):
-        _print(f"note: {n}")
+        print(f"note: {n}")
     _attribution(r)
 
 
 def render_grid(r: dict) -> None:
     for a in r.get("answers", [r]):
         if not a.get("found"):
-            _print(a.get("reason", "not found"))
+            print(a.get("reason", "not found"))
             for n in a.get("nearest_years_with_value", []):
-                _print(f"  nearest with a value: {n['year']}: {n['value']} ({n['factor_id']})")
+                print(f"  nearest with a value: {n['year']}: {n['value']} ({n['factor_id']})")
             if a.get("did_you_mean"):
-                _print("  did you mean: " + ", ".join(a["did_you_mean"]))
-            _print("")
+                print("  did you mean: " + ", ".join(a["did_you_mean"]))
+            if a.get("nearest_years_with_value"):
+                _attribution(a)
+            print("")
             continue
-        _print(f"{a['factor_id']}  {a['area']} {a['year']}: {a['value_text']} {a['unit']}"
-               f" (= {_value(a['kg_per_kwh'])} kg per kWh)  ({a['source']})")
-        _print(f"basis: {a['basis']}")
-        _print(a["scope2"])
+        print(f"{a['factor_id']}  {a['area']} {a['year']}: {a['value_text']} {a['unit']}"
+              f" (= {_value(a['kg_per_kwh'])} kg per kWh)  ({a['source']})")
+        print(f"basis: {a['basis']}")
+        print(a["scope2"])
         if a.get("see_also"):
             s = a["see_also"]
-            _print(f"see also: {s['factor_id']} = {_value(s['value'])} {s['unit']}. {s['note']}")
+            print(f"see also: {s['factor_id']} = {_value(s['value'])} {s['unit']}. {s['note']}")
         if a.get("other_areas_matching"):
-            _print("other areas matching: " + ", ".join(a["other_areas_matching"]))
+            print("other areas matching: " + ", ".join(a["other_areas_matching"]))
         for n in a.get("notes", []):
-            _print(f"note: {n}")
+            print(f"note: {n}")
         _attribution(a)
-        _print("")
+        print("")
     if r.get("note"):
-        _print(r["note"])
+        print(r["note"])
 
 
 def render_sources(r: dict) -> None:
     for s in r["sources"]:
-        _print(f"{s['id']}: {s['name']}")
-        _print(f"  licence: {s['licence']}  {s.get('licence_url') or s.get('terms_url')}")
-        _print(f"  retrieved {s['retrieved']}, {s['rows']} rows, raw file sha256 {s['raw_sha256']}")
-        _print(f"  {s['raw_url']}")
-        _print(f"  cite: {s['attribution']}")
-    _print("")
-    _print("Not included, on licence grounds:")
+        print(f"{s['id']}: {s['name']}")
+        print(f"  licence: {s['licence']}  {s.get('licence_url') or s.get('terms_url')}")
+        print(f"  retrieved {s['retrieved']}, {s['rows']} rows, raw file sha256 {s['raw_sha256']}")
+        print(f"  {s['raw_url']}")
+        print(f"  cite: {s['attribution']}")
+    print("")
+    print("Not included, on licence grounds:")
     for x in r["excluded"]:
-        _print(f"  {x['source']}: {x['reason']} ({x['evidence_url']}, checked {x['checked']})")
-    _print("")
-    _print(r["scope2"]["location_based"])
-    _print(f"snapshot: {r['data_dir']}")
+        print(f"  {x['source']}: {x['reason']} ({x['evidence_url']}, checked {x['checked']})")
+    print("")
+    print(r["scope2"]["location_based"])
+    print(f"snapshot: {r['data_dir']}")
 
 
 def _checkout_data_dir() -> Path | None:
@@ -154,7 +153,11 @@ def cmd_refresh(args) -> int:
     if only and not only <= valid:
         print(f"refresh: --only takes {', '.join(sorted(valid))}", file=sys.stderr)
         return 2
-    report = R.refresh(out, only=only, years=tuple(args.years))
+    try:
+        report = R.refresh(out, only=only, years=tuple(args.years))
+    except OSError as e:
+        print(f"refresh: cannot write the snapshot in {out}: {e}", file=sys.stderr)
+        return 2
     for key, m in report["ok"].items():
         print(f"{key}: ok, {m['rows']} rows, raw sha256 {m['raw_sha256'][:16]}..., retrieved {m['retrieved']}")
     for key, why in report["failed"].items():

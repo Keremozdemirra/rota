@@ -1,0 +1,3 @@
+position_id,counterparty,asset_class,currency,outstanding,denominator_basis,denominator,scope1_tco2e,scope2_tco2e,dq_score
+SG,Singapore (PCAF Table 10.3-2),sovereign_debt,USD,1000000,ppp_adjusted_gdp,579762000000,61451586,,1
+HK,Hong Kong (PCAF Table 10.3-2),sovereign_debt,USD,1000000,ppp_adjusted_gdp,469182000000,42654105,,1

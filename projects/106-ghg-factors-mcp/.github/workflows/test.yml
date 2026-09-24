@@ -1,0 +1,24 @@
+name: test
+
+# Offline: recorded fixtures only, no network, no token.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tests -v
+      # The installed wheel must carry the snapshot: answer from outside the checkout.
+      - run: pip install . && cd "$RUNNER_TEMP" && ghg-factors-mcp get desnz-2026:1_101_1011_8_1

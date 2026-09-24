@@ -225,14 +225,9 @@ def describe(snapshot: Snapshot, subsector, gas: str, level: str) -> dict:
     """
     sub = subsector if isinstance(subsector, str) and SLUG.match(subsector) else None
     leads = snapshot.data_leads(sub) if sub else None
-    ext = []
-    for key, scope, wording in TERMS_SUBSECTORS.get(sub or "", []):
-        if level == "source" and scope == _COUNTRY:
-            continue
-        d = external_dataset(key)
-        d["scope"] = scope
-        d["terms_page_wording"] = wording
-        ext.append(d)
+    ext = [{"dataset": key, "scope": scope, "terms_page_wording": wording}
+           for key, scope, wording in TERMS_SUBSECTORS.get(sub or "", [])
+           if not (level == "source" and scope == _COUNTRY)]
     lead_names = [lead["name"] for lead in leads or []]
     edgar_in_terms = any(d["dataset"] == "EDGAR" for d in ext)
     edgar_lead = any(n.strip().upper() == "EDGAR" for n in lead_names)
@@ -257,24 +252,38 @@ def describe(snapshot: Snapshot, subsector, gas: str, level: str) -> dict:
 
     out = {"subsector": sub, "sector": snapshot.sector_of(sub) if sub else None, "label": label,
            "data_leads": leads, "data_leads_as_of": snapshot.retrieved if leads is not None else None,
-           "external_datasets": ext}
-    if ext:
-        out["licence"] = ("Climate TRACE's CC BY 4.0 excludes the external datasets listed here; their own terms "
-                          "apply to the parts that come from them (%s)" % TERMS_URL)
-    else:
-        out["licence"] = LICENCE_NAME
-    gas_info = GASES.get(gas, {})
-    if (edgar_in_terms or edgar_lead) and gas_info.get("includes_co2"):
-        who = "Climate TRACE's terms name EDGAR" if edgar_in_terms else "The API names EDGAR as a data lead"
-        out["non_commercial_terms_may_apply"] = True
-        out["licence_note"] = (
-            "%s for this subsector. EDGAR licenses its CO2 data (IEA-EDGAR CO2) under CC BY-NC-ND 4.0 "
-            "(non-commercial, no derivatives); its other EU-owned data are CC BY 4.0 (%s, checked %s). If this "
-            "figure includes CO2 taken from EDGAR, non-commercial terms may apply to that part: check before "
-            "commercial use." % (who, EXTERNAL["EDGAR"]["licence_source"], CHECKED))
-    else:
-        out["non_commercial_terms_may_apply"] = False
+           "external_datasets": ext,
+           "licence": ("Climate TRACE's CC BY 4.0 excludes the external datasets listed here; their own terms apply "
+                       "to the parts that come from them" if ext else LICENCE_NAME),
+           "non_commercial_terms_may_apply": bool((edgar_in_terms or edgar_lead) and GASES.get(gas, {}).get("includes_co2"))}
+    if out["non_commercial_terms_may_apply"]:
+        out["edgar_named_by"] = "Climate TRACE terms" if edgar_in_terms else "API data lead"
     return out
+
+
+def dataset_terms(described) -> dict:
+    """Licence details, once per answer, for every external dataset the described subsectors name."""
+    keys = []
+    for d in described:
+        for e in d.get("external_datasets") or []:
+            if e["dataset"] not in keys:
+                keys.append(e["dataset"])
+    return {k: external_dataset(k) for k in keys}
+
+
+def licence_note(described) -> str | None:
+    """The EDGAR non-commercial note for the flagged subsectors among `described`, or None."""
+    flagged = sorted(d["subsector"] for d in described if d.get("non_commercial_terms_may_apply") and d.get("subsector"))
+    if not flagged:
+        return None
+    return edgar_note("Climate TRACE names EDGAR (in its terms or as a data lead) for: " + ", ".join(flagged))
+
+
+def edgar_note(who: str) -> str:
+    return ("%s. EDGAR licenses its CO2 data (IEA-EDGAR CO2) under CC BY-NC-ND 4.0 (non-commercial, no "
+            "derivatives); its other EU-owned data are CC BY 4.0 (%s, checked %s). If a figure includes CO2 taken "
+            "from EDGAR, non-commercial terms may apply to that part: check before commercial use."
+            % (who, EXTERNAL["EDGAR"]["licence_source"], CHECKED))
 
 
 def openapi_version(text: str):

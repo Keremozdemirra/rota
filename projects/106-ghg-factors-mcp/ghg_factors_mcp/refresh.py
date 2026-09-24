@@ -21,11 +21,12 @@ import math
 import os
 import re
 import tempfile
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
-from pathlib import Path
 from decimal import Decimal
+from pathlib import Path
 from typing import Callable
 
 from . import VERSION
@@ -71,6 +72,9 @@ def fetch(url: str, max_bytes: int, timeout: float = 90.0) -> tuple[bytes, dict]
                                                "Accept-Encoding": "identity"})
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
+            final = urllib.parse.urlsplit(r.geturl() or url)
+            if final.scheme != "https":  # urllib follows redirects; a downgrade to http is not followed through
+                raise RefreshError(f"{parts.hostname} redirected to a non-https URL, refused")
             body = r.read(max_bytes + 1)
             headers = {k.lower(): v for k, v in r.headers.items()}
     except urllib.error.HTTPError as e:
@@ -92,6 +96,22 @@ def fetch(url: str, max_bytes: int, timeout: float = 90.0) -> tuple[bytes, dict]
     return body, headers
 
 
+MAX_LABEL = 200  # the longest label in the 2025 and 2026 files is 55 characters
+
+
+def _label_text(value: str, what: str) -> str:
+    """A table cell as it will reach an agent: no control characters, single spaces, bounded length.
+
+    The cells are labels from a government table, but they end up in a model's
+    context, so anything that does not look like a label is refused here.
+    """
+    text = "".join(ch for ch in value if unicodedata.category(ch) not in ("Cc", "Cf"))
+    text = " ".join(text.split())
+    if len(text) > MAX_LABEL:
+        raise RefreshError(f"{what}: a {len(text)}-character cell where a label is expected, refused")
+    return text
+
+
 def _text(body: bytes, what: str) -> str:
     try:
         return body.decode("utf-8-sig")
@@ -107,7 +127,8 @@ def desnz_attachment(api_body: bytes, year: int) -> dict:
         doc = json.loads(_text(api_body, "GOV.UK Content API response"))
     except json.JSONDecodeError:
         raise RefreshError("GOV.UK Content API response is not JSON") from None
-    attachments = doc.get("details", {}).get("attachments") if isinstance(doc, dict) else None
+    details = doc.get("details") if isinstance(doc, dict) else None
+    attachments = details.get("attachments") if isinstance(details, dict) else None
     if not isinstance(attachments, list):
         raise RefreshError("GOV.UK Content API response has no attachment list")
     flat = [a for a in attachments if isinstance(a, dict) and "flat file" in str(a.get("title", "")).lower()
@@ -166,7 +187,7 @@ def parse_desnz(data: bytes, year: int) -> tuple[list[dict], dict]:
     cols = [header.index(h) for h in _DESNZ_HEADER] + factor_cols
     out, seen, odd = [], set(), 0
     for row in sheets[sheet][start + 1:]:
-        cells = [((row[i] if i < len(row) else None) or "").strip() for i in cols]
+        cells = [_label_text((row[i] if i < len(row) else None) or "", f"DESNZ {year} flat file") for i in cols]
         if not cells[0]:
             continue  # blank lines and the closing END marker
         if not _SAFE_ID.match(cells[0]):
@@ -211,7 +232,7 @@ def parse_ember(data: bytes) -> tuple[list[dict], dict]:
             raw += 1
             if (r.get("Electricity source") or "").strip() != "Total generation":
                 continue
-            row = {dst: (r.get(src) or "").strip() for src, dst in _EMBER_REQUIRED.items()}
+            row = {dst: _label_text(r.get(src) or "", "Ember CSV") for src, dst in _EMBER_REQUIRED.items()}
             if not row["area"] or not re.fullmatch(r"\d{4}", row["year"]):
                 raise RefreshError(f"Ember CSV row {raw}: area or year missing")
             for k in ("intensity_gco2e_per_kwh", "emissions_mtco2e", "generation_twh"):
@@ -357,6 +378,8 @@ def refresh(out: Path, only: set[str] | None = None, years: tuple[int, ...] = P.
             manifest["sources"][key] = ok[key] = job()
         except RefreshError as e:
             failed[key] = str(e)
+        except Exception as e:  # one source's surprise must not stop the others or leave a traceback
+            failed[key] = f"unexpected {type(e).__name__}: {e}"
     manifest["schema"] = 1
     manifest["generated_by"] = f"ghg-factors-mcp {VERSION} refresh"
     manifest["sources"] = dict(sorted(manifest["sources"].items()))
@@ -383,7 +406,8 @@ def sources_markdown(manifest: dict) -> str:
                   f"- Licence: {P.DESNZ['licence']}, {P.DESNZ['licence_url']}",
                   f"- Terms (GOV.UK footer): \"{P.DESNZ['terms_quote']}\"",
                   f"- Attribution: {P.DESNZ['attribution_statement']}",
-                  f"- Retrieved: {m.get('retrieved')}; SHA-256 of the raw XLSX: `{m.get('raw_sha256')}` ({m.get('raw_bytes')} bytes)",
+                  f"- Retrieved: {m.get('retrieved')}; SHA-256 of the raw XLSX: `{m.get('raw_sha256')}`"
+                  f" ({m.get('raw_bytes')} bytes)",
                   f"- Snapshot: `{m.get('file')}`, {m.get('rows')} rows, {m.get('rows_with_value')} with a value"
                   " (the others are published blank)", ""]
     if "ember" in src:
@@ -393,7 +417,8 @@ def sources_markdown(manifest: dict) -> str:
                   f"- Last-Modified header: {m.get('last_modified')}",
                   f"- Licence: {P.EMBER['licence']}, {P.EMBER['licence_url']}; terms {P.EMBER['terms_url']}",
                   f"- Terms: \"{P.EMBER['terms_quote']}\"",
-                  f"- Retrieved: {m.get('retrieved')}; SHA-256 of the raw CSV: `{m.get('raw_sha256')}` ({m.get('raw_bytes')} bytes)",
+                  f"- Retrieved: {m.get('retrieved')}; SHA-256 of the raw CSV: `{m.get('raw_sha256')}`"
+                  f" ({m.get('raw_bytes')} bytes)",
                   f"- Snapshot: `{m.get('file')}`, {m.get('rows')} rows (the 'Total generation' rows of"
                   f" {m.get('raw_rows')}), {m.get('areas')} areas, years with a value {m.get('years')};"
                   " columns kept: area, ISO 3 code, area type, year, emissions intensity, emissions, generation", ""]
@@ -405,7 +430,8 @@ def sources_markdown(manifest: dict) -> str:
                   "- Kept: the yearly figures only (g CO2 per kWh). Page texts and graphics are CC BY-NC-ND 4.0"
                   " and are not copied.",
                   f"- Retrieved: {m.get('retrieved')}; SHA-256 of the page as retrieved: `{m.get('raw_sha256')}`"
-                  f" ({m.get('raw_bytes')} bytes; the page is re-rendered often, so the hash identifies this retrieval only)",
+                  f" ({m.get('raw_bytes')} bytes; the page is re-rendered often, so the hash identifies"
+                  " this retrieval only)",
                   f"- Snapshot: `{m.get('file')}`, {m.get('rows')} values, years {m.get('years')}", ""]
     lines += ["## Not included, on licence grounds", ""]
     for x in P.EXCLUDED:

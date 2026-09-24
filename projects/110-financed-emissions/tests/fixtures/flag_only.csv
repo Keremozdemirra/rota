@@ -1,0 +1,2 @@
+position_id,counterparty,asset_class,currency,outstanding,denominator,scope1_tco2e,scope2_tco2e,dq_score
+M1,Mortgage 1 (fictional),mortgage,EUR,315000,300000,3.4,0.9,3
