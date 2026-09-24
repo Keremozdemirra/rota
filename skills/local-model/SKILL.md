@@ -1,6 +1,6 @@
 ---
 name: local-model
-description: Runs footwork on local Ollama models (Qwen3.6, Qwen3.8, Qwen3-Coder) instead of the Max subscription, nothing leaves the machine. Use for bulk or mechanical text jobs: summarising many files, classifying, tagging, translation drafts, data generation, first-pass rewrites, census notes. "yerel modelle yap", "qwen ile", "kotayi harcama", "run this locally", "offload to the local model". Not for decisions, anything touching money, credentials or legal text, or a final answer Kerem will publish; those stay on Claude.
+description: Sends mechanical text work to local Ollama models (Qwen3.6 fast, Qwen3.8 careful, Qwen3-Coder) so it never reaches the Max plan; nothing leaves the machine. Use without being asked whenever the job is footwork over material not yet in context: summarising three or more files, classifying or tagging a list, pulling fields from many records, a translation draft, a boilerplate or test-scaffold draft, census notes. Also on "yerel modelle yap", "qwen ile", "kotayi harcama", "run this locally". Not for decisions, money, credentials, legal text, anything published, or work needing tools or the web; those stay on Claude. Model policy: ~/agents/MODELS.md.
 ---
 
 # Local model
