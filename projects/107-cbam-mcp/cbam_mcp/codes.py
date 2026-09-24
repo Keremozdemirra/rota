@@ -13,7 +13,7 @@ import unicodedata
 # "7208-51-20", and the no-break or thin spaces that EU documents put there.
 _SEPARATORS = re.compile(r"[\s.\-   ]+")
 _PREFIX = re.compile(r"^(?:cn|hs|taric)\s*:?\s*", re.IGNORECASE)
-_EX = re.compile(r"^ex\b\s*", re.IGNORECASE)
+_EX = re.compile(r"^ex\s*(?=[0-9])", re.IGNORECASE)
 _ASCII_DIGITS = re.compile(r"[0-9]+")
 
 
@@ -111,29 +111,42 @@ ISO_BY_TABLE_NAME = {
     "Viet Nam": "VN", "Yemen": "YE", "Zambia": "ZM", "Zimbabwe": "ZW",
 }
 
-# Other names people use for the same countries. Keys are matched after
-# country_key(), so case, accents and apostrophes do not matter.
-ALIASES = {
-    "turkey": "Türkiye", "republic of turkiye": "Türkiye",
-    "south korea": "Korea, Republic of (South Korea)", "korea": "Korea, Republic of (South Korea)",
-    "republic of korea": "Korea, Republic of (South Korea)",
-    "north korea": "North Korea (Democratic People's Republic of Korea)",
-    "dprk": "North Korea (Democratic People's Republic of Korea)",
-    "russia": "Russian Federation", "iran": "Iran, Islamic Republic of",
-    "moldova": "Moldova, Republic of", "tanzania": "Tanzania, United Republic of",
-    "vietnam": "Viet Nam", "cote d'ivoire": "Ivory Coast", "cote divoire": "Ivory Coast",
-    "democratic republic of the congo": "Congo, Democratic Republic of",
-    "dr congo": "Congo, Democratic Republic of", "drc": "Congo, Democratic Republic of",
-    "republic of the congo": "Congo", "congo brazzaville": "Congo",
-    "lao pdr": "Laos", "lao people's democratic republic": "Laos",
-    "brunei darussalam": "Brunei", "swaziland": "Eswatini", "macedonia": "North Macedonia",
-    "uae": "United Arab Emirates", "uk": "United Kingdom", "great britain": "United Kingdom",
-    "usa": "United States", "united states of america": "United States", "us": "United States",
-    "syrian arab republic": "Syria", "new caledonia": "New Caledonia and dependencies",
-    "bolivia (plurinational state of)": "Bolivia", "venezuela (bolivarian republic of)": "Venezuela",
-    "other": "Other Countries and Territories", "other countries": "Other Countries and Territories",
-    "other countries and territories": "Other Countries and Territories",
+# Other names for the same countries, from the English labels of the EU country
+# authority table (EU Vocabularies, http://publications.europa.eu/resource/authority/country,
+# read through the CELLAR SPARQL endpoint on 2026-09-24), leaving out demonyms and former
+# states. Keys are matched after country_key(), so case, accents and apostrophes do not matter.
+AUTHORITY_ALIASES = {
+    "People’s Republic of China": "China",
+    "Republic of Korea": "Korea, Republic of (South Korea)", "South Korea": "Korea, Republic of (South Korea)",
+    "ROK": "Korea, Republic of (South Korea)",
+    "Democratic People’s Republic of Korea": "North Korea (Democratic People's Republic of Korea)",
+    "North Korea": "North Korea (Democratic People's Republic of Korea)",
+    "DPRK": "North Korea (Democratic People's Republic of Korea)",
+    "United Kingdom of Great Britain and Northern Ireland": "United Kingdom", "UK": "United Kingdom",
+    "United States of America": "United States", "US": "United States", "USA": "United States",
+    "Turkey": "Türkiye", "Republic of Türkiye": "Türkiye", "Republic of Turkey": "Türkiye",
+    "Democratic Republic of the Congo": "Congo, Democratic Republic of",
+    "Congo-Kinshasa": "Congo, Democratic Republic of",
+    "Republic of the Congo": "Congo", "Congo-Brazzaville": "Congo",
+    "Côte d’Ivoire": "Ivory Coast", "Republic of Côte d’Ivoire": "Ivory Coast",
+    "Iran": "Iran, Islamic Republic of", "Islamic Republic of Iran": "Iran, Islamic Republic of",
+    "Moldova": "Moldova, Republic of", "Republic of Moldova": "Moldova, Republic of",
+    "Russia": "Russian Federation", "Syrian Arab Republic": "Syria",
+    "Tanzania": "Tanzania, United Republic of", "United Republic of Tanzania": "Tanzania, United Republic of",
+    "Vietnam": "Viet Nam", "Socialist Republic of Viet Nam": "Viet Nam",
+    "Lao People’s Democratic Republic": "Laos", "Lao": "Laos",
+    "Czech Republic": "Czechia", "Slovak Republic": "Slovakia", "Kingdom of the Netherlands": "Netherlands",
 }
+# This tool's own additions: common abbreviations and names that table does not list.
+TOOL_ALIASES = {
+    "PRC": "China", "S. Korea": "Korea, Republic of (South Korea)", "UAE": "United Arab Emirates",
+    "DRC": "Congo, Democratic Republic of", "DR Congo": "Congo, Democratic Republic of",
+    "Brunei Darussalam": "Brunei", "Swaziland": "Eswatini", "New Caledonia": "New Caledonia and dependencies",
+}
+# Asking for the fallback table by name: the only way to get its values for a country
+# the tables do not list (Annex I rule quoted in legal.RULE_NOT_LISTED).
+OTHER_ALIASES = {"Other": "Other Countries and Territories", "Other countries": "Other Countries and Territories",
+                 "Other countries and territories": "Other Countries and Territories"}
 
 
 def country_key(text: str) -> str:
@@ -169,8 +182,9 @@ def resolve_country(value, table_names, extra: dict | None = None) -> tuple[str 
         for name, info in (extra or {}).items():
             if isinstance(info, dict) and info.get("iso") == code:
                 return name, []
-    alias = ALIASES.get(key)
-    if alias and alias in names:
-        return alias, []
+    for table in (AUTHORITY_ALIASES, TOOL_ALIASES, OTHER_ALIASES):
+        alias = next((v for k, v in table.items() if country_key(k) == key), None)
+        if alias and alias in names:
+            return alias, []
     close = difflib.get_close_matches(key, list(by_key), n=3, cutoff=0.75)
     return None, [by_key[k] for k in close]

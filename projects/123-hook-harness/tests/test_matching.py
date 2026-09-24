@@ -208,7 +208,8 @@ class PathRules(unittest.TestCase):
         self.assertTrue(hh.rule_fires("Write(//**/*mcp*.json)", "Write", {"file_path": "/p/.mcp.json"}, self.CTX).fires)
 
     def test_grep_and_glob_default_to_the_working_directory(self):
-        self.assertTrue(hh.rule_fires("Grep(/**)", "Grep", {"pattern": "x"}, self.CTX).fires)
+        self.assertTrue(hh.rule_fires("Grep(//p)", "Grep", {"pattern": "x"}, self.CTX).fires)
+        self.assertFalse(hh.rule_fires("Grep(//q)", "Grep", {"pattern": "x"}, self.CTX).fires)
 
 
 class OtherTools(unittest.TestCase):

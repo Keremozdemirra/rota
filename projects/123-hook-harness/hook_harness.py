@@ -1492,8 +1492,12 @@ def substitute(text: str, values: dict, powershell: bool = False) -> str:
 _USER_CONFIG = re.compile(r"\$\{user_config\.([A-Za-z0-9_.-]+)\}")
 
 
+HARNESS_GAP = "cannot emulate here: "
+
+
 def spawn_plan(h: Handler, values: dict, user_config: dict, plugin: bool) -> tuple[list | None, str | None]:
-    """The argv Claude Code would start for a command handler (hooks docs, "Exec form and shell form")."""
+    """The argv Claude Code would start for a command handler (hooks docs, "Exec form and shell form"). A reason
+    starting with HARNESS_GAP is a limit of this run; any other reason is a failure Claude Code would meet too."""
     spec = h.spec
     command = spec.get("command")
     if not isinstance(command, str) or not command.strip():
@@ -1515,7 +1519,8 @@ def spawn_plan(h: Handler, values: dict, user_config: dict, plugin: bool) -> tup
         try:
             exe, rest = sub(command), [sub(a) for a in args]
         except KeyError as e:
-            return None, f"${{user_config.{e.args[0]}}} has no value (give it under \"user_config\" in the cases file)"
+            return None, (f"{HARNESS_GAP}${{user_config.{e.args[0]}}} has no value (give it under \"user_config\" in the "
+                          "cases file)")
         found = exe if os.path.sep in exe or (os.altsep and os.altsep in exe) else shutil.which(exe)
         if not found:
             return None, f"exec form: {exe!r} is not an executable on PATH, so the spawn fails"
@@ -1527,7 +1532,7 @@ def spawn_plan(h: Handler, values: dict, user_config: dict, plugin: bool) -> tup
     if shell == "powershell" or (os.name == "nt" and shell != "bash" and not _git_bash()):
         ps = shutil.which("pwsh") or shutil.which("powershell")
         if not ps:
-            return None, "a PowerShell hook, and neither pwsh nor powershell is on PATH here"
+            return None, f"{HARNESS_GAP}a PowerShell hook, and neither pwsh nor powershell is on PATH"
         return [ps, "-NoProfile", "-NonInteractive", "-Command", substitute(command, values, True)], None
     if os.name == "nt":
         return [_git_bash(), "-c", substitute(command, values)], None
@@ -2006,8 +2011,9 @@ def run_case(src: Source, suite: Suite, case: dict, opts: Options, workdir: Path
             reading = read_run(event, run, bool(c.handler.spec.get("async")))
             res.runs.append((c, run, reading))
             readings.append(reading)
-            if run.error and ("PowerShell" in run.error or "user_config" in run.error or "PATH" in run.error):
-                res.errors.append(f"{c.handler.label}: {run.error}")
+            if run.error and run.error.startswith(HARNESS_GAP):
+                res.errors.append(f"{c.handler.label}: {run.error[len(HARNESS_GAP):]}")
+                continue
         res.decision = combine(event, readings)
         reasons = [x for r in readings for x in r.reasons]
         contexts = [x for r in readings for x in r.contexts]
@@ -2023,6 +2029,8 @@ def run_case(src: Source, suite: Suite, case: dict, opts: Options, workdir: Path
             res.checks.append(("max_duration", f"<= {expect['max_duration']:g} s", f"{res.duration:.2f} s",
                                res.duration <= expect["max_duration"]))
         for c, run, reading in res.runs:
+            if run.error and run.error.startswith(HARNESS_GAP):
+                continue
             for sev, msg in reading.problems:
                 if sev == "error" or (sev == "warning" and opts.strict):
                     res.checks.append(("output", f"{c.handler.label} valid for {event}", msg, False))

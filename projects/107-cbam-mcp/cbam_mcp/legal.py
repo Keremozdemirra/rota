@@ -6,11 +6,10 @@ the consolidated text of Regulation (EU) 2023/956 carries (de minimis threshold,
 Annex II and III lists) are not repeated here: `refresh` parses them from that
 text, so they always match the snapshot in use.
 
-Deliberately absent: the mark-up percentages. They are in the introductory part
-of Annex I as replaced by Implementing Regulation (EU) 2026/1740, but no
-consolidated text of Implementing Regulation (EU) 2025/2621 that includes them
-existed on 2026-09-24, and this tool only states such rules from consolidated
-text. Answers point to where the increase is set instead.
+The mark-up rule is not kept here either: `refresh` reads it from the consolidated
+text of Implementing Regulation (EU) 2025/2621 (02025R2621-20260101 on 2026-09-24,
+which includes Implementing Regulation (EU) 2026/1740 as M1) and answers quote it
+with that text's version. This tool quotes the rule and never applies it.
 """
 
 CHECKED = "2026-09-24"
@@ -68,7 +67,7 @@ RULE_NOT_LISTED = {
     "quote": "Where a country or territory is not explicitly listed, the default value for the respective good "
              "from the table “Other countries and territories” needs to be selected.",
     "citation": "Annex I (introductory part) to Implementing Regulation (EU) 2025/2621 as replaced by "
-                "Implementing Regulation (EU) 2026/1740",
+                "Implementing Regulation (EU) 2026/1740; same words in the consolidated text 02025R2621-20260101",
     "checked": CHECKED,
 }
 RULE_NO_VALUE = {
@@ -76,7 +75,7 @@ RULE_NO_VALUE = {
              "shows “–”, the default value for the respective good from the table “Other "
              "countries and territories” needs to be selected.",
     "citation": "Annex I (introductory part) to Implementing Regulation (EU) 2025/2621 as replaced by "
-                "Implementing Regulation (EU) 2026/1740",
+                "Implementing Regulation (EU) 2026/1740; same words in the consolidated text 02025R2621-20260101",
     "checked": CHECKED,
 }
 
@@ -100,7 +99,17 @@ NO_ROUTE = {
     "quote": "If no production route is indicated for a CN code, the CBAM benchmark (BM) is independent of the "
              "production route.",
     "citation": "Annex I (introductory part) to Implementing Regulation (EU) 2025/2621 as replaced by "
-                "Implementing Regulation (EU) 2026/1740",
+                "Implementing Regulation (EU) 2026/1740; same words in the consolidated text 02025R2621-20260101",
+    "checked": CHECKED,
+}
+
+HS_GROUP_ROUTE = {
+    "quote": "If a production route is indicated for a group of CN codes at HS code level (i.e. with 4 or 6 digits) "
+             "and the CBAM BM as defined in Implementing Regulation (EU) 2025/2620 for one or more of the CN codes at "
+             "8-digit level in that group has no production route, the CBAM BM for the concerned CN code is "
+             "independent of the production route.",
+    "citation": "Annex I (introductory part) to Implementing Regulation (EU) 2025/2621 as replaced by "
+                "Implementing Regulation (EU) 2026/1740; same words in the consolidated text 02025R2621-20260101",
     "checked": CHECKED,
 }
 
@@ -111,11 +120,10 @@ DIRECT_INDIRECT_FOR_INFORMATION = {
     "checked": CHECKED,
 }
 
-MARKUP_POINTER = (
-    "Values as listed in the table. For the calculation of the number of CBAM certificates, the introductory "
-    "part of Annex I (as replaced by Implementing Regulation (EU) 2026/1740) says the 'total emissions' value "
-    "is selected and increased; this tool does not apply or state that increase."
-)
+MARKUP_NOTE = ("Values as listed, before the mark-up. The rule is quoted in markup_rule from the consolidated "
+               "text named there; this tool quotes it and does not apply it.")
+MARKUP_MISSING = ("Values as listed, before the mark-up that the introductory part of Annex I sets; the rule could "
+                  "not be read from the consolidated text at the last refresh.")
 
 ANNEX_IV_USE = {
     "quote": "By way of derogation from paragraph 2, where a country of production cannot be identified for a "
@@ -181,27 +189,46 @@ CN_DATASET = {
 
 # --------------------------------------------------------------- licences
 
+# Licence basis (standards point 16). The EUR-Lex legal notice answers HTTP 202 with an
+# empty body to curl from the build sandbox; it was read on 2026-09-24 through the
+# WebFetch tool, and Decision 2011/833/EU from CELLAR (celex 32011D0833) the same day.
 LICENCES = {
+    "eurlex": {
+        "name": "CC BY 4.0 (EUR-Lex legal notice: consolidated texts); EU legal documents re-usable "
+                "(EUR-Lex legal notice; Commission Decision 2011/833/EU, Article 4)",
+        "terms": "https://eur-lex.europa.eu/content/legal-notice/legal-notice.html",
+        "quote": "The copyright for the editorial content of this website, the summaries of EU legislation and the "
+                 "consolidated texts, which is owned by the EU, is licensed under the Creative Commons Attribution "
+                 "4.0 International licence.",
+        "quote_2": "Unless otherwise specified, you can re-use the legal documents published in EUR-Lex for "
+                   "commercial or non-commercial purposes.",
+        "read": "2026-09-24 through the WebFetch tool (curl from here got HTTP 202 with an empty body)",
+    },
+    "decision_2011_833": {
+        "name": "Commission Decision 2011/833/EU on the reuse of Commission documents, Article 4",
+        "terms": "http://data.europa.eu/eli/dec/2011/833/oj",
+        "quote": "All documents shall be available for reuse: (a) for commercial or non-commercial purposes under "
+                 "the conditions laid down in Article 6; (b) without charge, subject to the provisions laid down in "
+                 "Article 9; and (c) without the need to make an individual application, unless otherwise provided "
+                 "in Article 7.",
+        "read": "2026-09-24 from CELLAR, celex 32011D0833",
+    },
     "commission": {
-        "name": "CC BY 4.0",
+        "name": "CC BY 4.0 (the Commission legal notice that the CBAM page links as its legal notice); "
+                "Commission Decision 2011/833/EU, Article 4",
         "terms": "https://commission.europa.eu/legal-notice_en",
         "quote": "Unless otherwise indicated (e.g. in individual copyright notices), content owned by the EU on "
                  "this website is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) "
                  "licence. This means that reuse is allowed, provided appropriate credit is given and changes "
                  "are indicated.",
+        "read": "2026-09-24; the footer of taxation-customs.ec.europa.eu links this page as its legal notice",
     },
     "cn": {
         "name": "European Commission reuse notice (Commission Decision 2011/833/EU)",
         "terms": "http://data.europa.eu/eli/dec/2011/833/oj",
         "quote": "Licence of both distributions of the datasets combined-nomenclature-2025 and "
                  "combined-nomenclature-2026 on data.europa.eu: 'European Commission reuse notice'.",
-    },
-    "eurlex": {
-        "name": "EU legal acts from EUR-Lex/CELLAR; reuse conditions of CELLAR content on request",
-        "terms": "https://op.europa.eu/en/web/about-us/legal-notices/publications-office-of-the-european-union-copyright",
-        "quote": "If you need further information regarding copyright issues, including the conditions under "
-                 "which the content of the CELLAR, and of the EU Vocabularies may be re-used, please contact us "
-                 "at op-copyright@publications.europa.eu",
+        "read": "2026-09-24 from the data.europa.eu dataset metadata",
     },
 }
 
