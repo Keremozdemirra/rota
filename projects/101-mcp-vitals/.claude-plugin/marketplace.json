@@ -1,0 +1,15 @@
+{
+  "name": "mcp-vitals",
+  "description": "The mcp-vitals plugin: facts about an MCP server's repository and package before Claude adds it.",
+  "owner": {
+    "name": "Kerem Özdemir",
+    "url": "https://github.com/Keremozdemirra"
+  },
+  "plugins": [
+    {
+      "name": "mcp-vitals",
+      "source": "./",
+      "description": "Asks before Claude adds an MCP server whose repository is archived, abandoned, deprecated, gone or unlicensed, and checks the servers you already run."
+    }
+  ]
+}

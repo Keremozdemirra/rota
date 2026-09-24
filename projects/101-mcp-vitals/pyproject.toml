@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-vitals"
+version = "0.1.0"
+description = "Check the MCP servers you run: is the repository behind each one still maintained, licensed, pinned?"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [{ name = "Kerem Özdemir" }]
+keywords = ["mcp", "model-context-protocol", "mcp-server", "claude-code", "ai-agents", "supply-chain", "licence"]
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Keremozdemirra/mcp-vitals"
+Issues = "https://github.com/Keremozdemirra/mcp-vitals/issues"
+Census = "https://github.com/Keremozdemirra/agent-vitals"
+
+[project.scripts]
+mcp-vitals = "doctor:main"
+mcp-vitals-hook = "hook:main"
+
+[tool.setuptools]
+py-modules = ["doctor", "hook"]

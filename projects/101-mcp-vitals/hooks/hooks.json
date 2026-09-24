@@ -1,0 +1,30 @@
+{
+  "description": "mcp-vitals: check an MCP server before Claude adds it, and after Claude edits an MCP config.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(claude mcp add*)",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hook.py\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hook.py\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}
