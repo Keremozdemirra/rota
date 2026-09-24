@@ -86,10 +86,12 @@ MAX_RETRY_WAIT = 30.0
 GLEIF_PAGE_MAX = 200
 # Children returned per call, at most (tool's choice: three GLEIF pages).
 CHILDREN_MAX = 500
-# FIRDS records per request and requests per ISIN (tool's choice). Widely traded shares
-# had 54 to 92 current venue records on 2026-09-24, so one request is the normal case.
+# FIRDS records per request and requests per ISIN (tool's choice). Apple, SAP and Deutsche
+# Bank shares had 54 to 92 current venue records on 2026-09-24, so one request is the norm.
 FIRDS_ROWS = 500
 FIRDS_MAX_PAGES = 4
+# The FIRDS answer for Deutsche Bank's share was 69 KB; an answer past this size is not one
+# this tool asked for, and reading it would only cost memory (tool's choice).
 MAX_BODY = 8 * 1024 * 1024
 
 # ESMA legal notice, checked 2026-09-24 (ESMA_TERMS): "if the original material is

@@ -230,6 +230,14 @@ def parse_eu_legislation(value):
     return found, (", ".join(other) or None)
 
 
+def subject_to_phase_in(dp: dict):
+    """True when a phase-in column says something for this datapoint; None when the file has no such column."""
+    detail = dp.get("phase_in")
+    if detail is None:
+        return None
+    return any(not k.startswith("disclose_when") for k in detail)
+
+
 def list_date(sheets, table_sheets: set):
     """A 'Version: 28 August 2026' line in a sheet that is not a datapoint table, as an ISO date."""
     for sheet in sheets:
