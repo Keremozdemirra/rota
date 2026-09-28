@@ -138,6 +138,34 @@ class TerraformBackup(Base):
         self.assertEqual(code, 1)
         self.assertEqual(self.backup_dirs(), [])  # the state file written before it is gone too
 
+    def test_cli_args_do_not_reach_the_export(self):
+        # TF_CLI_ARGS_apply=-destroy makes the apply a destroy, and must not be added to `state pull`
+        self.fake_tool("terraform", [{"args": ["state", "pull"], "stdout": state_json()}, TF_VERSION])
+        cmd = "TF_CLI_ARGS='-no-color' TF_CLI_ARGS_apply='-destroy -auto-approve' terraform apply"
+        self.assertIsNotNone(self.hook(cmd))
+        code, _, err = self.cli("backup", "--cwd", str(self.project), "--", cmd)
+        self.assertEqual(code, 0, err)
+        env = self.calls("terraform")[0]["env"]
+        self.assertEqual((env["TF_CLI_ARGS"], env["TF_CLI_ARGS_apply"]), (None, None))
+        self.assertIsNone(self.hook(cmd))
+
+    def test_a_command_inside_a_credential_program(self):
+        self.fake_tool("terraform", [{"args": ["state", "pull"], "stdout": state_json()}, TF_VERSION])
+        code, _, err = self.cli("backup", "--cwd", str(self.project), "--", "aws-vault exec prod -- terraform destroy")
+        self.assertEqual(code, 0, err)
+        self.assertIn("runs inside `aws-vault exec prod --`", err)
+        self.assertIn("aws-vault exec prod -- ", err.split("instead")[0].split("run `")[-1])
+        self.assertIsNone(self.hook("aws-vault exec prod -- terraform destroy"))  # the same target
+
+    def test_state_push_and_workspace_delete_back_up_that_state(self):
+        self.fake_tool("terraform", [{"args": ["state", "pull"], "stdout": state_json()}, TF_VERSION])
+        self.assertEqual(self.backup("terraform workspace delete -force staging")[0], 0)
+        self.assertEqual(self.calls("terraform")[0]["env"]["TF_WORKSPACE"], "staging")
+        self.assertIsNone(self.hook("terraform workspace delete -force staging"))
+        self.assertIsNotNone(self.hook("terraform state push old.tfstate"))  # the default workspace: no backup
+        self.assertEqual(self.backup("terraform state push old.tfstate")[0], 0)
+        self.assertIsNone(self.hook("terraform state push -force old.tfstate"))
+
     def test_version_failure_is_not_a_backup_failure(self):
         self.fake_tool("terraform", [{"args": ["state", "pull"], "stdout": state_json()},
                                      {"args": ["version"], "stdout": "garbage"}])
@@ -165,6 +193,21 @@ class KubectlBackup(Base):
         self.assertIsNone(self.hook("kubectl delete deployment web --namespace=prod"))
         self.assertIsNotNone(self.hook("kubectl delete deployment web --namespace=staging"))
         self.assertIsNotNone(self.hook("kubectl --context other delete deployment web -n prod"))
+
+    def test_the_context_default_namespace_is_pinned_and_matched(self):
+        cfg = self.home / ".kube" / "config"
+        layout = ("apiVersion: v1\ncontexts:\n- context:\n    cluster: kind\n    namespace: {ns}\n    user: kind\n"
+                  "  name: kind-prod\ncurrent-context: kind-prod\nkind: Config\nusers: []\n")
+        cfg.write_text(layout.format(ns="prod"))
+        self.fake_tool("kubectl", [{"args": ["get", "deploy", "web"], "stdout": k8s_object("Deployment", "web", "prod")}])
+        code, _, err = self.backup("kubectl delete deploy web")
+        self.assertEqual(code, 0, err)
+        self.assertIn("--namespace=prod", self.calls("kubectl")[0]["args"])
+        self.assertIsNone(self.hook("kubectl delete deploy web"))
+        self.assertIsNone(self.hook("kubectl delete deploy web -n prod"))  # the same object
+        cfg.write_text(layout.format(ns="staging"))  # `kubens staging`: the same command now deletes staging/web
+        reason = self.hook("kubectl delete deploy web")["hookSpecificOutput"]["permissionDecisionReason"]
+        self.assertIn("in namespace staging (the context's default)", reason)
 
     def test_wrong_object_or_failure(self):
         cases = [({"stdout": k8s_object("Service", "web", "prod")}, "returned a Service, expected a Deployment"),

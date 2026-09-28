@@ -183,6 +183,25 @@ class Probe(Isolated):
         self.assertEqual([h["authorization"] for _, h, _ in web.requests], ["Bearer " + oauth])
         self.assertEqual(rep["probe"]["results"][0]["sources"], ["~" + os.sep + os.path.join(".config", "gh", "hosts.yml")])
 
+    def test_environment_tokens_stay_home_when_another_github_host_is_named(self):
+        # gh sends GH_TOKEN to a ghe.com GH_HOST; a GHES workflow's GITHUB_TOKEN belongs to GITHUB_SERVER_URL
+        for var, value in (("GH_HOST", "octo.ghe.com"), ("GITHUB_SERVER_URL", "https://ghe.corp.example"),
+                           ("GITHUB_API_URL", "https://ghe.corp.example/api/v3")):
+            os.environ[var] = value
+            code, rep, err, web = self.run_probe()
+            self.assertEqual(web.requests, [], var)
+            env = next(s for s in rep["sections"] if s["id"] == "environment")
+            self.assertIn(f"{var} names a host other than github.com", " ".join(env["notes"]))
+            del os.environ[var]
+        os.environ["GH_HOST"] = "github.com"
+        _, _, _, web = self.run_probe(401)
+        self.assertEqual(len(web.requests), 1)
+
+    def test_refresh_tokens_are_not_sent(self):
+        os.environ["GITHUB_TOKEN"] = self.tok = "ghr_" + rand(36)  # it cannot authenticate an API request
+        _, rep, _, web = self.run_probe()
+        self.assertEqual(web.requests, [])
+
     def test_nothing_to_probe_sends_nothing(self):
         del os.environ["GITHUB_TOKEN"]
         code, out, err, web = self.run_probe(argv=())

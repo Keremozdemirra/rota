@@ -6,8 +6,11 @@ import os
 import shutil
 import subprocess
 import sys
+import threading
+import time
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from support import Isolated, cr, synthetic, text_of  # noqa: E402
@@ -138,6 +141,16 @@ users:
         self.assertEqual(self.scan().findings[0]["severity"], "high")
         self.write(".kube/config", text.encode("utf-16"))
         self.assertEqual(self.scan().findings[0]["severity"], "high")
+
+
+    def test_a_context_whose_user_is_a_mapping_is_never_printed(self):
+        token = rand(32, "abcdef0123456789")
+        self.write(".kube/config", "apiVersion: v1\nclusters:\n- cluster:\n    server: https://k.example\n  name: c1\n"
+                                   "contexts:\n- context:\n    cluster: c1\n    user:\n      token: " + token +
+                                   "\n  name: ctx1\nusers: []\n")
+        sec = self.scan()
+        self.assertNotIn(token, text_of(sec))
+        self.assertIn("user or cluster is not a name", sec.errors[0])
 
 
 class Aws(Isolated):
@@ -291,6 +304,13 @@ class Docker(Isolated):
         sec = cr.scan_docker(self.ctx(env={**os.environ, "DOCKER_CONFIG": str(self.tmp / "d")}))
         self.assertEqual(sec.findings[0]["severity"], "high")
 
+    def test_a_registry_key_with_a_password_but_no_scheme(self):
+        pw = rand(16)
+        self.write(".docker/config.json", json.dumps({"auths": {f"me:{pw}@registry.example.com": {"auth": "eA=="}}}))
+        sec = cr.scan_docker(self.ctx())
+        self.assertEqual(sec.findings[0]["item"], "registry.example.com")
+        self.assertNotIn(pw, text_of(sec))
+
 
 class Npm(Isolated):
     def test_tokens_env_references_and_masked_paths(self):
@@ -308,6 +328,15 @@ class Npm(Isolated):
         self.assertEqual(f["empty.example"]["detail"], "_authToken empty")
         self.assertNotIn(token, text_of(sec))
         self.assertNotIn(path_key, text_of(sec))
+
+    def test_tokens_in_registry_paths_are_masked(self):
+        short, bot = rand(20), rand(35)
+        self.write(".npmrc", f"//npm.fury.example/{short}/:_authToken=${{FURY_TOKEN}}\n"
+                             f"//hooks.example.com/bot123456789:{bot}/:_authToken=x{rand(12)}\n")
+        out = text_of(cr.scan_npm(self.ctx()))
+        self.assertNotIn(short, out)
+        self.assertNotIn(bot, out)
+        self.assertIn("npm.fury.example/***", out)
 
     def test_registry_key_that_is_not_a_url(self):
         self.assertEqual(cr._npm_target("//[bad/"), "***")  # found by fuzzing: used to raise IndexError
@@ -330,6 +359,10 @@ class Pypirc(Isolated):
         self.assertEqual(f["pypi"]["detail"], "upload.pypi.org: API token stored in the file")
         self.assertEqual(f["corp"]["detail"], "pypi.corp.example: no password stored")
         self.assertNotIn(pw, text_of(sec))
+
+    def test_section_names_are_cleaned_everywhere(self):
+        self.write(".pypirc", f"[corp\x1b]0;title\x07]\nusername = me\npassword = {rand(12)}\n")
+        self.assertNotIn("\x1b", text_of(cr.scan_pypirc(self.ctx())))
 
     def test_malformed(self):
         self.write(".pypirc", "password = x\n")
@@ -381,6 +414,12 @@ class Git(Isolated):
         self.assertIn("credential.helper a shell command", f)
         self.assertNotIn("credential.helper no", f)
         self.assertNotIn(tok, text_of(sec))
+
+    def test_a_line_without_a_scheme_is_not_printed_as_a_host(self):
+        tok = rand(40)
+        self.write(".git-credentials", tok + "\n")
+        out = text_of(cr.scan_git(self.ctx()))
+        self.assertNotIn(tok.lower(), out.lower())
 
     def test_helpers_function(self):
         self.assertEqual(cr.git_helpers("[credential]\nhelper = store --file x\n"), ["store"])
@@ -518,11 +557,77 @@ class EnvFiles(unittest.TestCase):
         self.assertEqual(cr.parse_env_file(text), [("A", "1"), ("B", "two words"), ("C", "multi\nline"),
                                                    ("D", "plain"), ("E", ""), ("F", "x=y")])
 
+    def test_an_unquoted_pem_block_is_not_read_as_names(self):
+        # the padded last base64 line of a key ends in `=` and so reads as NAME=
+        body = [rand(64, synthetic.ALNUM + "+/") for _ in range(4)] + ["K" + rand(30) + "7=="]
+        text = ("APP_PRIVATE_KEY=" + synthetic.DASHES + "BEGIN RSA PRIVATE KEY" + synthetic.DASHES + "\n"
+                + "\n".join(body) + "\n" + synthetic.DASHES + "END RSA PRIVATE KEY" + synthetic.DASHES + "\nDEBUG=1\n")
+        pairs = cr.parse_env_file(text)
+        self.assertEqual([n for n, _ in pairs], ["APP_PRIVATE_KEY", "DEBUG"])
+        self.assertEqual(cr.env_kind("APP_PRIVATE_KEY", pairs[0][1]), "secret")
+
+    def test_value_like_names_are_dropped(self):
+        stray = "K" + rand(30) + "7"
+        self.assertEqual([n for n, _ in cr.parse_env_file(f"GOOD_NAME=1\n{stray}==\nghp_{rand(36)}=\n")],
+                         ["GOOD_NAME"])
+
     def test_placeholders(self):
         for v in ("", "<token>", "${X}", "$X", "%X%", "xxxx", "****", "changeme", "your-key-here", "[REDACTED:jwt]"):
             self.assertTrue(cr.is_placeholder(v) or not v, v)
         for v in ("hunter2", "password", "abc123"):
             self.assertFalse(cr.is_placeholder(v), v)
+
+
+class CraftedInputs(Isolated):
+    """Inputs well under the 4 MB cap (or in a transcript, which has none) that once took minutes."""
+
+    def test_they_stay_linear(self):
+        cases = {
+            "a long run of letters (a value)": (cr.looks_like, "a" * 60_000),
+            "a hex blob in a transcript line": (cr.redact_text, "0x" + "ab12" * 25_000 + " AKIA"),
+            "a kubeconfig line with a long run of blanks": (cr.yaml_load, "x" + " " * 60_000 + "y: z\n"),
+            "a flow mapping with a long run of blanks": (cr.yaml_load, "a: {b" + " " * 30_000 + "c: d}\n"),
+            "a kubeconfig line full of quotes": (cr._strip_comment, "a'" * 300_000),
+            "a .env with an unterminated quote": (cr.parse_env_file, 'A="\n' + "x\n" * 300_000),
+            "private key headers with no end": (cr.redact_text, (synthetic.DASHES + "BEGIN PRIVATE KEY"
+                                                                  + synthetic.DASHES + "#") * 5_000),
+        }
+        for what, (fn, arg) in cases.items():
+            with self.subTest(what):
+                start = time.perf_counter()
+                try:
+                    fn(arg)
+                except ValueError:
+                    pass  # a parse error is an answer too; only the time matters here
+                self.assertLess(time.perf_counter() - start, 1.5)
+
+    def _returns_soon(self, fn):
+        """fn() in a thread; its result if it returned within 5 s. A blocked open() cannot be interrupted, so the
+        thread is a daemon and is left behind if it hangs."""
+        box = []
+        t = threading.Thread(target=lambda: box.append(fn()), daemon=True)
+        t.start()
+        t.join(5)
+        self.assertFalse(t.is_alive(), "blocked")
+        return box[0]
+
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "no FIFOs here")
+    def test_a_fifo_named_like_a_transcript_is_not_opened(self):
+        d = self.home / ".claude" / "projects" / "p"
+        d.mkdir(parents=True)
+        os.mkfifo(d / "s.jsonl")
+        sec, hits = self._returns_soon(lambda: cr.scan_transcripts(self.ctx()))
+        self.assertEqual((hits, sec.errors), ([], []))
+        counts, why = self._returns_soon(lambda: cr.redact_file(d / "s.jsonl", self.tmp / "bk" / "s.jsonl"))
+        self.assertEqual(counts, {})
+        self.assertIn("not a regular file", why)
+
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "no FIFOs here")
+    def test_a_fifo_that_replaces_a_file_after_the_check_is_not_read(self):
+        fifo = self.tmp / "credentials"
+        os.mkfifo(fifo)
+        with mock.patch.object(cr, "is_regular", return_value=True):  # as if it was a file a moment ago
+            self.assertEqual(self._returns_soon(lambda: cr.read_file(fifo)), (None, "not a regular file"))
 
 
 if __name__ == "__main__":

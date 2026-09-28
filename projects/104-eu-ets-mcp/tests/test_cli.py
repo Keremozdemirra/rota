@@ -77,7 +77,7 @@ class CliTest(unittest.TestCase):
         with Registry() as reg:
             code, out, err = run("refresh", "--listing-url", reg.listing_url, "--no-compliance")
         self.assertEqual(code, 0, err)
-        self.assertIn("Snapshot 2026-09-24: 25 installations", out)
+        self.assertIn("Snapshot 2026-09-24: 26 installations", out)
         self.assertFalse(any("compliance" in p for p, _ in reg.requests))
 
     def test_a_5000_digit_activity_is_a_usage_error(self):

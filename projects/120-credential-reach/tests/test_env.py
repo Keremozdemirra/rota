@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from support import Isolated, cr, synthetic  # noqa: E402
+from support import Isolated, cr, synthetic, text_of  # noqa: E402
 
 rand = synthetic.rand
 
@@ -68,6 +68,24 @@ class EnvScan(Isolated):
         sec = self.scan(CLAUDECODE="1", CLAUDE_CODE_SUBPROCESS_ENV_SCRUB="1")
         self.assertIn("after CLAUDE_CODE_SUBPROCESS_ENV_SCRUB removed", sec.notes[0])
 
+    def test_scrub_note_says_a_moved_config_dir_is_not_seen(self):
+        # the scrub removes CLAUDE_CONFIG_DIR too, so the transcript scan falls back to ~/.claude
+        sec = self.scan(CLAUDECODE="1", CLAUDE_CODE_SUBPROCESS_ENV_SCRUB="1")
+        self.assertIn("removes CLAUDE_CONFIG_DIR", " ".join(sec.notes))
+
+    def test_a_redis_url_without_a_user_is_a_credential(self):
+        pw = rand(20)
+        sec = self.scan(REDIS_URL=f"redis://:{pw}@cache.internal:6379/0")
+        f = {x["item"]: x for x in sec.findings}
+        self.assertEqual((f["REDIS_URL"]["severity"], f["REDIS_URL"]["looks_like"]), ("high", "url-password"))
+        self.assertNotIn(pw, text_of(sec))
+
+    def test_a_path_variable_that_holds_the_key_itself(self):
+        key = json.dumps({"type": "service_account", "private_key": synthetic.pkcs8_ed25519()})
+        f = {x["item"]: x for x in self.scan(GOOGLE_APPLICATION_CREDENTIALS=key).findings}
+        self.assertEqual((f["GOOGLE_APPLICATION_CREDENTIALS"]["severity"],
+                          f["GOOGLE_APPLICATION_CREDENTIALS"]["looks_like"]), ("high", "private-key"))
+
     def test_tokens_are_kept_only_for_probe(self):
         tok = "ghp_" + rand(36)
         ctx = self.ctx(env={**os.environ, "GITHUB_TOKEN": tok})
@@ -104,6 +122,22 @@ class Shapes(unittest.TestCase):
             new, counts = cr.redact_text("before " + text + " after")
             self.assertEqual(counts, {name: 1}, name)
             self.assertIn(f"[REDACTED:{name}]", new)
+
+    def test_a_json_escape_before_a_token_is_a_word_edge(self):
+        # "...\nghp_..." in a transcript line: the n of the escape is not part of the decoded token's word
+        for tok in ("ghp_" + rand(36), "sk-ant-api03-" + rand(40), "npm_" + rand(36), "glpat-" + rand(20),
+                    "xoxb-" + rand(30), "hf_" + rand(34), "github_pat_" + rand(22) + "_" + rand(59)):
+            for before in ("\n", "\t", "é"):
+                line = json.dumps({"stdout": "first line" + before + tok}).encode()
+                self.assertTrue(cr.line_counts(line), (tok[:6], before))
+                self.assertNotIn(tok.encode(), cr.redact_line(line)[0], (tok[:6], before))
+
+    def test_invisible_characters_cannot_hide_a_token_from_the_mask(self):
+        a, b = rand(18), rand(18)
+        for sep in ("​", "\x1b[0m", "⁦", "\x00", "\x1f", "­"):
+            out = cr.safe("context ghp_" + a + sep + b)
+            self.assertNotIn(a, out, repr(sep))
+            self.assertNotIn(b, out, repr(sep))
 
     def test_first_pass_skips_lines_without_candidates(self):
         for text in ("plain words", "the task-runner and disk-cache", "email me@example.com", "https://example.com/x@y"):

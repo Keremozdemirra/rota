@@ -29,12 +29,12 @@ class Canaries(Isolated):
         self.addCleanup(cwd.stop)
 
     def fragments(self):
-        """Every canary, and every 12-character piece of it, so a partial print is caught too."""
+        """Every canary, and every 12-character piece of it at every offset, so a partial print is caught too."""
         out = set()
         for v in self.c.values():
             out.add(v)
             core = v.split("_", 1)[-1] if v.startswith(("ghp_", "gho_", "npm_")) else v
-            out.update(core[i:i + 12] for i in range(0, max(1, len(core) - 11), 4))
+            out.update(core[i:i + 12] for i in range(0, max(1, len(core) - 11)))
         return out
 
     def assert_clean(self, text, what):
@@ -180,6 +180,36 @@ class Project(Isolated):
         self.assertEqual(f[".npmrc"]["severity"], "high")
         self.assertIn("sub/.env.production", f)
         self.assertNotIn(".venv/lib/.env", f)
+
+    def test_links_out_of_the_project_are_reported_not_read(self):
+        outside = self.write("outside/unrelated.env", f"PAYROLL_DB_PASSWORD={rand(20)}\n", base=self.tmp)
+        key = self.write("outside/id_work", synthetic.openssh_key(), base=self.tmp)
+        inside = self.write("config/real.env", f"INSIDE_TOKEN={rand(20)}\n", base=self.project)
+        try:
+            os.symlink(outside, self.project / ".env")
+            os.symlink(key, self.project / "deploy.pem")
+            os.symlink(inside, self.project / ".env.local")
+        except (OSError, NotImplementedError):
+            self.skipTest("no symlinks here")
+        sec = cr.scan_project(self.ctx())
+        f = {x["item"]: x for x in sec.findings}
+        out = json.dumps(sec.as_dict())
+        self.assertNotIn("PAYROLL", out)
+        self.assertNotIn("OpenSSH", out)
+        for item in (".env", "deploy.pem"):
+            self.assertIn("outside the project; not read", f[item]["detail"])
+        self.assertIn("INSIDE_TOKEN", f[".env.local"]["detail"])  # a link that stays inside is read
+
+    def test_git_messages_are_not_echoed(self):
+        # git quotes config values in some messages; none of them reaches the report
+        value = rand(24)
+        failed = subprocess.CompletedProcess([], 128, b"", f"fatal: bad boolean config value '{value}' for "
+                                                          "'core.bare'\n".encode())
+        self.write(".env", "A=1\n", base=self.project)
+        with mock.patch.object(cr.subprocess, "run", return_value=failed):
+            sec = cr.scan_project(self.ctx())
+        self.assertNotIn(value, json.dumps(sec.as_dict()))
+        self.assertIn("git could not read it (exit 128)", sec.notes[0])
 
     def test_unreadable_env_file_is_an_error(self):
         self.write(".env", "x" * 10, base=self.project)

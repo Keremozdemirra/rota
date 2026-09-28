@@ -12,7 +12,8 @@ staging task hit a credential mismatch, went looking for an API token, and found
 created to add and remove custom domains through the Railway CLI, but it had
 "blanket authority across the entire Railway GraphQL API". The agent used it to
 delete a production volume, and the volume-level backups went with it
-([post](https://twitter.com/lifeof_jer/status/2048103471019434248), discussed as
+(Jer Crane, "An AI Agent Just Destroyed Our Production Data. It Confessed in Writing.",
+[X, 2026-04-25](https://x.com/lifeofjer/status/2048103471019434248), discussed as
 [Hacker News item 47911524](https://news.ycombinator.com/item?id=47911524) on
 2026-04-26; both checked 2026-09-24).
 
@@ -24,7 +25,7 @@ of credential sits where, and never printed, logged or sent.
 
 ```
 credential-reach 0.1.0: what an agent running as you here can reach
-checked 2026-09-24T13:53:20Z on Linux · home /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/cr-demo/home · project ~/work/app
+checked 2026-09-24T19:01:50Z on Linux · home [...]/demo/home · project ~/work/app
 No secret values are shown: names, locations, hosts, profiles, lengths and presence only.
 
 Blast radius
@@ -75,24 +76,20 @@ SSH keys  (~/.ssh)
   not visible here: macOS can keep a key's passphrase in the Keychain (UseKeychain), and a running ssh-agent holds unlocked keys; neither is queried, so a passphrase-protected key may still be usable.
 [...]
 Claude Code transcripts  (~/.claude/projects)
-  high    ~/.claude/projects/-home-dev-work-app/7f0d1ba1f658fa7f79534401927f77e7.jsonl  aws-access-key-id 1 in 1 line, github-classic-pat 1 in 1 line, private-key 1 in 1 line, url-password 1 in 1 line
+  high    ~/.claude/projects/-home-dev-work-app/1ffe258c1d70dec80ca77e5baa50ac0c.jsonl  aws-access-key-id 1 in 1 line, github-classic-pat 1 in 1 line, private-key 1 in 1 line, url-password 1 in 1 line
   note: 4 secret-shaped strings in 1 of 2 files (github-classic-pat 1, aws-access-key-id 1, private-key 1, url-password 1). They are plaintext copies of what passed through a tool; `credential-reach --redact` replaces them after a confirmation and a backup.
-
-GitHub probe  (GET https://api.github.com/user, one request per token)
-  info    $GITHUB_TOKEN: personal access token (classic): rejected (401): revoked, expired or not a valid token
-  info    ~/.git-credentials: personal access token (classic): rejected (401): revoked, expired or not a valid token
-  info    ~/.config/gh/hosts.yml: OAuth token: rejected (401): revoked, expired or not a valid token
 
 20 high · 16 medium · 10 info
 Not read: macOS Keychain, Windows Credential Manager, browser sessions, and MCP server settings; programs the agent can run may still use what they hold.
 ```
 
 This is real output from 2026-09-24, abridged where it says `[...]`, of
-`python3 tests/synthetic.py --run cr-demo -- --probe`. That command builds a
-**synthetic** home directory and project filled with fake credentials generated at run
-time, then runs `credential-reach --probe` there with `HOME` pointed at it and a clean
-environment. None of these credentials exist. The probe was live: the three fake GitHub
-tokens went to api.github.com, which rejected each with 401.
+`python3 tests/synthetic.py --run DIR`, with `DIR` a scratch directory outside this
+repository (`[...]/demo` above; without `DIR` it makes a temporary one). That command
+builds a **synthetic** home directory and project filled with fake credentials generated
+at run time, then runs `credential-reach` there with `HOME` pointed at it and a clean
+environment. None of these credentials exist. `--probe` is left out of the example: it
+would send the fake tokens to api.github.com.
 
 ## Install
 
@@ -111,16 +108,9 @@ confirmation typed at a terminal.
 
 ### Command line
 
-No install, standard library only, Python 3.9 or newer:
-
-```bash
-# the newest code on main
-curl -sL https://raw.githubusercontent.com/Keremozdemirra/credential-reach/main/credential_reach.py | python3 -
-# or a fixed release
-curl -sL https://raw.githubusercontent.com/Keremozdemirra/credential-reach/v0.1.0/credential_reach.py | python3 -
-```
-
-Or from PyPI, pinned to a release:
+Standard library only, Python 3.9 or newer. From PyPI, pinned to a release; "PyPI does not
+allow for a filename to be reused" ([PyPI help](https://pypi.org/help/#file-name-reuse),
+checked 2026-09-24), so the files of a published release cannot be replaced:
 
 ```bash
 uvx credential-reach@0.1.0                     # audit this machine and the current directory
@@ -129,11 +119,26 @@ pipx run --spec credential-reach==0.1.0 credential-reach --json
 ```
 
 `uvx credential-reach` without a version installs the newest release the first time and
-reuses uv's cached copy after that; `uvx credential-reach@latest` refreshes it.
+reuses uv's cached copy after that; `uvx credential-reach@latest` refreshes it
+([uv tools](https://docs.astral.sh/uv/concepts/tools/), checked 2026-09-24).
+
+Without installing anything: it is one file. Download the file of a tagged release, read it,
+then run it:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/Keremozdemirra/credential-reach/v0.1.0/credential_reach.py
+python3 credential_reach.py
+```
+
+Piping that URL straight into `python3 -` would run whatever it serves at that moment, unread,
+with access to every credential this tool looks at, so this README does not suggest it.
 
 Run it the way your agent runs: from the project directory, in the same shell, so it sees
-the same environment. Inside Claude Code (through the skill, or `!credential-reach` at the
-prompt) it sees exactly the environment Claude Code's Bash tool passes to commands.
+the same environment. Through the skill, Claude Code runs it with its Bash tool, so it sees
+the environment that tool passes to commands. A command typed after `!` at the Claude Code
+prompt is different: such commands "run outside the sandbox even when you've enabled
+sandboxing" ([interactive mode](https://code.claude.com/docs/en/interactive-mode), checked
+2026-09-24), so they can see more than the agent does.
 
 | Option | What it does |
 | --- | --- |
@@ -184,18 +189,21 @@ Environment variables of the process it runs in, and these files where they exis
 | gh | `hosts.yml` in `GH_CONFIG_DIR`, `$XDG_CONFIG_HOME/gh` or `~/.config/gh` | hosts, user, token in the file or in the system store |
 | SSH | `~/.ssh/*` except `*.pub`, `known_hosts`, `authorized_keys`, `config`; `UseKeychain` in `~/.ssh/config`; `SSH_AUTH_SOCK` | private key files: format, key type, passphrase yes/no, read from the unencrypted header (OpenSSH `PROTOCOL.key`, PEM `Proc-Type`, PKCS#8, PuTTY) without decrypting |
 | Terraform | `~/.terraform.d/credentials.tfrc.json`, `~/.terraformrc` (or `TF_CLI_CONFIG_FILE`) | hosts with a token; a `credentials_helper` |
-| Project | `.env`, `.env.*`, `*.env`, `.envrc` and secret-named files (`*.pem`, `*.key`, `id_rsa`, `*.tfstate`, `credentials.json`, `.npmrc`, ...) under `--project`, skipping `.git`, `node_modules` and virtual environments | variable names, which are credential-like with a value, and git status (`tracked`, `ignored`, `not ignored`) from `git ls-files` and `git check-ignore` |
+| Project | `.env`, `.env.*`, `*.env`, `.envrc` and secret-named files (`*.pem`, `*.key`, `id_rsa`, `*.tfstate`, `credentials.json`, `.npmrc`, ...) under `--project`, skipping `.git`, `node_modules` and virtual environments; a symbolic link to a file outside the project is reported, not read | variable names, which are credential-like with a value, and git status (`tracked`, `ignored`, `not ignored`) from `git ls-files` and `git check-ignore` |
 | Transcripts | `~/.claude/projects/**/*.jsonl` and set-aside `*.jsonl.superseded-*` (or under `CLAUDE_CONFIG_DIR`) | per file, the count of secret-shaped strings and of lines per type |
 
-Secret shapes in transcripts are the seven that `ship.sh` scans every commit for
-(Anthropic and OpenAI keys, classic and fine-grained GitHub tokens, AWS access key IDs,
-private key blocks, Replicate tokens) plus GitHub OAuth and App tokens, AWS secret keys
-next to their name, Slack, GitLab, Google API, Stripe, npm, PyPI and Hugging Face tokens,
-JWTs, passwords inside URLs and bearer tokens.
+Secret shapes in transcripts are the seven that `tests/test_plugin.py` keeps out of this
+repository (Anthropic and OpenAI keys, classic and fine-grained GitHub tokens, AWS access
+key IDs, private key blocks, Replicate tokens) plus GitHub OAuth and App tokens, AWS secret
+keys next to their name, Slack, GitLab, Google API, Stripe, npm, PyPI and Hugging Face
+tokens, JWTs, passwords inside URLs (also with an empty user name, as in `redis://:pw@host`)
+and bearer tokens.
 
 Git runs with `core.fsmonitor=false`, so that a repository's own configuration cannot make
-it start a program. FIFOs and devices are never opened, and a credential file larger than
-4 MB is not parsed; transcripts are read line by line, whatever their size.
+it start a program, and git's own error messages are not repeated (some quote a
+configuration value). FIFOs and devices are never read, and opening a file never waits on
+one; a credential file larger than 4 MB is not parsed; transcripts are read line by line,
+whatever their size.
 
 ## What it sends
 
@@ -212,18 +220,25 @@ or `~/.git-credentials` and `~/.netrc` entries for `github.com`), it sends one
 - the account's `login`, and the `GitHub-Authentication-Token-Expiration` date when the
   response carries one.
 
-A string goes out only if it matches GitHub's token formats (`ghp_`, `github_pat_`,
-`gho_`, `ghu_`, `ghs_`, `ghr_`, [GitHub docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats),
+A string goes out only if it matches GitHub's access token formats (`ghp_`, `github_pat_`,
+`gho_`, `ghu_`, `ghs_`, [GitHub docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#githubs-token-formats),
 checked 2026-09-24), or is a 40-character hex token in `GITHUB_TOKEN`, `GH_TOKEN` or a
-github.com entry. Tokens for
-GitHub Enterprise hosts are never sent to github.com. Using a token for this request is a
-use of it; GitHub may record it, for example in the token's last-used date.
+github.com entry. A `ghr_` refresh token is not sent: it cannot authenticate an API request.
+Tokens from entries for any other host are never sent, and neither are tokens from
+variables whose name contains `ENTERPRISE` or `GHE`. No token from the environment is sent
+when `GH_HOST`, `GITHUB_SERVER_URL` or `GITHUB_API_URL` names a host other than github.com:
+gh uses `GH_TOKEN` and `GITHUB_TOKEN` "when a command targets either github.com or a
+subdomain of ghe.com" ([gh environment](https://cli.github.com/manual/gh_help_environment),
+checked 2026-09-24), and in a GitHub Enterprise Server workflow `GITHUB_TOKEN` belongs to that
+server. Using a token for this request is a use of it; GitHub may record it, for example in
+the token's last-used date.
 
-If `HTTPS_PROXY` is set, the request goes through that proxy, and the report says so
-without printing the proxy's address. A proxy that inserts its own GitHub credentials
-changes the answer: in the hosted sandbox this tool was built in, requests to
-api.github.com sent through its proxy came back as the sandbox's own account, whatever
-token they carried. The live check above ran without the proxy variables.
+The request is made with urllib, verifies TLS against the system's default CA
+certificates, and never follows a redirect: a `3xx` answer is reported, not followed, so
+the token reaches no other host and never travels over plain HTTP. If `HTTPS_PROXY` is set,
+the request goes through that proxy inside a TLS tunnel to api.github.com, and the report
+says so without printing the proxy's address. A proxy that terminates TLS and adds its own
+GitHub credentials changes the answer: the scopes shown would then be the proxy's.
 
 There is no other network code in the tool.
 
@@ -249,9 +264,9 @@ un-expose a credential that already passed through a session: rotate those as we
 
 Claude Code keeps transcripts because it needs them: "Claude Code clients store session
 transcripts locally in plaintext under `~/.claude/projects/` for 30 days by default to
-enable session resumption" ([data usage](https://code.claude.com/docs/en/data-usage), checked 2026-09-24),
-and "anything that passes through a tool is written to a transcript on disk: file
-contents, command output, pasted text" ([the .claude directory](https://code.claude.com/docs/en/claude-directory), checked 2026-09-24).
+enable session resumption" ([data usage](https://code.claude.com/docs/en/data-usage), checked 2026-09-24).
+"Anything that passes through a tool is written to a transcript on disk: file contents,
+command output, pasted text." ([the .claude directory](https://code.claude.com/docs/en/claude-directory), checked 2026-09-24)
 
 ## What each tool keeps where
 
@@ -285,7 +300,45 @@ The `not visible here` lines come from these sources, all checked 2026-09-24:
   repositories in your personal account" ([GitHub docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)).
 - **Claude Code**: `CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1` strips "Anthropic and cloud provider
   credentials, any other variable that Claude Code recognizes as a credential" from the
-  environment of the Bash tool, hooks and MCP stdio servers ([environment variables](https://code.claude.com/docs/en/env-vars)).
+  environment of the Bash tool, hooks and MCP stdio servers; from v2.1.251 it also removes
+  `CLAUDE_CONFIG_DIR`, so a run inside Claude Code cannot find transcripts in a moved
+  configuration directory, and the report says so ([environment variables](https://code.claude.com/docs/en/env-vars)).
+
+The locations in "What it reads" come from these pages, also checked 2026-09-24:
+
+- **kubectl**: "By default, kubectl looks for a file named config in the $HOME/.kube
+  directory. You can specify other kubeconfig files by setting the KUBECONFIG environment
+  variable" ([kubeconfig](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/)).
+- **AWS CLI**: the SSO token "is cached to disk under the ~/.aws/sso/cache directory"
+  ([IAM Identity Center](https://docs.aws.amazon.com/cli/latest/userguide/sso-configure-profile-token.html));
+  role credentials "are stored in ~/.aws/cli/cache" ([IAM roles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-role.html)).
+- **gcloud**: "The config directory can be changed by setting the environment variable
+  CLOUDSDK_CONFIG" ([configurations](https://cloud.google.com/sdk/docs/configurations)).
+- **Azure CLI**: "The default value of AZURE_CONFIG_DIR is $HOME/.azure on Linux and macOS,
+  and %USERPROFILE%\.azure on Windows" ([configuration](https://learn.microsoft.com/en-us/cli/azure/azure-cli-configuration)).
+- **Docker**: "By default, the Docker command line stores its configuration files in a
+  directory called .docker within your $HOME directory"; `DOCKER_CONFIG` is "The location of
+  your client configuration files" ([docker CLI](https://docs.docker.com/reference/cli/docker/)).
+- **npm**: "per-user config file (~/.npmrc)", configurable with "environment variable
+  $NPM_CONFIG_USERCONFIG" ([npmrc](https://docs.npmjs.com/cli/v11/configuring-npm/npmrc),
+  [config](https://docs.npmjs.com/cli/v11/using-npm/config)).
+- **.pypirc**: "Twine will add additional configuration from $HOME/.pypirc"
+  ([.pypirc](https://packaging.python.org/en/latest/specifications/pypirc/)).
+- **netrc** (curl): "If the NETRC environment variable is set, that filename is used as the
+  netrc file"; "On Windows, two filenames in the home directory are checked: .netrc and
+  _netrc" ([everything curl](https://everything.curl.dev/usingcurl/netrc.html)).
+- **git**: credentials "will be searched for from ~/.git-credentials and
+  $XDG_CONFIG_HOME/git/credentials" ([git-credential-store](https://git-scm.com/docs/git-credential-store));
+  global settings are read "from global ~/.gitconfig and from $XDG_CONFIG_HOME/git/config"
+  ([git-config](https://git-scm.com/docs/git-config)).
+- **gh**: `GH_CONFIG_DIR`, else "$XDG_CONFIG_HOME/gh (if $XDG_CONFIG_HOME is set), $AppData/GitHub
+  CLI (on Windows if $AppData is set), or $HOME/.config/gh" ([gh environment](https://cli.github.com/manual/gh_help_environment)).
+- **Terraform**: the CLI configuration is `terraform.rc` in `%APPDATA%` on Windows and
+  `.terraformrc` in the home directory elsewhere, or the file `TF_CLI_CONFIG_FILE` names
+  ([CLI configuration](https://developer.hashicorp.com/terraform/cli/config/config-file)).
+  The documentation does not name the directory of `credentials.tfrc.json` (`terraform login`
+  says where it will save the token); this tool looks in `~/.terraform.d`, and in
+  `%APPDATA%\terraform.d` on Windows, the directories the same page uses for plugins.
 
 ## Data source
 
@@ -302,11 +355,14 @@ python3 -m unittest discover -s tests
 The tests never read the real home directory or environment: each one runs with `HOME`,
 `USERPROFILE`, `APPDATA` and `XDG_CONFIG_HOME` pointed at a temporary directory, with the
 process environment replaced, and with the network replaced by a stand-in that fails on
-any request nobody prepared. Every fake secret is generated at run time, so this
-repository contains no token-shaped text (one test checks that). One test plants a canary
-in every file and variable the tool reads, runs every output format, `--probe` and
+any request nobody prepared. The probe's redirect, proxy and TLS handling run through
+urllib's own handlers over a fake connection. Every fake secret is generated at run time,
+so this repository contains no token-shaped text (one test checks that). One test plants a
+canary in every file and variable the tool reads, runs every output format, `--probe` and
 `--redact`, and fails if any canary, or any 12-character piece of one, appears in what it
-printed.
+printed. Others plant secrets where they leak most easily (a key pasted unquoted into
+`.env`, a token in a registry path, a mis-indented kubeconfig, links out of the project) and
+time inputs that used to make the parsers quadratic.
 
 Licence: MIT.
 
@@ -317,5 +373,6 @@ too powerful. It lists what is reachable from the standard places, so that you c
 what an agent should run with. It does not read macOS Keychain, Windows Credential
 Manager, Secret Service, browser sessions, MCP server `env` blocks, Claude Code's own
 login, or credentials that programs fetch at run time; the report says where those can
-exist. A clean report means none of the listed places holds a credential, not that the
-machine holds none.
+exist. Nor does it read the credential files of tools not listed above, such as cargo's
+`credentials.toml`, `pip.conf`, `.pgpass` or Maven's `settings.xml`. A clean report means
+none of the listed places holds a credential, not that the machine holds none.

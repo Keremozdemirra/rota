@@ -33,33 +33,34 @@ its own, and it never blocks: you can always approve at the prompt.
 
 ## A real run
 
-2026-09-24, git 2.43.0, against a local bare repository made for the check in a scratch
-directory (the long paths below are that directory). A teammate has pushed
-`teammate: fix login`; this clone has not seen it and has rewritten `v1`. The session:
+2026-09-24, git 2.43.0, destroy-guard 0.1.0 installed from the built wheel, against a local
+bare repository made for the check in a scratch directory (the long paths below are that
+directory). A teammate has pushed `teammate: fix login`; this clone has not seen it and has
+rewritten `v1`. The session:
 
 ```
 $ git log --oneline -1 origin/main  (what this clone last saw)
-72a0030 v1
+22a1ba9 v1
 $ git ls-remote origin main  (what the remote has now)
-d2254051c6316f1c592f892a6fc1f46a99aee297	refs/heads/main
+7f41f169719b3f2e94ca2380e7cf4639a68b3486	refs/heads/main
 
 $ # the hook, as Claude Code calls it before: git push --force origin main
 {
     "hookSpecificOutput": {
         "hookEventName": "PreToolUse",
         "permissionDecision": "ask",
-        "permissionDecisionReason": "destroy-guard: `git push --force` overwrites refs/heads/main on origin (repository /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/live119/app). No backup of it from the last 30 min. To make one, run `destroy-guard backup -- git push --force origin main` on its own first. The 30 min window is destroy-guard's own choice (DESTROY_GUARD_MAX_AGE_MINUTES changes it). Approving runs the command as it is.",
+        "permissionDecisionReason": "destroy-guard: `git push --force` overwrites refs/heads/main on origin (repository /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/review-119/live119/app). No backup of it from the last 30 min. To make one, run `destroy-guard backup -- git push --force origin main` on its own first. The 30 min window is destroy-guard's own choice (DESTROY_GUARD_MAX_AGE_MINUTES changes it). Approving runs the command as it is.",
         "additionalContext": "(the same text, plus one sentence for Claude; shortened here)"
     }
 }
 
 $ destroy-guard backup -- git push --force origin main
-git push --force overwrites refs/heads/main on origin (repository /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/live119/app); backing it up
-  refs/heads/main on origin was d2254051c6316f1c592f892a6fc1f46a99aee297; kept as refs/destroy-guard/main-20260924T135026Z
-  git-main.txt: 117 bytes, sha256 55de4afe10d08080...
-verified backup: /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/live119/app/.destroy-guard/backups/20260924T135026Z-b42adfce36a7
-  counts for this exact target until 14:20:26 UTC (30 min, destroy-guard's own window)
-  .destroy-guard/ is listed in /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/live119/app/.git/info/exclude
+git push --force overwrites refs/heads/main on origin (repository /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/review-119/live119/app); backing it up
+  refs/heads/main on origin was 7f41f169719b3f2e94ca2380e7cf4639a68b3486; kept as refs/destroy-guard/main-20260924T190214Z
+  git-main.txt: 117 bytes, sha256 89b8f2d158feb993...
+verified backup: /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/review-119/live119/app/.destroy-guard/backups/20260924T190214Z-81cab2e55107
+  counts for this exact target until 19:32:14 UTC (30 min, destroy-guard's own window)
+  .destroy-guard/ is listed in /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/review-119/live119/app/.git/info/exclude
 Backups can hold secrets: Terraform state often contains passwords and keys, Kubernetes Secrets are only base64-encoded, Helm values often carry credentials. They stay on this machine, in a directory only you can read; destroy-guard never uploads or prints them.
 exit 0
 
@@ -67,10 +68,10 @@ $ # the hook again, same command
 (no output: the normal permission flow decides)
 
 $ git push --force origin main
-  To /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/live119/origin.git
-   + d225405...eae7327 main -> main (forced update)
-$ git log --oneline -1 refs/destroy-guard/main-*
-d225405 teammate: fix login
+To /tmp/claude-0/-home-user/46610765-d3a5-5dc6-8c0f-75f635a72ba6/scratchpad/review-119/live119/origin.git
+ + 7f41f16...8725cc3 main -> main (forced update)
+$ git log --oneline -1 --glob='refs/destroy-guard/main-*'
+7f41f16 teammate: fix login
 $ git status --porcelain  (the store is excluded)
 (empty)
 ```
@@ -97,8 +98,8 @@ this was built.
 
 That adds the hook (PreToolUse, one handler for the Bash and PowerShell tools) and a skill:
 ask "make a backup before you delete this" or "why did destroy-guard ask?". The hook runs
-`python3`, so `python3` must be on your `PATH`; on Windows, check that `python3 --version`
-works in the shell Claude Code uses.
+`python3`, so Python 3.9 or later must be on your `PATH` as `python3`; on Windows, check that
+`python3 --version` works in the shell Claude Code uses.
 
 ### Command line
 
@@ -122,15 +123,20 @@ Install it once (`pipx install destroy-guard==0.1.0`), then in `.claude/settings
 }
 ```
 
-Use the plugin or this, not both: Claude Code runs a plugin's handler and a settings
-handler as separate processes, and you would get the question twice.
+Use the plugin or this, not both. "A plugin's or skill's copy of the same handler stays
+separate" ([hooks docs](https://code.claude.com/docs/en/hooks), checked 2026-09-24), so
+with both, two processes start for every Bash and PowerShell call. Only the first one to
+claim the call answers. It claims the call with an empty file named after the
+`tool_use_id`, created exclusively in a private temporary directory. Without the claim,
+Claude would get the same text twice ("When several hooks return `additionalContext` for
+the same event, Claude receives all of the values", same page).
 
 There is one handler and no `if` rule, on purpose. An `if` rule matches one tool's calls,
 and a Bash rule more specific than a command name still fires on any command with `$()`,
-backticks or `$VAR` ([hooks docs](https://code.claude.com/docs/en/hooks), checked
-2026-09-24), so the filtering happens inside the script. Every Bash and PowerShell call
-starts Python once; commands that name none of the tools return after one regular
-expression.
+backticks or `$VAR` (same page), so the filtering happens inside the script. Every Bash
+and PowerShell call starts Python once. Commands that name none of the tools return after
+one regular expression, which also runs on the line with its quotes and backslashes
+removed.
 
 ## Commands
 
@@ -152,71 +158,128 @@ missing or its checksum differs.
 
 ## What it detects, and what the backup is
 
-The hook reads the command the way a shell would: `;`, `&&`, `||`, `|` and newlines,
-`VAR=value` prefixes and `export`, `sudo`, `env`, `timeout`, `nohup`, `xargs`, `cd` and
-subshells, `bash -c` / `sh -c`, `eval`, `cmd /c`, `pwsh -Command`, `$(...)` and backticks
-(also inside double quotes), heredocs and here-strings fed to a shell, and the Windows forms
-(`& 'C:\...\terraform.exe'`, `$env:TF_WORKSPACE = ...`). Text that is only printed or
-written to a file (`echo`, `grep`, a commit message, a heredoc into `cat`) is not a command.
+The hook reads the command the way a shell would:
+- separators: `;`, `&&`, `||`, `|`, newlines, and line continuations (`\` and PowerShell's backtick);
+- quoting: quotes and backslashes inside a word (`terr''aform`), and bash's `$'...'`;
+- prefixes: `VAR=value` and `export`, `sudo`, `env` (with `-S`), `timeout`, `nohup`, `nice`,
+  `time`, `caffeinate`, `xargs`;
+- directories: `cd` and subshells;
+- shells and evaluation: `bash -c` / `sh -c` / `fish -c`, `eval`, `cmd /c`, `pwsh -Command`,
+  `watch`, `flock`, `find -exec`;
+- substitutions: `$(...)`, backticks and `<(...)`. Each one also runs as a command line of its
+  own, including inside double quotes. In the line around it, its value is unknown, so a
+  target that uses it is unresolved;
+- heredocs and here-strings fed to a shell, directly or through `cat`;
+- the Windows forms: `& 'C:\...\terraform.exe'`, `$env:TF_WORKSPACE = ...`, script blocks
+  such as `ForEach-Object { ... }`, and `Start-Process`;
+- credential programs: `aws-vault exec`, `doppler run`, `op run`, `infisical run`,
+  `chamber exec`, `saml2aws exec`, `dotenvx run`, `teller run`, `berglas exec`,
+  `direnv exec`, `dotenv` and `summon`. The printed backup command runs inside the same
+  program, because the export needs the same credentials. Given the whole wrapped command,
+  `destroy-guard backup` runs the export without the program and says so.
+
+Text that is only printed or written to a file (`echo`, `grep`, a commit message, a heredoc
+into `cat`) is not a command.
 
 | Command | Backup (`destroy-guard backup`) | Checked | Target it must match |
 | --- | --- | --- | --- |
-| `terraform destroy`, `terraform apply -destroy`, `terraform state rm`, and `apply` of a plan made with `plan -destroy` on the same line; the same for `tofu` | `terraform state pull` in the target directory, with `TF_WORKSPACE` set to the target workspace | JSON object, integer `serial`, non-empty `lineage`, at least one resource; stored byte for byte, ready for `terraform state push` | tool, real directory (after `cd`, `-chdir`), workspace (`TF_WORKSPACE`, `workspace select` on the line, `.terraform/environment`) |
-| `kubectl delete <kind> <name>...`, `<kind>/<name>` | `kubectl get <kind> <name> -o json`, pinned with `--context` to the target's context | a JSON object of the expected kind and name | context (`--context`, else the kubeconfig's `current-context`), kubeconfig path, namespace (`-n`, all, or the context default), kind (aliases such as `deploy`, `po`, `svc` normalised), name |
+| `terraform destroy`, `terraform apply -destroy` (also through `TF_CLI_ARGS` / `TF_CLI_ARGS_apply`), `terraform state rm`, `terraform state push`, `terraform workspace delete -force`, and `apply` of a plan made with `plan -destroy` on the same line; the same for `tofu` | `terraform state pull` in the target directory, with `TF_WORKSPACE` set to the target workspace and `TF_CLI_ARGS*` removed | JSON object, integer `serial`, non-empty `lineage`, at least one resource; stored byte for byte, ready for `terraform state push` | tool, real directory (after `cd`, `-chdir`), `TF_DATA_DIR` when set (it holds the backend configuration), workspace (`TF_WORKSPACE`, `workspace select` on the line, `.terraform/environment`, the workspace `workspace delete` names) |
+| `kubectl delete <kind> <name>...`, `<kind>/<name>` | `kubectl get <kind> <name> -o json`, pinned with `--context` to the target's context | a JSON object of the expected kind and name | context (`--context`, else the kubeconfig's `current-context`), kubeconfig path, namespace (`-n`, all, or the namespace the kubeconfig sets for that context, `default` when it sets none), kind (aliases such as `deploy`, `po`, `svc` normalised), name |
 | `kubectl delete namespace <ns>` | the Namespace object, plus every object of every listable namespaced type in it (`kubectl api-resources`, events left out) | both are valid JSON; the contents are a list | as above |
 | `kubectl delete crd <name>` | the definition, plus every object of that type in all namespaces | as above | as above |
 | `kubectl delete <kind> -l <selector>` / `--field-selector` / `--all` | `kubectl get` with the same selector | a non-empty list | the selector as written |
-| `kubectl delete -f <file or dir>` / `-k <dir>` | `kubectl get -f ... -o json` | objects with kind and name | the path and a SHA-256 of the files' content: edit the manifest and the backup no longer matches |
-| `helm uninstall` (`delete`, `del`, `un`) `<release>...` | `helm get all <release>` | not empty, and names the release | kube context, namespace (`-n`, `HELM_NAMESPACE`), release |
+| `kubectl delete -f <file or dir>` / `-k <dir>` | `kubectl get -f ... -o json` | objects with kind and name | the path and a SHA-256 of the files' content: edit the manifest and the backup no longer matches. For a `-f` directory: its `.json`, `.yaml` and `.yml` files, subdirectories only with `-R`; for `-k`, every file under the directory (files a kustomization reads from outside it, such as `../base`, are not hashed). A URL is matched by its address only. A path that is missing, unreadable or over 2000 files / 64 MB leaves the target unresolved |
+| `helm uninstall` (`delete`, `del`, `un`) `<release>...` | `helm get all <release>` | not empty, and names the release | kube context, namespace (`-n`, `HELM_NAMESPACE`, else the context's namespace as above), release |
 | `git push --force`, `-f`, `--force-with-lease`, `+refspec`, `--delete`, `:branch` | `git ls-remote` for the remote tip, `git fetch --no-tags --refmap=` of that ref, then `refs/destroy-guard/<branch>-<utc>` created at the tip | the commit exists locally after the fetch, and the new ref resolves to it | repository, remote (name, or URL with credentials masked), destination ref (`push.default`, `branch.<name>.remote`, `pushRemote` from the repository's own config) |
 | `DROP ...` / `TRUNCATE` through `psql -c`, `mysql -e`, a heredoc or an `echo ... |`; `dropdb`; `mysqladmin drop` | none in v1 | | the prompt says so, and that a dump with the database's own tool is the manual equivalent |
 
 Also asked about, without an automatic backup: `git push --mirror`, `--prune`, `--all`,
 `--tags` with force, and `push.default = matching`, which rewrite many refs at once.
 
-When the target cannot be known from the command line (a `$VARIABLE`, `cd -`, names read
-from standard input through `xargs` or `-f -`, `--raw`, a Terraform `-state=` file), the
-hook asks and says why; no backup can match such a command.
+When the target cannot be known from the command line, the hook asks and says why, and no
+backup can match such a command. That is the case for:
+- a `$VARIABLE`, or a `$(...)` or backtick value in a name or path;
+- `cd -`;
+- names read from standard input through `xargs` or `-f -`;
+- `--raw`;
+- a Terraform `-state=` file.
 
-Not in scope: `git reset --hard` on a branch with unpushed commits (it changes nothing
-outside the clone, and `git reflog` still has the commits); plain `terraform apply`, which
-can also destroy resources removed from the configuration; Terragrunt; commands inside
-scripts, Makefiles, aliases or shell functions; commands run through `ssh`, `docker run` or
-`kubectl exec`; PowerShell `-EncodedCommand`; other datastores.
+Not in scope, and not asked about:
+- `git reset --hard` on a branch with unpushed commits. It changes nothing outside the
+  clone, and `git reflog` still has the commits.
+- Plain `terraform apply` (with or without `-replace`), which can also destroy resources.
+- Terragrunt; `kubectl replace --force` and `kubectl apply --prune`; `oc` and `kubecolor`.
+- A force or mirror set in the repository's config: a `+` refspec in `remote.<name>.push`,
+  or `remote.<name>.mirror`.
+- Commands inside scripts, Makefiles, aliases or shell functions.
+- A command whose name is built at run time: `$TF destroy`, `"$(which terraform)" destroy`,
+  `source <(...)`.
+- Commands run through `ssh`, `docker run`, `kubectl exec`, `parallel` or `sops exec-env`.
+- Shells nested more than four deep (`bash -c "sh -c '...'"` and so on).
+- PowerShell `-EncodedCommand`.
+- Other datastores.
 
 ## Freshness and the exact target
 
 A backup counts for 30 minutes. That window is this tool's own choice, not a standard: long
 enough to make a backup and then run the command, short enough that the target has probably
-not changed in between. `DESTROY_GUARD_MAX_AGE_MINUTES` changes it. A manifest dated more
+not changed in between. `DESTROY_GUARD_MAX_AGE_MINUTES` changes it; a value that is not a
+number of minutes above 0 and up to 10080 (a week) falls back to 30. A manifest dated more
 than 60 seconds in the future is not counted.
 
-A backup counts only for the targets written in its manifest. A backup of workspace
-`staging` does not cover `prod`; a backup of `deployment/web` in namespace `prod` does not
-cover `staging`, another context, or `-n` left out; a backup of `origin/main` does not
-cover `origin/release`. A backup of several objects covers any of them. A manifest is
-ignored if its directory has any permission bit for group or others, or belongs to another
-user (a git checkout or a plain copy normally gives 0755), if an exported file is missing or has
-another size, or if the manifest is malformed.
+A backup counts only for the targets written in its manifest:
+- A backup of workspace `staging` does not cover `prod`, nor another `TF_DATA_DIR`.
+- A backup of `deployment/web` in namespace `prod` does not cover `staging` or another context.
+- A backup of `origin/main` does not cover `origin/release`.
+- A backup of several objects covers any of them.
+
+With `-n` left out, the namespace is the one the kubeconfig sets for the context. So after
+`kubens staging`, a backup made while the context pointed at `prod` no longer counts. In a
+kubeconfig entry this reader does not follow (YAML anchors, for example), the target says
+"the context's default namespace", and a switch in between goes unnoticed; `-n` pins it.
+
+A manifest is ignored in any of these cases:
+- its directory has any permission bit for group or others, or belongs to another user (a
+  git checkout or a plain copy normally gives 0755);
+- an exported file is missing, empty or has another size;
+- the manifest is malformed.
 
 ## What it reads, runs and sends
 
-- **The hook** reads the command and these files, and nothing else: the manifests under
-  `.destroy-guard/backups/`; `.terraform/environment` (the selected workspace); `.git/HEAD`
-  and, from the repository's own `.git/config`, only `branch.<name>.remote`,
-  `branch.<name>.pushRemote`, `branch.<name>.merge`, `remote.pushDefault` and
-  `push.default`; from the kubeconfig, only the `current-context` line; and the manifest
-  files a `kubectl delete -f` or `-k` names, to hash them (for a `-f` directory its `.json`,
-  `.yaml` and `.yml` files, the ones kubectl reads; for `-k`, every file). Names taken from
-  these files (workspace, context, branch, remote) are used only when they are plain names;
-  anything else leaves the target unresolved, so text a repository carries does not reach
-  the prompt or Claude's context. It reads `TF_WORKSPACE`, `TF_DATA_DIR`,
-  `KUBECONFIG`, `HELM_NAMESPACE`, `HELM_KUBECONTEXT`, `DESTROY_GUARD_DIR` and
-  `DESTROY_GUARD_MAX_AGE_MINUTES` from the environment, plus `HOME` for `~` and `PATH` to name
-  the backup command. It runs no command, writes no file,
-  and sends nothing anywhere. On any internal error it lets the command through to the
-  normal permission flow and writes one line to stderr, which Claude Code keeps in its debug
-  log.
+- **The hook** reads the command and these files, and nothing else:
+  - the manifests under `.destroy-guard/backups/`, each read once per call;
+  - `.terraform/environment` (the selected workspace);
+  - `.git/HEAD`, and from the repository's own `.git/config` it keeps only
+    `branch.<name>.remote`, `branch.<name>.pushRemote`, `branch.<name>.merge`,
+    `remote.pushDefault` and `push.default`;
+  - from the kubeconfig, the `current-context` line and that context's `namespace`. It reads
+    line by line and stops once it has both, so in kubectl's own layout (keys in alphabetical
+    order) it never reaches the `users:` entries that hold credentials. A JSON kubeconfig is
+    parsed whole, and only those two values are kept;
+  - the manifest files a `kubectl delete -f` or `-k` names, to hash them.
+
+  It opens only regular files. A named pipe or a device in one of these places would block
+  until the hook's timeout, and a timed-out hook gives no answer: "The call continues through
+  the normal permission flow" ([hooks docs](https://code.claude.com/docs/en/hooks), checked
+  2026-09-24).
+
+  Names taken from these files (workspace, context, namespace, branch, remote) are used only
+  when they are plain names. Anything else leaves the target unresolved, so text a
+  repository carries does not reach the prompt or Claude's context.
+
+  From the environment it reads `TF_WORKSPACE`, `TF_DATA_DIR`, `TF_CLI_ARGS`,
+  `TF_CLI_ARGS_<command>`, `KUBECONFIG`, `HELM_NAMESPACE`, `HELM_KUBECONTEXT`,
+  `DESTROY_GUARD_DIR` and `DESTROY_GUARD_MAX_AGE_MINUTES`, plus `HOME` for `~`, `PATH` to name
+  the backup command, and the temporary directory.
+
+  It runs no command and sends nothing anywhere. The one file it writes, when it asks, is the
+  claim for that tool call: an empty file named after the `tool_use_id`, in `destroy-guard-<uid>` (mode 0700)
+  under the system temporary directory. Claims older than ten minutes are removed.
+
+  On any internal error it lets the command through to the normal permission flow and writes
+  one line to stderr. "Stderr from a hook that exits 0 goes to the debug log only" ([hooks
+  docs](https://code.claude.com/docs/en/hooks), checked 2026-09-24). Its answer is written as
+  ASCII JSON, so the code page of a Windows console cannot keep it from being printed.
 - **`destroy-guard backup`** runs only the commands in the table above, plus
   `terraform version -json`, `kubectl version --client -o json`, `helm version --short` and
   `git --version` for the manifest. They run with the destructive command's own `VAR=value`
@@ -224,15 +287,21 @@ another size, or if the manifest is malformed.
   `CHECKPOINT_DISABLE=1` for Terraform, which turns off Terraform's version and security
   bulletin check against HashiCorp's Checkpoint service
   ([Terraform CLI docs](https://developer.hashicorp.com/terraform/cli/commands), checked
-  2026-09-24), and `GIT_TERMINAL_PROMPT=0` for git. The exports talk to what the
-  destructive command talks to (the state backend, the cluster API, the git remote);
+  2026-09-24), and `GIT_TERMINAL_PROMPT=0` for git. It removes `TF_CLI_ARGS` and
+  `TF_CLI_ARGS_<command>` from the export's environment: Terraform adds those arguments to
+  every command ([environment
+  variables](https://developer.hashicorp.com/terraform/cli/config/environment-variables),
+  checked 2026-09-24), and `-destroy` does not belong on `state pull`. The exports talk to
+  what the destructive command talks to (the state backend, the cluster API, the git remote).
   destroy-guard itself sends nothing and uploads nothing.
 - **Printed:** what was exported (serial, lineage and resource counts by type; kinds and
   names; release names; commit IDs), file sizes and checksums. Never the contents.
-  Credentials in URLs, `--token`/`--password` values, `mysql -p...` and `VAR=value`
-  prefixes other than `TF_WORKSPACE`, `TF_DATA_DIR`, `KUBECONFIG`, `HELM_NAMESPACE`,
-  `HELM_KUBECONTEXT`, `AWS_PROFILE` and `AWS_REGION` are shown as `***` in the prompt, the
-  manifest and the CLI output.
+- **Hidden as `***`** in the prompt, the manifest and the CLI output: credentials in URLs,
+  `--token`/`--password` values, `mysql -p...`, and `VAR=value` prefixes other than
+  `TF_WORKSPACE`, `TF_DATA_DIR`, `KUBECONFIG`, `HELM_NAMESPACE`, `HELM_KUBECONTEXT`,
+  `AWS_PROFILE`, `AWS_REGION` and `AWS_DEFAULT_REGION`. The backup command in the prompt
+  quotes every word, a hidden one included, so the shell does not expand `***`. When a
+  value is hidden, the prompt says that the backup needs the original value in its place.
 
 No third-party data source is involved: destroy-guard reads your files and the output of
 your own tools, so there is no data licence or attribution to carry.
@@ -261,13 +330,21 @@ Old backups are never deleted automatically. Delete the directories under
 python3 -m unittest discover -s tests -t .
 ```
 
-Offline, standard library only. A table of real-world command lines (positives and
-negatives: `terraform plan`, `kubectl delete --dry-run=client`, `echo terraform destroy`,
-quoted strings, heredocs, commit messages); target resolution; manifest matching (exact
-target, freshness, clock skew, tampering, permissions, malformed manifests); the backup CLI
-with fake `terraform`, `kubectl`, `helm` and `git` on `PATH`, including non-zero exits, empty
-output, invalid JSON, the wrong object and timeouts; `.git/info/exclude` handling; hook
-payloads and exit codes; and the force-push flow with the real git when git is installed.
+Offline, standard library only. The suite covers:
+- a table of real-world command lines. Positives include line continuations, substitutions in
+  the middle of a command, quotes inside a name, xargs, credential programs and PowerShell
+  script blocks. Negatives include `terraform plan`, `kubectl delete --dry-run=client`,
+  `echo terraform destroy`, heredocs and commit messages;
+- target resolution, including the kubeconfig's namespace for a context and `TF_DATA_DIR`;
+- manifest matching: exact target, freshness, clock skew, tampering, permissions and malformed
+  manifests;
+- the backup CLI with fake `terraform`, `kubectl`, `helm` and `git` on `PATH`, including
+  non-zero exits, empty output, invalid JSON, the wrong object and timeouts;
+- `.git/info/exclude` handling;
+- hook payloads, exit codes, one answer per tool call, and an answer on a non-UTF-8 stdout;
+- the time a long line, a full store or crafted SQL takes;
+- the backup command run through bash to check that nothing is globbed;
+- the force-push flow with the real git when git is installed.
 
 ## What this is not
 

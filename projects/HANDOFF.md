@@ -65,7 +65,7 @@ licences, packaging from the sdist, CI pins); every finding was fixed with a reg
 | 101 | `101-mcp-upkeep` → `mcp-upkeep` | Check the MCP servers you run: is the repository behind each one still maintained, licensed, pinned? Asks before Claude adds one that is not. | CLI, plugin with hook | 127 |
 | 102 | `102-pkg-vitals` → `pkg-vitals` | Check an npm or PyPI package before a coding agent installs it: does the name exist, is it brand new, deprecated or yanked, is its repository archived? | CLI, plugin with hook | 173 |
 | 103 | `103-awesome-vitals` → `awesome-vitals` | Check every GitHub repository linked from a Markdown list: archived, gone, renamed, abandoned or unlicensed entries, with line numbers. | CLI, GitHub Action | 90 |
-| 104 | `104-eu-ets-mcp` → `eu-ets-mcp` | EU ETS installations from the Union Registry: verified emissions, free allocation and surrendered units by installation, LEI, country or sector. | MCP server, CLI | (fixing) |
+| 104 | `104-eu-ets-mcp` → `eu-ets-mcp` | EU ETS installations from the Union Registry: verified emissions, free allocation and surrendered units by installation, LEI, country or sector. | MCP server, CLI | 99 |
 | 105 | `105-eu-taxonomy-mcp` → `eu-taxonomy-mcp` | EU Taxonomy activities, NACE codes and technical screening criteria, from a dated snapshot of the EU Taxonomy Navigator. | MCP server, CLI | 95 |
 | 107 | `107-cbam-mcp` → `cbam-mcp` | EU CBAM scope, default values and CN descriptions from dated official sources. | MCP server, CLI | 135 |
 | 108 | `108-xlsx-review` → `xlsx-review` | A pull-request-style review for spreadsheets: formula-level diffs of .xlsx files and the edits that usually break models. | MCP server, CLI, plugin | 84 |
@@ -73,8 +73,8 @@ licences, packaging from the sdist, CI pins); every finding was fixed with a reg
 | 114 | `114-eudr-scope-mcp` → `eudr-scope-mcp` | EU Deforestation Regulation scope and dates: Annex I by CN code, application dates, country risk, with legal sources. | MCP server, CLI | 117 |
 | 115 | `115-csrd-scope` → `csrd-scope` | Is an undertaking in scope of the EU CSRD, and from which financial year? Rules with article citations. | MCP server, CLI | 71 |
 | 117 | `117-vsme-kit` → `vsme-kit` | The VSME standard's text, and a check of a filled EFRAG Digital Template. | MCP server, CLI, plugin | 77 |
-| 119 | `119-destroy-guard` → `destroy-guard` | A Claude Code hook: terraform destroy, kubectl delete, helm uninstall and git push --force wait for a verified backup. | plugin with hook, CLI | (fixing) |
-| 120 | `120-credential-reach` → `credential-reach` | What credentials could an AI agent running as you on this machine use? Lists them without printing a secret. | CLI, plugin | (fixing) |
+| 119 | `119-destroy-guard` → `destroy-guard` | A Claude Code hook: terraform destroy, kubectl delete, helm uninstall and git push --force wait for a verified backup. | plugin with hook, CLI | 134 |
+| 120 | `120-credential-reach` → `credential-reach` | What credentials could an AI agent running as you on this machine use? Lists them without printing a secret. | CLI, plugin | 139 |
 
 ### Built, not reviewed: do not publish as they are
 
@@ -106,10 +106,33 @@ sandbox that built them and need adjusting.
    line, or rename (for example `ctrace-mcp`) — a lawyer's question if you want certainty.
 3. **Old rota commits that held personal data (optional, recommended).** See the first note below. To have GitHub
    drop the unreferenced commits, open a request at https://support.github.com/contact naming the repository
-   `Keremozdemirra/rota` and the old commits `65ba043` to `9946a12` (46 commits of the old history of this branch).
+   `Keremozdemirra/rota` and the old commits `65ba043` to `9946a12` (46 commits of the old history of this branch),
+   plus `1fde6c9` once it has been rewritten (see the notes).
    GitHub's guide: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository
 4. **agent-vitals PR #1** (https://github.com/Keremozdemirra/agent-vitals/pull/1) links to mcp-upkeep. Merge it
    after mcp-upkeep is public; until then its links return 404.
+5. **eu-ets-mcp's name guard is a heuristic.** It withholds 2,792 installation names and 728 LEIs where the
+   operator may be a natural person (sole traders, farms, family partnerships). It can still miss a name, and it
+   hides some company names. The Commission publishes the same data under CC BY 4.0, and its legal notice says
+   reusers "may be required to clear additional rights" for identifiable private individuals. Publishing as it
+   is seems proportionate to me. The zero-risk alternative is to ship identifiers only, with no names and no
+   LEIs, which makes search by name impossible. Your call; it is a lawyer's question if you want certainty.
+6. **credential-reach, before publishing.** Its review found real leaks, and all of them are fixed: a token
+   followed a redirect to another host, and a private key or registry token appeared in output. One claim is
+   still open: the README quotes Git Credential Manager's documentation, which is on GitHub and could not be
+   fetched from the sandbox. Check that quote against
+   https://github.com/git-ecosystem/git-credential-manager or delete it. Not scanned yet, as the README says:
+   cargo `credentials.toml`, `pip.conf`, `.pgpass`, Maven settings.
+7. **Purge `.tmp-refresh` from the branch history (recommended).** In a clean clone of rota:
+   ```bash
+   git fetch origin claude/oss-program-setup-cian0f
+   git switch -C purge origin/claude/oss-program-setup-cian0f
+   git filter-branch -f --index-filter \
+     'git rm -r -q --cached --ignore-unmatch projects/104-eu-ets-mcp/.tmp-refresh' 3d642fe..HEAD
+   git log --all --oneline -- projects/104-eu-ets-mcp/.tmp-refresh   # expect only the old, unrewritten commits
+   git push --force-with-lease=claude/oss-program-setup-cian0f:<the tip you fetched> origin HEAD:claude/oss-program-setup-cian0f
+   ```
+   Then add `1fde6c9` and the commit after it to the GitHub Support request of decision 3.
 
 ## Not built, and why
 
@@ -137,6 +160,12 @@ sandbox that built them and need adjusting.
   new tip `259b5a5`), the tool now withholds any name that may be a natural person's, and the data file is
   regenerated without them. The old commits are off every branch but stay reachable by SHA on GitHub until
   purged (decision 3).
+- **A second slip, same day.** A snapshot commit of work in progress, `1fde6c9`, swept in the 104 builder's
+  temporary folder `projects/104-eu-ets-mcp/.tmp-refresh/`, which held the raw registry downloads (account
+  holders' names and addresses). The next commit deletes the folder, so the branch tip is clean, but the
+  files stay in the history. Removing them needs a history rewrite and a force-push, which the building
+  session's safety classifier blocked, so it is your call (decision 7). The builder now keeps its temporary
+  files outside the project.
 - **Rename.** 101 was built as `mcp-vitals`. PyPI would refuse that name: it normalises to the same name as the
   existing project `mcpvitals` (ContextJet.ai, 2026-07-05, "Vital signs for your MCP servers"), and PyPI rejects
   names "too similar to an existing project". `github.com/Keremozdemirra/mcp-vitals` is also agent-vitals' former

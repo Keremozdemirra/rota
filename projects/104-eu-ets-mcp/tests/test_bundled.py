@@ -59,13 +59,26 @@ class BundledSnapshot(unittest.TestCase):
         # an LEI's public record names the holder. A failure reports only ids, never a name or an LEI.
         rows = self.rows()
         cz = next(r for r in rows if (r["REGISTRY_CODE"], r["INSTALLATION_IDENTIFIER"]) == ("CZ", "310"))
-        self.assertTrue(cz["INSTALLATION_NAME"] == eu_ets.WITHHELD and cz["ACCOUNT_HOLDER_LEI"] == "", "CZ-310 carries an LEI")
+        self.assertTrue(cz["INSTALLATION_NAME"] == eu_ets.WITHHELD and cz["ACCOUNT_HOLDER_LEI"] == eu_ets.LEI_WITHHELD,
+                        "CZ-310 carries an LEI")
         leaks = [f"{r['REGISTRY_CODE']}-{r['INSTALLATION_IDENTIFIER']}" for r in rows
-                 if r["INSTALLATION_NAME"] == eu_ets.WITHHELD and r["ACCOUNT_HOLDER_LEI"]]
+                 if r["INSTALLATION_NAME"] == eu_ets.WITHHELD and r["ACCOUNT_HOLDER_LEI"] not in ("", eu_ets.LEI_WITHHELD)]
         self.assertEqual(leaks, [])
-        self.assertEqual(sum(1 for r in rows if r["ACCOUNT_HOLDER_LEI"]), self.manifest["counts"]["installations_with_lei"])
+
+    def test_withheld_lei_counts_agree(self):
+        # The holder is not in the snapshot, so the rule itself is tested on the fixtures; here the
+        # shipped file, the manifest and SOURCES.md must tell the same story.
+        rows = self.rows()
+        marked = sum(1 for r in rows if r["ACCOUNT_HOLDER_LEI"] == eu_ets.LEI_WITHHELD)
+        shown = sum(1 for r in rows if r["ACCOUNT_HOLDER_LEI"] not in ("", eu_ets.LEI_WITHHELD))
+        counts = self.manifest["counts"]
+        self.assertEqual((shown, marked), (counts["installations_with_lei"], counts["leis_withheld"]))
         ops = next(s for s in self.manifest["sources"] if s["kind"] == "operators")
-        self.assertIn(f"account-holder LEIs of {ops['leis_withheld']} of them", (DATA / "SOURCES.md").read_text(encoding="utf-8"))
+        self.assertEqual(ops["leis_withheld"], marked)
+        self.assertEqual(sum(ops["leis_withheld_by_reason"].values()), marked)
+        self.assertEqual(ops["leis_withheld_by_reason"]["name withheld"],
+                         sum(1 for r in rows if r["ACCOUNT_HOLDER_LEI"] == eu_ets.LEI_WITHHELD and r["INSTALLATION_NAME"] == eu_ets.WITHHELD))
+        self.assertIn(f"{marked} account-holder LEIs are withheld", (DATA / "SOURCES.md").read_text(encoding="utf-8"))
 
     def test_withheld_counts_agree(self):
         withheld = sum(1 for r in self.rows() if r["INSTALLATION_NAME"] == eu_ets.WITHHELD)

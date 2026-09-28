@@ -32,9 +32,17 @@ python3 "${CLAUDE_PLUGIN_ROOT}/destroy_guard.py" backup -- git push --force orig
   cannot resolve, SQL, or the tool is not installed). Report the message as it is.
 - Then run the destructive command as a separate step. Do not put the backup and the
   destructive command on one line: the hook checks the whole line before any of it runs.
+- In the command the prompt prints, `***` stands for a value hidden there (a token, a
+  password, an environment variable). Run it with the original value from the destructive
+  command in its place.
+- When the destructive command runs inside a credential program (`aws-vault exec`,
+  `doppler run`, `op run`, ...), run the backup inside the same program, as the prompt prints
+  it: the export needs the same credentials.
 - A backup counts for 30 minutes (the tool's own window; `DESTROY_GUARD_MAX_AGE_MINUTES`
-  changes it) and only for the same target: same directory and workspace, same kube
-  context, namespace, kind and name, same Helm release, same remote and branch.
+  changes it) and only for the same target: same directory, `TF_DATA_DIR` and workspace; same
+  kube context, namespace, kind and name; same Helm release; same remote and branch. With
+  `-n` left out, the namespace is the one the kubeconfig sets for the context, so switching
+  it (`kubens`) after the backup makes the hook ask again.
 
 ## Why did destroy-guard ask?
 
@@ -46,10 +54,10 @@ python3 "${CLAUDE_PLUGIN_ROOT}/destroy_guard.py" list
 `check` prints, per destructive operation, what it removes and whether a fresh backup
 covers it (`--json` for fields). Explain it in plain words: no backup yet, the newest one
 is too old, it was made for another target (workspace, namespace, context, branch), or the
-target cannot be known from the command (a shell variable, a `cd` into `$DIR`, names read
-from stdin). For SQL (`DROP`, `TRUNCATE` through psql or mysql) there is no automatic
-backup in this version: suggest a dump with the database's own tool before the person
-approves.
+target cannot be known from the command (a shell variable or `$(...)` value, a `cd` into
+`$DIR`, names read from stdin through xargs). For SQL (`DROP`, `TRUNCATE` through psql or
+mysql) there is no automatic backup in this version: suggest a dump with the database's own
+tool before the person approves.
 
 ## Rules
 

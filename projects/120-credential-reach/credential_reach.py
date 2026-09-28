@@ -7,9 +7,8 @@ whatever sits in the project's .env files. This lists them, grouped by what
 they reach, without printing a secret: names, locations, hosts, profiles,
 lengths and presence only.
 
-Standard library only, one file, so it runs without installing anything:
-
-  curl -sL https://raw.githubusercontent.com/Keremozdemirra/credential-reach/main/credential_reach.py | python3 -
+Standard library only, one file: `uvx credential-reach@<version>`, or read this
+file and run `python3 credential_reach.py`.
 
 What it reads, sends and changes:
 
@@ -63,10 +62,11 @@ SEVERITIES = ("high", "medium", "info")
 _B = r"(?<![A-Za-z0-9])"
 # Order matters: a pattern replaces its matches before the next one runs, so a key
 # inside a private-key block, or a JWT after "Bearer", is counted once.
-# The first seven are the shapes ship.sh and publish.sh scan for; the rest are common ones.
+# The first seven are the shapes the secret scan on this repository's commits looks for; the rest are common ones.
 SECRET_PATTERNS = [(name, re.compile(rx)) for name, rx in (
+    # the search for END stops at the next BEGIN: a lazy scan to the end of the text for every BEGIN was quadratic
     ("private-key", r"-{5}BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-{5}"
-                    r"(?:[\s\S]*?-{5}END (?:[A-Z0-9]+ )*PRIVATE KEY-{5}|[A-Za-z0-9+/=\s:,-]*)"),
+                    r"(?:(?:(?!-{5}BEGIN )[\s\S])*?-{5}END (?:[A-Z0-9]+ )*PRIVATE KEY-{5}|[A-Za-z0-9+/=\s:,-]*)"),
     ("anthropic-api-key", _B + r"sk-ant-[A-Za-z0-9_-]{20,}"),
     ("openai-api-key", _B + r"sk-(?:(?:proj|svcacct|admin)-[A-Za-z0-9_-]{20,}|[A-Za-z0-9]{32,})"),
     ("github-classic-pat", _B + r"ghp_[A-Za-z0-9]{36,}"),
@@ -86,8 +86,10 @@ SECRET_PATTERNS = [(name, re.compile(rx)) for name, rx in (
     ("pypi-token", _B + r"pypi-AgEIcHlwaS5vcmc[A-Za-z0-9_-]{50,}"),
     ("huggingface-token", _B + r"hf_[A-Za-z0-9]{34,}"),
     ("jwt", _B + r"eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}"),
-    # only the password part is replaced; `${VAR}`, `***` and `<...>` are references, not passwords
-    ("url-password", r"[A-Za-z][A-Za-z0-9+.-]*://[^\s:/@\"'<>\[\]]+:(?P<s>(?!\[REDACTED)(?![$*<{])[^\s@/\"'<>]{1,256})@"),
+    # only the password part is replaced; `${VAR}`, `***` and `<...>` are references, not passwords. The user may
+    # be empty (`redis://:pw@host`); the scheme is bounded, since an unbounded one made long letter runs quadratic.
+    ("url-password", r"[A-Za-z][A-Za-z0-9+.-]{0,31}://[^\s:/@\"'<>\[\]]*:"
+                     r"(?P<s>(?!\[REDACTED)(?![$*<{])[^\s@/\"'<>]{1,256})@"),
     ("bearer-token", r"(?i:\bbearer)\s+(?P<s>(?!\[REDACTED)[A-Za-z0-9._~+/-]{20,}=*)"),
 )]
 SECRET_LABELS = {
@@ -111,8 +113,15 @@ _AT_EDGE = (b"sk-", b"sk_live_", b"rk_live_", b"ghp_", b"gho_", b"ghu_", b"ghs_"
 _URL_USERINFO = re.compile(rb"://[^/\s\"@]*@")
 
 
+def _edge(body: bytes, i: int) -> bool:
+    """Whether a literal at body[i] may start a word once the line is decoded. A JSON escape right before it
+    (`\\n`, `\\t`, `\\u00e9`) ends in a letter or digit here but is a newline or another character there."""
+    return (i == 0 or not body[i - 1:i].isalnum() or body[i - 2:i - 1] == b"\\"
+            or (i >= 6 and body[i - 6:i - 4] == b"\\u"))
+
+
 def triggered(body: bytes) -> bool:
-    """False only when no secret pattern can match anywhere in `body`."""
+    """False only when no secret pattern can match anywhere in `body`, raw or JSON-decoded."""
     if any(x in body for x in _ANYWHERE):
         return True
     low = body.lower()
@@ -121,7 +130,7 @@ def triggered(body: bytes) -> bool:
     for lit in _AT_EDGE:
         i = body.find(lit)
         while i != -1:
-            if i == 0 or not body[i - 1:i].isalnum():
+            if _edge(body, i):
                 return True
             i = body.find(lit, i + 1)
     return b"@" in body and _URL_USERINFO.search(body) is not None
@@ -151,22 +160,42 @@ def looks_like(value: str) -> str | None:
 
 
 # ---------------------------------------------------------------- cleaning and masking
-CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f\u200b-\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069\ufeff]")
 ANSI = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]|\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)?")  # colour codes, terminal titles
-URL_IN_TEXT = re.compile(r"[A-Za-z][A-Za-z0-9+.-]*://[^\s\"'<>`]+")
+# the scheme is bounded (RFC 3986 schemes are short): an unbounded one made a long run of letters quadratic
+URL_IN_TEXT = re.compile(r"[A-Za-z][A-Za-z0-9+.-]{0,31}://[^\s\"'<>`]+")
+
+
+def _visible(text) -> str:
+    """One line without terminal sequences, control characters or invisible format characters (zero-width, bidi).
+    They are removed, not spaced, so that a token they split is whole again before any mask looks at it."""
+    t = ANSI.sub("", str(text))
+    if not t.isascii() or not t.isprintable():
+        t = "".join(_visible_char(ch) for ch in t)
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def _visible_char(ch: str) -> str:
+    if ch in "\t\n\r\x0b\x0c":
+        return " "
+    if unicodedata.category(ch) in ("Cc", "Cf"):  # includes the separators \x1c-\x1f, which isspace() accepts
+        return ""
+    return " " if ch.isspace() else ch
 
 
 def clean(text, limit: int = 120) -> str:
     """Text made safe to print: no control or bidi characters, one line, bounded."""
-    t = re.sub(r"\s+", " ", CONTROL.sub(" ", ANSI.sub("", str(text)))).strip()
+    t = _visible(text)
     return t if len(t) <= limit else t[:limit - 3].rstrip() + "..."
 
 
 def _secret_segment(seg: str) -> bool:
-    # a path segment like a key: long, letters mixed with digits (tokens some registries put in the URL path)
-    return looks_like(seg) is not None or (
-        len(seg) >= 24 and re.fullmatch(r"[A-Za-z0-9_\-+=.~]+", seg) is not None
-        and re.search(r"[0-9]", seg) is not None and re.search(r"[A-Za-z]", seg) is not None)
+    # a path segment that may be a credential (some registries and webhooks put the token in the path): a known
+    # shape, a `user:secret` or `bot<id>:<token>` pair, or a long run mixing letters with digits or both cases
+    # (`npm-remote-cache` stays readable)
+    if looks_like(seg) is not None or ":" in seg or "@" in seg or len(seg) >= 32:
+        return True
+    lower, upper, digit = (re.search(c, seg) is not None for c in ("[a-z]", "[A-Z]", "[0-9]"))
+    return len(seg) >= 16 and (lower or upper) and (digit or (lower and upper))
 
 
 def mask_url(u: str) -> str:
@@ -185,9 +214,9 @@ def mask_url(u: str) -> str:
 
 
 def safe(text, limit: int = 120) -> str:
-    """Anything read from a file or the environment, fit to print. Masks first, then cuts, so a cut
-    cannot remove the delimiter a mask looks for."""
-    masked = URL_IN_TEXT.sub(lambda m: mask_url(m.group(0)), str(text))
+    """Anything read from a file or the environment, fit to print. Strips invisible characters, then masks, then
+    cuts: a mask sees the string as it will be printed, and a cut cannot remove the delimiter a mask looks for."""
+    masked = URL_IN_TEXT.sub(lambda m: mask_url(m.group(0)), _visible(text))
     return clean(redact_text(masked)[0], limit)
 
 
@@ -197,7 +226,7 @@ def host_of(url: str) -> str:
         host, port = p.hostname or "", p.port
     except ValueError:
         return "?"
-    if not re.fullmatch(r"[A-Za-z0-9.\-_:]{1,253}", host or "-"):
+    if not re.fullmatch(r"[A-Za-z0-9.\-_:]{1,253}", host or "-") or looks_like(p.netloc.rpartition("@")[2]):
         return "?"
     host = f"[{host}]" if ":" in host else host
     return (host + (f":{port}" if port else "")) or "?"
@@ -231,12 +260,31 @@ def exists(p) -> bool:
         return False
 
 
+def open_regular(p):
+    """A binary file object for `p`, or None when it is not a regular file. O_NONBLOCK keeps the open itself from
+    waiting on a FIFO that took the file's place after a check; fstat then turns anything irregular away."""
+    flags = os.O_RDONLY | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_NOCTTY", 0) | getattr(os, "O_BINARY", 0)
+    fd = os.open(p, flags)
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            os.close(fd)
+            return None
+        return os.fdopen(fd, "rb")
+    except BaseException:
+        os.close(fd)
+        raise
+
+
 def read_file(p, limit: int = MAX_FILE) -> tuple[str | None, str]:
-    """(text, "") or (None, why). A FIFO or device is never opened, so a read cannot block."""
+    """(text, "") or (None, why). A FIFO or device is never read, and is not even opened unless it replaced a
+    regular file after the first check, so a read cannot block."""
     if not is_regular(p):
         return None, "not a regular file" if exists(p) else "missing"
     try:
-        with open(p, "rb") as f:
+        f = open_regular(p)
+        if f is None:
+            return None, "not a regular file"
+        with f:
             data = f.read(limit + 1)
     except OSError as e:
         return None, f"unreadable ({type(e).__name__})"
@@ -390,9 +438,11 @@ def env_kind(name: str, value: str) -> str | None:
     words = [w for w in re.split(r"[^A-Z0-9]+", up) if w]
     named = (up in AWS_SECRET_NAMES or up in SECRET_NAMES or bool(SECRET_WORDS & set(words))
              or (len(words) > 1 and words[-1] in ("KEY", "KEYS")))
+    if value and looks_like(value):  # before the path rule: a "path" variable can hold the key itself
+        return "secret"
     if up == "GOOGLE_APPLICATION_CREDENTIALS" or (named and words[-1] in PATH_WORDS):
         return "path"
-    if named or (value and looks_like(value)):
+    if named:
         return "secret"
     if up.startswith("AWS_"):
         return "setting"
@@ -409,8 +459,19 @@ def github_reach(kind: str) -> str:
     return ""
 
 
+def other_github_host(ctx: Context) -> str:
+    """The variable that points gh or a GitHub Actions run at a host other than github.com, or "".
+    gh sends GH_TOKEN/GITHUB_TOKEN to GH_HOST when that is a ghe.com subdomain (gh help environment), and in a
+    GitHub Enterprise Server workflow GITHUB_TOKEN belongs to GITHUB_SERVER_URL."""
+    for var in ("GH_HOST", "GITHUB_SERVER_URL", "GITHUB_API_URL"):
+        if ctx.get(var) and host_of(ctx.env[var].strip()) not in ("github.com", "api.github.com"):
+            return var
+    return ""
+
+
 def scan_env(ctx: Context) -> Section:
     sec = Section("environment", "Environment variables")
+    elsewhere = other_github_host(ctx)
     for name in sorted(ctx.env):
         value = ctx.env[name] or ""
         kind = env_kind(name, value)
@@ -439,16 +500,25 @@ def scan_env(ctx: Context) -> Section:
             extra = github_reach(shape or "")
             reach = f"Environment: {shown} holds {_a(label)}" + (f"; {extra}" if extra else "")
             sec.add("high", shown, detail, reach=reach, **facts)
-            if name.upper() in ("GITHUB_TOKEN", "GH_TOKEN"):
+            # with another host named, a token here may belong to it: it is never sent to github.com
+            if not elsewhere and name.upper() in ("GITHUB_TOKEN", "GH_TOKEN"):
                 ctx.add_token(value, f"${shown}", strict_github=False)
-            elif shape and shape.startswith("github") and not re.search(r"ENTERPRISE|GHE", name.upper()):
+            elif not elsewhere and shape and shape.startswith("github") and not re.search(r"ENTERPRISE|GHE",
+                                                                                            name.upper()):
                 ctx.add_token(value, f"${shown}")
+    if elsewhere and ctx.probe:
+        sec.notes.append(f"{elsewhere} names a host other than github.com, so --probe sends no token from the "
+                         "environment.")
     if ctx.get("CLAUDECODE") == "1":
         scrub = ctx.get("CLAUDE_CODE_SUBPROCESS_ENV_SCRUB") == "1"
         sec.notes.append("Started inside Claude Code: this is the environment its Bash tool passes to commands"
                          + (", after CLAUDE_CODE_SUBPROCESS_ENV_SCRUB removed the credentials it recognises."
                             if scrub else ". CLAUDE_CODE_SUBPROCESS_ENV_SCRUB=1 strips credentials it recognises "
                             "from that environment (Claude Code env-vars docs)."))
+        if scrub and not ctx.get("CLAUDE_CONFIG_DIR"):
+            # the scrub also removes CLAUDE_CONFIG_DIR (Claude Code v2.1.251 or later, env-vars docs)
+            sec.notes.append("The scrub also removes CLAUDE_CONFIG_DIR, so if Claude Code's configuration directory "
+                             "was moved, its transcripts are not found from here.")
     sec.found = bool(sec.findings)
     return sec
 
@@ -722,7 +792,8 @@ class YamlError(ValueError):
 
 
 def _strip_comment(s: str) -> str:
-    quote, i = None, 0
+    # `last` is the last non-blank character before i; slicing s[:i] at every quote made long lines quadratic
+    quote, i, last = None, 0, ""
     while i < len(s):
         c = s[i]
         if quote:
@@ -734,10 +805,12 @@ def _strip_comment(s: str) -> str:
                     i += 2
                     continue
                 quote = None
-        elif c in "'\"" and (not s[:i].strip() or s[:i].rstrip()[-1] in ":-[{,"):
+        elif c in "'\"" and (not last or last in ":-[{,"):
             quote = c
         elif c == "#" and (i == 0 or s[i - 1] in " \t"):
             return s[:i]
+        if not c.isspace():
+            last = c
         i += 1
     return s
 
@@ -791,6 +864,9 @@ def _scalar(v: str):
     return v
 
 
+_FLOW_STOP = re.compile(r"[,\]\}]|:(?=\s|$)")
+
+
 def _flow(s: str, i: int):
     """A flow collection ([a, b] or {k: v}) starting at s[i] -> (value, index after it)."""
     opener = s[i]
@@ -809,10 +885,18 @@ def _flow(s: str, i: int):
         elif s[i] in "'\"":
             end = _quoted_end(s, i)
             item, i = _unquote(s[i:end]), end
-        else:
-            m = re.compile(r"[^,\]\}]*?(?=\s*(?:,|\]|\}|:\s|:$))" if opener == "{" else r"[^,\]\}]*").match(s, i)
+        elif opener == "{":
+            # a key runs to the first `,`, `]`, `}` or `: `, less the blanks before it; one search, where a lazy
+            # regex with a `\s*` lookahead was quadratic on a long run of blanks
+            m = _FLOW_STOP.search(s, i)
             if m is None:
                 raise YamlError("unterminated flow mapping")
+            end = m.start()
+            while end > i and s[end - 1].isspace():
+                end -= 1
+            item, i = _scalar(s[i:end]), end
+        else:
+            m = re.compile(r"[^,\]\}]*").match(s, i)
             item, i = _scalar(m.group(0)), m.end()
         while i < len(s) and s[i] in " \t":
             i += 1
@@ -842,7 +926,7 @@ def _flow(s: str, i: int):
             raise YamlError("expected a comma")
 
 
-_KEY = re.compile(r"([^\s#\[\]{},'\"][^#]*?)\s*:(?:[ \t]+|$)")
+_KEY_END = re.compile(r":(?:[ \t]|$)")
 
 
 def _entry(text: str):
@@ -855,8 +939,14 @@ def _entry(text: str):
         if not rest.startswith(":") or rest[1:2] not in ("", " ", "\t"):
             return None
         return str(_unquote(text[:end])), rest[1:].strip()
-    m = _KEY.match(text)
-    return (m.group(1), text[m.end():].strip()) if m else None
+    # the key runs to the first `: ` (or a final `:`) with no `#` before it; a backtracking regex for this was
+    # quadratic on a long run of blanks
+    if text[0].isspace() or text[0] in "#[]{},'\"":
+        return None
+    m = _KEY_END.search(text, 1)
+    if m is None or "#" in text[:m.start()]:
+        return None
+    return text[:m.start()].rstrip(), text[m.end():].strip()
 
 
 def yaml_load(text: str):
@@ -1021,7 +1111,11 @@ def scan_kube(ctx: Context) -> Section:
         used = set()
         where = ctx.show(path)
         for name, c in contexts.items():
-            user, cluster = str(c.get("user") or ""), str(c.get("cluster") or "")
+            user, cluster = c.get("user") or "", c.get("cluster") or ""
+            if not isinstance(user, str) or not isinstance(cluster, str):
+                # an indentation slip can put a user's token here; its text is never printed
+                sec.error(where, f"context {safe(name, 60)}: its user or cluster is not a name; not checked")
+                continue
             used.add(user)
             sev, how = kube_user_auth(users.get(user))
             cl = clusters.get(cluster, {})
@@ -1045,7 +1139,10 @@ DOCKER_STORES = {"osxkeychain": "macOS Keychain", "wincred": "Windows Credential
 
 
 def _registry(key: str) -> str:
-    name = host_of(key) if "://" in key else key.split("/")[0]
+    # a key without a scheme can still carry `user:password@` in front of the host
+    name = host_of(key) if "://" in key else key.split("/")[0].rpartition("@")[2]
+    if looks_like(name):
+        return "?"
     return name if re.fullmatch(r"[A-Za-z0-9.\-_]{1,253}(?::[0-9]{1,5})?", name) else safe(name, 60)
 
 
@@ -1193,7 +1290,7 @@ def scan_pypirc(ctx: Context) -> Section:
         token = s.get("username", "").strip() == "__token__"
         if s.get("password", "").strip():
             sec.add("high", safe(name, 60), f"{host}: {'API token' if token else 'password'} stored in the file",
-                    where=ctx.show(p), reach=f"PyPI: upload as you to {host} ({name} in {ctx.show(p)})")
+                    where=ctx.show(p), reach=f"PyPI: upload as you to {host} ({safe(name, 60)} in {ctx.show(p)})")
         else:
             sec.add("info", safe(name, 60), f"{host}: no password stored", where=ctx.show(p))
     return sec
@@ -1313,6 +1410,8 @@ def scan_git(ctx: Context) -> Section:
             if not line or line.startswith("#"):
                 continue
             try:
+                if "://" not in line:  # without a scheme, host_of would print whatever the line holds as a host
+                    raise ValueError
                 u = urllib.parse.urlsplit(line)
                 pw, host = u.password, host_of(line)
             except ValueError:
@@ -1349,13 +1448,14 @@ def scan_git(ctx: Context) -> Section:
 
 # ---------------------------------------------------------------- gh
 def gh_dir(ctx: Context) -> Path:
-    # gh: GH_CONFIG_DIR, else $XDG_CONFIG_HOME/gh, else %AppData%\GitHub CLI on Windows, else ~/.config/gh
+    # gh: GH_CONFIG_DIR, else $XDG_CONFIG_HOME/gh, else %AppData%\GitHub CLI on Windows if AppData is set, else
+    # ~/.config/gh (gh help environment, checked 2026-09-24)
     if ctx.get("GH_CONFIG_DIR"):
         return Path(ctx.env["GH_CONFIG_DIR"])
     if ctx.get("XDG_CONFIG_HOME"):
         return Path(ctx.env["XDG_CONFIG_HOME"]) / "gh"
-    if ctx.windows:
-        return ctx.appdata() / "GitHub CLI"
+    if ctx.windows and ctx.get("APPDATA"):
+        return Path(ctx.env["APPDATA"]) / "GitHub CLI"
     return Path(ctx.home) / ".config" / "gh"
 
 
@@ -1603,11 +1703,23 @@ SECRET_FILE_PATTERNS = ["*.pem", "*.key", "*.p12", "*.pfx", "*.p8", "*.jks", "*.
                         "_netrc", ".git-credentials", ".htpasswd", "kubeconfig", "*.kubeconfig", ".vault-token",
                         "master.key", ".dockercfg"]
 ENV_LINE = re.compile(r"\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_.-]*)\s*=\s?(.*)$")
+PEM_ARMOUR = re.compile(r"-{5}BEGIN [A-Z0-9 ]{1,60}-{5}")
+PEM_ARMOUR_END = re.compile(r"-{5}END [A-Z0-9 ]{1,60}-{5}")
 MAX_WALK = 50_000
 
 
+def _value_like(name: str) -> bool:
+    """A "name" no one gives a variable: a secret shape, or a long run of letters and digits such as the last
+    line of a base64 block, which ends in `=` and so reads as `NAME=`."""
+    if looks_like(name):
+        return True
+    lower, upper, digit, separator = (re.search(c, name) is not None for c in ("[a-z]", "[A-Z]", "[0-9]", "[_.-]"))
+    return (len(name) >= 16 and digit and not separator) or (len(name) >= 20 and lower and upper and digit)
+
+
 def parse_env_file(text: str) -> list:
-    """[(name, value)] from a .env file: KEY=value, export KEY=value, quoted and multi-line quoted values."""
+    """[(name, value)] from a .env file: KEY=value, export KEY=value, quoted and multi-line quoted values.
+    An unquoted PEM block is taken whole, so that its base64 lines are never read as names."""
     out, lines, i = [], text.splitlines(), 0
     while i < len(lines):
         m = ENV_LINE.match(lines[i])
@@ -1617,13 +1729,23 @@ def parse_env_file(text: str) -> list:
         name, value = m.group(1), m.group(2).strip()
         if value[:1] in ("'", '"'):
             q, body = value[0], value[1:]
-            while q not in body and i < len(lines):  # a quoted value may run over several lines
-                body += "\n" + lines[i]
-                i += 1
+            if q not in body:  # a quoted value may run over several lines; only each new line is searched
+                parts = [body]
+                while i < len(lines):
+                    parts.append(lines[i])
+                    i += 1
+                    if q in parts[-1]:
+                        break
+                body = "\n".join(parts)
             value = body.split(q, 1)[0]
+        elif PEM_ARMOUR.match(value) and not PEM_ARMOUR_END.search(value):
+            while i < len(lines) and not PEM_ARMOUR_END.search(lines[i]):
+                i += 1
+            i += 1
         else:
-            value = re.split(r"\s+#", value, 1)[0].strip()
-        out.append((name, value))
+            value = re.split(r"\s+#", value, maxsplit=1)[0].strip()
+        if not _value_like(name):
+            out.append((name, value))
     return out
 
 
@@ -1641,9 +1763,11 @@ def git_status(root: Path, rels: list) -> tuple[dict, str]:
     try:
         top = run(["rev-parse", "--is-inside-work-tree"])
         if top.returncode != 0 or top.stdout.strip() != b"true":
-            first = decode_bytes(top.stderr).strip().splitlines()[:1]
-            return {}, ("not a git repository" if not first or "not a git repository" in first[0]
-                        else clean(first[0], 100))
+            # git's own message is not echoed: some quote a config value ("bad boolean config value '...'")
+            err = decode_bytes(top.stderr)
+            return {}, ("not a git repository" if not err.strip() or "not a git repository" in err
+                        else "git refuses this repository (dubious ownership, see git's safe.directory)"
+                        if "dubious ownership" in err else f"git could not read it (exit {top.returncode})")
         tracked = {os.fsdecode(p) for p in run(["ls-files", "-z", "--cached"]).stdout.split(b"\0") if p}
         chk = run(["check-ignore", "--stdin", "-z"], b"".join(os.fsencode(r) + b"\0" for r in rels))
         if chk.returncode not in (0, 1):
@@ -1654,6 +1778,13 @@ def git_status(root: Path, rels: list) -> tuple[dict, str]:
     except (OSError, subprocess.SubprocessError) as e:
         return {}, f"git failed ({type(e).__name__})"
     return {r: "tracked" if r in tracked else "ignored" if r in ignored else "not ignored" for r in rels}, ""
+
+
+def _inside(path: str, root: str) -> bool:
+    try:
+        return os.path.commonpath([path, root]) == root
+    except ValueError:  # another drive on Windows
+        return False
 
 
 def scan_project(ctx: Context) -> Section:
@@ -1689,10 +1820,18 @@ def scan_project(ctx: Context) -> Section:
     status, why = git_status(root, rels)
     if found and why:
         sec.notes.append(f"Git status unknown: {why}.")
+    real_root = os.path.realpath(root)
     for p, rel in zip(found, rels):
         st = status.get(rel, "")
         where = safe(rel, 160)
         git_note = {"tracked": "tracked by git", "not ignored": "not git-ignored", "ignored": "git-ignored"}.get(st, "")
+        if os.path.islink(p) and not _inside(os.path.realpath(p), real_root):
+            # reported, never read: the scan stays inside the project
+            target = ctx.show(os.path.realpath(p))
+            sec.add("medium", where, f"a symbolic link to {target}, outside the project; not read"
+                    + (f"; {git_note}" if git_note else ""), git=st or None,
+                    reach=f"Project: {where} links to {target}, outside the project (not read)")
+            continue
         text, why_r = read_file(p)
         if text is None and why_r != "missing":
             sec.error(where, why_r)
@@ -1738,10 +1877,18 @@ def transcript_files(ctx: Context) -> tuple[Path, list]:
     for dirpath, _, filenames in os.walk(root, onerror=lambda e: None):
         for n in filenames:
             # set-aside transcripts are named <session>.jsonl.superseded-<timestamp> (Claude Code docs)
-            # a symlink is skipped: rewriting it would replace the link and leave its target as it was
-            if (n.endswith(".jsonl") or ".jsonl.superseded-" in n) and not os.path.islink(os.path.join(dirpath, n)):
+            # a symlink is skipped: rewriting it would replace the link and leave its target as it was;
+            # a FIFO or device is skipped: opening one blocks or has effects
+            if (n.endswith(".jsonl") or ".jsonl.superseded-" in n) and _lregular(os.path.join(dirpath, n)):
                 out.append(Path(dirpath) / n)
     return root, sorted(out)
+
+
+def _lregular(p) -> bool:
+    try:
+        return stat.S_ISREG(os.lstat(p).st_mode)
+    except (OSError, ValueError):
+        return False
 
 
 def _strings(obj):
@@ -1794,7 +1941,7 @@ def line_counts(body: bytes) -> dict:
         return redact_text(body.decode("utf-8", "surrogateescape"))[1]
     try:
         obj = json.loads(text)
-    except ValueError:
+    except (ValueError, RecursionError):  # nested too deep for the parser: matched as plain text instead
         return redact_text(text)[1]
     counts: dict = {}
     for s in _strings(obj):
@@ -1816,19 +1963,22 @@ def redact_line(body: bytes) -> tuple[bytes, dict]:
         return new.encode("utf-8", "surrogateescape"), counts
     try:
         obj = json.loads(text)
-    except ValueError:
+        new_obj, counts = _redact_obj(obj)
+    except (ValueError, RecursionError):  # not JSON, or nested too deep to walk: replaced in the text
         new, counts = redact_text(text)
         return new.encode("utf-8"), counts
-    new_obj, counts = _redact_obj(obj)
     if not counts:
         return body, {}
     raw = redact_text(text)[0]
     try:
         if json.loads(raw) == new_obj:
             return raw.encode("utf-8"), counts
-    except ValueError:
+    except (ValueError, RecursionError):
         pass
-    return json.dumps(new_obj, ensure_ascii=True, separators=(",", ":")).encode("ascii"), counts
+    try:
+        return json.dumps(new_obj, ensure_ascii=True, separators=(",", ":")).encode("ascii"), counts
+    except (ValueError, RecursionError):
+        return raw.encode("utf-8"), counts
 
 
 def scan_transcript_file(p: Path) -> tuple[dict, dict, str]:
@@ -1836,7 +1986,10 @@ def scan_transcript_file(p: Path) -> tuple[dict, dict, str]:
     counts: dict = {}
     lines: dict = {}
     try:
-        with open(p, "rb") as f:
+        f = open_regular(p)
+        if f is None:
+            return counts, lines, "not a regular file"
+        with f:
             for raw in f:
                 body, _ = _split_ending(raw)
                 c = line_counts(body)
@@ -1888,13 +2041,20 @@ def redact_file(p: Path, backup: Path) -> tuple[dict, str]:
     (count per type, "") on success, ({}, why) when the file was left as it was."""
     try:
         before = os.stat(p)
+        src = open_regular(p)
     except OSError as e:
         return {}, f"unreadable ({type(e).__name__})"
-    fd, tmp = tempfile.mkstemp(prefix=f".{p.name}.", suffix=".credential-reach.tmp", dir=str(p.parent))
+    if src is None:
+        return {}, "not a regular file; left unchanged"
+    try:
+        fd, tmp = tempfile.mkstemp(prefix=f".{p.name}.", suffix=".credential-reach.tmp", dir=str(p.parent))
+    except OSError as e:
+        src.close()
+        return {}, f"could not rewrite ({type(e).__name__})"
     counts: dict = {}
     valid_before = 0
     try:
-        with os.fdopen(fd, "wb") as out, open(p, "rb") as src:
+        with os.fdopen(fd, "wb") as out, src:
             for raw in src:
                 body, end = _split_ending(raw)
                 valid_before += _valid_json(body)
@@ -1936,7 +2096,7 @@ def _valid_json(body: bytes) -> int:
     try:
         json.loads(body.decode("utf-8"))
         return 1
-    except (UnicodeDecodeError, ValueError):
+    except (UnicodeDecodeError, ValueError, RecursionError):
         return 0
 
 
@@ -1997,7 +2157,9 @@ def run_redact(ctx: Context, as_json: bool) -> int:
 
 
 # ---------------------------------------------------------------- --probe
-GITHUB_TOKEN_SHAPE = re.compile(r"gh[pousr]_[A-Za-z0-9]{36,251}|github_pat_[A-Za-z0-9_]{22,251}"
+# ghr_ is left out: a refresh token cannot authenticate an API request (GitHub docs, token formats), so sending it
+# would only earn a 401 that reads as "not a valid token"
+GITHUB_TOKEN_SHAPE = re.compile(r"gh[pous]_[A-Za-z0-9]{36,251}|github_pat_[A-Za-z0-9_]{22,251}"
                                 r"|ghs_[0-9]{1,20}_[A-Za-z0-9_-]{1,2000}\.[A-Za-z0-9_-]{1,2000}\.[A-Za-z0-9_-]{1,2000}")
 LEGACY_GITHUB_TOKEN = re.compile(r"[0-9a-f]{40}")  # unprefixed, from before 2021; only from a github.com entry
 SCOPE_NOTES = {  # GitHub docs, "Scopes for OAuth apps", checked 2026-09-24

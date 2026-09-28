@@ -8,8 +8,9 @@ Two halves that never share work:
              `helm uninstall`, `git push --force` and the like it looks for the
              manifest of a fresh, verified backup of exactly that target. If
              there is none it asks the person and names the command that makes
-             one; if there is one it says nothing. It runs no command and
-             writes no file.
+             one; if there is one it says nothing. It runs no command; the
+             one file it writes, when it asks, is an empty claim for that
+             tool call, so that a second copy of the hook stays silent.
   the CLI    `destroy-guard backup -- <command>` works out the read-only export
              for that command (terraform state pull, kubectl get -o json,
              helm get all, git ls-remote + fetch), checks what came back, and
@@ -19,6 +20,7 @@ Standard library only; Python 3.9+.
 """
 from __future__ import annotations
 
+import bisect
 import datetime as dt
 import hashlib
 import json
@@ -434,9 +436,27 @@ def _join(cwd, rel):
     return os.path.normpath(os.path.join(cwd, rel)) if cwd else None
 
 
+def _open_regular(path, buffered: bool = True):
+    """A regular file opened for reading, else None. Opening a FIFO or a terminal would block
+    until the hook's timeout, and a timed-out hook gives no answer at all. Unbuffered, nothing
+    past the last line the caller reads leaves the file."""
+    fd = os.open(path, os.O_RDONLY | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_BINARY", 0))
+    try:
+        if stat.S_ISREG(os.fstat(fd).st_mode):
+            return os.fdopen(fd, "rb", buffering=-1 if buffered else 0)
+    except BaseException:
+        os.close(fd)
+        raise
+    os.close(fd)
+    return None
+
+
 def _read_small(path, limit: int = MAX_SMALL_FILE) -> str:
     try:
-        with open(path, "rb") as f:
+        f = _open_regular(path)
+        if f is None:
+            return ""
+        with f:
             return f.read(limit).decode("utf-8", "replace")
     except (OSError, ValueError):
         return ""
@@ -468,6 +488,8 @@ PWSH = {"powershell", "pwsh"}
 CD = {"cd", "pushd", "chdir", "set-location", "sl", "push-location"}
 EVAL = {"eval", "iex", "invoke-expression"}
 WATCH_VALUE = {"-n", "--interval", "-q", "--equexit"}
+FLOCK_VALUE = {"-w", "--wait", "--timeout", "-E", "--conflict-exit-code"}
+FIND_EXEC = {"-exec", "-execdir", "-ok", "-okdir"}
 # PowerShell's Start-Process: its parameters that take a value, its switches, and their aliases.
 START_PROCESS = {"start-process", "saps", "start"}
 SP_VALUE = ("filepath", "argumentlist", "workingdirectory", "verb", "windowstyle", "redirectstandardoutput",
@@ -709,7 +731,7 @@ def _stdin_texts(it, prev, bodies) -> list[str]:
 def _known(name: str) -> bool:
     """A command destroy-guard reads: a tool it parses, or something that runs one."""
     return (name in PARSERS or name in SHELLS or name in PWSH or name in WRAPPERS or name in RUNNERS
-            or name in EVAL or name in ("cmd", "watch"))
+            or name in EVAL or name in ("cmd", "watch", "flock", "find"))
 
 
 def _runner_start(name: str, args: list[str]):
@@ -792,6 +814,25 @@ def _nested_scripts(tool: str, args: list[str], stdin: list[str], shell: str):
             j += 2 if args[j] in WATCH_VALUE else 1
         j += args[j:j + 1] == ["--"]
         return [(" ".join(args[j:]), "bash")] if j < len(args) else []
+    if tool == "flock":  # flock [options] FILE COMMAND..., or flock [options] FILE -c 'COMMAND'
+        j = 0
+        while j < len(args) and args[j].startswith("-") and args[j] != "--":
+            j += 2 if args[j] in FLOCK_VALUE else 1
+        j += args[j:j + 1] == ["--"]
+        rest = args[j + 1:]
+        if rest[:1] in (["-c"], ["--command"]):
+            return [(rest[1], "bash")] if len(rest) > 1 else []
+        return [(shlex.join(rest), "bash")] if rest else []
+    if tool == "find":  # find ... -exec COMMAND {} ; runs COMMAND once per file found
+        scripts, j = [], 0
+        while j < len(args):
+            if args[j] in FIND_EXEC:
+                k = next((k for k in range(j + 1, len(args)) if args[k] in (";", "+")), len(args))
+                if k > j + 1:
+                    scripts.append((shlex.join(args[j + 1:k]), "bash"))
+                j = k
+            j += 1
+        return scripts
     return None
 
 
@@ -815,17 +856,20 @@ def _pflags(args: list[str], value_flags: set):
                 i += 1
             flags.setdefault(name, []).append(val if eq else None)
         elif a.startswith("-") and len(a) > 1:
-            short = a[:2]
-            if short in value_flags:
-                if len(a) > 2:
-                    val = a[3:] if a[2] == "=" else a[2:]
-                else:
+            # bundled letters, as pflag and getopt read them: in -Rf dir, -R is a switch and -f takes dir
+            for k in range(1, len(a)):
+                short = "-" + a[k]
+                if short not in value_flags:
+                    flags.setdefault(short, []).append(None)
+                    continue
+                val = a[k + 1:]
+                if val.startswith("="):
+                    val = val[1:]
+                elif not val:
                     val = args[i + 1] if i + 1 < len(args) else ""
                     i += 1
                 flags.setdefault(short, []).append(val)
-            else:
-                for ch in a[1:]:
-                    flags.setdefault("-" + ch, []).append(None)
+                break
         else:
             pos.append(a)
         i += 1
@@ -876,7 +920,7 @@ def _op(ctx: _Ctx, tool: str, label: str, what: str, targets=(), problem=None, a
             "problem": problem, "auto": bool(auto and not problem and targets), "manual": not auto,
             "cwd": ctx.cwd, "exe": ctx.exe,
             "words": list(ctx.words), "assign": ctx.assign_words() + list(extra_assign), "plan": plan or {},
-            "shell": ctx.shell}
+            "shell": ctx.shell, "prefix": list(ctx.prefix)}
 
 
 def _q(s) -> str:
@@ -888,6 +932,22 @@ def _q(s) -> str:
 TF_VALUE = {"-target", "-replace", "-var", "-var-file", "-lock-timeout", "-parallelism", "-state", "-state-out",
             "-backup", "-out", "-exclude", "-generate-config-out"}
 TF_NAMES = {"terraform": "Terraform", "tofu": "OpenTofu"}
+
+
+def _cli_args(env: dict, command: list[str]) -> list[str]:
+    """TF_CLI_ARGS_<command> and TF_CLI_ARGS as words, in the order Terraform puts them after the command.
+
+    Terraform: "These arguments are inserted directly after the subcommand (such as plan) and before
+    any flags specified directly on the command-line" (developer.hashicorp.com/terraform/cli/config/
+    environment-variables, read 2026-09-24), so TF_CLI_ARGS_apply=-destroy turns an apply into a destroy.
+    """
+    extra = []
+    for var in ("TF_CLI_ARGS_" + "_".join(command).replace("-", "_"), "TF_CLI_ARGS"):
+        try:
+            extra += shlex.split(env.get(var) or "")
+        except ValueError:
+            pass
+    return extra
 
 
 def _terraform(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
@@ -906,19 +966,35 @@ def _terraform(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
         return []
     sub, rest = args[i], args[i + 1:]
     d = _join(ctx.cwd, chdir)
+    env = ctx.env()
+    if sub in ("state", "workspace") and rest:
+        rest = rest[:1] + _cli_args(env, [sub, rest[0]]) + rest[1:]
+    else:
+        rest = _cli_args(env, [sub]) + rest
+    named_ws, pos = None, []
     if sub == "workspace":
         if rest[:1] and rest[0] in ("select", "new"):
             _, pos = _go_flags(rest[1:], set())
             if pos and d:
                 ctx.line.tf_ws[d] = pos[0]
-        return []
-    if sub == "state":
-        if rest[:1] != ["rm"]:
             return []
-        flags, _ = _go_flags(rest[1:], TF_VALUE)
-        if _true(flags, "dry-run"):
+        if rest[:1] != ["delete"]:
             return []
-        action = "state rm"
+        flags, pos = _go_flags(rest[1:], TF_VALUE)
+        if not _true(flags, "force") or not pos:
+            return []  # without -force Terraform refuses to delete a workspace that still tracks resources
+        action, named_ws = "workspace delete -force", pos[0]
+    elif sub == "state":
+        if rest[:1] == ["rm"]:
+            flags, _ = _go_flags(rest[1:], TF_VALUE)
+            if _true(flags, "dry-run"):
+                return []
+            action = "state rm"
+        elif rest[:1] == ["push"]:
+            flags, pos = _go_flags(rest[1:], TF_VALUE)
+            action = "state push"
+        else:
+            return []
     else:
         flags, pos = _go_flags(rest, TF_VALUE)
         if sub == "plan":
@@ -936,31 +1012,42 @@ def _terraform(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
     if _has(flags, "help", "h"):
         return []
     label, product = f"{tool} {action}", TF_NAMES[tool]
-    problem, ws, from_line = None, None, False
-    if chdir is not None and d is None:
+    problem, ws, from_line, data_dir = None, None, False, env.get("TF_DATA_DIR") or ""
+    if ctx.stdin_args:
+        problem = "it takes arguments from standard input (xargs), so destroy-guard cannot tell what it acts on."
+    elif chdir is not None and d is None:
         problem = "its -chdir directory comes from a shell expression, so destroy-guard cannot match a backup to it."
     elif d is None:
         problem = "destroy-guard cannot tell which directory it runs in (after a cd it cannot follow)."
     elif _has(flags, "state"):
         problem = ("it names a state file with -state; destroy-guard backs up the state of the configured"
                    " backend only.")
+    elif DYNAMIC.search(data_dir):
+        problem = "its TF_DATA_DIR comes from a shell expression, so destroy-guard cannot match a backup to it."
     else:
-        env = ctx.env()
-        ws = env.get("TF_WORKSPACE")
+        ws = named_ws or env.get("TF_WORKSPACE")
         if not ws and d in ctx.line.tf_ws:
             ws, from_line = ctx.line.tf_ws[d], True
         if not ws:
-            data_dir = env.get("TF_DATA_DIR") or ".terraform"
-            ws = _read_small(Path(d) / data_dir / "environment", 4096).strip() or "default"
+            ws = _read_small(Path(d) / (data_dir or ".terraform") / "environment", 4096).strip() or "default"
         if DYNAMIC.search(ws):
             problem = "its workspace comes from a shell expression, so destroy-guard cannot match a backup to it."
         elif not PLAIN_WORKSPACE.fullmatch(ws):
             problem, ws = "its workspace name is not a plain name, so destroy-guard does not repeat or match it.", None
     real = os.path.realpath(d) if d else ""
     scope = f"the {product} state of {real} (workspace {_q(ws)})" if not problem else f"what the {product} state tracks"
-    what = f"removes entries from {scope}; the resources themselves stay" if action == "state rm" \
-        else f"destroys everything in {scope}"
+    if action == "state rm":
+        what = f"removes entries from {scope}; the resources themselves stay"
+    elif action == "state push":
+        what = f"replaces {scope} with {_q(pos[0]) if pos else 'a state file'}"
+    elif named_ws is not None:
+        what = f"deletes {scope}; the resources it tracks stay, untracked"
+    else:
+        what = f"destroys everything in {scope}"
     target = {"tool": tool, "dir": real, "workspace": ws}
+    if data_dir and not problem:
+        # TF_DATA_DIR holds the backend configuration: another data directory can be another backend
+        target["data_dir"] = os.path.realpath(os.path.join(real, data_dir))
     extra = [f"TF_WORKSPACE={ws}"] if from_line else []
     return [_op(ctx, tool, label, what, [target], problem, plan={"dir": real, "workspace": ws}, extra_assign=extra)]
 
@@ -1009,8 +1096,143 @@ def kind_of(resource: str) -> str:
     return r
 
 
+YAML_KEY = re.compile(r"([A-Za-z_][A-Za-z0-9_-]*)\s*:(?:\s+(.*))?$")
+PLAIN_NAMESPACE = re.compile(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?")
+
+
+def _yaml_value(v) -> str:
+    """A plain YAML scalar: comment and quotes removed."""
+    v = re.sub(r"(?:^|\s)#.*$", "", v or "").strip()
+    return v[1:-1] if len(v) > 1 and v[0] == v[-1] and v[0] in "'\"" else v
+
+
+def _context_entries(lines) -> dict:
+    """{name: namespace} from the entries of a kubeconfig's `contexts:` block.
+
+    The namespace is '' when an entry sets none, and None when the entry uses YAML this reader does not
+    follow (anchors, aliases, merge keys). Only these two keys of each entry are kept.
+    """
+    out, entry, item_col = {}, None, None
+
+    def finish():
+        if entry and entry["name"]:
+            out.setdefault(entry["name"], None if entry["odd"] else entry["ns"])
+
+    for line in lines:
+        s = line.strip()
+        if not s or s.startswith("#"):
+            continue
+        col = len(line) - len(line.lstrip(" "))
+        if s == "-" or s.startswith("- "):
+            item_col = col if item_col is None else item_col
+            if col == item_col:
+                finish()
+                body = s[1:].lstrip(" ")
+                entry = {"name": "", "ns": "", "odd": False, "top": None, "child": None,
+                         "key": col + len(s) - len(body) if body else None}
+                if not body:
+                    continue
+                s, col = body, entry["key"]
+        if entry is None:
+            continue
+        if s.startswith("<<") or re.search(r"(?:^|:\s+)[&*]", s):
+            entry["odd"] = True
+        m = YAML_KEY.match(s)
+        if not m:
+            continue
+        key, val = m.group(1), _yaml_value(m.group(2))
+        entry["key"] = col if entry["key"] is None else entry["key"]
+        if col == entry["key"]:
+            entry["top"] = key
+            if key == "name":
+                entry["name"] = val
+            elif key == "context" and val:  # flow style: context: {cluster: c, namespace: n}
+                f = re.search(r"[{,]\s*namespace\s*:\s*([^,}\s]+)", val)
+                entry["ns"] = _yaml_value(f.group(1)) if f else ""
+                entry["odd"] |= not val.startswith("{")
+        elif col > entry["key"] and entry["top"] == "context":
+            entry["child"] = col if entry["child"] is None else entry["child"]
+            if col == entry["child"] and key == "namespace":
+                entry["ns"] = val
+    finish()
+    return out
+
+
+def _kubeconfig(path):
+    """(current-context or None, {context name: namespace}) of one kubeconfig file.
+
+    Read line by line, and only the `current-context` line and the `contexts:` entries are kept.
+    Reading stops once both have been seen, so in kubectl's own layout (keys in alphabetical order)
+    the `users:` entries that hold credentials are never read. A JSON kubeconfig is parsed whole, and
+    the same two things are kept.
+    """
+    current, spaces, block, contexts_seen, first = None, {}, None, False, True
+    try:
+        f = _open_regular(path, buffered=False)  # a read buffer would pull in the users: entries too
+        if f is None:
+            return None, {}
+        with f:
+            budget = MAX_SMALL_FILE
+            for raw in f:
+                budget -= len(raw)
+                if budget < 0:
+                    break
+                line = raw.decode("utf-8", "replace").rstrip("\r\n")
+                s = line.strip()
+                if not s or s.startswith("#"):
+                    continue
+                if first and s.startswith("{"):
+                    return _kubeconfig_json(raw + f.read(max(budget, 0)))
+                first = False
+                if line[0] in " \t-":
+                    if block is not None:
+                        block.append(line)
+                    continue
+                if block is not None:
+                    spaces.update(_context_entries(block))
+                    block, contexts_seen = None, True
+                m = YAML_KEY.match(line)
+                if m and m.group(1) == "current-context":
+                    current = _yaml_value(m.group(2)) or None
+                elif m and m.group(1) == "contexts":
+                    if _yaml_value(m.group(2)):
+                        contexts_seen = True  # `[]`, or a flow sequence this reader does not follow
+                    else:
+                        block = []
+                if current is not None and contexts_seen:
+                    break
+    except OSError:
+        return None, {}
+    if block is not None:
+        spaces.update(_context_entries(block))
+    return current, spaces
+
+
+def _kubeconfig_json(data: bytes):
+    try:
+        doc = json.loads(data.decode("utf-8", "replace"))
+    except ValueError:
+        return None, {}
+    if not isinstance(doc, dict):
+        return None, {}
+    current = doc.get("current-context")
+    spaces = {}
+    for c in doc.get("contexts") if isinstance(doc.get("contexts"), list) else []:
+        if isinstance(c, dict) and isinstance(c.get("name"), str):
+            inner = c.get("context") if isinstance(c.get("context"), dict) else {}
+            ns = inner.get("namespace") or ""
+            spaces.setdefault(c["name"], ns if isinstance(ns, str) else None)
+    return (current if isinstance(current, str) and current else None), spaces
+
+
 def kube_context(ctx: _Ctx, context_flag, kubeconfig_flag, env_context: str = ""):
-    """(context, kubeconfig paths, problem). Of a kubeconfig only `current-context` is read."""
+    """(context, kubeconfig paths, problem, default namespace).
+
+    Of a kubeconfig only `current-context` and the namespace of that context are kept. The default
+    namespace is the context's own, `default` when it sets none, and None when it cannot be known
+    (no entry for the context, or one this reader does not follow); the target then says "the
+    context's default namespace" and cannot tell two defaults apart.
+    """
     env = ctx.env()
     if kubeconfig_flag is not None:
         files = [kubeconfig_flag]
@@ -1020,29 +1242,31 @@ def kube_context(ctx: _Ctx, context_flag, kubeconfig_flag, env_context: str = ""
         files = [os.path.join(os.path.expanduser("~"), ".kube", "config")]
     paths = [_join(ctx.cwd, f) for f in files]
     if any(p is None for p in paths):
-        return "", "", "its kubeconfig path comes from a shell expression or an unknown directory."
+        return "", "", "its kubeconfig path comes from a shell expression or an unknown directory.", None
     kubeconfig = os.pathsep.join(os.path.realpath(p) for p in paths)
+    facts = [_kubeconfig(p) for p in paths]  # merged like kubectl does: the first file that sets a value wins
     context = context_flag if context_flag is not None else (env.get(env_context) or None) if env_context else None
     if context is not None:
         if not context or DYNAMIC.search(context):
-            return "", kubeconfig, "its context comes from a shell expression, so destroy-guard cannot match a backup."
+            return "", kubeconfig, "its context comes from a shell expression, so destroy-guard cannot match a backup.", None
         if not PLAIN_CONTEXT.fullmatch(context):
-            return "", kubeconfig, "its context is not a plain name, so destroy-guard does not repeat or match it."
-        return context, kubeconfig, None
-    for p in paths:
-        text = _read_small(p)
-        m = re.search(r"(?m)^current-context:[ \t]*(.*?)[ \t]*$", text) or \
-            re.search(r'"current-context"\s*:\s*"((?:[^"\\]|\\.)*)"', text)
-        if m and m.group(1).strip("'\""):
-            name = m.group(1).strip("'\"")
-            if not PLAIN_CONTEXT.fullmatch(name):
-                return "", kubeconfig, "the kubeconfig's current-context is not a plain name, so destroy-guard does not repeat or match it."
-            return name, kubeconfig, None
-    return "", kubeconfig, None
+            return "", kubeconfig, "its context is not a plain name, so destroy-guard does not repeat or match it.", None
+    else:
+        context = next((cur for cur, _ in facts if cur), None)
+        if context is None:
+            return "", kubeconfig, None, None
+        if not PLAIN_CONTEXT.fullmatch(context):
+            return "", kubeconfig, ("the kubeconfig's current-context is not a plain name, so destroy-guard does not"
+                                    " repeat or match it."), None
+    ns = next((spaces[context] for _, spaces in facts if context in spaces), None)
+    if ns is None or (ns and not PLAIN_NAMESPACE.fullmatch(ns)):
+        return context, kubeconfig, None, None
+    return context, kubeconfig, None, ns or "default"
 
 
-def _where(ns_id: str, context: str) -> str:
+def _where(ns_id: str, context: str, default: bool = False) -> str:
     ns = {"*": "in every namespace", "-": "", "": "in the context's default namespace"}.get(ns_id, f"in namespace {ns_id}")
+    ns += " (the context's default)" if default and ns_id not in ("*", "-", "") else ""
     return (f" {ns}" if ns else "") + (f", context {context}" if context else ", no kubeconfig context found")
 
 
@@ -1054,7 +1278,7 @@ def _kubectl(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
     if dry is not None and (dry[-1] is None or dry[-1].lower() in ("client", "server", "true", "unchanged")):
         return []
     label = "kubectl delete"
-    context, kubeconfig, problem = kube_context(ctx, _last(flags, "--context"), _last(flags, "--kubeconfig"))
+    context, kubeconfig, problem, default_ns = kube_context(ctx, _last(flags, "--context"), _last(flags, "--kubeconfig"))
     conn = [f"{k}={v}" for k in sorted(KUBE_CONN - {"--context", "--kubeconfig"}) for v in _all(flags, k)]
     base = {"tool": "kubectl", "context": context, "kubeconfig": kubeconfig}
     for k in ("--server", "-s", "--cluster", "--user", "--as"):
@@ -1062,11 +1286,12 @@ def _kubectl(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
             base[k.lstrip("-")] = mask_text(_last(flags, k))
     ns = _last(flags, "-n", "--namespace")
     all_ns = _has(flags, "-A", "--all-namespaces")
-    ns_id = "*" if all_ns else (ns or "")
+    ns_id = "*" if all_ns else (ns or default_ns or "")
+    from_default = not all_ns and not ns and bool(default_ns)
     if ns and DYNAMIC.search(ns):
         problem = problem or "its namespace comes from a shell expression, so destroy-guard cannot match a backup."
     plan = {"context": context, "kubeconfig": _last(flags, "--kubeconfig"), "conn": conn,
-            "namespace": ns, "all_namespaces": all_ns}
+            "namespace": ns, "default_namespace": default_ns if from_default else None, "all_namespaces": all_ns}
     res = pos[1:]
     files, kust = _all(flags, "-f", "--filename"), _last(flags, "-k", "--kustomize")
     selector, fsel, every = _last(flags, "-l", "--selector"), _last(flags, "--field-selector"), _has(flags, "--all")
@@ -1089,15 +1314,24 @@ def _kubectl(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
             if p is None:
                 problem = problem or "a manifest path comes from a shell expression or an unknown directory."
                 break
-            entries.append({"path": os.path.realpath(p), "sha256": fingerprint(p, manifests_only=f != kust)})
+            digest = fingerprint(p, manifests_only=f != kust, recursive=f == kust or _has(flags, "-R", "--recursive"))
+            if digest is None:
+                problem = problem or (f"{os.path.realpath(p)} is missing or unreadable, or holds more than destroy-guard"
+                                      f" hashes ({FINGERPRINT_LIMIT[0]} files, {FINGERPRINT_LIMIT[1] >> 20} MB), so no"
+                                      " backup can be matched to its content.")
+                break
+            entries.append({"path": os.path.realpath(p), "sha256": digest})
         target = dict(base, namespace=ns_id, files=entries, kustomize=bool(kust),
                       recursive=_has(flags, "-R", "--recursive"))
         shown = ", ".join(e.get("path") or e.get("url", "") for e in entries)
         plan.update(mode="files", files=files, kustomize=kust, recursive=_has(flags, "-R", "--recursive"))
-        return [_op(ctx, tool, label, f"deletes the objects defined in {shown}{_where(ns_id, context)}", [target], problem,
-                    plan=plan)]
+        return [_op(ctx, tool, label, f"deletes the objects defined in {shown}{_where(ns_id, context, from_default)}",
+                    [target], problem, plan=plan)]
     if not res:
         return []  # kubectl refuses a delete that names nothing
+    if any(DYNAMIC.search(r) for r in res):
+        return [_op(ctx, tool, label, "deletes objects that a shell expression names", problem="the objects it deletes"
+                    " come from a shell expression, so destroy-guard cannot match a backup.")]
     if any("/" in r for r in res):
         if not all("/" in r for r in res):
             return []  # kubectl refuses TYPE/NAME mixed with other arguments
@@ -1114,8 +1348,8 @@ def _kubectl(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
                           field_selector=(fsel or "").replace(" ", ""), all=bool(every))
             how = f"-l {selector}" if selector else f"--field-selector {fsel}" if fsel else "--all"
             plan.update(mode="group", resources=res[0], selector=selector, field_selector=fsel)
-            return [_op(ctx, tool, label, f"deletes every {kinds} matching {how}{_where(ns_id, context)}", [target],
-                        problem, plan=plan)]
+            return [_op(ctx, tool, label, f"deletes every {kinds} matching {how}{_where(ns_id, context, from_default)}",
+                        [target], problem, plan=plan)]
         if selector or fsel:
             return []  # kubectl refuses names together with a selector
         pairs = [(t, n) for t in types for n in names]
@@ -1137,30 +1371,32 @@ def _kubectl(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
                 shown.append(f"the resource type {name} and every object of that type")
             else:
                 shown.append(f"{kind}/{name}")
-    where = _where(ns_id if any(not o["cluster_scoped"] for o in objects) else "-", context)
+    where = _where(ns_id if any(not o["cluster_scoped"] for o in objects) else "-", context, from_default)
     plan.update(mode="objects", objects=objects)
     return [_op(ctx, tool, label, "deletes " + ", ".join(shown) + where, targets, problem, plan=plan)]
 
 
-def fingerprint(path, manifests_only: bool = False) -> str:
+def fingerprint(path, manifests_only: bool = False, recursive: bool = True):
     """SHA-256 over a manifest file, or over the files under a directory (names and contents), bounded.
 
-    For `kubectl delete -f <dir>` only .json, .yaml and .yml files count, the ones kubectl reads;
-    a kustomization (-k) can pull in any file, so there every file counts.
+    For `kubectl delete -f <dir>` only .json, .yaml and .yml files count, the ones kubectl reads, and
+    subdirectories only with -R, hidden ones included, as kubectl reads them. A kustomization (-k) can
+    pull in any file, so there every file under the directory counts. None when the path is missing,
+    unreadable or larger than FINGERPRINT_LIMIT: then no backup can be matched to its content.
     """
     p = Path(path)
     h = hashlib.sha256()
     try:
         if p.is_file():
             if p.stat().st_size > FINGERPRINT_LIMIT[1]:
-                return "too-large"
+                return None
             h.update(p.read_bytes())
             return h.hexdigest()
         if not p.is_dir():
-            return "missing"
+            return None
         files, total = 0, 0
         for root, dirs, names in os.walk(p):
-            dirs[:] = sorted(d for d in dirs if not d.startswith("."))
+            dirs[:] = sorted(d for d in dirs if d != ".git") if recursive else []
             for n in sorted(names):
                 f = Path(root) / n
                 if not f.is_file() or (manifests_only and not n.lower().endswith((".json", ".yaml", ".yml"))):
@@ -1168,11 +1404,11 @@ def fingerprint(path, manifests_only: bool = False) -> str:
                 files += 1
                 total += f.stat().st_size
                 if files > FINGERPRINT_LIMIT[0] or total > FINGERPRINT_LIMIT[1]:
-                    return "too-large"
+                    return None
                 h.update(f.relative_to(p).as_posix().encode("utf-8") + b"\0" + f.read_bytes() + b"\0")
         return h.hexdigest()
     except OSError:
-        return "unreadable"
+        return None
 
 
 # ---------------------------------------------------------------- Helm
@@ -1191,12 +1427,18 @@ def _helm(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
     if dry is not None and (dry[-1] is None or dry[-1].lower() != "false"):
         return []
     releases = pos[1:]
+    label = f"helm {pos[0]}"
+    if ctx.stdin_args:
+        return [_op(ctx, tool, label, "uninstalls releases named on standard input", problem="it takes the release"
+                    " names from standard input (xargs), so destroy-guard cannot tell which releases it removes.")]
     if not releases:
         return []
     env = ctx.env()
-    context, kubeconfig, problem = kube_context(ctx, _last(flags, "--kube-context"), _last(flags, "--kubeconfig"),
-                                                "HELM_KUBECONTEXT")
+    context, kubeconfig, problem, default_ns = kube_context(ctx, _last(flags, "--kube-context"),
+                                                            _last(flags, "--kubeconfig"), "HELM_KUBECONTEXT")
     ns = _last(flags, "-n", "--namespace") or env.get("HELM_NAMESPACE") or ""
+    from_default = not ns and bool(default_ns)
+    ns = ns or default_ns or ""
     if ns and DYNAMIC.search(ns) or any(DYNAMIC.search(r) for r in releases):
         problem = problem or "its release or namespace comes from a shell expression, so destroy-guard cannot match a backup."
     base = {"tool": "helm", "context": context, "kubeconfig": kubeconfig, "namespace": ns}
@@ -1209,9 +1451,9 @@ def _helm(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
     conn = [f"{k}={v}" for k in sorted(HELM_CONN - {"--kube-context", "--kubeconfig"}) for v in _all(flags, k)]
     plan = {"context": context, "kubeconfig": _last(flags, "--kubeconfig"), "namespace": ns, "conn": conn,
             "releases": [t["release"] for t in targets]}
-    label = f"helm {pos[0]}"
     names = ", ".join(t["release"] for t in targets)
-    return [_op(ctx, tool, label, f"uninstalls release {names}{_where(ns, context)}", targets, problem, plan=plan)]
+    return [_op(ctx, tool, label, f"uninstalls release {names}{_where(ns, context, from_default)}", targets, problem,
+                plan=plan)]
 
 
 # ---------------------------------------------------------------- git
@@ -1352,6 +1594,9 @@ def _git(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
         return []
     deleting = (delete or any(s.startswith(":") for s in marked)) and not force
     label = "git push --delete" if deleting else "git push --force"
+    if ctx.stdin_args:
+        return [_op(ctx, tool, label, "rewrites refs named on standard input", problem="it takes the refs from standard"
+                    " input (xargs), so destroy-guard cannot tell which branches it overwrites or deletes.")]
     if many:
         return [_op(ctx, tool, label, "rewrites many refs at once", problem=f"it uses {', '.join(many)}, which can overwrite or"
                     " delete many refs; destroy-guard makes backups of single branches only.", auto=False)]
@@ -1418,8 +1663,9 @@ def _git(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
 
 # ---------------------------------------------------------------- SQL
 
-SQL_NOISE = re.compile(r"--[^\n]*|/\*.*?\*/|'(?:[^']|'')*'|\$([A-Za-z_][A-Za-z0-9_]*|)\$.*?\$\1\$|\"(?:[^\"]|\"\")*\"|`[^`]*`",
-                       re.S)
+SQL_START = re.compile(r"--|/\*|['\"`]|\$(?:[A-Za-z_][A-Za-z0-9_]*)?\$")
+# every place a dollar-quote tag starts, overlapping ones included ($a$$ holds both $a$ and $$)
+DOLLAR_TAG = re.compile(r"(?=(\$(?:[A-Za-z_][A-Za-z0-9_]*)?\$))")
 SQL_DESTRUCTIVE = re.compile(r"(?i)\b(?:DROP\s+(?:(?:MATERIALIZED|FOREIGN)\s+)?(TABLE|DATABASE|SCHEMA|VIEW|INDEX|"
                              r"SEQUENCE|COLUMN|PARTITION|USER|ROLE|OWNED|TYPE|FUNCTION|PROCEDURE|TRIGGER|EXTENSION)"
                              r"|(TRUNCATE))\b")
@@ -1431,15 +1677,69 @@ SQL_MANUAL = ("destroy-guard has no automatic backup for databases in v1; a dump
               " (pg_dump, mysqldump) before approving is the manual equivalent.")
 
 
+def _sql_code(text: str) -> str:
+    """SQL with comments, string literals, quoted names and dollar-quoted bodies blanked out.
+
+    Linear in the length of the text: a closer found missing once is not searched for again, and
+    dollar-quote tags are indexed up front, so text full of unclosed openers cannot stall the hook.
+    An opener without its closer counts as an ordinary character.
+    """
+    n, out, i, missing, tags = len(text), [], 0, {}, {}
+    for m in DOLLAR_TAG.finditer(text):
+        tags.setdefault(m.group(1), []).append(m.start())
+
+    def find(closer: str, start: int) -> int:
+        if closer in tags:
+            k = bisect.bisect_left(tags[closer], start)
+            return tags[closer][k] if k < len(tags[closer]) else -1
+        if missing.get(closer, n + 1) <= start:
+            return -1
+        k = text.find(closer, start)
+        if k < 0:
+            missing[closer] = start
+        return k
+
+    while i < n:
+        m = SQL_START.search(text, i)
+        if m is None:
+            out.append(text[i:])
+            break
+        out.append(text[i:m.start()])
+        tok, j = m.group(0), m.end()
+        if tok == "--":
+            k = text.find("\n", j)
+            out.append(" ")
+            i = n if k < 0 else k
+            continue
+        closer = "*/" if tok == "/*" else tok
+        k = find(closer, j)
+        if tok in ("'", '"'):
+            # a doubled quote is an escaped one; with no single quote left, the string ends at the last
+            # doubled one, where the regex this replaces ended it too
+            last = -1
+            while k >= 0 and text.startswith(tok, k + 1):
+                last, k = k, find(closer, k + 2)
+            k = k if k >= 0 else last
+        if k < 0:
+            out.append(tok[0])
+            i = m.start() + 1
+            continue
+        out.append(" ")
+        i = k + len(closer)
+    return "".join(out)
+
+
 def sql_destructive(text: str) -> set:
     """`DROP TABLE`, `TRUNCATE`, ... in SQL, outside string literals, quoted names and comments."""
     found = set()
-    for m in SQL_DESTRUCTIVE.finditer(SQL_NOISE.sub(" ", text or "")):
+    for m in SQL_DESTRUCTIVE.finditer(_sql_code(text or "")):
         found.add("TRUNCATE" if m.group(2) else "DROP " + m.group(1).upper())
     return found
 
 
 def _sql(ctx: _Ctx, tool: str, args: list[str], stdin) -> list[dict]:
+    if tool in MYSQL_TOOLS:  # -pSECRET: the password is glued to -p, and its letters are not options
+        args = [a for a in args if not re.fullmatch(r"-p.+", a)]
     if tool == "dropdb":
         flags, pos = _pflags(args, {"-h", "--host", "-p", "--port", "-U", "--username", "--maintenance-db"})
         if not pos or _has(flags, "--help", "-?", "-V", "--version"):
@@ -1528,7 +1828,10 @@ def load_manifest(d: Path):
         # so a checked-in or planted backup fails here.
         if os.name == "posix" and (st.st_mode & 0o077 or (hasattr(os, "getuid") and st.st_uid != os.getuid())):
             return None, "not private to this user"
-        with open(d / "manifest.json", "rb") as f:
+        f = _open_regular(d / "manifest.json")
+        if f is None:
+            return None, "no readable manifest"
+        with f:
             raw = f.read(MAX_MANIFEST_BYTES + 1)
         if len(raw) > MAX_MANIFEST_BYTES:
             return None, "manifest too large"
@@ -1543,7 +1846,9 @@ def load_manifest(d: Path):
         return None, "incomplete manifest"
     for e in exports:
         name = e.get("file") if isinstance(e, dict) else None
-        if not isinstance(name, str) or not SAFE_FILE.fullmatch(name) or not isinstance(e.get("bytes"), int):
+        # the CLI never keeps an empty export, so an entry of 0 bytes is not one of its backups
+        if not isinstance(name, str) or not SAFE_FILE.fullmatch(name) or not isinstance(e.get("bytes"), int) \
+                or isinstance(e.get("bytes"), bool) or e["bytes"] <= 0:
             return None, "bad export entry"
         try:
             if os.lstat(d / name).st_size != e["bytes"]:
@@ -1574,18 +1879,31 @@ def _stores(op: dict) -> list[Path]:
     return out
 
 
-def find_backup(op: dict, now=None, window=None) -> dict:
+def _manifests(store: Path, cache: dict) -> list:
+    """[(directory, created, target keys)] of the backups in a store that pass every check, newest first.
+
+    Read once per cache: a line with many operations must not read the store once for each of them.
+    """
+    if store not in cache:
+        rows = []
+        for d in backups(store):
+            m, created = load_manifest(d)
+            if m is not None:
+                rows.append((d, created, frozenset(target_key(t) for t in m["targets"] if isinstance(t, dict))))
+        cache[store] = rows
+    return cache[store]
+
+
+def find_backup(op: dict, now=None, window=None, cache=None) -> dict:
     """Whether fresh, verified backups cover every target of `op`: status covered or missing, and ages."""
     now = now or now_utc()
     window = window or max_age()
+    cache = {} if cache is None else cache
     wanted = {target_key(t) for t in op["targets"]}
     covered, newest, used = set(), None, []
     for store in _stores(op):
-        for d in backups(store):
-            m, created = load_manifest(d)
-            if m is None:
-                continue
-            keys = {target_key(t) for t in m["targets"] if isinstance(t, dict)} & wanted
+        for d, created, keys in _manifests(store, cache):
+            keys = keys & wanted
             if not keys:
                 continue
             age = now - created
@@ -1601,12 +1919,12 @@ def find_backup(op: dict, now=None, window=None) -> dict:
 
 def evaluate(command: str, shell: str = "bash", cwd=None, now=None) -> list[dict]:
     """Each destructive operation in `command`, with status covered, missing, unresolved or manual."""
-    results = []
+    results, cache = [], {}
     for op in analyse(command, shell, cwd):
         if op["problem"]:
             results.append({"op": op, "status": "manual" if op["manual"] else "unresolved"})
         else:
-            results.append(dict(find_backup(op, now), op=op))
+            results.append(dict(find_backup(op, now, cache=cache), op=op))
     return results
 
 
@@ -1621,34 +1939,41 @@ def fmt_age(age: dt.timedelta) -> str:
     return f"{s // 86400} d {s % 86400 // 3600} h"
 
 
-def _runner() -> str:
+def _runner(quote=shlex.quote) -> str:
     import shutil
     if shutil.which("destroy-guard"):
         return "destroy-guard"
-    return "python3 " + shlex.quote(str(Path(__file__).resolve()))
+    return "python3 " + quote(str(Path(__file__).resolve()))
 
 
 def _ps_quote(w: str) -> str:
-    return w if re.fullmatch(r"[A-Za-z0-9_./:=@%+,\\-]+", w) else "'" + w.replace("'", "''") + "'"
+    # `,` makes an array and a leading `@` splats in PowerShell, so neither is left bare
+    return w if re.fullmatch(r"[A-Za-z0-9_./:=%+\\-]+", w) else "'" + w.replace("'", "''") + "'"
 
 
-def backup_command(op: dict, session_cwd=None, runner=None) -> str:
-    """The one command that makes the backup `op` needs, masked for printing."""
+def backup_command(op: dict, session_cwd=None, runner=None, shell=None) -> str:
+    """The one command that makes the backup `op` needs, masked for printing.
+
+    Quoted for `shell`, the shell the person or Claude will type it into (the operation's own by
+    default). Every word is quoted, masked ones too: a bare `***` is a glob. A command that ran inside
+    a credential program (aws-vault exec, doppler run, ...) gets its backup inside the same program.
+    """
     words = list(op["assign"]) + list(op["words"])
     shown = mask_words(words, _basename(op["exe"]), len(op["assign"]))
-    quote = _ps_quote if op["shell"] == "powershell" else shlex.quote
+    quote = _ps_quote if (shell or op["shell"]) == "powershell" else shlex.quote
+    prefix = [quote(w) for w in mask_words(op.get("prefix") or [])]
     cwd = []
     if op["cwd"] and (not session_cwd or os.path.realpath(op["cwd"]) != os.path.realpath(session_cwd)):
         cwd = ["--cwd", op["cwd"]]
-    return " ".join([runner or _runner(), "backup"] + [quote(w) for w in cwd] + ["--"]
-                    + [w if "***" in w else quote(w) for w in shown])
+    return " ".join(prefix + [runner or _runner(quote), "backup"] + [quote(w) for w in cwd] + ["--"]
+                    + [quote(w) for w in shown])
 
 
-def reason(results: list[dict], session_cwd=None, window=None) -> str | None:
+def reason(results: list[dict], session_cwd=None, window=None, shell=None, limit: int = MAX_REASON) -> str | None:
     """The text for the permission prompt, or None when every operation is covered."""
     window = window or max_age()
     w = fmt_age(window)
-    parts, data_note, missing = [], False, False
+    parts, data_note, missing, hidden = [], False, False, False
     for r in results:
         op = r["op"]
         if r["status"] == "covered":
@@ -1660,17 +1985,21 @@ def reason(results: list[dict], session_cwd=None, window=None) -> str | None:
             age = r.get("newest_age")
             have = f"No backup of it from the last {w}." if age is None else (
                 f"The newest backup of it is {fmt_age(age)} old.")
-            parts.append(f"{head} {have} To make one, run `{backup_command(op, session_cwd)}` on its own first.")
+            command = backup_command(op, session_cwd, shell=shell)
+            hidden |= "***" in command
+            parts.append(f"{head} {have} To make one, run `{command}` on its own first.")
         else:
             parts.append(f"{head} {op['problem']}")
     if not parts:
         return None
     text = "destroy-guard: " + " | ".join(parts)
+    if hidden:
+        text += " *** stands for a value hidden here; the backup needs the original value in its place."
     if data_note:
         text += " A backup holds state and object definitions, not the data inside databases or volumes."
     if missing:
         text += f" The {w} window is destroy-guard's own choice ({MAX_AGE_ENV} changes it)."
-    return clean(mask_text(text + " Approving runs the command as it is."), MAX_REASON)
+    return clean(mask_text(text + " Approving runs the command as it is."), limit)
 
 
 # ---------------------------------------------------------------- the backup CLI
@@ -1789,7 +2118,9 @@ def _safe_name(*parts) -> str:
 
 def _export_terraform(op, exe, env, d: Path):
     plan, tool = op["plan"], op["tool"]
-    env = dict(env, TF_WORKSPACE=plan["workspace"], CHECKPOINT_DISABLE="1", TF_INPUT="0", TF_IN_AUTOMATION="1")
+    # TF_CLI_ARGS would add the destructive command's own flags (-destroy, -auto-approve) to `state pull`
+    env = {k: v for k, v in env.items() if not k.startswith("TF_CLI_ARGS")}
+    env.update(TF_WORKSPACE=plan["workspace"], CHECKPOINT_DISABLE="1", TF_INPUT="0", TF_IN_AUTOMATION="1")
     shown = f"{tool} state pull"
     out = _ok([exe, "state", "pull"], plan["dir"], env)
     if not out.strip():
@@ -1845,8 +2176,9 @@ def _count_kinds(items) -> str:
 def _export_kubectl(op, exe, env, d: Path):
     plan = op["plan"]
     base = _kube_argv(op, exe)
-    ns_args = ["--all-namespaces"] if plan.get("all_namespaces") else (
-        [f"--namespace={plan['namespace']}"] if plan.get("namespace") else [])
+    # the namespace the target names, the context's default included, so a switch in between cannot move it
+    namespace = plan.get("namespace") or plan.get("default_namespace")
+    ns_args = ["--all-namespaces"] if plan.get("all_namespaces") else ([f"--namespace={namespace}"] if namespace else [])
     exports, notes = [], []
 
     def save(fname, data, command, facts):
@@ -1917,7 +2249,9 @@ def _export_kubectl(op, exe, env, d: Path):
             argv += ["-k", plan["kustomize"]]
         if plan.get("recursive"):
             argv.append("--recursive")
-        argv += ns_args + ["-o", "json"]
+        # only a namespace the command gives: kubectl refuses `get -f` when it differs from a manifest's own
+        argv += (["--all-namespaces"] if plan.get("all_namespaces") else
+                 [f"--namespace={plan['namespace']}"] if plan.get("namespace") else []) + ["-o", "json"]
         shown = " ".join(mask_words(["kubectl"] + argv[1:]))
         out = _ok(argv, op["cwd"], env)
         doc = _json(out, shown)
@@ -2044,6 +2378,10 @@ def backup_one(op: dict, out=sys.stdout, err=sys.stderr, now=None) -> int:
     if os.name == "posix":
         os.chmod(d, 0o700)
     print(f"{op['label']} {op['what']}; backing it up", file=out)
+    if op.get("prefix"):
+        wrap = " ".join(shlex.quote(w) for w in mask_words(op["prefix"]))
+        print(f"  the command runs inside `{wrap}`; this export runs without it. If it fails for lack of"
+              f" credentials, run `{backup_command(op, op['cwd'])}` instead.", file=err)
     try:
         exporter = EXPORTERS[op["tool"]]
         if op["tool"] == "git":

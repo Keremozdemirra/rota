@@ -106,6 +106,50 @@ POSITIVE = [
     ("bash", "cmd.exe /s /c terraform destroy", ["terraform destroy"]),
     ("bash", "terraform destroy -auto-approve && kubectl delete ns prod && helm uninstall web",
      ["terraform destroy", "kubectl delete", "helm uninstall"]),
+    # line continuations
+    ("bash", "kubectl delete \\\n  ns prod", ["kubectl delete"]),
+    ("bash", "git push \\\n  --force origin main", ["git push --force"]),
+    ("bash", "terraform -chdir=infra \\\n  destroy -auto-approve", ["terraform destroy"]),
+    ("powershell", "terraform `\n  destroy -auto-approve", ["terraform destroy"]),
+    # a substitution in the middle of a command keeps the command whole
+    ("bash", "git push origin $(git branch --show-current) --force", ["git push --force"]),
+    ("bash", "terraform -chdir=$(pwd)/infra destroy", ["terraform destroy"]),
+    ("bash", "kubectl delete $(kubectl get pods -o name)", ["kubectl delete"]),
+    ("bash", "kubectl --kubeconfig <(cat cfg) delete ns prod", ["kubectl delete"]),
+    ("powershell", "git push origin $(git branch --show-current) --force", ["git push --force"]),
+    ("bash", 'kubectl delete "$RES"', ["kubectl delete"]),
+    # names from standard input
+    ("bash", "helm list -q | xargs helm uninstall", ["helm uninstall"]),
+    ("bash", "git branch -r --merged | xargs git push origin --delete", ["git push --delete"]),
+    # quoting and escaping inside a name
+    ("bash", "terr''aform destroy", ["terraform destroy"]),
+    ("bash", "ku\\bectl delete ns prod", ["kubectl delete"]),
+    ("bash", 'g"i"t push --force', ["git push --force"]),
+    ("bash", "$'terraform' destroy", ["terraform destroy"]),
+    ("bash", "kubectl $'\\x64elete' ns prod", ["kubectl delete"]),
+    ("bash", "psql -Xc 'DROP TABLE users'", ["psql DROP TABLE"]),
+    # programs that run the command
+    ("bash", "aws-vault exec prod -- terraform destroy", ["terraform destroy"]),
+    ("bash", "doppler run -- kubectl delete ns prod", ["kubectl delete"]),
+    ("bash", "op run --env-file=.env -- helm uninstall web", ["helm uninstall"]),
+    ("bash", "direnv exec . terraform destroy", ["terraform destroy"]),
+    ("bash", "env -S 'terraform destroy -auto-approve'", ["terraform destroy"]),
+    ("bash", "watch -n 5 kubectl delete pod x", ["kubectl delete"]),
+    ("bash", "caffeinate -i terraform destroy", ["terraform destroy"]),
+    ("bash", "flock /tmp/tf.lock terraform destroy", ["terraform destroy"]),
+    ("bash", "find k8s -name '*.yaml' -exec kubectl delete -f {} \\;", ["kubectl delete"]),
+    ("bash", "cat <<'EOF' | bash\nterraform destroy\nEOF", ["terraform destroy"]),
+    ("bash", "bash -c -- 'terraform destroy'", ["terraform destroy"]),
+    ("bash", "fish -c 'terraform destroy'", ["terraform destroy"]),
+    # Terraform forms that change or replace state
+    ("bash", "TF_CLI_ARGS_apply=-destroy terraform apply -auto-approve", ["terraform apply -destroy"]),
+    ("bash", "terraform state push -force old.tfstate", ["terraform state push"]),
+    ("bash", "terraform workspace delete -force staging", ["terraform workspace delete -force"]),
+    # PowerShell script blocks and Start-Process
+    ("powershell", "Get-Content pods.txt | ForEach-Object { kubectl delete pod $_ }", ["kubectl delete"]),
+    ("powershell", "Invoke-Command -ScriptBlock { terraform destroy }", ["terraform destroy"]),
+    ("bash", 'pwsh -Command "& {terraform destroy}"', ["terraform destroy"]),
+    ("powershell", "Start-Process terraform -ArgumentList 'destroy','-auto-approve' -Wait", ["terraform destroy"]),
 ]
 
 NEGATIVE = [
@@ -167,6 +211,16 @@ NEGATIVE = [
     ("powershell", 'Write-Output "terraform destroy"'),
     ("powershell", "# terraform destroy"),
     ("powershell", 'Get-Content x.txt | Select-String "helm uninstall"'),
+    ("powershell", "$labels = @{ Name = 'kubectl delete' }"),
+    ("bash", "terraform workspace delete staging"),  # without -force Terraform refuses a workspace with resources
+    ("bash", "TF_CLI_ARGS_plan=-destroy terraform plan"),
+    ("bash", "op item get db --fields username"),
+    ("bash", "aws-vault exec prod -- aws s3 ls"),
+    ("bash", "find . -name '*.log' -delete"),
+    ("bash", "echo $'terraform destroy'"),
+    ("bash", "git commit -m 'wip' \\\n  -m 'about terraform destroy'"),
+    ("bash", "cat <<'EOF' | grep destroy\nterraform destroy\nEOF"),
+    ("bash", "mysql -pe2eDROP -e 'SELECT 1'"),
 ]
 
 
@@ -206,6 +260,42 @@ class Detector(Isolated):
     def test_unicode_names(self):
         ops = self.ops("kubectl delete configmap café-配置 -n prod")
         self.assertEqual(ops[0]["targets"][0]["name"], "café-配置")
+
+    def test_what_a_substitution_names_stays_unresolved(self):
+        for cmd in ("git push origin $(git branch --show-current) --force", "terraform -chdir=$(pwd)/infra destroy",
+                    "kubectl delete $(kubectl get pods -o name)", "helm list -q | xargs helm uninstall",
+                    "git branch -r --merged | xargs git push origin --delete", 'kubectl delete "$RES"'):
+            with self.subTest(cmd=cmd):
+                self.git_repo()
+                [op] = self.ops(cmd)
+                self.assertTrue(op["problem"])
+                self.assertEqual(op["targets"], [])
+
+    def test_nested_substitutions_cost_linear_time(self):
+        # three times the nesting may cost about three times the time, not nine; absolute times vary by machine
+        import time
+
+        def cost(n, closed):
+            cmd = "terraform destroy; echo " + "$(" * n + (")" * n if closed else "")
+            t = time.monotonic()
+            self.assertEqual([o["label"] for o in self.ops(cmd)], ["terraform destroy"])
+            return time.monotonic() - t
+
+        for closed in (True, False):
+            with self.subTest(closed=closed):
+                small = min(cost(6000, closed) for _ in range(2))
+                self.assertLess(cost(18000, closed), 5 * small + 0.1)
+
+    def test_sql_scan_costs_linear_time(self):
+        import time
+        import destroy_guard as dg
+        for text in (" ".join(f"$t{i}$" for i in range(20000)) + " DROP TABLE t", "/*" * 50000 + " DROP TABLE t",
+                     "'" + "''" * 50000 + " DROP TABLE t"):
+            t = time.monotonic()
+            dg.sql_destructive(text)
+            self.assertLess(time.monotonic() - t, 1)
+        self.assertEqual(dg.sql_destructive("SELECT $a$ DROP TABLE x $a$; DROP TABLE y"), {"DROP TABLE"})
+        self.assertEqual(dg.sql_destructive("SELECT 'it''s DROP TABLE x' /* DROP TABLE z */"), set())
 
 
 if __name__ == "__main__":

@@ -27,7 +27,7 @@ class RefreshTest(unittest.TestCase):
 
     def test_refresh_builds_the_cache_and_tolerates_missing_compliance_files(self):
         meta = self.refresh()
-        self.assertEqual(meta["counts"]["installations"], 25)
+        self.assertEqual(meta["counts"]["installations"], 26)
         self.assertEqual(meta["compliance_years"], [2024])
         # the listing offers 2021-2023 too; the loopback registry answers 404 for them
         self.assertEqual(sorted(e["file"] for e in meta["errors"]),
@@ -134,6 +134,15 @@ class WhichDataTest(unittest.TestCase):
         os.environ["EU_ETS_SNAPSHOT_DIR"] = str(self.snapshot("2027-01-01"))
         meta = eu_ets.read_meta(eu_ets.ensure_database())
         self.assertEqual((meta["origin"], meta["snapshot_date"]), ("bundled", "2027-01-01"))
+
+    def test_a_snapshot_of_an_older_format_is_not_read(self):
+        # Format 1 predates withholding LEIs by holder; without the holder it cannot be fixed on reading.
+        snap = self.snapshot("2026-09-24")
+        manifest = json.loads((snap / "snapshot.json").read_text(encoding="utf-8"))
+        manifest["format"] = 1
+        (snap / "snapshot.json").write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaisesRegex(eu_ets.DataUnavailable, "format 1"):
+            eu_ets.build_from_snapshot(snap, self.env.path / "old" / eu_ets.DB_NAME)
 
     def test_a_corrupt_cache_is_rebuilt_from_the_bundle(self):
         import os

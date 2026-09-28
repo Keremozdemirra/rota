@@ -95,6 +95,38 @@ class Payloads(Isolated):
             self.assertEqual(code, 0)
             self.assertIn(str(self.project), json.loads(out)["hookSpecificOutput"]["permissionDecisionReason"])
 
+    def test_one_answer_per_tool_call(self):
+        # a plugin copy and a settings copy of the hook both run; only the first to claim the call answers
+        self.assertIsNotNone(self.hook("terraform destroy", tool_use_id="toolu_same"))
+        self.assertIsNone(self.hook("terraform destroy", tool_use_id="toolu_same"))
+        self.assertIsNotNone(self.hook("terraform destroy", tool_use_id="toolu_other"))
+        claims = self.tmp / f"destroy-guard-{os.getuid() if hasattr(os, 'getuid') else 'user'}"
+        self.assertEqual(sorted(p.name for p in claims.iterdir()), ["toolu_other", "toolu_same"])
+        if os.name == "posix":
+            self.assertEqual(claims.stat().st_mode & 0o777, 0o700)
+        old = time.time() - hook.CLAIM_MAX_AGE - 5
+        os.utime(claims / "toolu_same", (old, old))
+        self.assertIsNotNone(self.hook("ls; terraform destroy", tool_use_id="toolu_third"))
+        self.assertNotIn("toolu_same", [p.name for p in claims.iterdir()])  # old claims are swept
+        for i, cmd in enumerate(("ls -la", "git status", "terraform plan")):
+            self.assertIsNone(self.hook(cmd, tool_use_id=f"toolu_plain{i}"))
+        self.assertFalse(any(p.name.startswith("toolu_plain") for p in claims.iterdir()))  # a claim only to answer
+
+    def test_quick_test_sees_through_quotes_and_escapes(self):
+        for cmd in ("terr''aform destroy", "ku\\bectl delete ns prod", 'g"i"t push --force', "$'\\x74erraform' destroy"):
+            with self.subTest(cmd=cmd):
+                self.assertTrue(dg.quick(cmd))
+                self.assertIsNotNone(self.hook(cmd, cwd=self.project))
+        self.assertFalse(dg.quick("ls -la && echo done"))
+
+    def test_context_carries_every_backup_command(self):
+        self.kubeconfig()
+        cmd = " && ".join(f"kubectl delete configmap config-{i:03d} -n prod" for i in range(20))
+        hso = self.hook(cmd)["hookSpecificOutput"]
+        self.assertLessEqual(len(hso["permissionDecisionReason"]), dg.MAX_REASON)
+        self.assertIn("kubectl delete configmap config-019 -n prod` on its own first", hso["additionalContext"])
+        self.assertLess(len(hso["additionalContext"]), 10000)
+
     def test_hook_runs_nothing(self):
         with mock.patch("subprocess.run", side_effect=AssertionError("the hook ran a command")), \
                 mock.patch("subprocess.Popen", side_effect=AssertionError("the hook ran a command")):
@@ -119,6 +151,54 @@ class AsAProcess(Isolated):
         p = subprocess.run([sys.executable, str(ROOT / "destroy_guard_hook.py")], input=b"{", capture_output=True,
                            timeout=60)
         self.assertEqual((p.returncode, p.stdout), (0, b""))
+
+    def test_ask_reaches_a_stdout_that_is_not_utf8(self):
+        # a Windows pipe encodes stdout in the ANSI code page; the answer must not depend on it
+        (self.project / "şube-配置").mkdir()
+        payload = json.dumps({"hook_event_name": "PreToolUse", "tool_name": "Bash", "cwd": str(self.project),
+                              "tool_input": {"command": "cd şube-配置 && terraform destroy"}})
+        env = dict(os.environ, PYTHONIOENCODING="cp1252")
+        p = subprocess.run([sys.executable, str(ROOT / "destroy_guard_hook.py")], input=payload.encode(),
+                           capture_output=True, env=env, timeout=60)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertEqual(p.stderr, b"")
+        out = json.loads(p.stdout.decode("ascii"))["hookSpecificOutput"]
+        self.assertEqual(out["permissionDecision"], "ask")
+        self.assertIn("şube-配置", out["permissionDecisionReason"])
+
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "named pipes")
+    def test_a_named_pipe_does_not_stall_the_hook(self):
+        # opening a FIFO blocks until a writer comes; a hook that times out gives no answer at all
+        (self.project / ".terraform").mkdir()
+        os.mkfifo(self.project / ".terraform" / "environment")
+        (self.home / ".kube").mkdir()
+        os.mkfifo(self.home / ".kube" / "config")
+        (self.project / ".git").mkdir()
+        os.mkfifo(self.project / ".git" / "HEAD")
+        d = self.project / ".destroy-guard" / "backups" / "20260924T100000Z-aaaaaaaaaaaa"
+        d.mkdir(parents=True)
+        os.chmod(d, 0o700)
+        os.mkfifo(d / "manifest.json")
+        payload = json.dumps({"hook_event_name": "PreToolUse", "tool_name": "Bash", "cwd": str(self.project),
+                              "tool_input": {"command": "terraform destroy; kubectl delete ns x; git push -f"}})
+        start = time.monotonic()
+        p = subprocess.run([sys.executable, str(ROOT / "destroy_guard_hook.py")], input=payload.encode(),
+                           capture_output=True, env=dict(os.environ), timeout=30)
+        self.assertLess(time.monotonic() - start, 10)
+        self.assertEqual(json.loads(p.stdout)["hookSpecificOutput"]["permissionDecision"], "ask")
+
+    def test_broken_install_passes_silently(self):
+        # the hook script without its module next to it: exit 0, nothing on stdout, one line on stderr
+        lone = self.tmp / "lone"
+        lone.mkdir()
+        (lone / "destroy_guard_hook.py").write_bytes((ROOT / "destroy_guard_hook.py").read_bytes())
+        payload = json.dumps({"hook_event_name": "PreToolUse", "tool_name": "Bash", "cwd": str(self.project),
+                              "tool_input": {"command": "terraform destroy"}})
+        env = dict(os.environ, PYTHONPATH="")
+        p = subprocess.run([sys.executable, "-S", str(lone / "destroy_guard_hook.py")], input=payload.encode(),
+                           capture_output=True, env=env, cwd=str(lone), timeout=60)
+        self.assertEqual((p.returncode, p.stdout), (0, b""))
+        self.assertIn(b"internal error", p.stderr)
 
 
 if __name__ == "__main__":

@@ -144,6 +144,14 @@ class Lines(unittest.TestCase):
         new, _ = cr.redact_line(b"not json " + tok.encode())
         self.assertEqual(new, b"not json [REDACTED:github-classic-pat]")
 
+    def test_a_line_nested_too_deep_for_the_parser_is_still_scanned(self):
+        tok = "ghp_" + rand(36)
+        body = b'{"a":' + b"[" * 100_000 + json.dumps(tok).encode() + b"]" * 100_000 + b"}"
+        self.assertEqual(cr.line_counts(body), {"github-classic-pat": 1})
+        new, counts = cr.redact_line(body)
+        self.assertEqual(counts, {"github-classic-pat": 1})
+        self.assertNotIn(tok.encode(), new)
+
     def test_unicode_escapes_and_line_endings(self):
         tok = "ghp_" + rand(36)
         body = ('{"t":"caf\\u00e9 ' + tok + '","n":1.5e3,"k":[true,null]}').encode()

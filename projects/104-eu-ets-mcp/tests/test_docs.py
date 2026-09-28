@@ -17,6 +17,8 @@ class Readme(unittest.TestCase):
 
     def test_withheld_names_and_their_rule_are_described(self):
         self.assertIn(eu_ets.WITHHELD, README)
+        self.assertIn("and its city and account-holder LEI are left out", README)
+        self.assertIn(eu_ets.LEI_WITHHELD, README)
         for reason in ("personal identifier", "sole-trader or partnership marker", "holder's name in the installation name",
                        "person-shaped name without site or company words", "no account holder in the registry"):
             self.assertIn(reason, README)

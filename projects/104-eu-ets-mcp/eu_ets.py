@@ -45,7 +45,7 @@ import zlib
 from pathlib import Path
 
 VERSION = "0.1.0"
-SCHEMA_VERSION = "3"  # 2: guard on every activity; 3: no LEI where the name is withheld (older caches are rebuilt)
+SCHEMA_VERSION = "4"  # 2: guard on every activity; 3, 4: LEIs withheld (older caches are rebuilt)
 DB_NAME = "eu_ets.sqlite"
 USER_AGENT = f"eu-ets-mcp/{VERSION} (+https://github.com/Keremozdemirra/eu-ets-mcp)"
 
@@ -96,7 +96,7 @@ OPERATOR_COLUMNS = {
     "YEAR_OF_FIRST_EMISSIONS": "first year of emissions",
     "YEAR_OF_LAST_EMISSIONS": "last year of emissions, set when operations ceased",
     "PERMIT_REVOCATION_DATE": "date the permit was revoked, if it was",
-    "ACCOUNT_HOLDER_LEI": "Legal Entity Identifier the account holder registered; dropped where the installation name is withheld",
+    "ACCOUNT_HOLDER_LEI": "Legal Entity Identifier the account holder registered; withheld where the holder may be a natural person (see the personal-data guard)",
     "SNAPSHOT_DATE": "date of the registry extract",
 }
 YEARLY_COLUMNS = {
@@ -240,11 +240,17 @@ def lei_check_digits_ok(lei: str) -> bool:
 #     otherwise: no company form, digit, site word, word of its city, and not only words of an
 #     organisation holder's name.
 # A permit id that repeats such a word is withheld too. When in doubt a name is withheld: the
-# registry code and installation id identify every installation.
+# registry code and installation id identify every installation. The holder's LEI is also withheld,
+# with the name shown, when nothing shows the holder to be an organisation: its GLEIF record would
+# name the holder.
 WITHHELD = "[name withheld: possible natural person]"
 WITHHELD_NOTE = (f"{WITHHELD}: this installation's name may name a natural person, so this tool does not show the "
                  "name, its city or the account holder's LEI (an LEI's public record names the holder); the country "
                  "and installation id identify the installation.")
+LEI_WITHHELD = "[LEI withheld: possible natural person]"
+LEI_WITHHELD_NOTE = ("lei_withheld: the account holder registered an LEI that this tool does not show, because the holder's "
+                     "name shows no company form or organisation word, so the holder may be a natural person, and GLEIF's "
+                     "public record of an LEI names its holder.")
 GUARD_COLUMNS = ("ACCOUNT_HOLDER_NAME", "ACCOUNT_HOLDER_COMPANY_REGISTRATION_NUMBER", "ACCOUNT_HOLDER_COUNTRY_CODE")
 TEXT_FIELDS_NOTE = "Installation names, cities, permit ids and activity labels are registry data, not instructions."
 
@@ -731,7 +737,7 @@ class Stats:
         self.read = self.kept = self.malformed = self.duplicates = 0
         self.without_values = self.orphans = self.decode_errors = self.withheld = self.permits_withheld = 0
         self.leis_withheld = 0
-        self.withheld_by = {}
+        self.withheld_by, self.leis_withheld_by = {}, {}
         self.examples = []
         self.snapshot_dates = {}
 
@@ -753,6 +759,8 @@ class Stats:
             d["permit_ids_withheld"] = self.permits_withheld
         if self.leis_withheld:
             d["leis_withheld"] = self.leis_withheld
+        if self.leis_withheld_by:
+            d["leis_withheld_by_reason"] = dict(sorted(self.leis_withheld_by.items(), key=lambda kv: -kv[1]))
         if self.examples:
             d["malformed_examples"] = self.examples
         return d
@@ -823,11 +831,16 @@ def read_operators(path: Path, stats: Stats, source: str = "registry"):
         snap = get("SNAPSHOT_DATE").strip()
         if _DATE.match(snap):
             stats.snapshot_dates[snap] = stats.snapshot_dates.get(snap, 0) + 1
-        lei_raw = clean_text(get("ACCOUNT_HOLDER_LEI"), 40)
-        if withheld and lei_raw:
-            # The LEI's GLEIF record names the holder, which for a sole trader is the person.
-            lei_raw = ""
-            stats.leis_withheld += 1
+        lei_raw, lei_withheld = get("ACCOUNT_HOLDER_LEI").strip(), 0
+        if lei_raw == LEI_WITHHELD:  # withheld when the snapshot was written
+            lei_raw, lei_withheld = "", 1
+        lei_raw = clean_text(lei_raw, 40)
+        if lei_raw and (withheld or guard and not holder_is_organisation(holder, reg)):
+            # GLEIF's record of an LEI names its holder, who may be the person the guard is unsure of.
+            why = "name withheld" if withheld else "holder shows no company form or organisation word"
+            stats.leis_withheld_by[why] = stats.leis_withheld_by.get(why, 0) + 1
+            lei_raw, lei_withheld = "", 1
+        stats.leis_withheld += lei_withheld
         lei = normalize_lei(lei_raw)
         revoked = get("PERMIT_REVOCATION_DATE").strip()
         stats.kept += 1
@@ -837,6 +850,7 @@ def read_operators(path: Path, stats: Stats, source: str = "registry"):
             "activity_code": code, "activity": clean_text(get("ACTIVITY_TYPE"), 200),
             "city": None if city in ("", "-") else city,
             "lei": lei or None, "lei_registered": lei_raw or None, "lei_ok": int(lei_check_digits_ok(lei)) if lei else None,
+            "lei_withheld": lei_withheld,
             "first_year": _year(get("YEAR_OF_FIRST_EMISSIONS")), "last_year": _year(get("YEAR_OF_LAST_EMISSIONS")),
             "permit_revoked": revoked if _DATE.match(revoked) else None,
         }
@@ -1022,7 +1036,7 @@ CREATE TABLE installations (
   registry TEXT NOT NULL, installation_id INTEGER NOT NULL, registry_name TEXT,
   name TEXT NOT NULL, name_withheld INTEGER NOT NULL, permit_id TEXT,
   activity_code INTEGER, activity TEXT, city TEXT,
-  lei TEXT, lei_registered TEXT, lei_ok INTEGER,
+  lei TEXT, lei_registered TEXT, lei_ok INTEGER, lei_withheld INTEGER NOT NULL,
   first_year INTEGER, last_year INTEGER, permit_revoked TEXT, search TEXT NOT NULL,
   PRIMARY KEY (registry, installation_id));
 CREATE TABLE yearly (
@@ -1069,9 +1083,9 @@ def build_database(db_path: Path, operators, yearly_fn, compliance, meta: dict, 
                                                         r["permit_id"] or "", r["installation_id"])))
                 batch.append((r["registry"], r["installation_id"], r["registry_name"], r["name"], r["name_withheld"],
                               r["permit_id"], r["activity_code"], r["activity"], r["city"], r["lei"],
-                              r["lei_registered"], r["lei_ok"], r["first_year"], r["last_year"],
+                              r["lei_registered"], r["lei_ok"], r["lei_withheld"], r["first_year"], r["last_year"],
                               r["permit_revoked"], search))
-            con.executemany("INSERT INTO installations VALUES (" + ",".join("?" * 16) + ")", batch)
+            con.executemany("INSERT INTO installations VALUES (" + ",".join("?" * 17) + ")", batch)
             con.executemany("INSERT INTO registries VALUES (?,?,?)", [(k, v[0], v[1]) for k, v in registries.items()])
             con.executemany("INSERT INTO activities VALUES (?,?,?)", [(k, v[0], v[1]) for k, v in activities.items()])
             con.executemany("INSERT INTO yearly VALUES (?,?,?,?,?,?,?,?,?,?)", yearly_fn(known))
@@ -1094,6 +1108,7 @@ def build_database(db_path: Path, operators, yearly_fn, compliance, meta: dict, 
                 "compliance_rows": con.execute("SELECT COUNT(*) FROM compliance").fetchone()[0],
                 "installations_with_lei": con.execute("SELECT COUNT(*) FROM installations WHERE lei IS NOT NULL").fetchone()[0],
                 "names_withheld": con.execute("SELECT COUNT(*) FROM installations WHERE name_withheld = 1").fetchone()[0],
+                "leis_withheld": con.execute("SELECT COUNT(*) FROM installations WHERE lei_withheld = 1").fetchone()[0],
             }
             meta = dict(meta, schema_version=SCHEMA_VERSION, built_at=_utcnow(), tool_version=VERSION,
                         latest_reported_year=latest, last_year_with_values=max(by_year) if by_year else None,
@@ -1225,6 +1240,7 @@ def _snapshot_date(stats: Stats):
 
 # ------------------------------------------------------------------ snapshot
 SNAPSHOT_FILES = ("installations.csv.gz", "yearly.csv.gz", "compliance.csv.gz")
+SNAPSHOT_FORMAT = 2  # 2: LEIs withheld where the holder may be a natural person; format 1 is not read
 _INST_OUT = list(OPERATOR_COLUMNS)
 _YEARLY_OUT = list(YEARLY_COLUMNS)
 _COMP_OUT = ["REGISTRY_CODE", "INSTALLATION_IDENTIFIER", "YEAR", "COMPLIANCE_CODE", "SOURCE_FILE_YEAR"]
@@ -1260,8 +1276,9 @@ def export_snapshot(db: Path, out: Path) -> dict:
             "installations.csv.gz": _write_gz_csv(out / "installations.csv.gz", _INST_OUT, (
                 (r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10], r[11], snap) for r in con.execute(
                     "SELECT registry, registry_name, installation_id, name, permit_id, activity_code, activity, "
-                    "COALESCE(city, ''), first_year, last_year, permit_revoked, lei_registered "
-                    "FROM installations ORDER BY registry, installation_id"))),
+                    "COALESCE(city, ''), first_year, last_year, permit_revoked, "
+                    "CASE WHEN lei_withheld = 1 THEN ? ELSE lei_registered END "
+                    "FROM installations ORDER BY registry, installation_id", (LEI_WITHHELD,)))),
             "yearly.csv.gz": _write_gz_csv(out / "yearly.csv.gz", _YEARLY_OUT, (
                 (r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], {1: "YES", 0: "NO"}.get(r[8], ""), r[9])
                 for r in con.execute(
@@ -1274,7 +1291,7 @@ def export_snapshot(db: Path, out: Path) -> dict:
     finally:
         con.close()
     manifest = {
-        "format": 1,
+        "format": SNAPSHOT_FORMAT,
         "snapshot_date": meta.get("snapshot_date"),
         "retrieved_at": meta.get("retrieved_at"),
         "listing_url": meta.get("listing_url"),
@@ -1299,11 +1316,12 @@ def _withheld_lines(m: dict) -> list:
     if not reasons:
         return []
     return ["## Names withheld", "",
-            f"{ops.get('names_withheld', 0)} installation names (with their cities"
-            + (f", and the account-holder LEIs of {ops['leis_withheld']} of them" if ops.get("leis_withheld") else "")
-            + f") and {ops.get('permit_ids_withheld', 0)} permit ids are withheld because they may name a natural "
-            "person (this tool's rule, see README):", ""] + \
-        [f"- {reason}: {n}" for reason, n in reasons.items()]
+            f"{ops.get('names_withheld', 0)} installation names (with their cities) and {ops.get('permit_ids_withheld', 0)} "
+            "permit ids are withheld because they may name a natural person (this tool's rule, see README):", ""] + \
+        [f"- {reason}: {n}" for reason, n in reasons.items()] + \
+        ["", f"{ops.get('leis_withheld', 0)} account-holder LEIs are withheld because the holder may be a natural "
+         "person, whom GLEIF's public record of the LEI would name:", ""] + \
+        [f"- {reason}: {n}" for reason, n in (ops.get("leis_withheld_by_reason") or {}).items()]
 
 
 def sources_markdown(m: dict) -> str:
@@ -1321,9 +1339,9 @@ def sources_markdown(m: dict) -> str:
         f"- Attribution: Source: European Commission, EU ETS Union Registry, {LICENCE}, retrieved "
         f"{(m.get('retrieved_at') or '')[:10]}.",
         "- Changes: only the allowlisted columns are kept (see README, \"Personal data\"); rows without any "
-        "value are dropped; text is stripped of control characters; installation names (with their city and "
-        "account-holder LEI) and permit ids that may name a natural person are withheld; compliance codes are "
-        "converted from XLSX to CSV.",
+        "value are dropped; text is stripped of control characters; installation names (with their city) and "
+        "permit ids that may name a natural person are withheld, and so are account-holder LEIs where the holder "
+        "may be one; compliance codes are converted from XLSX to CSV.",
         ""] + _withheld_lines(m) + ["",
         "## Raw files", "",
         "| File | Bytes | SHA-256 | Rows read | Rows kept | Malformed |",
@@ -1345,6 +1363,10 @@ def sources_markdown(m: dict) -> str:
 
 def build_from_snapshot(snap_dir: Path, db: Path) -> dict:
     manifest = json.loads((snap_dir / "snapshot.json").read_text(encoding="utf-8"))
+    if manifest.get("format") != SNAPSHOT_FORMAT:
+        # An older snapshot may carry LEIs this version withholds; it cannot tell which without the holder.
+        raise DataUnavailable(f"{snap_dir} holds a snapshot of format {manifest.get('format')}; this version reads "
+                              f"format {SNAPSHOT_FORMAT}. Run `eu-ets refresh` for current data.")
     op_stats, yr_stats, c_stats = Stats("installations.csv.gz"), Stats("yearly.csv.gz"), Stats("compliance.csv.gz")
     comp = list(read_compliance_csv(snap_dir / "compliance.csv.gz", c_stats)) \
         if (snap_dir / "compliance.csv.gz").is_file() else []
@@ -1508,7 +1530,14 @@ class Dataset:
              "permit_id": r["permit_id"], "lei": r["lei"]}
         if r["name_withheld"]:
             d["name_withheld"] = True
+        if r["lei_withheld"]:
+            d["lei_withheld"] = True
         return d
+
+    @staticmethod
+    def _lei_note(rows) -> list:
+        """The LEI note where a shown name's LEI is withheld; WITHHELD_NOTE covers withheld names."""
+        return [LEI_WITHHELD_NOTE] if any(d.get("lei_withheld") and not d.get("name_withheld") for d in rows) else []
 
     @staticmethod
     def _last(meta: dict):
@@ -1610,7 +1639,7 @@ class Dataset:
             notes = [f"verified_emissions is for {year}; it is null where the registry file has no value for that year "
                      "(for example an installation that closed earlier), and a 0 can mean zero or nothing entered."
                      if any(d["verified_emissions"] in (None, 0) for d in out) else None,
-                     WITHHELD_NOTE if withheld else None]
+                     WITHHELD_NOTE if withheld else None] + self._lei_note(out)
             return self._envelope(con, payload, False, notes)
         finally:
             con.close()
@@ -1673,7 +1702,7 @@ class Dataset:
                        "compliance_codes": {c: COMPLIANCE_CODES.get(c) for c in present} or None,
                        "units": {k: UNITS[k] for k in ("verified_emissions", "free_allocation", "surrendered")}}
             notes = [self.ZERO_NOTE] + self._notes_for(meta, years, [inst["activity_code"]], bool(inst["name_withheld"]),
-                                                      meta.get("snapshot_date") or "")
+                                                      meta.get("snapshot_date") or "") + self._lei_note([d])
             return self._envelope(con, payload, True, notes)
         finally:
             con.close()
@@ -1701,9 +1730,9 @@ class Dataset:
                 counts = meta.get("counts") or {}
                 return self._envelope(con, dict(base, found=False, installations_count=0, message=(
                     f"No installation in this snapshot lists this LEI. Only {counts.get('installations_with_lei') or 0:,} of "
-                    f"{counts.get('installations') or 0:,} installations carry an account-holder LEI (none whose name is "
-                    "withheld), so this is not proof that the company holds none; search by installation name or city "
-                    "instead.")), False, [warn])
+                    f"{counts.get('installations') or 0:,} installations carry an account-holder LEI (this tool withholds "
+                    f"{counts.get('leis_withheld') or 0:,} more whose holder may be a natural person), so this is not proof "
+                    "that the company holds none; search by installation name or city instead.")), False, [warn])
             where = "i.lei = ?" + (" AND y.year >= ?" if y0 else "") + (" AND y.year <= ?" if y1 else "")
             args = [code] + ([y0] if y0 else []) + ([y1] if y1 else [])
             ycodes = {}
@@ -1750,6 +1779,10 @@ class Dataset:
                            "does not validate it, and earlier years may have been operated by another company.",
                      "yearly_totals are sums over these installations (derived).", self.ZERO_NOTE]
             notes += self._notes_for(meta, years, acts, any(r["name_withheld"] for r in insts), meta.get("snapshot_date") or "")
+            hidden = (meta.get("counts") or {}).get("leis_withheld")
+            if hidden:
+                notes.append(f"This tool withholds the LEI of {hidden:,} installations whose account holder may be a natural "
+                             "person; any of them held under this LEI are missing here.")
             return self._envelope(con, payload, True, notes)
         finally:
             con.close()
@@ -1793,7 +1826,7 @@ class Dataset:
             if y not in (meta.get("compliance_years") or []):
                 notes.append(f"No compliance codes for {y}: the listing offers them for {meta.get('compliance_years')}.")
             notes += self._notes_for(meta, [y], {d["activity_code"] for d in out}, any(d.get("name_withheld") for d in out),
-                                     meta.get("snapshot_date") or "")
+                                     meta.get("snapshot_date") or "") + self._lei_note(out)
             return self._envelope(con, payload, True, notes)
         finally:
             con.close()
@@ -1826,15 +1859,19 @@ class Dataset:
                 "columns_kept": {"operators_daily": OPERATOR_COLUMNS, "operators_yearly_activity_daily": YEARLY_COLUMNS},
                 "columns_dropped": DROPPED_COLUMNS,
                 "names_withheld_rule": "This tool's rule, not the source's: an installation name (with its city and "
-                                       "its account holder's LEI, whose public record names the holder) is "
+                                       "its account holder's LEI, whose GLEIF record names the holder) is "
                                        "withheld when the holder's registration number is a personal identifier, when "
                                        "the name or the holder's name carries a sole-trader or partnership marker, when "
                                        "the registry gives no holder and the name no company form, when a holder with no "
                                        "sign of being an organisation has its name repeated in the installation name, or "
                                        "when the name is shaped like a person's name and nothing else explains it. The "
-                                       "holder's name is compared while parsing and never stored.",
+                                       "LEI is also withheld (lei_withheld) where the name is shown but the holder's name "
+                                       "shows no company form or organisation word. The holder's name is compared while "
+                                       "parsing and never stored.",
                 "names_withheld_by_reason": next((x.get("names_withheld_by_reason") for x in meta.get("sources") or []
                                                   if x.get("kind") == "operators"), None),
+                "leis_withheld_by_reason": next((x.get("leis_withheld_by_reason") for x in meta.get("sources") or []
+                                                 if x.get("kind") == "operators"), None),
                 "licence": LICENCE, "licence_url": LICENCE_URL, "terms_url": TERMS_URL,
                 "not_legal_advice": "Information from a public register, not legal advice. The binding acts are "
                                     "Directive 2003/87/EC and Regulation (EU) 2019/1122.",
@@ -1877,7 +1914,7 @@ def _render(cmd: str, r: dict) -> str:
     if cmd == "search":
         head = f"{r['matches']} match{'es' if r['matches'] != 1 else ''}; verified emissions {r['emissions_year']}, t CO2e"
         rows = [[i["country"], str(i["installation_id"]), i["name"][:48], i["activity_code"], i["city"] or "",
-                 i["lei"] or "", i["verified_emissions"]] for i in r["installations"]]
+                 i["lei"] or ("withheld" if i.get("lei_withheld") else ""), i["verified_emissions"]] for i in r["installations"]]
         return "\n\n".join([head, table(["country", "id", "name", "act", "city", "lei", "verified t CO2e"], rows, {1, 3, 6}), _footer(r)])
     if cmd == "history":
         if not r["found"]:
@@ -1887,7 +1924,8 @@ def _render(cmd: str, r: dict) -> str:
             return "\n".join(lines + ["", _footer(r)])
         i = r["installation"]
         head = (f"{i['country']}-{i['installation_id']}  {i['name']}\n{i['activity_code']} {i['activity']}; "
-                f"city {i['city'] or '-'}; permit {i['permit_id'] or '-'}; LEI {i['lei'] or '-'}; "
+                f"city {i['city'] or '-'}; permit {i['permit_id'] or '-'}; "
+                f"LEI {i['lei'] or ('withheld' if i.get('lei_withheld') else '-')}; "
                 f"emissions {i['first_emissions_year'] or '?'}-{i['last_emissions_year'] or ''}")
         ch = any(y["ch_verified_emissions"] for y in r["years"])
         hdr = ["year", "verified t CO2e", "free allocation", "surrendered", "excluded", "compliance"] + (["CH verified"] if ch else [])
@@ -1935,7 +1973,8 @@ def _render(cmd: str, r: dict) -> str:
         lines = [f"Snapshot {r['snapshot_date']} ({r['origin']}), retrieved {r['retrieved_at']}",
                  f"Database: {r['database']}",
                  f"{c.get('installations'):,} installations ({c.get('installations_with_lei'):,} with an LEI, "
-                 f"{c.get('names_withheld'):,} names withheld), {c.get('yearly_rows'):,} yearly rows, "
+                 f"{c.get('names_withheld'):,} names and {c.get('leis_withheld') or 0:,} LEIs withheld), "
+                 f"{c.get('yearly_rows'):,} yearly rows, "
                  f"{c.get('compliance_rows'):,} compliance codes for {r['compliance_years']}",
                  f"Years {r['years']['first']}-{r['years']['last']}; latest verified emissions: "
                  f"{r['years']['latest_verified_emissions_year']}",

@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _support import PLACEHOLDERS, WITHHELD_LEI, Isolated, build_fixture_db, eu_ets, fixture_rows  # noqa: E402
+from _support import HOLDER_LEI, PLACEHOLDERS, WITHHELD_LEI, Isolated, build_fixture_db, eu_ets, fixture_rows  # noqa: E402
 
 VOEST = "529900FGOWZKLBZ81V67"  # voestalpine Stahl GmbH at GLEIF; three installations in the fixtures
 
@@ -155,7 +155,7 @@ class QueryTest(unittest.TestCase):
     def test_dataset_info(self):
         r = self.ds.dataset_info()
         self.assertEqual((r["licence"], r["terms_url"]), ("CC BY 4.0", "https://european-union.europa.eu/legal-notice_en"))
-        self.assertEqual(r["counts"]["installations"], 25)
+        self.assertEqual(r["counts"]["installations"], 26)
         self.assertEqual(r["compliance_years"], [2024])
         self.assertNotIn("ACCOUNT_HOLDER_NAME", r["columns_kept"]["operators_daily"])
         self.assertIn("Art. 3(a)", r["units"]["free_allocation"])
@@ -200,6 +200,21 @@ class ReviewRegressions(unittest.TestCase):
         for row in self.ds.search_installations("", country="DE", limit=100)["installations"]:
             if row.get("name_withheld"):
                 self.assertIsNone(row["lei"], row["installation_id"])
+
+    def test_an_lei_withheld_for_its_holder_is_flagged_and_finds_nothing(self):
+        h = self.ds.installation_history("DE-990011")
+        i = h["installation"]
+        self.assertEqual((i["name"], i["city"], i["lei"], i["lei_registered"], i["lei_withheld"]),
+                         ("Heizwerk Nord", "Kassel", None, None, True))
+        self.assertIn(eu_ets.LEI_WITHHELD_NOTE, h["notes"])
+        s = self.ds.search_installations("heizwerk nord")
+        self.assertEqual([(d["installation_id"], d["lei"], d.get("lei_withheld")) for d in s["installations"]], [(990011, None, True)])
+        self.assertIn(eu_ets.LEI_WITHHELD_NOTE, s["notes"])
+        r = self.ds.company_by_lei(HOLDER_LEI)
+        self.assertEqual((r["found"], r["installations_count"]), (False, 0))
+        self.assertIn("withholds 2 more", r["message"])
+        self.assertNotIn(eu_ets.LEI_WITHHELD_NOTE, self.ds.installation_history("DE-990001").get("notes"))  # WITHHELD_NOTE says it
+        self.assertEqual(self.ds.dataset_info()["counts"]["leis_withheld"], 2)
 
     def test_search_shows_null_not_zero_for_a_year_without_value(self):
         r = self.ds.search_installations("voestalpine kokerei", country="AT")

@@ -1,7 +1,8 @@
 """Shared by the tests: a home directory that is not yours, fake infrastructure tools, and hook/CLI runners.
 
-Every test built on `Isolated` runs with HOME, USERPROFILE and XDG_CONFIG_HOME
-pointing at a temporary directory, `Path.home()` patched, the variables that
+Every test built on `Isolated` runs with HOME, USERPROFILE, XDG_CONFIG_HOME and
+the temporary directory (where the hook keeps its per-call claims) pointing at a
+temporary directory, `Path.home()` patched, the variables that
 change what destroy-guard targets removed from the environment, and
 `urllib.request.urlopen` replaced so that any attempt to reach the network
 fails the test (destroy-guard itself sends nothing).
@@ -31,8 +32,9 @@ for _p in (str(ROOT), str(HERE)):
 
 import destroy_guard as dg  # noqa: E402
 
-SCRUB = ("TF_WORKSPACE", "TF_DATA_DIR", "KUBECONFIG", "HELM_NAMESPACE", "HELM_KUBECONTEXT", "DESTROY_GUARD_DIR",
-         "DESTROY_GUARD_MAX_AGE_MINUTES", "GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GITHUB_TOKEN", "GH_TOKEN")
+SCRUB = ("TF_WORKSPACE", "TF_DATA_DIR", "TF_CLI_ARGS", "TF_CLI_ARGS_apply", "TF_CLI_ARGS_destroy", "KUBECONFIG",
+         "HELM_NAMESPACE", "HELM_KUBECONTEXT", "DESTROY_GUARD_DIR", "DESTROY_GUARD_MAX_AGE_MINUTES", "GIT_DIR",
+         "GIT_WORK_TREE", "GIT_INDEX_FILE", "GITHUB_TOKEN", "GH_TOKEN")
 
 FAKE = r'''#!{python}
 import json, os, sys
@@ -42,7 +44,8 @@ args = sys.argv[1:]
 with open(os.path.join(HERE, "calls.jsonl"), "a", encoding="utf-8") as log:
     log.write(json.dumps({{"tool": NAME, "args": args, "cwd": os.getcwd(),
                           "env": {{k: os.environ.get(k) for k in ("TF_WORKSPACE", "CHECKPOINT_DISABLE", "TF_INPUT",
-                                                                 "GIT_TERMINAL_PROMPT", "AWS_PROFILE")}}}}) + "\n")
+                                                                 "GIT_TERMINAL_PROMPT", "AWS_PROFILE", "TF_CLI_ARGS",
+                                                                 "TF_CLI_ARGS_apply")}}}}) + "\n")
 with open(os.path.join(HERE, NAME + ".rules.json"), encoding="utf-8") as f:
     rules = json.load(f)
 
@@ -95,8 +98,10 @@ class Isolated(unittest.TestCase):
         for d in (self.home, self.project, self.bin):
             d.mkdir()
         env = {"HOME": str(self.home), "USERPROFILE": str(self.home), "XDG_CONFIG_HOME": str(self.home / ".config"),
-               "PATH": str(self.bin) + os.pathsep + os.environ.get("PATH", ""), "GIT_CONFIG_NOSYSTEM": "1"}
+               "PATH": str(self.bin) + os.pathsep + os.environ.get("PATH", ""), "GIT_CONFIG_NOSYSTEM": "1",
+               "TMPDIR": str(self.tmp), "TEMP": str(self.tmp), "TMP": str(self.tmp)}
         patches = [mock.patch.dict(os.environ, env),
+                   mock.patch.object(tempfile, "tempdir", str(self.tmp)),  # the hook's claims stay in the test
                    mock.patch("pathlib.Path.home", return_value=self.home),
                    mock.patch("urllib.request.urlopen", self._refuse)]
         for p in patches:
@@ -147,11 +152,14 @@ class Isolated(unittest.TestCase):
             code = dg.main(list(argv))
         return code, out.getvalue(), err.getvalue()
 
-    def hook(self, command, tool="Bash", cwd=None, event="PreToolUse"):
-        """The hook's main() on a payload -> its parsed JSON answer, or None when it stays silent."""
+    def hook(self, command, tool="Bash", cwd=None, event="PreToolUse", tool_use_id=None):
+        """The hook's main() on a payload -> its parsed JSON answer, or None when it stays silent.
+
+        Each call is a new tool call (its own tool_use_id) unless `tool_use_id` says otherwise.
+        """
         import destroy_guard_hook
         payload = {"hook_event_name": event, "tool_name": tool, "tool_input": {"command": command},
-                   "cwd": str(cwd or self.project), "tool_use_id": "toolu_test"}
+                   "cwd": str(cwd or self.project), "tool_use_id": tool_use_id or "toolu_" + os.urandom(8).hex()}
         stdin = io.TextIOWrapper(io.BytesIO(json.dumps(payload).encode("utf-8")), encoding="utf-8")
         with mock.patch("sys.stdin", stdin), mock.patch("sys.stdout", new_callable=io.StringIO) as out, \
                 mock.patch("sys.stderr", new_callable=io.StringIO) as err:

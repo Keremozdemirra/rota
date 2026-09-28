@@ -79,6 +79,34 @@ class Terraform(Isolated):
     def test_tofu_and_terraform_are_different_targets(self):
         self.assertNotEqual(self.target("tofu destroy")[0], self.target("terraform destroy")[0])
 
+    def test_data_dir_is_part_of_the_target(self):
+        # TF_DATA_DIR holds the backend configuration: two data directories can be two backends
+        prod, staging = (self.target(f"TF_DATA_DIR=.tf-{e} terraform destroy")[0] for e in ("prod", "staging"))
+        self.assertEqual(prod["data_dir"], str(self.project / ".tf-prod"))
+        self.assertNotEqual(prod, staging)
+        self.assertNotIn("data_dir", self.target("terraform destroy")[0])
+        self.assertTrue(self.ops("TF_DATA_DIR=$D terraform destroy")[0]["problem"])
+
+    def test_cli_args_from_the_environment(self):
+        t, op = self.target("TF_CLI_ARGS_apply='-destroy -auto-approve' terraform apply")
+        self.assertEqual(op["label"], "terraform apply -destroy")
+        with mock.patch.dict(os.environ, {"TF_CLI_ARGS": "-no-color", "TF_CLI_ARGS_state_rm": "-lock=false"}):
+            self.assertEqual(self.target("terraform state rm aws_instance.web")[1]["label"], "terraform state rm")
+        self.assertEqual(self.ops("TF_CLI_ARGS_apply=-destroy terraform plan"), [])
+
+    def test_state_push_and_workspace_delete(self):
+        (self.project / ".terraform").mkdir()
+        (self.project / ".terraform" / "environment").write_text("prod")
+        t, op = self.target("terraform state push -force old.tfstate")
+        self.assertEqual((op["label"], t["workspace"]), ("terraform state push", "prod"))
+        self.assertIn('with "old.tfstate"', op["what"])
+        t, op = self.target("terraform workspace delete -force staging")
+        self.assertEqual((op["label"], t["workspace"]), ("terraform workspace delete -force", "staging"))
+        # the same target as a destroy of that workspace: one backup of its state covers both
+        self.assertEqual(t, self.target("TF_WORKSPACE=staging terraform destroy")[0])
+        self.assertEqual(self.ops("terraform workspace delete staging"), [])
+        self.assertTrue(self.ops("terraform workspace delete -force $WS")[0]["problem"])
+
     def test_unresolvable(self):
         for cmd in ("cd $DIR && terraform destroy", "cd - && terraform destroy", "terraform -chdir=$D destroy",
                     "terraform destroy -state=old.tfstate", "TF_WORKSPACE=$WS terraform destroy",
@@ -170,11 +198,94 @@ class Kubernetes(Isolated):
         (self.project / "k8s" / "config.env").write_text("A=1")  # a kustomization can read any file
         self.assertNotEqual(k1, self.targets("kubectl delete -k k8s")[0])
 
+    def contexts(self, current="kind-prod", **namespaces):
+        """A kubeconfig in kubectl's own layout: contexts with their namespaces, then the users."""
+        entries = "".join(f"- context:\n    cluster: c\n" + (f"    namespace: {ns}\n" if ns else "")
+                          + f"    user: u\n  name: {name}\n" for name, ns in namespaces.items())
+        p = self.home / ".kube" / "config"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(f"apiVersion: v1\nclusters: []\ncontexts:\n{entries}current-context: {current}\nkind: Config\n"
+                     "users:\n- name: u\n  user:\n    token: not-a-real-token\n", encoding="utf-8")
+        return p
+
+    def test_default_namespace_comes_from_the_context(self):
+        self.contexts(**{"kind-prod": "prod", "bare": ""})
+        t = self.targets("kubectl delete deploy web")[0]
+        self.assertEqual(t["namespace"], "prod")
+        self.assertEqual(t, self.targets("kubectl delete deploy web -n prod")[0])  # the same objects
+        self.assertIn("in namespace prod (the context's default)", self.ops("kubectl delete deploy web")[0]["what"])
+        self.contexts(**{"kind-prod": "staging"})  # what `kubens staging` does
+        self.assertEqual(self.targets("kubectl delete deploy web")[0]["namespace"], "staging")
+        self.assertEqual(self.targets("kubectl --context bare delete deploy web")[0]["namespace"], "")
+        self.contexts("bare", bare="")
+        self.assertEqual(self.targets("kubectl delete deploy web")[0]["namespace"], "default")
+        self.assertEqual(self.targets("kubectl delete ns prod")[0]["namespace"], "-")  # cluster-scoped
+        helm = self.ops("helm uninstall web")[0]
+        self.assertEqual(helm["targets"][0]["namespace"], "default")
+
+    def test_the_users_entries_are_never_read(self):
+        # kubectl writes its keys in alphabetical order: contexts, current-context, ..., users
+        path = self.contexts(**{"kind-prod": "prod"})
+        read, offsets, real = [], [], dg._open_regular
+
+        class Recording:
+            def __init__(self, f):
+                self.f = f
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                offsets.append(os.lseek(self.f.fileno(), 0, os.SEEK_CUR))  # what left the file, buffers included
+                self.f.close()
+
+            def __iter__(self):
+                for line in self.f:
+                    read.append(line)
+                    yield line
+
+            def read(self, n=-1):
+                data = self.f.read(n)
+                read.append(data)
+                return data
+
+        with mock.patch.object(dg, "_open_regular", side_effect=lambda p, **kw: Recording(real(p, **kw))):
+            self.assertEqual(dg._kubeconfig(path), ("kind-prod", {"kind-prod": "prod"}))
+        self.assertTrue(read)
+        self.assertFalse([line for line in read if b"users:" in line or b"token" in line], read)
+        self.assertLessEqual(offsets[0], path.read_bytes().index(b"users:"))
+
+    def test_bundled_short_flags(self):
+        self.kubeconfig()
+        (self.project / "k8s" / "sub").mkdir(parents=True)
+        (self.project / "k8s" / "a.yaml").write_text("x")
+        [t] = self.targets("kubectl delete -Rf k8s")
+        self.assertEqual((t["files"][0]["path"], t["recursive"]), (str(self.project / "k8s"), True))
+
+    def test_manifest_fingerprint_follows_what_kubectl_reads(self):
+        self.kubeconfig()
+        k8s = self.project / "k8s"
+        (k8s / "sub").mkdir(parents=True)
+        (k8s / "a.yaml").write_text("a")
+        flat, deep = self.targets("kubectl delete -f k8s")[0], self.targets("kubectl delete -f k8s -R")[0]
+        (k8s / "sub" / "b.yaml").write_text("b")  # read only with -R
+        self.assertEqual(flat, self.targets("kubectl delete -f k8s")[0])
+        self.assertNotEqual(deep, self.targets("kubectl delete -f k8s -R")[0])
+        deep = self.targets("kubectl delete -f k8s -R")[0]
+        (k8s / ".hidden").mkdir()
+        (k8s / ".hidden" / "c.yaml").write_text("c")  # kubectl -R reads hidden directories too
+        self.assertNotEqual(deep, self.targets("kubectl delete -f k8s -R")[0])
+        for cmd in ("kubectl delete -f missing.yaml", "kubectl delete -f k8s -R"):
+            with self.subTest(cmd=cmd), mock.patch.object(dg, "FINGERPRINT_LIMIT", (1, 1 << 20)):
+                op = self.ops(cmd)[0]
+                self.assertIn("no backup can be matched to its content", op["problem"])
+
     def test_unresolvable(self):
         self.kubeconfig()
         for cmd in ("kubectl delete pod $POD", "kubectl delete -f -", "kubectl get pods -o name | xargs kubectl delete",
                     "kubectl delete --raw /api/v1/namespaces/prod", "kubectl delete pods -l $SEL",
-                    "kubectl delete pod x -n $NS", "kubectl --context $CTX delete pod x"):
+                    "kubectl delete pod x -n $NS", "kubectl --context $CTX delete pod x", 'kubectl delete "$RES"',
+                    "kubectl delete $(kubectl get pods -o name)", "helm list -q | xargs helm uninstall"):
             with self.subTest(cmd=cmd):
                 op = self.ops(cmd)[0]
                 self.assertTrue(op["problem"])
@@ -332,6 +443,46 @@ class Masking(Isolated):
     def test_powershell_quoting(self):
         op = self.ops("terraform destroy -var 'name=a b'", "powershell")[0]
         self.assertIn("'name=a b'", dg.backup_command(op, str(self.project), runner="destroy-guard"))
+        # `,` makes an array in PowerShell and a leading `@` splats
+        self.assertEqual([dg._ps_quote(w) for w in ("pods,services", "@all", "web")], ["'pods,services'", "'@all'", "web"])
+        # a PowerShell line sent through the Bash tool gets its backup command quoted for bash
+        op = self.ops("pwsh -Command \"terraform destroy -var 'n=a,b'\"")[0]
+        self.assertIn("-var 'n=a,b'", dg.backup_command(op, str(self.project), runner="destroy-guard"))
+        self.assertIn("-var n=a,b", dg.backup_command(op, str(self.project), runner="destroy-guard", shell="bash"))
+
+    def test_ordinary_names_are_not_masked(self):
+        for name in ("disk-cleanup-worker", "network-monitoring-prod", "task-runner-service", "bookmark-sync-api"):
+            with self.subTest(name=name):
+                self.assertEqual(dg.mask_text(f"deploy/{name}"), f"deploy/{name}")
+        for key in ("sk-" + "a1" * 12, "sk_live_" + "Z9" * 12, "ghp_" + "b" * 36):
+            self.assertEqual(dg.mask_text(f"key {key} here"), "key *** here")
+
+    def test_backup_command_survives_the_shell(self):
+        import subprocess
+        self.kubeconfig()
+        (self.project / "a.txt").write_text("x")  # a bare *** would expand to this file name
+        token = "tok" + "9" * 20
+        op = self.ops(f"TF_LOG=DEBUG terraform destroy && kubectl delete pods -l authz=on --token {token}")
+        cmds = [dg.backup_command(o, str(self.project), runner="destroy-guard") for o in op]
+        self.assertIn("-l authz=on", cmds[1])  # a label selector is not a credential
+        self.assertNotIn(token, " ".join(cmds))
+        for cmd, masked in zip(cmds, ("TF_LOG=***", "***")):
+            words = subprocess.run(["bash", "-c", "printf '%s\\n' " + cmd], cwd=self.project, capture_output=True,
+                                   text=True, check=True).stdout.splitlines()
+            self.assertNotIn("a.txt", words)  # not globbed
+            self.assertIn(masked, words)
+        text = dg.reason(dg.evaluate(f"kubectl delete pod web --token {token}", "bash", str(self.project)),
+                         str(self.project))
+        self.assertIn("--token '***'", text)
+        self.assertIn("*** stands for a value hidden here", text)
+
+    def test_runner_prefix_goes_in_front_of_the_backup(self):
+        op = self.ops("aws-vault exec prod -- terraform destroy -auto-approve")[0]
+        self.assertEqual(dg.backup_command(op, str(self.project), runner="destroy-guard"),
+                         "aws-vault exec prod -- destroy-guard backup -- terraform destroy -auto-approve")
+        op = self.ops("doppler run --token=dp.st.x -- bash -c 'terraform destroy'")[0]
+        self.assertEqual(dg.backup_command(op, str(self.project), runner="destroy-guard"),
+                         "doppler run '--token=***' -- destroy-guard backup -- terraform destroy")
 
 
 if __name__ == "__main__":

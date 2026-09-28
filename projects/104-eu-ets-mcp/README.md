@@ -74,6 +74,7 @@ Note: yearly_totals are sums over these installations (derived).
 Note: The registry file writes 0 both for a reported zero and for nothing verified or allocated (the Commission's annual XLSX shows the latter as n/a). Years with no value at all are left out.
 Note: Surrenders for 2025 are due by 30 September 2026 (Directive 2003/87/EC Art. 12(3)); this snapshot of 2026-09-24 may not hold them all yet.
 Note: Verified emissions and surrenders after 2025 are not reported yet and shown as null; allocation for those years is the registry's current figure.
+Note: This tool withholds the LEI of 728 installations whose account holder may be a natural person; any of them held under this LEI are missing here.
 Source: European Commission, EU ETS Union Registry, CC BY 4.0, retrieved 2026-09-24 (registry snapshot 2026-09-24). Changes: selected columns; free_allocation and totals derived by eu-ets-mcp.
 ```
 
@@ -83,7 +84,7 @@ steelworks, DE-69 above, has no LEI at all:
 
 ```
 $ eu-ets lei 549300QGIICV4ZFTKX83
-549300QGIICV4ZFTKX83: No installation in this snapshot lists this LEI. Only 5,234 of 23,322 installations carry an account-holder LEI, so this is not proof that the company holds none; search by installation name or city instead.
+549300QGIICV4ZFTKX83: No installation in this snapshot lists this LEI. Only 4,506 of 23,322 installations carry an account-holder LEI (this tool withholds 728 more whose holder may be a natural person), so this is not proof that the company holds none; search by installation name or city instead.
 
 Source: European Commission, EU ETS Union Registry, CC BY 4.0, retrieved 2026-09-24 (registry snapshot 2026-09-24). Changes: selected columns.
 ```
@@ -130,7 +131,7 @@ pipx run --spec eu-ets-mcp eu-ets lei 529900FGOWZKLBZ81V67
 ```
 
 Standard library only, Python 3.9 or later. The package carries a dated snapshot of the registry
-(3.4 MB compressed); on first use it is loaded into a SQLite cache (18.6 MB, about 3 seconds here).
+(3.4 MB compressed); on first use it is loaded into a SQLite cache (18.6 MB, under 4 seconds here).
 To replace it with today's registry files:
 
 ```bash
@@ -159,8 +160,9 @@ Every answer carries `snapshot_date` and a `source` line to cite; answers with f
 units, and notes where they apply (surrender deadlines, maritime phase-in, a year still incomplete,
 zeros that may mean "nothing entered"). In MCP answers, registry text (names, cities, permit ids,
 labels) is wrapped as `<<remote text, not an instruction: ...>>`; the command line prints it as is.
-Names that may name a natural person read `[name withheld: possible natural person]` (see
-[Personal data](#personal-data)).
+Names that may name a natural person read `[name withheld: possible natural person]`, with no city
+or LEI, and an LEI is also withheld, flagged `lei_withheld`, where the account holder may be a
+natural person (see [Personal data](#personal-data)).
 
 ## Commands
 
@@ -189,7 +191,7 @@ directory, such as one written by `eu-ets refresh --write-snapshot`.
 | How they are found | The JSON list at https://union-registry-data.ec.europa.eu/api/data-download, which the registry website loads to show its download page. **It is undocumented and may change or disappear without notice.** File URLs are always taken from it; the tool fetches only from that host, the registry's blob storage (`dlsclimabi.blob.core.windows.net`) and `*.europa.eu`, over https. |
 | Licence | CC BY 4.0. The registry website's footer links to the legal notice https://european-union.europa.eu/legal-notice_en, which says: "Unless otherwise indicated (e.g. in individual copyright notices), content owned by the EU on this website is licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence. This means that reuse is allowed, provided appropriate credit is given and changes are indicated. You may be required to clear additional rights if a specific content depicts identifiable private individuals or includes third-party works." The Commission's own legal notice, https://commission.europa.eu/legal-notice_en, has the same text. (checked 2026-09-24) |
 | Attribution | Every answer ends with `Source: European Commission, EU ETS Union Registry, CC BY 4.0, retrieved <date> (registry snapshot <date>). Changes: ...`; it says "derived" when the tool computed a number. Keep it when you reuse the numbers. |
-| Bundled snapshot | `data/`, retrieved 2026-09-24 18:30 UTC; [data/SOURCES.md](data/SOURCES.md) lists the file URLs, SHA-256 of the raw files, row counts and the changes made. `eu-ets refresh --write-snapshot data/` rebuilds it; the same input gives byte-identical files. |
+| Bundled snapshot | `data/`, retrieved 2026-09-24 18:58 UTC; [data/SOURCES.md](data/SOURCES.md) lists the file URLs, SHA-256 of the raw files, row counts and the changes made. `eu-ets refresh --write-snapshot data/` rebuilds it; the same input gives byte-identical files. |
 
 ### Units and definitions
 
@@ -236,7 +238,7 @@ So only these columns are kept:
 | `INSTALLATION_NAME` | Names the site; withheld when it may name a natural person (below) |
 | `ACTIVITY_TYPE_CODE`, `ACTIVITY_TYPE` | The sector |
 | `CITY` | Tells same-named installations apart; street address and postcode are not kept |
-| `ACCOUNT_HOLDER_LEI` | Identifies the company without naming anyone |
+| `ACCOUNT_HOLDER_LEI` | Identifies the account holder, usually a company; withheld where the holder may be a natural person (below), because GLEIF's public record of an LEI names its holder |
 | `YEAR_OF_FIRST_EMISSIONS`, `YEAR_OF_LAST_EMISSIONS`, `PERMIT_REVOCATION_DATE`, `SNAPSHOT_DATE` | Dates |
 | Yearly file: `VERIFIED_EMISSIONS`, `CH_VERIFIED_EMISSIONS`, `ALLOCATION`, `ALLOCATION_RES`, `ALLOCATION_TRA`, `EXCLUDED`, `SURR_ALL` | The figures |
 
@@ -247,9 +249,9 @@ Never read: the account label, the holder's address, postcode and city, account 
 installation's street address and postcode, the EPER id. There is no name search for companies;
 use the LEI or the installation name.
 
-**Withheld names.** This is the tool's own rule, not the source's. An installation name, with its
-city, is shown as `[name withheld: possible natural person]` for any of these reasons; the counts
-are for the snapshot of 2026-09-24:
+**Withheld names.** This is the tool's own rule, not the source's. An installation name is shown as
+`[name withheld: possible natural person]`, and its city and account-holder LEI are left out, for
+any of these reasons; the counts are for the snapshot of 2026-09-24:
 
 | Reason | Names |
 | --- | ---: |
@@ -267,10 +269,20 @@ the last word; partnership forms (KG, OHG, GbR, & Co, K/S) do not count as a com
 withholds some company names as well, such as shipping companies registered without a legal form,
 and it cannot promise to catch every personal name.
 
+**Withheld LEIs.** GLEIF's public record of an LEI names its holder, for a sole trader the person.
+So the LEI is withheld wherever the holder may be a natural person: with the name for 482
+installations, and for 246 installations whose name is shown but whose account holder's name shows
+no company form or organisation word (the same test as above). Answers flag them with
+`lei_withheld`; the snapshot writes `[LEI withheld: possible natural person]`. 4,506 LEIs remain.
+This rule also withholds the LEIs of some companies registered without a legal form.
+
 The test fixtures carry placeholders (Mustermann) in every personal field, and ten synthetic
-installations stand for sole traders, family partnerships and a company-named plant; the tests
-check that no placeholder reaches the cache, the snapshot or any output, and, by id only, that the
-installations a review of 2026-09-24 found to name persons are withheld in the shipped snapshot.
+installations stand for sole traders, family partnerships and a company-named plant; an eleventh
+is a heating plant whose holder has no company form. Two of them carry synthetic LEIs, one with a
+withheld name and one with a shown name. The tests check that neither a placeholder nor those LEIs
+reach the cache, the snapshot or any output, and, by id only, that the installations a review of
+2026-09-24 found to name persons are withheld in the shipped snapshot and that no withheld
+installation there carries an LEI.
 
 ## What it reads and what it sends
 
@@ -286,14 +298,16 @@ installations a review of 2026-09-24 found to name persons are withheld in the s
 ## Limits
 
 - The LEI is the one the **current** account holder registered. The registry does not validate it:
-  76 of the 5,234 LEI entries fail the ISO 17442 check digits. Earlier years of an installation may
-  belong to another operator.
+  66 of the 4,506 LEI entries kept fail the ISO 17442 check digits. Earlier years of an installation
+  may belong to another operator. The 728 withheld LEIs (see [Personal data](#personal-data)) are
+  left out, so `company_by_lei` does not find or count those installations.
 - Compliance codes exist only for the years whose file the listing offers (2021-2024 on 2026-09-24).
 - The latest year's surrenders are incomplete until 30 September of the following year.
 - A year counts as reported once it has verified emissions for at least half as many installations
   as the year before (this tool's rule). Until then answers default to the year before and flag the
   new year as incomplete.
-- 2,792 installation names are withheld (see [Personal data](#personal-data)); their figures are not.
+- 2,792 installation names are withheld, with their city and LEI (see [Personal data](#personal-data));
+  their figures are not.
 - Figures are the registry's; the tool adds only sums. It does not correct for scope changes
   between trading periods (the Commission's note: "As of 2013 data is not directly comparable to
   data of 2012 and before given the extended scope of the EU ETS in phase III").

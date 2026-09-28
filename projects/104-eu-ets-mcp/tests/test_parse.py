@@ -9,7 +9,7 @@ import zipfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _support import FILES, FIXTURES, PLACEHOLDERS, WITHHELD_LEI, eu_ets, gz  # noqa: E402
+from _support import FILES, FIXTURES, HOLDER_LEI, PLACEHOLDERS, WITHHELD_LEI, eu_ets, gz  # noqa: E402
 
 
 def operators():
@@ -21,7 +21,7 @@ class Operators(unittest.TestCase):
     def test_counts_and_malformed_rows(self):
         rows, st = operators()
         d = st.as_dict()
-        self.assertEqual((d["rows_read"], d["rows_kept"], d["malformed_rows"], d["duplicate_rows"]), (29, 25, 3, 1))
+        self.assertEqual((d["rows_read"], d["rows_kept"], d["malformed_rows"], d["duplicate_rows"]), (30, 26, 3, 1))
         self.assertEqual(d["rows_with_undecodable_bytes"], 1)
         self.assertIn("5 fields, expected 28", d["malformed_examples"][0])
 
@@ -29,7 +29,7 @@ class Operators(unittest.TestCase):
         rows, _ = operators()
         self.assertEqual(set(rows[0]), {"registry", "registry_name", "installation_id", "name", "name_withheld",
                                         "permit_id", "activity_code", "activity", "city", "lei", "lei_registered",
-                                        "lei_ok", "first_year", "last_year", "permit_revoked"})
+                                        "lei_ok", "lei_withheld", "first_year", "last_year", "permit_revoked"})
         blob = json.dumps(rows, ensure_ascii=False)
         for p in PLACEHOLDERS:
             self.assertNotIn(p, blob)
@@ -46,9 +46,9 @@ class Operators(unittest.TestCase):
         rows, st = operators()
         by = {(r["registry"], r["installation_id"]): r for r in rows}
         sole = by[("DE", 990001)]
-        self.assertEqual((sole["name_withheld"], sole["lei"], sole["lei_registered"], sole["lei_ok"]), (1, None, None, None))
-        self.assertEqual(st.as_dict()["leis_withheld"], 1)
-        self.assertEqual(by[("AT", 16)]["lei"], "529900FGOWZKLBZ81V67")  # a shown name keeps its LEI
+        self.assertEqual((sole["name_withheld"], sole["lei"], sole["lei_registered"], sole["lei_ok"], sole["lei_withheld"]),
+                         (1, None, None, None, 1))
+        self.assertEqual(st.as_dict()["leis_withheld_by_reason"]["name withheld"], 1)
         self.assertFalse(any(r["lei"] for r in rows if r["name_withheld"]))
         # A snapshot written before this rule could still pair the two; reading it drops the LEI too.
         head = ",".join(eu_ets.OPERATOR_COLUMNS)
@@ -61,6 +61,29 @@ class Operators(unittest.TestCase):
             st = eu_ets.Stats("snapshot")
             (r,) = eu_ets.read_operators(path, st, source="snapshot")
         self.assertEqual((r["name_withheld"], r["lei"], r["lei_registered"], st.leis_withheld), (1, None, None, 1))
+
+    def test_an_lei_is_withheld_where_the_holder_may_be_a_natural_person(self):
+        # Second review, second finding: a shown name whose holder shows no company form or
+        # organisation word keeps its name and city but not the LEI, whose GLEIF record names the holder.
+        rows, st = operators()
+        by = {(r["registry"], r["installation_id"]): r for r in rows}
+        plant = by[("DE", 990011)]
+        self.assertEqual((plant["name"], plant["city"], plant["name_withheld"]), ("Heizwerk Nord", "Kassel", 0))
+        self.assertEqual((plant["lei"], plant["lei_registered"], plant["lei_ok"], plant["lei_withheld"]), (None, None, None, 1))
+        self.assertEqual(st.as_dict()["leis_withheld_by_reason"],
+                         {"name withheld": 1, "holder shows no company form or organisation word": 1})
+        steel = by[("AT", 16)]  # the holder is a GmbH: the LEI stays
+        self.assertEqual((steel["lei"], steel["lei_withheld"]), ("529900FGOWZKLBZ81V67", 0))
+        self.assertNotIn(HOLDER_LEI, json.dumps(rows))
+        # The snapshot keeps a marker, so a cache built from it knows the LEI is withheld, not missing.
+        row = {c: "" for c in eu_ets.OPERATOR_COLUMNS}
+        row.update(REGISTRY_CODE="DE", REGISTRY_NAME="Germany", INSTALLATION_IDENTIFIER="990011",
+                   INSTALLATION_NAME="Heizwerk Nord", ACTIVITY_TYPE_CODE="20", ACCOUNT_HOLDER_LEI=eu_ets.LEI_WITHHELD)
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "installations.csv.gz"
+            path.write_bytes(gz(",".join(eu_ets.OPERATOR_COLUMNS) + "\n" + ",".join(row.values()) + "\n"))
+            (r,) = eu_ets.read_operators(path, eu_ets.Stats("snapshot"), source="snapshot")
+        self.assertEqual((r["name"], r["lei"], r["lei_registered"], r["lei_withheld"]), ("Heizwerk Nord", None, None, 1))
 
     def test_control_and_bidi_characters_are_stripped(self):
         rows, _ = operators()

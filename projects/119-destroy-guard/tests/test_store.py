@@ -3,6 +3,7 @@ import datetime as dt
 import json
 import os
 import sys
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -93,6 +94,16 @@ class Matching(Isolated):
         (d / "manifest.json").write_text(json.dumps(m))
         self.assertEqual(self.status()["status"], "missing")
 
+    def test_an_empty_export_is_not_a_backup(self):
+        # the CLI never keeps an empty export; a manifest that lists one was made some other way
+        self.write_backup([self.target], files={"terraform.tfstate": b""})
+        self.assertEqual(self.status()["status"], "missing")
+        d = self.write_backup([self.target])
+        m = json.loads((d / "manifest.json").read_text())
+        m["exports"][0]["bytes"] = True  # a bool is an int in Python, and still no size
+        (d / "manifest.json").write_text(json.dumps(m))
+        self.assertEqual(self.status()["status"], "missing")
+
     def test_oversized_manifest_is_not_read(self):
         d = self.write_backup([self.target])
         with open(d / "manifest.json", "ab") as f:
@@ -167,6 +178,31 @@ class Evaluate(Isolated):
         text = dg.reason(dg.evaluate(cmd, "bash", str(self.project)), str(self.project))
         self.assertLessEqual(len(text), dg.MAX_REASON)
         self.assertNotIn("\n", text)
+
+    def test_many_operations_read_the_store_once(self):
+        # the store is never pruned; a line with many operations must still finish well within the timeout
+        self.kubeconfig()
+        root = self.project / ".destroy-guard" / "backups"
+        for i in range(dg.MAX_MANIFESTS):
+            self.write_backup([{"tool": "kubectl", "name": f"old-{i}"}], created=minutes_ago(90 + i),
+                              name=f"{(dg.now_utc() - dt.timedelta(minutes=90 + i)).strftime('%Y%m%dT%H%M%SZ')}-{i:012x}")
+        self.assertEqual(len(list(root.iterdir())), dg.MAX_MANIFESTS)
+        cmd = " && ".join(f"kubectl delete pod p{i} -n prod" for i in range(200))
+        real, reads = dg.load_manifest, []
+        with mock.patch.object(dg, "load_manifest", side_effect=lambda d: reads.append(d) or real(d)):
+            start = time.monotonic()
+            results = dg.evaluate(cmd, "bash", str(self.project))
+            elapsed = time.monotonic() - start
+        self.assertEqual(len(results), 200)
+        self.assertEqual(len(reads), dg.MAX_MANIFESTS)  # each manifest once, not once per operation
+        self.assertLess(elapsed, 5)
+
+    def test_reason_keeps_spaces_inside_paths(self):
+        d = self.project / "two  spaces"
+        d.mkdir()
+        text = dg.reason(dg.evaluate("cd 'two  spaces' && terraform destroy", "bash", str(self.project)),
+                         str(self.project))
+        self.assertIn(f"--cwd '{d}'", text)
 
     def test_fmt_age(self):
         self.assertEqual([dg.fmt_age(dt.timedelta(seconds=s)) for s in (-5, 42, 600, 7500, 200000)],
