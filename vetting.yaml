@@ -109,6 +109,7 @@ declined_repos:
   chen.media video-watching skill:  "NOT VETTED. Guide sits behind an email form; not submitted. The method (ffmpeg frames, timestamped contact sheets, yt-dlp) is buildable here with installed ffmpeg if wanted (2026-09-28)"
   semantic-cache MCP:               "NOT FOUND. Only CoderDayton/semantic-cache-mcp at 2 stars; nothing credible to vet (2026-09-28)"
   mmccaff/PlacesToPostYourStartup:  "REFERENCE, not a tool. CC0 list of about 100 launch sites; posting is Kerem's call per site (2026-09-28)"
+  OHF-Voice/piper1-gpl:            "INSTALL NOW, installed 2026-09-29 for the Roblox audio chat: piper-tts 1.8.0 in ~/agents/vendor/piper/.venv, GPL-3.0-or-later engine kept out of every repo; voice en_US-ljspeech-high from rhasspy/piper-voices, model card says trained from scratch on public-domain LJ Speech. Offline synthesis verified (2.9 s line, 22,050 Hz). Kokoro-82M passed over by the requester: part of its training audio came from closed providers' models (2026-09-29)"
 
 vetted_repos:
   upstash/context7:                "INSTALL NOW, incumbent kept. MCP over HTTP, MIT, 62,263 stars. Proved live by protocol: serverInfo Context7 4.1.1, protocolVersion 2025-06-18, 2 tools totalling 4,937 chars; the tools are deferred, so the resident cost is one index line. Zero invocations across every local transcript, so it is on notice: re-check 2026-12-21 and remove if still zero (2026-09-21)"
