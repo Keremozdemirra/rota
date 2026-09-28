@@ -90,6 +90,26 @@ declined_repos:
 #     so a later pass does not re-derive a verdict that already has evidence.
 #     scout.py reads declined_repos alone, so a line here does not suppress a
 #     re-proposal; it records the reason the proposal will meet.
+  musistudio/claude-code-router:    "DECLINE. A local proxy set as ANTHROPIC_BASE_URL that can swap the model to another provider: the subscription-routing red line. On Max it saves money only for API users, no tokens (2026-09-28)"
+  mksglu/context-mode:              "DECLINE. Elastic License 2.0, hooks on six lifecycle events, stores tool arguments in SQLite; rtk plus ltm.py already do both halves as audited pieces. 98% reduction asserted, not measured (2026-09-28)"
+  tirth8205/code-review-graph:      "COVERED by graphify. MIT, local; adds diff-aware impact radius and a measured tiktoken calibration, not enough for a second graph MCP with a SessionStart hook (2026-09-28)"
+  Madhan230205/token-reducer:       "DECLINE. 47 stars, prompt hook, same local-embedding RAG as ltm.py; 98.9% claim self-run on its own repo (2026-09-28)"
+  zilliztech/claude-context:        "DECLINE. Default path sends code embeddings to OpenAI and Zilliz Cloud with keys; the local path (Ollama plus self-hosted Milvus) duplicates graphify and ltm.py (2026-09-28)"
+  drona23/claude-token-efficient:   "COVERED. A terse-output CLAUDE.md snippet; global CLAUDE.md section 2 already says it. Its own benchmark is labelled directional, 5 prompts (2026-09-28)"
+  alexgreensh/token-optimizer:      "DECLINE. PolyForm Noncommercial and the studio earns money; hooks on eleven events; overlaps rtk, claude-hud and ccusage. Best-measured of the batch, noted for a licence change (2026-09-28)"
+  toon-format/toon:                 "NOT APPLICABLE. MIT format for JSON you serialise into your own prompts; a Claude Code session has no such payload. Revisit if an MCP server of ours emits large JSON (2026-09-28)"
+  microsoft/LLMLingua:              "NOT APPLICABLE. MIT library that compresses prompts you assemble in code; no hook point inside a Claude Code session (2026-09-28)"
+  yamadashy/repomix:                "DECLINE. Packs a whole repo into one file, the opposite of reading less (2026-09-28)"
+  oraios/serena:                    "DECLINE for now. GPL-3.0 app plus MIT SolidLSP, local MCP with per-language LSP daemons; symbol-level reads are real but the tool definitions load every session and most work here is sites and scripts where Grep, rtk and graphify suffice. Reopen on a large-codebase task with a measured A/B (2026-09-28)"
+  JayPokale/Chisle:                 "DECLINE. curl|bash installer and four always-on hooks rewriting output, the caveman/headroom category (2026-09-28)"
+  reticlehq/reticle:                "DECLINE for now. Runnable server is FSL-1.1 (source-available), init edits build config and registers an MCP. Runtime proof-of-done is new; reopen with a named target app (2026-09-28)"
+  ibelick/ui-skills:                "COVERED by impeccable, de-ai-slop-ui and emil-design-eng; the MCP route is a hosted third-party server (2026-09-28)"
+  dmmulroy/anti-slop:               "PER-PROJECT OPTION, not harness. MIT Oxlint plugin vendored into one TS/JS repo; no network, no authority. Add inside a TS repo when that repo's chat asks (2026-09-28)"
+  openseo.so:                       "DECLINE. Hosted, account and usage billing; data to DataForSEO, AI features relay through OpenRouter/OpenAI, PostHog analytics. The link Kerem received carries an mcp_token; not opened (2026-09-28)"
+  chen.media video-watching skill:  "NOT VETTED. Guide sits behind an email form; not submitted. The method (ffmpeg frames, timestamped contact sheets, yt-dlp) is buildable here with installed ffmpeg if wanted (2026-09-28)"
+  semantic-cache MCP:               "NOT FOUND. Only CoderDayton/semantic-cache-mcp at 2 stars; nothing credible to vet (2026-09-28)"
+  mmccaff/PlacesToPostYourStartup:  "REFERENCE, not a tool. CC0 list of about 100 launch sites; posting is Kerem's call per site (2026-09-28)"
+
 vetted_repos:
   upstash/context7:                "INSTALL NOW, incumbent kept. MCP over HTTP, MIT, 62,263 stars. Proved live by protocol: serverInfo Context7 4.1.1, protocolVersion 2025-06-18, 2 tools totalling 4,937 chars; the tools are deferred, so the resident cost is one index line. Zero invocations across every local transcript, so it is on notice: re-check 2026-12-21 and remove if still zero (2026-09-21)"
   DeusData/codebase-memory-mcp:    "INSTALL AFTER. MIT, 43,930 stars, pushed the same day; install.sh verifies SHA-256 against a size-bounded checksums.txt, releases carry sigstore bundles and SLSA L3 provenance, and code search confirms no phone-home under src/ or internal/. It attacks the 97.700% cache-read row by displacing grep and read cycles. Held back because it starts a per-account coordination daemon with no opt-in; install with --skip-config after the running workflows end (2026-09-21)"
